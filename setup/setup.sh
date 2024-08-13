@@ -15,9 +15,9 @@ export APT_LISTCHANGES_FRONTEND=none
 # Протестировано на Debian 10 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на Debian 10
+# 1. Устанавливать только на чистую Debian 10
 # 2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
-# 3. Загрузить из архива папку setup на сервер в папку root по SFTP (например через программу FileZilla)
+# 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
 # chmod +x setup/setup.sh && setup/setup.sh
 # 5. Скопировать файл antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
