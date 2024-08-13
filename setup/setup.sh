@@ -37,12 +37,6 @@ pip3 install dnslib
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
-# debootstrap does not use these repositories by default.
-# Add them manually and update the system to make sure all the packets are up-to-date
-echo 'deb http://deb.debian.org/debian buster-updates main' >> /etc/apt/sources.list
-echo 'deb http://security.debian.org/debian-security buster/updates main' >> /etc/apt/sources.list
-
-#
 # Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
 cd /tmp
 curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver-release.deb
