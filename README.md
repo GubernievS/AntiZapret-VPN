@@ -18,6 +18,9 @@ chmod +x setup/setup.sh && setup/setup.sh
 ```
 5. Скопировать файл antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
 ***
+Обсуждение скрипта\
+https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
+***
 ### Обновления с AntiZapret-VPN-Container
 Для обновления с версии AntiZapret-VPN-Container надо создать бекап ключей и настроек подключения, в консоли под root выполнить команды:
 ```sh
