@@ -57,6 +57,7 @@ rm /var/lib/apt/lists/* || true
 
 #
 # Копируем нужные файлы
+find /root/setup -name '*.gitkeep' -delete
 cp -r /root/setup/* / 
 rm -r /root/setup
 
