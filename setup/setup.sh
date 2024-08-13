@@ -15,7 +15,7 @@ export APT_LISTCHANGES_FRONTEND=none
 # Протестировано на Debian 10 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на чистую Debian 10
+# 1. Устанавливать только на чистую Ubuntu 20.04 или Debian 10 (Внимание! Debian 10 уже устаревшая и возможно не безопасная, тк обновления безопасности прекращены с 30 июня 2022 года)
 # 2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
 # 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
@@ -46,7 +46,7 @@ apt -o Dpkg::Options::="--force-confold" -y full-upgrade
 
 #
 # Clean package cache and remove the lists
-apt clean
+apt autoremove -y && apt clean
 rm /var/lib/apt/lists/* || true
 
 #
