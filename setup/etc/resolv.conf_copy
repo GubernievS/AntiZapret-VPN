@@ -1,0 +1,5 @@
+# knot-resolver starts for quite some time, unfortunately we can't use localhost here
+# without modifying systemd-network-wait-online and similar hacks
+
+nameserver 8.8.8.8
+nameserver 9.9.9.9

@@ -1,0 +1,11 @@
+[Unit]
+Description=antizapret-vpn update
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/root/antizapret
+ExecStart=/root/antizapret/doall.sh
+
+[Install]
+WantedBy=multi-user.target
