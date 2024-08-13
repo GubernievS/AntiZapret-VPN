@@ -9,7 +9,7 @@ export APT_LISTCHANGES_FRONTEND=none
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 13.08.2024
+# Версия от 14.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Debian 10 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
@@ -20,7 +20,7 @@ export APT_LISTCHANGES_FRONTEND=none
 # 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
 # chmod +x setup/setup.sh && setup/setup.sh
-# 5. Скопировать файл antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
+# 5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
 #
 
 #
