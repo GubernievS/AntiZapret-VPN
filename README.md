@@ -28,5 +28,5 @@ sudo lxc file pull -r -p antizapret-vpn/etc/openvpn/server/keys backup/etc/openv
 sudo lxc file pull -r -p antizapret-vpn/root/easy-rsa-ipsec/easyrsa3/pki backup/root/easy-rsa-ipsec/easyrsa3
 sudo lxc file pull -r -p antizapret-vpn/root/easy-rsa-ipsec/CLIENT_KEY backup/root/easy-rsa-ipsec
 ```
-В папке root/backup будут лежат файлы для переноса ключей и настроек подключения, содержимое нужно сохранить на локальном компьютере и перенести на новый сервер в папку setup до запуска установки
+В папке root/backup будут лежат файлы для переноса ключей и настроек подключения, содержимое нужно сохранить на локальном компьютере и перенести на новый сервер в папку setup до запуска установки\
 В файлах ovpn в строке remote нужно изменить IP адрес на адрес нового сервера, если вы обновляете тот же сервер то обновлять IP адрес не нужно
