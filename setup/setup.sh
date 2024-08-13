@@ -74,7 +74,7 @@ mv /etc/resolv.conf_copy /etc/resolv.conf
 
 #
 # Обновляем process.sh в antizapret
-mv -f antizapret-process.sh antizapret/process.sh
+mv -f /root/antizapret-process.sh /root/antizapret/process.sh
 
 #
 # Run all needed service on boot
