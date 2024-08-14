@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 14.08.2024
+# Версия от 15.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Ubuntu 20.04 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
@@ -130,6 +130,7 @@ strava.com
 adguard-vpn.com
 signal.org
 intel.com
+nordvpn.com
 tor.eff.org
 news.google.com
 play.google.com
