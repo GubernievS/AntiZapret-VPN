@@ -108,6 +108,7 @@ digitalocean.com
 strava.com
 adguard-vpn.com
 signal.org
+intel.com
 tor.eff.org
 news.google.com
 play.google.com
