@@ -115,8 +115,9 @@ systemctl enable openvpn-server@antizapret
 systemctl enable openvpn-server@antizapret-tcp
 
 #
-# Добавляем свои адреса в исключения и адреса из https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
-echo "youtube.com
+# Добавляем свои адреса в исключения и адреса из:
+# Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
+# Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txtecho "youtube.com
 googlevideo.com
 ytimg.com
 ggpht.com
