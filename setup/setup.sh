@@ -1,8 +1,5 @@
 #!/bin/bash
 set -e
-export DEBIAN_FRONTEND=noninteractive
-export APT_LISTCHANGES_FRONTEND=none
-
 #
 # Скрипт для автоматического развертывания AntiZapret VPN
 # + Разблокирован YouTube и часть сайтов блокируемых без решения суда
@@ -21,6 +18,35 @@ export APT_LISTCHANGES_FRONTEND=none
 # 4. В консоли под root выполнить:
 # chmod +x setup/setup.sh && setup/setup.sh
 # 5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
+#
+# Обсуждение скрипта
+# https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
+#
+# Команды для настройки антизапрета
+#
+# Изменить файл с личным списком антизапрета include-hosts-custom.txt
+# nano /root/antizapret/config/include-hosts-custom.txt
+# Потом выполните команду для обновления списка антизапрета
+# /root/antizapret/doall.sh
+#
+# Изменить конфигурацию OpenVpn сервера с UDP
+# nano /etc/openvpn/server/antizapret.conf
+# Потом перезапустить OpenVpn сервер
+# service openvpn restart
+#
+# Изменить конфигурацию OpenVpn сервера с TCP
+# nano /etc/openvpn/server/antizapret-tcp.conf
+# Потом перезапустить OpenVpn сервер
+# service openvpn-tcp restart
+#
+# Посмотреть статистику подключений OpenVpn c UDP (выход Ctrl+X)
+# nano /etc/openvpn/server/logs/status.log -v
+#
+# Посмотреть статистику подключений OpenVpn c TCP (выход Ctrl+X)
+# nano /etc/openvpn/server/logs/status-tcp.log -v
+#
+# Для отключения подключений к OpenVpn по TCP выполните команду
+# systemctl disable openvpn-server@antizapret-tcp
 #
 
 #
