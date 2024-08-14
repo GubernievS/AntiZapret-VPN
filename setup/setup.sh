@@ -15,7 +15,7 @@ export APT_LISTCHANGES_FRONTEND=none
 # Протестировано на Debian 10 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на чистую Debian 10 (Внимание! Debian 10 уже устаревшая и возможно не безопасная, тк обновления безопасности прекращены с 30 июня 2022 года)
+# 1. Устанавливать только на чистую Ubuntu 20.04
 # 2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
 # 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
@@ -29,12 +29,21 @@ apt update && apt upgrade -y && apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt install bash ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-pip socat -y
+apt install bash ipcalc sipcalc idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-pip socat -y
 pip3 install dnslib
 
 #
 # Обновляем antizapret до последней версии из репозитория
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
+
+#
+# Ставим gawk 4.2.1 для правильной обработки .awk файла
+# Новые версии gawk >= 5 не правильно обрабатывают .awk файл
+apt install libsigsegv2
+cd /tmp
+curl http://launchpadlibrarian.net/440383450/gawk_4.2.1+dfsg-1.1build1_amd64.deb -o gawk.deb
+dpkg -i gawk.deb
+sudo apt-mark hold gawk
 
 #
 # Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
@@ -47,7 +56,8 @@ apt -o Dpkg::Options::="--force-confold" -y full-upgrade
 #
 # Clean package cache and remove the lists
 apt autoremove -y && apt clean
-rm /var/lib/apt/lists/* || true
+rm -f /var/lib/apt/lists/* || true
+rm -f /tmp/* || true
 
 #
 # Копируем нужные файлы
