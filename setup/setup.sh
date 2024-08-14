@@ -83,6 +83,7 @@ mv -f /root/antizapret-process.sh /root/antizapret/process.sh
 
 #
 # Run all needed service on boot
+systemctl unmask systemd-networkd.service
 systemctl enable systemd-networkd
 systemctl enable kresd@1
 systemctl enable antizapret-update.service
