@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+export DEBIAN_FRONTEND=noninteractive
 #
 # Скрипт для автоматического развертывания AntiZapret VPN
 # + Разблокирован YouTube и часть сайтов блокируемых без решения суда
@@ -9,7 +10,7 @@ set -e
 # Версия от 14.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
-# Протестировано на Debian 10 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
+# Протестировано на Ubuntu 20.04 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
 # 1. Устанавливать только на чистую Ubuntu 20.04
@@ -51,32 +52,26 @@ set -e
 
 #
 # Обновляем систему
-apt update && apt upgrade -y && apt autoremove -y
+apt update -y && apt upgrade -y && apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt install bash ipcalc sipcalc idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-pip socat -y
-pip3 install dnslib
+apt install -y ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-dnslib
 
 #
 # Обновляем antizapret до последней версии из репозитория
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
-# Ставим gawk 4.2.1 для правильной обработки .awk файла
-# Новые версии gawk >= 5 не правильно обрабатывают .awk файл
-apt install libsigsegv2
-cd /tmp
-curl http://launchpadlibrarian.net/440383450/gawk_4.2.1+dfsg-1.1build1_amd64.deb -o gawk.deb
-dpkg -i gawk.deb
-sudo apt-mark hold gawk
+# Исправляем шаблон для корректной работы gawk начиная с версии 5
+sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
 # Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
 cd /tmp
 curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver-release.deb
 dpkg -i knot-resolver-release.deb
-apt update
+apt update -y
 apt -o Dpkg::Options::="--force-confold" -y full-upgrade
 
 #
@@ -121,7 +116,7 @@ systemctl enable openvpn-server@antizapret-tcp
 
 #
 # Добавляем свои адреса в исключения и адреса из https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
-sh -c "echo 'youtube.com
+echo "youtube.com
 googlevideo.com
 ytimg.com
 ggpht.com
@@ -160,16 +155,20 @@ linktr.ee
 is.gd
 anicult.org
 12putinu.net
-padlet.com' > /root/antizapret/config/include-hosts-custom.txt"
+padlet.com
+tlsext.com" > /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Удаляем исключения из исключений
-sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
+echo "" > /root/antizapret/config/exclude-hosts-dist.txt
+#sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
 # Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
-sh -c "echo \"\npolicy.add(policy.all(policy.FORWARD({'94.140.14.14'})))\npolicy.add(policy.all(policy.FORWARD({'94.140.15.15'})))\" >> /etc/knot-resolver/kresd.conf"
+echo "
+policy.add(policy.all(policy.FORWARD({'94.140.14.14'})))
+policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 
 #
 # Перезагружаем
