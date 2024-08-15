@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 15.08.2024
+# Версия от 15.08.2024 fix
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Ubuntu 20.04 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
@@ -18,7 +18,7 @@ export DEBIAN_FRONTEND=noninteractive
 # 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
 # chmod +x setup/setup.sh && setup/setup.sh
-# 5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /root/easy-rsa-ipsec/CLIENT_KEY
+# 5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
 #
 # Обсуждение скрипта
 # https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
@@ -56,7 +56,7 @@ apt update -y && apt upgrade -y && apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt install -y ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-dnslib
+apt install -y --allow-unauthenticated ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-dnslib
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -67,12 +67,17 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
+# Скачиваем Easy-RSA 3
+curl -L https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.0/EasyRSA-3.2.0.tgz | tar -xz
+mv /root/EasyRSA-3.2.0/ /root/easyrsa3/
+
+#
 # Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
 cd /tmp
-curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver-release.deb
-dpkg -i knot-resolver-release.deb
-apt update -y
-apt -o Dpkg::Options::="--force-confold" -y full-upgrade
+curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver.deb
+dpkg -i knot-resolver.deb
+apt update -y --allow-insecure-repositories
+apt -o Dpkg::Options::="--force-confold" -y full-upgrade --allow-unauthenticated
 
 #
 # Clean package cache and remove the lists
@@ -90,7 +95,7 @@ rm -r /root/setup
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
-chmod +x /root/easy-rsa-ipsec/easyrsa3/easyrsa
+chmod +x /root/easyrsa3/easyrsa
 
 #
 # systemd-nspawn, which is used in mkosi, will by default mount (or copy?)
@@ -178,4 +183,4 @@ policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/
 reboot
 
 #
-# Забираем ovpn файлы подключений из /root/easy-rsa-ipsec/CLIENT_KEY
+# Забираем ovpn файлы подключений из /etc/openvpn/client

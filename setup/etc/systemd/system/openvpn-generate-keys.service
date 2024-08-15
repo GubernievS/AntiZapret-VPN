@@ -5,8 +5,8 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-WorkingDirectory=/root/easy-rsa-ipsec/
-ExecStart=/root/easy-rsa-ipsec/generate.sh
+WorkingDirectory=/root/
+ExecStart=/root/generate.sh
 
 [Install]
 WantedBy=multi-user.target
