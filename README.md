@@ -20,13 +20,3 @@ chmod +x setup/setup.sh && setup/setup.sh
 ***
 Обсуждение скрипта\
 https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
-***
-### Обновления с AntiZapret-VPN-Container
-Для обновления с версии AntiZapret-VPN-Container надо создать бекап ключей и настроек подключения, в консоли под root выполнить команды:
-```sh
-sudo lxc file pull -r -p antizapret-vpn/etc/openvpn/server/keys backup/etc/openvpn/server
-sudo lxc file pull -r -p antizapret-vpn/root/easy-rsa-ipsec/easyrsa3/pki backup/root/easy-rsa-ipsec/easyrsa3
-sudo lxc file pull -r -p antizapret-vpn/root/easy-rsa-ipsec/CLIENT_KEY backup/root/easy-rsa-ipsec
-```
-В папке root/backup будут лежат файлы для переноса ключей и настроек подключения, содержимое этой папки нужно сохранить на локальном компьютере и перенести на новый сервер в папку setup до запуска установки\
-В файлах ovpn в строке remote нужно изменить IP адрес на адрес нового сервера, если вы обновляете тот же сервер то обновлять IP адрес не нужно
