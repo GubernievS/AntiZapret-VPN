@@ -104,10 +104,6 @@ umount /etc/resolv.conf || true
 mv /etc/resolv.conf_copy /etc/resolv.conf
 
 #
-# Обновляем process.sh в antizapret
-mv -f /root/antizapret-process.sh /root/antizapret/process.sh
-
-#
 # Run all needed service on boot
 systemctl unmask systemd-networkd.service
 systemctl enable systemd-networkd
