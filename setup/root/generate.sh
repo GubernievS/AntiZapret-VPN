@@ -44,7 +44,7 @@ load_key() {
 }
 
 build_pki() {
-	rm -rf ./pki/
+    rm -rf ./pki/
     ./easyrsa init-pki
     EASYRSA_BATCH=1 EASYRSA_REQ_CN="AntiZapret CA" ./easyrsa build-ca nopass
     EASYRSA_BATCH=1 ./easyrsa build-server-full "antizapret-server" nopass nodatetime
@@ -54,8 +54,7 @@ build_pki() {
 copy_keys() {
     cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
     cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-	cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-
+    cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
     cp ./pki/issued/antizapret-client.crt /etc/openvpn/client/keys/antizapret-client.crt
     cp ./pki/private/antizapret-client.key /etc/openvpn/client/keys/antizapret-client.key
 }
@@ -67,7 +66,7 @@ if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
    [[ ! -f /etc/openvpn/client/keys/antizapret-client.crt ]] || \
    [[ ! -f  /etc/openvpn/client/keys/antizapret-client.key ]]
 then
-	build_pki
+    build_pki
     copy_keys
 fi
 
