@@ -7,13 +7,13 @@ export DEBIAN_FRONTEND=noninteractive
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 15.08.2024 fix
+# Версия от 16.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
-# Протестировано на Ubuntu 20.04 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
+# Протестировано на Ubuntu 20.04/Ubuntu 22.04/Debian 11 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на чистую Ubuntu 20.04
+# 1. Устанавливать только на чистую Ubuntu 20.04/Ubuntu 22.04/Debian 11
 # 2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
 # 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
 # 4. В консоли под root выполнить:
@@ -104,6 +104,10 @@ umount /etc/resolv.conf || true
 mv /etc/resolv.conf_copy /etc/resolv.conf
 
 #
+# Генерируем ключи и создаем ovpn файлы подключений в /etc/openvpn/client
+/root/generate.sh
+
+#
 # Run all needed service on boot
 systemctl unmask systemd-networkd.service
 systemctl enable systemd-networkd
@@ -111,7 +115,6 @@ systemctl enable kresd@1
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
 systemctl enable dnsmap
-systemctl enable openvpn-generate-keys
 systemctl enable openvpn-server@antizapret
 systemctl enable openvpn-server@antizapret-tcp
 
@@ -177,6 +180,3 @@ policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/
 #
 # Перезагружаем
 reboot
-
-#
-# Забираем ovpn файлы подключений из /etc/openvpn/client
