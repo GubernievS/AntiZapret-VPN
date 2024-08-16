@@ -14,10 +14,9 @@ do
     [[ "$?" == "0" ]] && break
     sleep 2
 done
-[[ ! "$SERVER" ]] && echo "Can't determine global IP address!" && exit 8
+[[ ! "$SERVER" ]] && echo "Can't determine global IP address!" && exit
 
 set -e
-
 
 render() {
     local IFS=''
@@ -38,8 +37,8 @@ load_key() {
     CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/antizapret-client.key")
     if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ]
     then
-            echo "Can't load client keys!"
-            exit 7
+        echo "Can't load client keys!"
+        exit
     fi
 }
 
@@ -59,12 +58,11 @@ copy_keys() {
     cp ./pki/private/antizapret-client.key /etc/openvpn/client/keys/antizapret-client.key
 }
 
-
 if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
    [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-   [[ ! -f  /etc/openvpn/server/keys/antizapret-server.key ]] || \
+   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
    [[ ! -f /etc/openvpn/client/keys/antizapret-client.crt ]] || \
-   [[ ! -f  /etc/openvpn/client/keys/antizapret-client.key ]]
+   [[ ! -f /etc/openvpn/client/keys/antizapret-client.key ]]
 then
     build_pki
     copy_keys
