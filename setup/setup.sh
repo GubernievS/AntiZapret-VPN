@@ -49,6 +49,8 @@ export DEBIAN_FRONTEND=noninteractive
 # Для отключения подключений к OpenVpn по TCP выполните команду
 # systemctl disable openvpn-server@antizapret-tcp
 #
+# Для добавления нового пользователя выполните команду и введите имя
+# /root/add-client.sh
 
 #
 # Обновляем систему
