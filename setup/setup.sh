@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-export DEBIAN_FRONTEND=noninteractive
 #
 # Скрипт для автоматического развертывания AntiZapret VPN
 # + Разблокирован YouTube и часть сайтов блокируемых без решения суда
@@ -54,11 +52,11 @@ export DEBIAN_FRONTEND=noninteractive
 
 #
 # Обновляем систему
-apt update -y && apt upgrade -y && apt autoremove -y
+apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt install -y --allow-unauthenticated ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-dnslib
+apt-get install gawk openvpn knot-resolver python3-dnslib idn sipcalc
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -69,41 +67,15 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
-# Скачиваем Easy-RSA 3
-curl -L https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.0/EasyRSA-3.2.0.tgz | tar -xz
-mv /root/EasyRSA-3.2.0/ /root/easyrsa3/
-
-#
-# Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
-cd /tmp
-curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver.deb
-dpkg -i knot-resolver.deb
-apt update -y --allow-insecure-repositories
-apt -o Dpkg::Options::="--force-confold" -y full-upgrade --allow-unauthenticated
-
-#
-# Clean package cache and remove the lists
-apt autoremove -y && apt clean
-rm -f /var/lib/apt/lists/* || true
-rm -f /tmp/* || true
-
-#
 # Копируем нужные файлы
-find /root/setup -name '*.gitkeep' -delete
 cp -r /root/setup/* / 
+mkdir /root/easyrsa3
 rm -r /root/setup
 
 #
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
-chmod +x /root/easyrsa3/easyrsa
-
-#
-# systemd-nspawn, which is used in mkosi, will by default mount (or copy?)
-# host resolv.conf. We don't need that.
-umount /etc/resolv.conf || true
-mv /etc/resolv.conf_copy /etc/resolv.conf
 
 #
 # Генерируем ключи и создаем ovpn файлы подключений в /etc/openvpn/client
