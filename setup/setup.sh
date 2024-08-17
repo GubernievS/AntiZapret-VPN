@@ -56,7 +56,7 @@ apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt-get install gawk openvpn knot-resolver python3-dnslib idn sipcalc
+apt-get install -y gawk openvpn knot-resolver python3-dnslib idn sipcalc
 
 #
 # Обновляем antizapret до последней версии из репозитория
