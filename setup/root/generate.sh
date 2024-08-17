@@ -44,10 +44,10 @@ load_key() {
 
 build_pki() {
     rm -rf ./pki/
-    ./easyrsa init-pki
-    EASYRSA_BATCH=1 EASYRSA_REQ_CN="AntiZapret CA" ./easyrsa build-ca nopass
-    EASYRSA_BATCH=1 ./easyrsa build-server-full "antizapret-server" nopass nodatetime
-    EASYRSA_BATCH=1 ./easyrsa build-client-full "antizapret-client" nopass nodatetime
+    /usr/share/easy-rsa/easyrsa init-pki
+    EASYRSA_BATCH=1 EASYRSA_REQ_CN="AntiZapret CA" /usr/share/easy-rsa/easyrsa build-ca nopass
+    EASYRSA_BATCH=1 /usr/share/easy-rsa/easyrsa build-server-full "antizapret-server" nopass nodatetime
+    EASYRSA_BATCH=1 /usr/share/easy-rsa/easyrsa build-client-full "antizapret-client" nopass nodatetime
 }
 
 copy_keys() {
