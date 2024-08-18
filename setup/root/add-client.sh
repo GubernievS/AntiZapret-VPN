@@ -44,7 +44,8 @@ load_key() {
     CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
     CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT.crt")
     CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/$CLIENT.key")
-    if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ]
+    TLS_CRYPT=$(cat -- "/etc/openvpn/server/keys/tls-crypt.key")
+    if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ] || [ ! "$TLS_CRYPT" ]
     then
         echo "Can't load client keys!"
         exit
@@ -54,7 +55,7 @@ load_key() {
 if [[ ! -f /etc/openvpn/client/keys/$CLIENT.crt ]] || \
    [[ ! -f /etc/openvpn/client/keys/$CLIENT.key ]]
 then
-    EASYRSA_BATCH=1 ./easyrsa build-client-full "$CLIENT" nopass nodatetime
+    EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "$CLIENT" nopass
     cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
     cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
 else

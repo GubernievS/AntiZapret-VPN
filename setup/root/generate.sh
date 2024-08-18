@@ -35,7 +35,8 @@ load_key() {
     CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
     CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/antizapret-client.crt")
     CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/antizapret-client.key")
-    if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ]
+    TLS_CRYPT=$(cat -- "/etc/openvpn/server/keys/tls-crypt.key")
+    if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ] || [ ! "$TLS_CRYPT" ]
     then
         echo "Can't load client keys!"
         exit
@@ -45,9 +46,12 @@ load_key() {
 build_pki() {
     rm -rf ./pki/
     /usr/share/easy-rsa/easyrsa init-pki
-    EASYRSA_BATCH=1 EASYRSA_REQ_CN="AntiZapret CA" /usr/share/easy-rsa/easyrsa build-ca nopass
-    EASYRSA_BATCH=1 /usr/share/easy-rsa/easyrsa build-server-full "antizapret-server" nopass nodatetime
-    EASYRSA_BATCH=1 /usr/share/easy-rsa/easyrsa build-client-full "antizapret-client" nopass nodatetime
+    echo -e "set_var EASYRSA_ALGO ec\nset_var EASYRSA_CURVE prime256v1" > ./pki/vars
+    EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
+    EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
+    EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "antizapret-client" nopass
+    EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+    openvpn --genkey secret ./pki/tls-crypt.key
 }
 
 copy_keys() {
@@ -56,13 +60,17 @@ copy_keys() {
     cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
     cp ./pki/issued/antizapret-client.crt /etc/openvpn/client/keys/antizapret-client.crt
     cp ./pki/private/antizapret-client.key /etc/openvpn/client/keys/antizapret-client.key
+    cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+    cp ./pki/tls-crypt.key /etc/openvpn/server/keys/tls-crypt.key
 }
 
 if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
    [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
    [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
    [[ ! -f /etc/openvpn/client/keys/antizapret-client.crt ]] || \
-   [[ ! -f /etc/openvpn/client/keys/antizapret-client.key ]]
+   [[ ! -f /etc/openvpn/client/keys/antizapret-client.key ]] || \
+   [[ ! -f /etc/openvpn/server/keys/crl.pem ]] || \
+   [[ ! -f /etc/openvpn/server/keys/tls-crypt.key ]]
 then
     build_pki
     copy_keys
