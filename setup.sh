@@ -92,7 +92,7 @@ rm -f /tmp/* || true
 # Копируем нужные файлы
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
-#rm -r /root/antizapret-vpn
+rm -r /root/antizapret-vpn
 
 #
 # Выставляем разрешения на запуск скриптов
