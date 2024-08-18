@@ -82,17 +82,6 @@ chmod +x /root/dnsmap/proxy.py
 /root/generate.sh
 
 #
-# Run all needed service on boot
-systemctl unmask systemd-networkd.service
-systemctl enable systemd-networkd
-systemctl enable kresd@1
-systemctl enable antizapret-update.service
-systemctl enable antizapret-update.timer
-systemctl enable dnsmap
-systemctl enable openvpn-server@antizapret
-systemctl enable openvpn-server@antizapret-tcp
-
-#
 # Добавляем свои адреса в исключения и адреса из:
 # Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
 # Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
@@ -151,6 +140,14 @@ echo "
 policy.add(policy.all(policy.FORWARD({'94.140.14.14'})))
 policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 
+
 #
-# Перезагружаем
-reboot
+# Run all needed service 
+systemctl restart ferm
+systemctl enable --now systemd-networkd
+systemctl enable --now kresd@1
+systemctl enable --now antizapret-update.service
+systemctl enable --now antizapret-update.timer
+systemctl enable --now dnsmap
+systemctl enable --now openvpn-server@antizapret
+systemctl enable --now openvpn-server@antizapret-tcp
