@@ -9,14 +9,14 @@
 Протестировано на Ubuntu 20.04/Ubuntu 22.04/Debian 11 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
 ### Установка:
-1. Устанавливать только на чистую Ubuntu 20.04/Ubuntu 22.04/Debian 11
-2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
-3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
-4. В консоли под root выполнить:
+1. Устанавливать только на чистую Ubuntu 20.04/22.04 или Debian 11
+2. В терминале под root выполнить:
 ```sh
-chmod +x setup/setup.sh && setup/setup.sh
+apt-get update && apt-get install -y git
+git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
+chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
-5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
+3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
 ***
 Обсуждение скрипта\
 https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270

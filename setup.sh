@@ -7,18 +7,18 @@ export DEBIAN_FRONTEND=noninteractive
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 16.08.2024
+# Версия от 19.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Ubuntu 20.04/Ubuntu 22.04/Debian 11 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на чистую Ubuntu 20.04/Ubuntu 22.04/Debian 11
-# 2. Загрузить и распаковать архив https://github.com/GubernievS/AntiZapret-VPN/archive/refs/heads/main.zip
-# 3. Папку из архива setup загрузить на сервер в папку root (например по SFTP через программу FileZilla)
-# 4. В консоли под root выполнить:
-# chmod +x setup/setup.sh && setup/setup.sh
-# 5. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
+# 1. Устанавливать только на чистую Ubuntu 20.04/22.04 или Debian 11
+# 2. В терминале под root выполнить:
+# apt-get update && apt-get install -y git
+# git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
+# chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
+# 3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
 #
 # Обсуждение скрипта
 # https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
@@ -62,6 +62,7 @@ apt install -y --allow-unauthenticated ipcalc sipcalc gawk idn iptables ferm ope
 
 #
 # Обновляем antizapret до последней версии из репозитория
+rm -r /root/antizapret || true
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
@@ -89,9 +90,9 @@ rm -f /tmp/* || true
 
 #
 # Копируем нужные файлы
-find /root/setup -name '*.gitkeep' -delete
-cp -r /root/setup/* / 
-rm -r /root/setup
+find /root/antizapret-vpn -name '*.gitkeep' -delete
+cp -r /root/antizapret-vpn/setup/* / 
+#rm -r /root/antizapret-vpn
 
 #
 # Выставляем разрешения на запуск скриптов
@@ -139,6 +140,8 @@ adguard-vpn.com
 signal.org
 intel.com
 nordvpn.com
+4pda.to
+habr.com
 tor.eff.org
 news.google.com
 play.google.com
