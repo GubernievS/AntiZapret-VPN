@@ -56,7 +56,7 @@ apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt-get install -y curl iptables easy-rsa gawk openvpn knot-resolver python3-dnslib idn sipcalc
+apt-get install -y curl iptables easy-rsa ferm gawk openvpn knot-resolver python3-dnslib idn sipcalc
 
 #
 # Обновляем antizapret до последней версии из репозитория
