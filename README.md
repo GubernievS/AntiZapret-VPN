@@ -20,3 +20,5 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Обсуждение скрипта\
 https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
+***
+Включаем DCO (Data Channel Offload) на OpenVpn 2.6+ скриптом Enable-OpenVPN-DCO.sh
