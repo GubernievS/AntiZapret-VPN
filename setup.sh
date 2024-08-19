@@ -90,7 +90,7 @@ rm -f /var/lib/apt/lists/* || true
 rm -f /tmp/* || true
 
 #
-# Копируем нужные файлы
+# Копируем нужные файлы и удаляем не нужные
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
 rm -r /root/antizapret-vpn
