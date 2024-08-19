@@ -120,7 +120,7 @@ echo "copilot.microsoft.com
 habr.com
 cisco.com
 dell.com
-dellcdn.com`
+dellcdn.com
 fujitsu.com
 deezer.com
 fluke.com
