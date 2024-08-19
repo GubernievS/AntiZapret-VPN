@@ -85,6 +85,12 @@ chmod +x /root/dnsmap/proxy.py
 /root/generate.sh
 
 #
+# Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
+echo "
+policy.add(policy.all(policy.FORWARD({'94.140.14.14'})))
+policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
+
+#
 # Запустим все необходимые службы при загрузке
 systemctl enable kresd@1
 systemctl enable antizapret-update.service
@@ -93,9 +99,9 @@ systemctl enable dnsmap
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 
-######################################
-# Добавляем свои адреса в исключения #
-######################################
+##################################
+#     Настраиваем исключения     #
+##################################
 
 #
 # Добавляем свои адреса в исключения
@@ -170,12 +176,6 @@ tlsext.com" >> /root/antizapret/config/include-hosts-custom.txt
 #echo "" > /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
-
-#
-# Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
-echo "
-policy.add(policy.all(policy.FORWARD({'94.140.14.14'})))
-policy.add(policy.all(policy.FORWARD({'94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 
 #
 # Перезагружаем
