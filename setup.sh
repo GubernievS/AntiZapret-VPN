@@ -31,9 +31,9 @@ export DEBIAN_FRONTEND=noninteractive
 # /root/antizapret/doall.sh
 #
 # Изменить конфигурацию OpenVpn сервера с UDP
-# nano /etc/openvpn/server/antizapret.conf
+# nano /etc/openvpn/server/antizapret-udp.conf
 # Потом перезапустить OpenVpn сервер
-# service openvpn restart
+# service openvpn-udp restart
 #
 # Изменить конфигурацию OpenVpn сервера с TCP
 # nano /etc/openvpn/server/antizapret-tcp.conf
@@ -41,7 +41,7 @@ export DEBIAN_FRONTEND=noninteractive
 # service openvpn-tcp restart
 #
 # Посмотреть статистику подключений OpenVpn c UDP (выход Ctrl+X)
-# nano /etc/openvpn/server/logs/status.log -v
+# nano /etc/openvpn/server/logs/status-udp.log -v
 #
 # Посмотреть статистику подключений OpenVpn c TCP (выход Ctrl+X)
 # nano /etc/openvpn/server/logs/status-tcp.log -v
@@ -72,6 +72,7 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 #
 # Скачиваем Easy-RSA 3
 curl -L https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.0/EasyRSA-3.2.0.tgz | tar -xz
+rm -rf /root/easyrsa3/EasyRSA-3.2.0/ || true
 mv /root/EasyRSA-3.2.0/ /root/easyrsa3/
 
 #
@@ -118,7 +119,7 @@ systemctl enable kresd@1
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
 systemctl enable dnsmap
-systemctl enable openvpn-server@antizapret
+systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 
 #
