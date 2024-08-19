@@ -18,11 +18,11 @@ class ProxyResolver(BaseResolver):
         Proxy resolver - passes all requests to upstream DNS server and
         returns response
 
-        Note that the request/response will be each be decoded/re-encoded 
+        Note that the request/response will be each be decoded/re-encoded
         twice:
 
-        a) Request packet received by DNSHandler and parsed into DNSRecord 
-        b) DNSRecord passed to ProxyResolver, serialised back into packet 
+        a) Request packet received by DNSHandler and parsed into DNSRecord
+        b) DNSRecord passed to ProxyResolver, serialised back into packet
            and sent to upstream DNS server
         c) Upstream DNS server returns response packet which is parsed into
            DNSRecord
@@ -42,7 +42,7 @@ class ProxyResolver(BaseResolver):
         self.unassigned_addresses = deque([str(x) for x in IPv4Network(iprange).hosts()])
         self.ipmap = {}
         self.tablename = tablename
-        
+
         # Load existing mappings
         output = subprocess.check_output(["./get_iptables_mappings.sh"])
         for mapped in output.decode().split("\n"):
@@ -50,16 +50,16 @@ class ProxyResolver(BaseResolver):
                 fake_addr, real_addr = mapped.split(' ')
                 self.add_mapping(real_addr, fake_addr) or sys.exit(1)
         #self.unassigned_addresses.remove()
-    
+
     def get_mapping(self, real_addr):
         return self.ipmap.get(real_addr)
-    
+
     def add_mapping(self, real_addr, fake_addr=None):
         if self.get_mapping(real_addr):
             # Real addr is already mapped
             print("Real addr {} is already mapped".format(real_addr))
             return False
-        
+
         if fake_addr:
             try:
                 self.unassigned_addresses.remove(fake_addr)
@@ -82,7 +82,7 @@ class ProxyResolver(BaseResolver):
             return fake_addr
         return True
 
-        
+
 
     def resolve(self,request,handler):
         try:
@@ -94,16 +94,25 @@ class ProxyResolver(BaseResolver):
                                 tcp=True,timeout=self.timeout)
             reply = DNSRecord.parse(proxy_r)
 
-            if request.q.qtype == QTYPE.AAAA:
-                print('GOT AAAA')
+            if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
+                print('GOT AAAA or HTTPS')
                 reply = request.reply()
                 return reply
-            
+
             if request.q.qtype == QTYPE.A:
                 print('GOT A')
+
+                newrr = []
+                for record in reply.rr:
+                    if record.rtype == QTYPE.CNAME:
+                        continue
+                    newrr.append(record)
+                reply.rr = newrr
+
                 for record in reply.rr:
                     if record.rtype != QTYPE.A:
                         continue
+
                     #print(dir(record))
                     #print(type(record.rdata))
 
@@ -118,6 +127,7 @@ class ProxyResolver(BaseResolver):
                         return reply
 
                     record.rdata = A(fake_addr)
+                    record.rname = request.q.qname
                     record.ttl = 300
                     #print(a.rdata)
                 return reply
@@ -131,7 +141,7 @@ class ProxyResolver(BaseResolver):
 
 class PassthroughDNSHandler(DNSHandler):
     """
-        Modify DNSHandler logic (get_reply method) to send directly to 
+        Modify DNSHandler logic (get_reply method) to send directly to
         upstream DNS server rather then decoding/encoding packet and
         passing to Resolver (The request/response packets are still
         parsed and logged but this is not inline)
@@ -181,8 +191,9 @@ def send_udp(data,host,port):
 
 if __name__ == '__main__':
 
-    import argparse,sys,time
+    import argparse,sys,time,os
 
+    dns = os.getenv('DNS', '8.8.8.8') + ':53'
     p = argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--port","-p",type=int,default=53,
                     metavar="<port>",
@@ -190,7 +201,7 @@ if __name__ == '__main__':
     p.add_argument("--address","-a",default="",
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
-    p.add_argument("--upstream","-u",default="8.8.8.8:53",
+    p.add_argument("--upstream","-u",default=dns,
             metavar="<dns server:port>",
                     help="Upstream DNS server:port (default:8.8.8.8:53)")
     p.add_argument("--tcp",action='store_true',default=False,
