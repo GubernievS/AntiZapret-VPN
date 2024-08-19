@@ -1,4 +1,4 @@
-Для того чтобы подключение antizapret-client-udp.ovpn заработало как надо на роутерах Keenetic, надо в antizapret-client-udp.ovpn дописать:
+Для того чтобы подключение antizapret-client-xxx.ovpn заработало как надо на роутерах Keenetic, надо в antizapret-client-xxx.ovpn дописать:
 
 ```
 pull-filter ignore block-outside-dns
