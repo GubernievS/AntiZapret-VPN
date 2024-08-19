@@ -82,8 +82,6 @@ class ProxyResolver(BaseResolver):
             return fake_addr
         return True
 
-
-
     def resolve(self,request,handler):
         try:
             if handler.protocol == 'udp':
@@ -191,9 +189,8 @@ def send_udp(data,host,port):
 
 if __name__ == '__main__':
 
-    import argparse,sys,time,os
+    import argparse,sys,time
 
-    dns = os.getenv('DNS', '8.8.8.8') + ':53'
     p = argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--port","-p",type=int,default=53,
                     metavar="<port>",
@@ -201,7 +198,7 @@ if __name__ == '__main__':
     p.add_argument("--address","-a",default="",
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
-    p.add_argument("--upstream","-u",default=dns,
+    p.add_argument("--upstream","-u",default="8.8.8.8:53",
             metavar="<dns server:port>",
                     help="Upstream DNS server:port (default:8.8.8.8:53)")
     p.add_argument("--tcp",action='store_true',default=False,
