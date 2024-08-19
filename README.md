@@ -18,9 +18,10 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
 3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
 ***
-Обсуждение скрипта\
-https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
+Обсуждение скрипта [тут](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
 ***
 Включаем DCO (Data Channel Offload) на OpenVpn 2.6+ скриптом Enable-OpenVPN-DCO.sh
+***
+Команды для настройки антизапрета описаны в самом скрипте в комментариях
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
