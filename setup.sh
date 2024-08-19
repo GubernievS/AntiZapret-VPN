@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-export DEBIAN_FRONTEND=noninteractive
 #
 # Скрипт для автоматического развертывания AntiZapret VPN
 # + Разблокирован YouTube и часть сайтов блокируемых без решения суда
@@ -10,10 +9,10 @@ export DEBIAN_FRONTEND=noninteractive
 # Версия от 19.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
-# Протестировано на Ubuntu 20.04/Ubuntu 22.04/Debian 11 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
+# Протестировано на Ubuntu 20.04/22.04/24.04 или Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать только на чистую Ubuntu 20.04/22.04 или Debian 11
+# 1. Устанавливать на Ubuntu 20.04/22.04/24.04 или Debian 11/12
 # 2. В терминале под root выполнить:
 # apt-get update && apt-get install -y git
 # git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
@@ -54,11 +53,11 @@ export DEBIAN_FRONTEND=noninteractive
 
 #
 # Обновляем систему
-apt update -y && apt upgrade -y && apt autoremove -y
+apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-apt install -y --allow-unauthenticated ipcalc sipcalc gawk idn iptables ferm openvpn knot-resolver inetutils-ping curl wget ca-certificates openssl host dnsutils bsdmainutils procps unattended-upgrades nano vim-tiny git python3-dnslib
+DEBIAN_FRONTEND=noninteractive apt-get install -y git curl iptables easy-rsa ferm gawk openvpn knot-resolver python3-dnslib idn sipcalc
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -70,51 +69,23 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
-# Скачиваем Easy-RSA 3
-curl -L https://github.com/OpenVPN/easy-rsa/releases/download/v3.2.0/EasyRSA-3.2.0.tgz | tar -xz
-rm -rf /root/easyrsa3/EasyRSA-3.2.0/ || true
-mv /root/EasyRSA-3.2.0/ /root/easyrsa3/
-
-#
-# Add knot-resolver CZ.NIC repository. It's newer and less buggy than in Debian repos.
-cd /tmp
-curl https://secure.nic.cz/files/knot-resolver/knot-resolver-release.deb -o knot-resolver.deb
-dpkg -i knot-resolver.deb
-apt update -y --allow-insecure-repositories
-apt -o Dpkg::Options::="--force-confold" -y full-upgrade --allow-unauthenticated
-
-#
-# Clean package cache and remove the lists
-apt autoremove -y && apt clean
-rm -f /var/lib/apt/lists/* || true
-rm -f /tmp/* || true
-
-#
-# Копируем нужные файлы и удаляем не нужные
+# Копируем нужные файлы и папки, удаляем не нужные
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
 rm -r /root/antizapret-vpn
+mkdir /root/easyrsa3 || true
 
 #
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
-chmod +x /root/easyrsa3/easyrsa
-
-#
-# systemd-nspawn, which is used in mkosi, will by default mount (or copy?)
-# host resolv.conf. We don't need that.
-umount /etc/resolv.conf || true
-mv /etc/resolv.conf_copy /etc/resolv.conf
 
 #
 # Генерируем ключи и создаем ovpn файлы подключений в /etc/openvpn/client
 /root/generate.sh
 
 #
-# Run all needed service on boot
-systemctl unmask systemd-networkd.service
-systemctl enable systemd-networkd
+# Запустим все необходимые службы при загрузке
 systemctl enable kresd@1
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
@@ -122,10 +93,12 @@ systemctl enable dnsmap
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 
+######################################
+# Добавляем свои адреса в исключения #
+######################################
+
 #
-# Добавляем свои адреса в исключения и адреса из:
-# Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
-# Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
+# Добавляем свои адреса в исключения
 echo "youtube.com
 googlevideo.com
 ytimg.com
@@ -136,14 +109,35 @@ gvt1.com
 gvt2.com
 gvt3.com
 digitalocean.com
-strava.com
 adguard-vpn.com
-signal.org
-intel.com
-nordvpn.com
+signal.org" >> /root/antizapret/config/include-hosts-custom.txt
+
+#
+# Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
+# (список примерный и скопирован не весь)
+echo "copilot.microsoft.com
 4pda.to
 habr.com
-tor.eff.org
+cisco.com
+dell.com
+dellcdn.com`
+fujitsu.com
+deezer.com
+fluke.com
+formula1.com
+intel.com
+nordvpn.com
+qualcomm.com
+strava.com
+openai.com
+intercomcdn.com
+oaistatic.com
+oaiusercontent.com
+chatgpt.com" >> /root/antizapret/config/include-hosts-custom.txt
+
+#
+# Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
+echo "tor.eff.org
 news.google.com
 play.google.com
 twimg.com
@@ -169,7 +163,7 @@ is.gd
 anicult.org
 12putinu.net
 padlet.com
-tlsext.com" > /root/antizapret/config/include-hosts-custom.txt
+tlsext.com" >> /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Удаляем исключения из исключений

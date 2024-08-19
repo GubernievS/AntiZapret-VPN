@@ -54,7 +54,7 @@ load_key() {
 if [[ ! -f /etc/openvpn/client/keys/$CLIENT.crt ]] || \
    [[ ! -f /etc/openvpn/client/keys/$CLIENT.key ]]
 then
-    EASYRSA_BATCH=1 ./easyrsa build-client-full "$CLIENT" nopass nodatetime
+	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "$CLIENT" nopass
     cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
     cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
 else

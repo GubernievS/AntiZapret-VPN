@@ -14,7 +14,7 @@ do
     [[ "$?" == "0" ]] && break
     sleep 2
 done
-[[ ! "$SERVER" ]] && echo "Can't determine global IP address!" && exit
+[[ ! "$SERVER" ]] && echo "Can't determine global IP address!" && exit 1
 
 set -e
 
@@ -38,16 +38,16 @@ load_key() {
     if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ]
     then
         echo "Can't load client keys!"
-        exit
+        exit 2
     fi
 }
 
 build_pki() {
     rm -rf ./pki/
-    ./easyrsa init-pki
-    EASYRSA_BATCH=1 EASYRSA_REQ_CN="AntiZapret CA" ./easyrsa build-ca nopass
-    EASYRSA_BATCH=1 ./easyrsa build-server-full "antizapret-server" nopass nodatetime
-    EASYRSA_BATCH=1 ./easyrsa build-client-full "antizapret-client" nopass nodatetime
+    /usr/share/easy-rsa/easyrsa init-pki
+	EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
+	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
+	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "antizapret-client" nopass
 }
 
 copy_keys() {
