@@ -143,6 +143,7 @@ intel.com
 nordvpn.com
 4pda.to
 habr.com
+ntc.party
 tor.eff.org
 news.google.com
 play.google.com
@@ -173,8 +174,8 @@ tlsext.com" > /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Удаляем исключения из исключений
-echo "" > /root/antizapret/config/exclude-hosts-dist.txt
-#sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
+#echo "" > /root/antizapret/config/exclude-hosts-dist.txt
+sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
