@@ -26,4 +26,4 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
 ***
-[Хостинг от ~100р со скидкой 10%](https://www.vdsina.com/?partner=9br77jaat2)
+[Хостинг для VPN от ~100р со скидкой 10%](https://www.vdsina.com/?partner=9br77jaat2)
