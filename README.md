@@ -20,11 +20,11 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Обсуждение скрипта [тут](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
 ***
-Для включения [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) на OpenVpn 2.6+ в терминале под root выполнить: 
+Для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в OpenVpn 2.6+ в терминале под root выполнить: 
 ```sh
 chmod +x enable-openvpn-dco.sh && ./enable-openvpn-dco.sh
 ```
-Для выключения OpenVPN DCO в терминале под root выполнить:
+Для выключения DCO в терминале под root выполнить:
 ```sh
 chmod +x disable-openvpn-dco.sh && ./disable-openvpn-dco.sh
 ```
