@@ -1,4 +1,4 @@
-Для того чтобы подключение antizapret-client-udp.ovpn заработало как надо на роутерах TP-Link, надо в antizapret-client-udp.ovpn дописать:
+Для того чтобы подключение antizapret-client-xxx.ovpn заработало как надо на роутерах TP-Link, надо в antizapret-client-xxx.ovpn дописать:
 
 ```
 route 10.224.0.0 255.254.0.0
