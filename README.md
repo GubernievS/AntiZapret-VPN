@@ -20,7 +20,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Обсуждение скрипта [тут](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
 ***
-Включаем DCO (Data Channel Offload) на OpenVpn 2.6+ скриптом Enable-OpenVPN-DCO.sh
+Включаем [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) на OpenVpn 2.6+ скриптом **enable-openvpn-dco.sh** выключаем **disable-openvpn-dco.sh**
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях
 ***
