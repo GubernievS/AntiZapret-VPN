@@ -25,3 +25,5 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 Команды для настройки антизапрета описаны в самом скрипте в комментариях
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
+***
+[Хостинг от ~100р со скидкой 10%](https://www.vdsina.com/?partner=9br77jaat2)
