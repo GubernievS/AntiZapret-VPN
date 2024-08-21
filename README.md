@@ -17,19 +17,26 @@ git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
 chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
 3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
-***
-Обсуждение скрипта [тут](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
+4. (Опционально) Включить DCO
+5. (Опционально) Добавить клиентов
 ***
 Для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в OpenVpn 2.6+ в терминале под root выполнить: 
 ```sh
-chmod +x enable-openvpn-dco.sh && ./enable-openvpn-dco.sh
+./enable-openvpn-dco.sh
 ```
 Для выключения DCO в терминале под root выполнить:
 ```sh
-chmod +x disable-openvpn-dco.sh && ./disable-openvpn-dco.sh
+./disable-openvpn-dco.sh
+```
+***
+Для добавления нового клиента в терминале под root выполнить:
+```sh
+./add-client.sh
 ```
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях
+***
+Обсуждение скрипта [тут](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
 ***
