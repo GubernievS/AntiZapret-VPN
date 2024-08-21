@@ -35,7 +35,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
 Для удаления клиента в терминале под root выполнить:
 ```sh
-# ./add-client.sh
+./add-client.sh
 ```
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях
