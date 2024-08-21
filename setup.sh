@@ -81,8 +81,8 @@ find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
 
 #
-# Генерируем ключи и создаем ovpn файлы подключений в /etc/openvpn/client
-/root/generate.sh
+# Создаем ключи и пользователя 'antizapret-client' и создаем ovpn файлы подключений в /etc/openvpn/client
+/root/add-client.sh antizapret-client
 
 #
 # Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
