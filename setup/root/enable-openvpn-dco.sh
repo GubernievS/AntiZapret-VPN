@@ -5,6 +5,7 @@
 # chmod +x enable-openvpn-dco.sh && ./enable-openvpn-dco.sh
 #
 set -e
+apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 apt-get install -y openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
 modprobe ovpn_dco_v2
