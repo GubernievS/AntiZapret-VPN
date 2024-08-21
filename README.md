@@ -20,7 +20,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в OpenVpn 2.6+ в терминале под root выполнить: 
+Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVpn до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в терминале под root выполнить: 
 ```sh
 ./enable-openvpn-dco.sh
 ```
@@ -32,6 +32,10 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 Для добавления нового клиента в терминале под root выполнить:
 ```sh
 ./add-client.sh
+```
+Для удаления клиента в терминале под root выполнить:
+```sh
+# ./add-client.sh
 ```
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях

@@ -6,7 +6,7 @@ set -e
 # Поддерживается подключение по UDP и TCP 
 # Используется 443 порт вместо 1194 для обхода блокировки по порту
 #
-# Версия от 20.08.2024
+# Версия от 22.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
@@ -48,12 +48,17 @@ set -e
 # Для отключения подключений к OpenVpn по TCP выполните команду
 # systemctl disable openvpn-server@antizapret-tcp
 #
-# Для добавления нового пользователя выполните команду и введите имя
+# Для добавления нового клиента выполните команду и введите имя
 # /root/add-client.sh
+#
+# Для удаления клиента выполните команду и введите имя
+# /root/delete-client.sh
 #
 # Для включения DCO в OpenVpn 2.6+ выполните команду 
 # /root/enable-openvpn-dco.sh
 #
+# Для выключения DCO выполните команду
+# /root/disable-openvpn-dco.sh
 
 #
 # Обновляем систему
@@ -77,7 +82,6 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
 rm -r /root/antizapret-vpn
-mkdir /root/easyrsa3 || true
 
 #
 # Выставляем разрешения на запуск скриптов

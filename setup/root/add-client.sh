@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+mkdir /root/easyrsa3 || true
+cd /root/easyrsa3
+
 CLIENT=$1
 if [ -z "$CLIENT" ]
 then
@@ -12,10 +15,6 @@ then
 		read -rp "Client name: " -e CLIENT
 	done
 fi
-
-
-HERE="$(dirname "$(readlink -f "${0}")")"
-cd "$HERE/easyrsa3"
 
 export EASYRSA_CERT_EXPIRE=3650
 
@@ -67,16 +66,25 @@ then
 	cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
 	cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 	cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-	echo "Created new PKI and CA in '/root/easyrsa3/pki'"
+	echo "Created new PKI and CA"
+fi
+
+if [[ ! -f ./pki/crl.pem ]]
+then
+	/usr/share/easy-rsa/easyrsa gen-crl
+	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+	echo "Created new CRL"
 fi
 
 if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
    [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]
+   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
+   [[ ! -f ./pki/crl.pem ]]
 then
 	cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
 	cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 	cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 fi
 
 if [[ ! -f ./pki/issued/$CLIENT.crt ]] || \
