@@ -124,7 +124,8 @@ gvt2.com
 gvt3.com
 digitalocean.com
 adguard-vpn.com
-signal.org" > /root/antizapret/config/include-hosts-custom.txt
+signal.org
+hetzner.com" > /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
@@ -147,7 +148,8 @@ openai.com
 intercomcdn.com
 oaistatic.com
 oaiusercontent.com
-chatgpt.com" >> /root/antizapret/config/include-hosts-custom.txt
+chatgpt.com
+bosch.de" >> /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
