@@ -27,10 +27,10 @@ set -e
 # /root/antizapret/doall.sh
 #
 # Для добавления нового клиента выполните команду и введите имя
-# /root/add-client.sh
+# /root/add-client.sh [имя_пользователя]
 #
 # Для удаления клиента выполните команду и введите имя
-# /root/delete-client.sh
+# /root/delete-client.sh [имя_пользователя]
 #
 # Для включения DCO в OpenVpn 2.6+ выполните команду 
 # /root/enable-openvpn-dco.sh
