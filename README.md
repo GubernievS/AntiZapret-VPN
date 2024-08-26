@@ -16,7 +16,7 @@ AntiZapret VPN + обычный VPN работают через OpenVPN\
 
 При подключении используется AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
 
-За основу взяты [эти исхоники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
+За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
