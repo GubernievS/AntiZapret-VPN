@@ -90,7 +90,7 @@ fi
 if [[ ! -f ./pki/issued/antizapret-$CLIENT.crt ]] || \
    [[ ! -f ./pki/private/antizapret-$CLIENT.key ]]
 then
-	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "antizapret-$CLIENT" nopass
+	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full antizapret-$CLIENT nopass
 	cp ./pki/issued/antizapret-$CLIENT.crt /etc/openvpn/client/keys/antizapret-$CLIENT.crt
 	cp ./pki/private/antizapret-$CLIENT.key /etc/openvpn/client/keys/antizapret-$CLIENT.key
 else
