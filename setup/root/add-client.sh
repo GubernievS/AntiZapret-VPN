@@ -56,16 +56,16 @@ load_key() {
 }
 
 if [[ ! -f ./pki/ca.crt ]] || \
-   [[ ! -f ./pki/issued/antizapret-server.crt ]] || \
-   [[ ! -f ./pki/private/antizapret-server.key ]]
+   [[ ! -f ./pki/issued/server.crt ]] || \
+   [[ ! -f ./pki/private/server.key ]]
 then
 	rm -rf ./pki/
 	/usr/share/easy-rsa/easyrsa init-pki
 	EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
-	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
+	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "server" nopass
 	cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
-	cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-	cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+	cp ./pki/issued/server.crt /etc/openvpn/server/keys/server.crt
+	cp ./pki/private/server.key /etc/openvpn/server/keys/server.key
 	echo "Created new PKI and CA"
 fi
 
@@ -77,13 +77,13 @@ then
 fi
 
 if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
-   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
+   [[ ! -f /etc/openvpn/server/keys/server.crt ]] || \
+   [[ ! -f /etc/openvpn/server/keys/server.key ]] || \
    [[ ! -f ./pki/crl.pem ]]
 then
 	cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
-	cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-	cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+	cp ./pki/issued/server.crt /etc/openvpn/server/keys/server.crt
+	cp ./pki/private/server.key /etc/openvpn/server/keys/server.key
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 fi
 
@@ -93,10 +93,8 @@ then
 	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full "$CLIENT" nopass
 	cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
 	cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
-	echo "OpenVPN client configuration files will be created now"
 else
 	echo "The specified client was already found, please choose another name"
-	echo "OpenVPN client configuration files will be updated now"
 fi
 
 if [[ ! -f /etc/openvpn/client/keys/$CLIENT.crt ]] || \
@@ -108,7 +106,9 @@ fi
 
 load_key
 
-render "/etc/openvpn/client/templates/openvpn-udp-unified.conf" > "/etc/openvpn/client/$CLIENT-udp.ovpn"
-render "/etc/openvpn/client/templates/openvpn-tcp-unified.conf" > "/etc/openvpn/client/$CLIENT-tcp.ovpn"
+render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/etc/openvpn/client/antizapret-$CLIENT-udp.ovpn"
+render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/etc/openvpn/client/antizapret-$CLIENT-tcp.ovpn"
+render "/etc/openvpn/client/templates/vpn-udp.conf" > "/etc/openvpn/client/vpn-$CLIENT-udp.ovpn"
+render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/etc/openvpn/client/vpn-$CLIENT-tcp.ovpn"
 
-echo "Files '$CLIENT-udp.ovpn' and '$CLIENT-tcp.ovpn' have been created in '/etc/openvpn/client'"
+echo "OpenVPN client configuration files have been (re)created in '/etc/openvpn/client'"

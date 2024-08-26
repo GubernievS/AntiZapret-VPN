@@ -1,10 +1,19 @@
-# AntiZapret-VPN
+# AntiZapret-VPN (версия без контейнера)
 
-Скрипт для автоматического развертывания AntiZapret VPN **(версия без контейнера)**\
-\+ Разблокирован YouTube и часть сайтов блокируемых без решения суда
+Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
 
+Через AntiZapret VPN работают только:
+- Заблокированные сайты из единого реестра РФ, список автоматически обновляется раз в 6 часов
+- Сайты к которым ограничивается доступ без судебного решения (например youtube.com) и сайты ограничивающие доступ из РФ (например intel.com, chatgpt.com), список предзаполнен и доступен для ручного редактирования
+Все остальные сайты работают через вашего провайдера с максимальной доступной вам скоростью
+
+Через обычный VPN доступны все сайты, которые будут доступны с вашего хостинга
+
+AntiZapret VPN + обычный VPN работают через OpenVPN\
 Поддерживается подключение по UDP и TCP\
-Используется 443 порт вместо 1194 для обхода блокировки по порту
+Используются 80 и 443 порты для обхода блокировок по портам
+
+При подключении используется AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
@@ -16,11 +25,11 @@ apt-get update && apt-get install -y git
 git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
 chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
+3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /etc/openvpn/client
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVpn до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в терминале под root выполнить: 
+Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в терминале под root выполнить: 
 ```sh
 ./enable-openvpn-dco.sh
 ```

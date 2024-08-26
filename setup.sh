@@ -1,12 +1,9 @@
 #!/bin/bash
 set -e
 #
-# Скрипт для автоматического развертывания AntiZapret VPN
-# + Разблокирован YouTube и часть сайтов блокируемых без решения суда
-# Поддерживается подключение по UDP и TCP 
-# Используется 443 порт вместо 1194 для обхода блокировки по порту
+# Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
+# Версия от 26.08.2024
 #
-# Версия от 22.08.2024
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 # Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
@@ -17,7 +14,7 @@ set -e
 # apt-get update && apt-get install -y git
 # git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
 # chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
-# 3. Дождаться перезагрузки сервера и скопировать файлы antizapret-client-udp.ovpn и antizapret-client-tcp.ovpn с сервера из папки /etc/openvpn/client
+# 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /etc/openvpn/client
 #
 # Обсуждение скрипта
 # https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
@@ -28,25 +25,6 @@ set -e
 # nano /root/antizapret/config/include-hosts-custom.txt
 # Потом выполните команду для обновления списка антизапрета
 # /root/antizapret/doall.sh
-#
-# Изменить конфигурацию OpenVpn сервера с UDP
-# nano /etc/openvpn/server/antizapret-udp.conf
-# Потом перезапустить OpenVpn сервер
-# service openvpn-udp restart
-#
-# Изменить конфигурацию OpenVpn сервера с TCP
-# nano /etc/openvpn/server/antizapret-tcp.conf
-# Потом перезапустить OpenVpn сервер
-# service openvpn-tcp restart
-#
-# Посмотреть статистику подключений OpenVpn c UDP (выход Ctrl+X)
-# nano /etc/openvpn/server/logs/status-udp.log -v
-#
-# Посмотреть статистику подключений OpenVpn c TCP (выход Ctrl+X)
-# nano /etc/openvpn/server/logs/status-tcp.log -v
-#
-# Для отключения подключений к OpenVpn по TCP выполните команду
-# systemctl disable openvpn-server@antizapret-tcp
 #
 # Для добавления нового клиента выполните команду и введите имя
 # /root/add-client.sh
@@ -90,7 +68,7 @@ chmod +x /root/dnsmap/proxy.py
 
 #
 # Создаем ключи и пользователя 'antizapret-client' и создаем ovpn файлы подключений в /etc/openvpn/client
-/root/add-client.sh antizapret-client
+/root/add-client.sh client
 
 #
 # Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
@@ -106,6 +84,9 @@ systemctl enable antizapret-update.timer
 systemctl enable dnsmap
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
+systemctl enable openvpn-server@vpn-udp
+systemctl enable openvpn-server@vpn-tcp
+
 
 ##################################
 #     Настраиваем исключения     #
