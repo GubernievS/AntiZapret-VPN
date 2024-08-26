@@ -1,4 +1,9 @@
 #!/bin/bash
+# Обновление с прошлых версий
+find /root/easyrsa3/pki -type f -name 'antizapret-client.*' -exec bash -c 'mv "$0" "${0%/*}/client.${0##*.}"' {} \;
+find /root/easyrsa3/pki -type f -name 'antizapret-server.*' -exec bash -c 'mv "$0" "${0%/*}/server.${0##*.}"' {} \;
+sed -i 's/antizapret-//g' /root/easyrsa3/pki/index.txt
+#
 set -e
 #
 # Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
