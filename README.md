@@ -5,15 +5,18 @@
 Через AntiZapret VPN работают только:
 - Заблокированные сайты из единого реестра РФ, список автоматически обновляется раз в 6 часов
 - Сайты к которым ограничивается доступ без судебного решения (например youtube.com) и сайты ограничивающие доступ из РФ (например intel.com, chatgpt.com), список предзаполнен и доступен для ручного редактирования
+
 Все остальные сайты работают через вашего провайдера с максимальной доступной вам скоростью
 
-Через обычный VPN доступны все сайты, которые будут доступны с вашего хостинга
+Через обычный VPN доступны все сайты, доступные с вашего хостинга
 
 AntiZapret VPN + обычный VPN работают через OpenVPN\
 Поддерживается подключение по UDP и TCP\
 Используются 80 и 443 порты для обхода блокировок по портам
 
 При подключении используется AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
+
+За основу взяты [эти исхоники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
@@ -29,7 +32,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на ЦПУ и увеличивает скорость передачи) в терминале под root выполнить: 
+Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на cpu и увеличивает скорость передачи) в терминале под root выполнить: 
 ```sh
 ./enable-openvpn-dco.sh
 ```
