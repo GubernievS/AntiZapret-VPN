@@ -49,6 +49,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```sh
 ./delete-client.sh
 ```
+Пользовательские ключи хранятся в файлах antizapret-имя_пользователя.*
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях
 ***
