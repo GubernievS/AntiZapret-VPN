@@ -43,11 +43,11 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Для добавления нового клиента в терминале под root выполнить:
 ```sh
-./add-client.sh
+./add-client.sh [имя_пользователя]
 ```
 Для удаления клиента в терминале под root выполнить:
 ```sh
-./delete-client.sh
+./delete-client.sh [имя_пользователя]
 ```
 Пользовательские ключи хранятся в файлах antizapret-имя_пользователя.*
 ***
