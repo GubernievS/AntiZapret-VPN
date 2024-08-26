@@ -15,7 +15,7 @@ then
 	done
 fi
 
-/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT
+/usr/share/easy-rsa/easyrsa --batch revoke antizapret-$CLIENT
 if [ $? -ne 0 ]; then
     echo "Failed to revoke certificate for client $CLIENT"
     exit 1
@@ -32,8 +32,8 @@ rm /etc/openvpn/client/antizapret-$CLIENT-udp.ovpn
 rm /etc/openvpn/client/antizapret-$CLIENT-tcp.ovpn
 rm /etc/openvpn/client/vpn-$CLIENT-udp.ovpn
 rm /etc/openvpn/client/vpn-$CLIENT-tcp.ovpn
-rm /etc/openvpn/client/keys/$CLIENT.crt
-rm /etc/openvpn/client/keys/$CLIENT.key
+rm /etc/openvpn/client/keys/antizapret-$CLIENT.crt
+rm /etc/openvpn/client/keys/antizapret-$CLIENT.key
 
 systemctl restart openvpn-server@antizapret-udp
 systemctl restart openvpn-server@antizapret-tcp
