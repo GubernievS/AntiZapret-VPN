@@ -2,7 +2,7 @@
 set -e
 #
 # Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
-# Версия от 26.08.2024
+# Версия от 28.08.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -130,7 +130,10 @@ intercomcdn.com
 oaistatic.com
 oaiusercontent.com
 chatgpt.com
-bosch.de" >> /root/antizapret/config/include-hosts-custom.txt
+bosch.de
+download.jetbrains.com
+software-static.download.prss.microsoft.com
+weather.com" >> /root/antizapret/config/include-hosts-custom.txt
 
 #
 # Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
