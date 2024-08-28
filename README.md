@@ -57,4 +57,4 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
 ***
-Хостинги для VPN принимающие рубли: [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) со скидкой 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (бонус действует 24ч)
+Хостинги для VPN принимающие рубли: [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) со скидкой 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
