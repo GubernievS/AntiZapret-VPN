@@ -65,7 +65,7 @@ nano /root/antizapret/config/include-hosts-custom.txt
 /root/antizapret/doall.sh
 ```
 ***
-Обсуждение скрипта на [ntc.party](https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270)
+Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270)
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
 ***
