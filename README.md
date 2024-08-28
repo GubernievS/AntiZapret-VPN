@@ -34,31 +34,33 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на cpu сервера и клиента и увеличивает скорость передачи) в терминале под root выполнить: 
+Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на cpu сервера и клиента и увеличивает скорость передачи данных через OpenVPN
+
+Для включения DCO в OpenVpn 2.6+ выполните команду:
 ```sh
-./enable-openvpn-dco.sh
+/root/enable-openvpn-dco.sh
 ```
-Для выключения DCO в терминале под root выполнить:
+Для выключения DCO выполните команду:
 ```sh
-./disable-openvpn-dco.sh
+/root/disable-openvpn-dco.sh
 ```
 ***
-Для добавления нового клиента в терминале под root выполнить:
+ Для добавления нового клиента выполните команду и введите имя:
 ```sh
-./add-client.sh [имя_пользователя]
+/root/add-client.sh [имя_пользователя]
 ```
-Для удаления клиента в терминале под root выполнить:
+Для удаления клиента выполните команду и введите имя:
 ```sh
-./delete-client.sh [имя_пользователя]
+/root/delete-client.sh [имя_пользователя]
 ```
 После добавления нового клиента скопируйте новые файлы \*.ovpn с сервера из папки /root\
 Пользовательские ключи хранятся в файлах antizapret-имя_пользователя.\*
 ***
-Изменить файл с предзаполненным списком антизапрета (include-hosts-custom.txt)
+Изменить файл с предзаполненным списком антизапрета (include-hosts-custom.txt):
 ```sh
 nano /root/antizapret/config/include-hosts-custom.txt
 ```
-Потом выполните команду для обновления списка антизапрета
+Потом выполнить команду для обновления списка антизапрета:
 ```sh
 /root/antizapret/doall.sh
 ```
