@@ -58,7 +58,7 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 #
 # Копируем нужные файлы и папки, удаляем не нужные
 find /root/antizapret -name '*.gitkeep' -delete
-rm -r /root/antizapret-vpn/.git
+rm -r /root/antizapret/.git
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
 rm -r /root/antizapret-vpn
