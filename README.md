@@ -33,7 +33,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на cpu и увеличивает скорость передачи) в терминале под root выполнить: 
+Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то для включения [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (снижает нагрузку на cpu сервера и клиента и увеличивает скорость передачи) в терминале под root выполнить: 
 ```sh
 ./enable-openvpn-dco.sh
 ```
