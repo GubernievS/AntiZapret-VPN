@@ -21,7 +21,7 @@ set -e
 #
 # Команды для настройки антизапрета
 #
-# Изменить файл с личным списком антизапрета include-hosts-custom.txt
+# Изменить файл с предзаполненным списком антизапрета (include-hosts-custom.txt)
 # nano /root/antizapret/config/include-hosts-custom.txt
 # Потом выполните команду для обновления списка антизапрета
 # /root/antizapret/doall.sh
