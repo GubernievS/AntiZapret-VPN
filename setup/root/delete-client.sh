@@ -28,16 +28,14 @@ if [ $? -ne 0 ]; then
     exit 2
 fi
 
-rm /etc/openvpn/client/antizapret-$CLIENT-udp.ovpn
-rm /etc/openvpn/client/antizapret-$CLIENT-tcp.ovpn
-rm /etc/openvpn/client/vpn-$CLIENT-udp.ovpn
-rm /etc/openvpn/client/vpn-$CLIENT-tcp.ovpn
-rm /etc/openvpn/client/keys/antizapret-$CLIENT.crt
-rm /etc/openvpn/client/keys/antizapret-$CLIENT.key
+rm -f /root/antizapret-$CLIENT*.ovpn
+rm -f /root/vpn-$CLIENT*.ovpn
+rm -f /etc/openvpn/client/keys/antizapret-$CLIENT.crt
+rm -f /etc/openvpn/client/keys/antizapret-$CLIENT.key
 
 systemctl restart openvpn-server@antizapret-udp
 systemctl restart openvpn-server@antizapret-tcp
 systemctl restart openvpn-server@vpn-udp
 systemctl restart openvpn-server@vpn-tcp
 
-echo "OpenVPN client successfull deleted"
+echo "OpenVPN client '$CLIENT' successfull deleted"

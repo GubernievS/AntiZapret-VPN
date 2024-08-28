@@ -28,7 +28,7 @@ apt-get update && apt-get install -y git
 git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
 chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /etc/openvpn/client
+3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
@@ -49,6 +49,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 ```sh
 ./delete-client.sh [имя_пользователя]
 ```
+После добавления нового клиента скопируйте новые файлы *.ovpn с сервера из папки /root
 Пользовательские ключи хранятся в файлах antizapret-имя_пользователя.*
 ***
 Команды для настройки антизапрета описаны в самом скрипте в комментариях

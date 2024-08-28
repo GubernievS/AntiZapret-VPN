@@ -14,7 +14,7 @@ set -e
 # apt-get update && apt-get install -y git
 # git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
 # chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
-# 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /etc/openvpn/client
+# 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 #
 # Обсуждение скрипта
 # https://ntc.party/t/скрипт-для-автоматического-развертывания-antizapret-vpn-новая-версия-без-контейнера-youtube/9270
@@ -28,6 +28,7 @@ set -e
 #
 # Для добавления нового клиента выполните команду и введите имя
 # /root/add-client.sh [имя_пользователя]
+# Скопируйте новые файлы *.ovpn с сервера из папки /root
 #
 # Для удаления клиента выполните команду и введите имя
 # /root/delete-client.sh [имя_пользователя]
@@ -48,7 +49,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y git curl iptables easy-rsa fer
 
 #
 # Обновляем antizapret до последней версии из репозитория
-rm -r /root/antizapret || true
+rm -rf /root/antizapret
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
@@ -58,10 +59,10 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 #
 # Копируем нужные файлы и папки, удаляем не нужные
 find /root/antizapret -name '*.gitkeep' -delete
-rm -r /root/antizapret/.git
+rm -rf /root/antizapret/.git
 find /root/antizapret-vpn -name '*.gitkeep' -delete
 cp -r /root/antizapret-vpn/setup/* / 
-rm -r /root/antizapret-vpn
+rm -rf /root/antizapret-vpn
 
 #
 # Выставляем разрешения на запуск скриптов

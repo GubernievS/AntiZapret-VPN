@@ -94,7 +94,7 @@ then
 	cp ./pki/issued/antizapret-$CLIENT.crt /etc/openvpn/client/keys/antizapret-$CLIENT.crt
 	cp ./pki/private/antizapret-$CLIENT.key /etc/openvpn/client/keys/antizapret-$CLIENT.key
 else
-	echo "The specified client was already found, please choose another name"
+	echo "The specified client was already found, please choose another name for new client OpenVPN"
 fi
 
 if [[ ! -f /etc/openvpn/client/keys/antizapret-$CLIENT.crt ]] || \
@@ -106,9 +106,9 @@ fi
 
 load_key
 
-render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/etc/openvpn/client/antizapret-$CLIENT-udp.ovpn"
-render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/etc/openvpn/client/antizapret-$CLIENT-tcp.ovpn"
-render "/etc/openvpn/client/templates/vpn-udp.conf" > "/etc/openvpn/client/vpn-$CLIENT-udp.ovpn"
-render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/etc/openvpn/client/vpn-$CLIENT-tcp.ovpn"
+render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret-$CLIENT-$SERVER-udp.ovpn"
+render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/antizapret-$CLIENT-$SERVER-tcp.ovpn"
+render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn-$CLIENT-$SERVER-udp.ovpn"
+render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$CLIENT-$SERVER-tcp.ovpn"
 
-echo "OpenVPN client name '$CLIENT' configuration files have been (re)created in '/etc/openvpn/client'"
+echo "OpenVPN configuration files for client '$CLIENT' have been (re)created in '/root'"
