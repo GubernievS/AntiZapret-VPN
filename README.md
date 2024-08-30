@@ -22,8 +22,8 @@ AntiZapret VPN (antizapret-\*.ovpn) и обычный VPN (vpn-\*.ovpn) рабо
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
-### Установка и обновление:
-1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04 или Debian 12)
+### Установка:
+1. Устанавливать на чистую Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04 или Debian 12)
 2. В терминале под root выполнить:
 ```sh
 apt-get update && apt-get install -y git
