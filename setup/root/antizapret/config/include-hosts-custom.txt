@@ -13,7 +13,7 @@ adguard-vpn.com
 signal.org
 hetzner.com
 
-# Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
+# Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
 # (список примерный и скопирован не весь)
 copilot.microsoft.com
 bing.com
