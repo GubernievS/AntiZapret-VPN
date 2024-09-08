@@ -112,6 +112,7 @@ hetzner.com" > /root/antizapret/config/include-hosts-custom.txt
 # Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
 # (список примерный и скопирован не весь)
 echo "copilot.microsoft.com
+bing.com
 4pda.to
 habr.com
 cisco.com
