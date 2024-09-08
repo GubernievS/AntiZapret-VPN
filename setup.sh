@@ -2,7 +2,7 @@
 set -e
 #
 # Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
-# Версия от 28.08.2024
+# Версия от 09.09.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -67,7 +67,7 @@ find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
 
 #
-# Создаем пользователя 'client', его ключи 'antizapret-client', ключи сервера  'antizapret-server' и создаем ovpn файлы подключений в /etc/openvpn/client
+# Создаем пользователя 'client', его ключи 'antizapret-client', ключи сервера  'antizapret-server' и создаем ovpn файлы подключений в /root
 /root/add-client.sh client
 
 #
@@ -87,88 +87,8 @@ systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 
-
-##################################
-#     Настраиваем исключения     #
-##################################
-
 #
-# Добавляем свои адреса в исключения
-echo "youtube.com
-googlevideo.com
-ytimg.com
-ggpht.com
-googleapis.com
-gstatic.com
-gvt1.com
-gvt2.com
-gvt3.com
-digitalocean.com
-adguard-vpn.com
-signal.org
-hetzner.com" > /root/antizapret/config/include-hosts-custom.txt
-
-#
-# Ограничивают доступ из РФ - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt
-# (список примерный и скопирован не весь)
-echo "copilot.microsoft.com
-bing.com
-4pda.to
-habr.com
-cisco.com
-dell.com
-dellcdn.com
-fujitsu.com
-deezer.com
-fluke.com
-formula1.com
-intel.com
-nordvpn.com
-qualcomm.com
-strava.com
-openai.com
-intercomcdn.com
-oaistatic.com
-oaiusercontent.com
-chatgpt.com
-bosch.de
-download.jetbrains.com
-software-static.download.prss.microsoft.com
-weather.com" >> /root/antizapret/config/include-hosts-custom.txt
-
-#
-# Внереестровые блокировки  - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
-echo "tor.eff.org
-news.google.com
-play.google.com
-twimg.com
-bbc.co.uk
-bbci.co.uk
-radiojar.com
-xvideos.com
-doubleclick.net
-windscribe.com
-vpngate.net
-rebrand.ly
-adguard.com
-antizapret.prostovpn.org
-avira.com
-mullvad.net
-invent.kde.org
-s-trade.com
-ua
-is.gd
-1plus1tv.ru
-linktr.ee
-is.gd
-anicult.org
-12putinu.net
-padlet.com
-tlsext.com" >> /root/antizapret/config/include-hosts-custom.txt
-
-#
-# Удаляем исключения из исключений
-#echo "" > /root/antizapret/config/exclude-hosts-dist.txt
+# Удаляем исключения из исключений антизапрета
 sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
