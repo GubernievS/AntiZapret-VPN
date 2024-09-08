@@ -39,6 +39,7 @@ bosch.de
 download.jetbrains.com
 software-static.download.prss.microsoft.com
 weather.com
+gemini.google.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
 tor.eff.org
