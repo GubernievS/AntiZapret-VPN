@@ -36,13 +36,22 @@ set -e
 # Для выключения DCO выполните команду:
 # /root/disable-openvpn-dco.sh
 
+
+
 #
 # Обновляем систему
 apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install -y git curl iptables easy-rsa ferm gawk openvpn knot-resolver python3-dnslib idn sipcalc
+DEBIAN_FRONTEND=noninteractive apt-get install -y git curl iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc pgp
+
+#
+# Ставим последнюю версию OpenVpn 2.6
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
+DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn
 
 #
 # Обновляем antizapret до последней версии из репозитория
