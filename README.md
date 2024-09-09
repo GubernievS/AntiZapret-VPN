@@ -14,7 +14,8 @@
 
 AntiZapret VPN (antizapret-\*.ovpn) и обычный VPN (vpn-\*.ovpn) работают через [OpenVPN](https://openvpn.net/client)\
 Поддерживается подключение по UDP и TCP\
-Используются 80 и 443 порты для обхода блокировок по портам
+Используются 80 и 443 порты для обхода блокировок по портам\
+На все системы устанавливается последняя версия OpenVPN 2.6
 
 При подключении используется AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
 
@@ -34,9 +35,9 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы [вручную обновили](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos) OpenVPN до версии 2.6+ то вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на cpu сервера и клиента и увеличивает скорость передачи данных через OpenVPN
+На OpenVPN версии 2.6 вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента и увеличивает скорость передачи данных через OpenVPN
 
-Для включения DCO в OpenVpn 2.6+ выполните команду:
+Для включения DCO выполните команду:
 ```sh
 /root/enable-openvpn-dco.sh
 ```
