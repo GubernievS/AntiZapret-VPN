@@ -36,8 +36,6 @@ set -e
 # Для выключения DCO выполните команду:
 # /root/disable-openvpn-dco.sh
 
-
-
 #
 # Обновляем систему
 apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
