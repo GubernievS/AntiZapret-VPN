@@ -2,7 +2,7 @@
 set -e
 #
 # Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
-# Версия от 10.09.2024
+# Версия от 12.09.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
