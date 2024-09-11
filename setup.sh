@@ -75,7 +75,7 @@ find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
 
 #
-# Создаем пользователя 'client', его ключи 'antizapret-client', ключи сервера  'antizapret-server' и создаем ovpn файлы подключений в /root
+# Создаем пользователя 'client', его ключи 'antizapret-client', ключи сервера 'antizapret-server' и создаем *.ovpn файлы подключений в /root
 /root/add-client.sh client
 
 #
