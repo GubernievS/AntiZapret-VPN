@@ -21,7 +21,10 @@ disable-dco" >> /etc/openvpn/server/vpn-udp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:AES-128-CBC:AES-256-CBC:BF-CBC\"
 providers legacy default
 disable-dco" >> /etc/openvpn/server/vpn-tcp.conf
+systemctl daemon-reload
 systemctl restart openvpn-server@antizapret-udp
 systemctl restart openvpn-server@antizapret-tcp
 systemctl restart openvpn-server@vpn-udp
 systemctl restart openvpn-server@vpn-tcp
+echo ""
+echo "Successful disable DCO!"
