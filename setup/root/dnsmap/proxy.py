@@ -85,16 +85,15 @@ class ProxyResolver(BaseResolver):
     def resolve(self,request,handler):
         try:
             if handler.protocol == 'udp':
-                proxy_r = request.send(self.address,self.port,
-                                timeout=self.timeout)
+                proxy_r = request.send(self.address,self.port, timeout=self.timeout)
             else:
-                proxy_r = request.send(self.address,self.port,
-                                tcp=True,timeout=self.timeout)
+                proxy_r = request.send(self.address,self.port, tcp=True, timeout=self.timeout)
             reply = DNSRecord.parse(proxy_r)
 
             if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
                 print('GOT AAAA or HTTPS')
                 reply = request.reply()
+                reply.header.rcode = getattr(RCODE, 'NXDOMAIN')
                 return reply
 
             if request.q.qtype == QTYPE.A:
