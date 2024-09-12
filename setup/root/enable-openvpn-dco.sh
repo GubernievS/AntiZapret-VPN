@@ -18,10 +18,10 @@ apt-get autoremove -y
 DEBIAN_FRONTEND=noninteractive apt-get install -y linux-headers-$(uname -r) openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
 modprobe ovpn_dco_v2
-sed -i "/ncp-ciphers\|data-ciphers\|disable-dco\|providers/d" /etc/openvpn/server/antizapret-udp.conf
-sed -i "/ncp-ciphers\|data-ciphers\|disable-dco\|providers/d" /etc/openvpn/server/antizapret-tcp.conf
-sed -i "/ncp-ciphers\|data-ciphers\|disable-dco\|providers/d" /etc/openvpn/server/vpn-udp.conf
-sed -i "/ncp-ciphers\|data-ciphers\|disable-dco\|providers/d" /etc/openvpn/server/vpn-tcp.conf
+sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
+sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
+sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-udp.conf
+sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-tcp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antizapret-udp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antizapret-tcp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-udp.conf
