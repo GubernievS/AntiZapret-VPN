@@ -5,6 +5,13 @@
 # chmod +x enable-openvpn-dco.sh && ./enable-openvpn-dco.sh
 #
 set -e
+
+version=$(openvpn --version | head -n 1 | awk '{print $2}')10
+if [[ ! $version =~ ^2\.6 ]]; then
+    echo "OpenVPN version is not 2.6. Exiting."
+    exit 1
+fi
+
 apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
 apt-get install -y openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
