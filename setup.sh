@@ -55,7 +55,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa 
 
 #
 # Сохраняем include-hosts-custom.txt
-mv /root/antizapret/config/include-hosts-custom.txt /root 2>/dev/null
+mv /root/antizapret/config/include-hosts-custom.txt /root || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -64,7 +64,7 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 
 #
 # Восстанавливаем include-hosts-custom.txt
-mv /root/include-hosts-custom.txt /root/antizapret/config 2>/dev/null
+mv /root/include-hosts-custom.txt /root/antizapret/config || true
 
 #
 # Исправляем шаблон для корректной работы gawk начиная с версии 5
