@@ -12,8 +12,10 @@ if [[ ! $version =~ ^2\.6 ]]; then
     exit 1
 fi
 
-apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
-apt-get install -y openvpn-dco-dkms
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef"
+apt-get autoremove -y
+DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
 modprobe ovpn_dco_v2
 sed -i "/ncp-ciphers\|data-ciphers\|disable-dco\|providers/d" /etc/openvpn/server/antizapret-udp.conf
