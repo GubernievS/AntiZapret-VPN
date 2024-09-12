@@ -41,7 +41,7 @@ chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 4. (Опционально) Включить DCO
 5. (Опционально) Добавить клиентов
 ***
-Для OpenVPN вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
+Для OpenVPN 2.6 вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
 
 Для включения DCO выполните команду:
 ```sh
