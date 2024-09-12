@@ -8,10 +8,11 @@
 #
 set -e
 apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
+version=$(openvpn --version | head -n 1 | awk '{print $2}')
 apt-get install -y curl tar perl build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
 rm -rf /root/openvpn
 mkdir -p /root/openvpn
-curl -L -o openvpn.tar.gz https://github.com/OpenVPN/openvpn/releases/download/v2.6.12/openvpn-2.6.12.tar.gz
+curl -L -o openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
 tar --strip-components=1 -xvzf openvpn.tar.gz -C /root/openvpn
 rm -f /root/openvpn.tar.gz
 mv /root/openvpn/src/openvpn/socket.h /root/openvpn/src/openvpn/socket
