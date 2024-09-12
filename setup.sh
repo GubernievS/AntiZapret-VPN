@@ -10,9 +10,7 @@
 # Установка:
 # 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04 или Debian 12)
 # 2. В терминале под root выполнить:
-# apt-get update && apt-get install -y git
-# git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn
-# chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
+# apt-get update && apt-get install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn && chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 #
 # Обсуждение скрипта: https://ntc.party/t/9270
