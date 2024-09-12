@@ -39,11 +39,13 @@ set -e
 
 #
 # Обновляем систему
-apt-get update && apt-get full-upgrade -y && apt-get autoremove -y
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef"
+apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc pgp
+DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc
 
 #
 # Ставим последнюю версию OpenVpn 2.6
@@ -99,6 +101,12 @@ systemctl enable openvpn-server@vpn-tcp
 # Удаляем исключения из исключений антизапрета
 sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
+
+#
+# Удаляем уже ненужные пакеты
+sudo apt-get purge -y git
+sudo apt-get autoremove -y
+sudo apt-get clean
 
 #
 # Перезагружаем
