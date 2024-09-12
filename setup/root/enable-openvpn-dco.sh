@@ -26,10 +26,6 @@ echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antiza
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antizapret-tcp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-udp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-tcp.conf
-systemctl daemon-reload
-systemctl restart openvpn-server@antizapret-udp
-systemctl restart openvpn-server@antizapret-tcp
-systemctl restart openvpn-server@vpn-udp
-systemctl restart openvpn-server@vpn-tcp
 echo ""
-echo "Successful enable DCO!"
+echo "Successful enable DCO! Rebooting..."
+reboot
