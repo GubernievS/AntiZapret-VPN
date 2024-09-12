@@ -1,4 +1,3 @@
-# Дополнительные и оригинальные адреса антизапрета
 youtube.com
 googlevideo.com
 ytimg.com
@@ -32,8 +31,6 @@ theins.ru
 acf.international
 rutracker.cc
 x.com
-
-# Ограничивают доступ из России
 copilot.microsoft.com
 bing.com
 4pda.to
@@ -63,8 +60,6 @@ claude.ai
 anthropic.com
 chatfuel.com
 notion.so
-
-# Внереестровые блокировки в России
 tor.eff.org
 news.google.com
 play.google.com
