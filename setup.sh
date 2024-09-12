@@ -104,9 +104,10 @@ sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/c
 
 #
 # Удаляем уже ненужные пакеты
-sudo apt-get purge -y git
-sudo apt-get autoremove -y
-sudo apt-get clean
+apt-get update
+apt-get purge -y git
+apt-get autoremove -y
+apt-get clean
 
 #
 # Перезагружаем
