@@ -55,13 +55,14 @@ chmod +x ./configure
 make
 make install
 rm -rf /root/openvpn
-sudo apt-get purge -y curl tar perl build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
-sudo apt-get autoremove -y
-sudo apt-get clean
 systemctl daemon-reload
 systemctl restart openvpn-server@antizapret-udp
 systemctl restart openvpn-server@antizapret-tcp
 systemctl restart openvpn-server@vpn-udp
 systemctl restart openvpn-server@vpn-tcp
+apt-get update
+apt-get purge -y curl tar perl build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
+apt-get autoremove -y
+apt-get clean
 echo ""
 echo "Patch successful installation!"
