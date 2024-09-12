@@ -55,10 +55,6 @@ chmod +x ./configure
 make
 make install
 rm -rf /root/openvpn
-systemctl daemon-reload
-systemctl restart openvpn-server@antizapret-udp
-systemctl restart openvpn-server@antizapret-tcp
-systemctl restart openvpn-server@vpn-udp
-systemctl restart openvpn-server@vpn-tcp
 echo ""
-echo "Patch successful installation!"
+echo "Patch successful installation! Rebooting..."
+reboot
