@@ -27,10 +27,10 @@ AntiZapret VPN (antizapret-\*.ovpn) и обычный VPN (vpn-\*.ovpn) рабо
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
-Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
+Протестировано на Ubuntu 22.04/24.04 и Debian 12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 ***
 ### Установка:
-1. Устанавливать на чистую Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04 или Debian 12)
+1. Устанавливать на чистую Ubuntu 22.04/24.04 или Debian 12 (рекомендуется Ubuntu 24.04)
 2. В терминале под root выполнить:
 ```sh
 apt-get update && apt-get install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn && chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
