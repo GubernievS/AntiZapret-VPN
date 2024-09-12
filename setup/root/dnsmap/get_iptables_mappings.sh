@@ -1,2 +1,2 @@
 #!/bin/bash
-iptables-legacy -w -t nat -nL dnsmap | awk '{if (NR<3) {next}; sub(/to\:/, "", $6); print $5,$6}'
+iptables-legacy -w -t nat -nL dnsmap | awk '{if (NR<3) {next}; sub(/to:/, "", $6); print $5,$6}'
