@@ -103,12 +103,5 @@ sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
-# Удаляем уже ненужные пакеты
-apt-get update
-apt-get purge -y git
-apt-get autoremove -y
-apt-get clean
-
-#
 # Перезагружаем
 reboot
