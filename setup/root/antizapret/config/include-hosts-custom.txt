@@ -42,6 +42,8 @@ weather.com
 gemini.google.com
 claude.ai
 anthropic.com
+chatfuel.com
+notion.so
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt
 tor.eff.org
