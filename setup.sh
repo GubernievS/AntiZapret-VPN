@@ -102,6 +102,9 @@ systemctl enable openvpn-server@vpn-tcp
 sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
+echo ""
+echo "AntiZapret-VPN successful installation! Rebooting..."
+
 #
 # Перезагружаем
 reboot
