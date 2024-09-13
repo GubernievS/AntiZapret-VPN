@@ -108,7 +108,9 @@ load_key
 
 render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret-$CLIENT-$SERVER-udp.ovpn"
 render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/antizapret-$CLIENT-$SERVER-tcp.ovpn"
+render "/etc/openvpn/client/templates/antizapret.conf" > "/root/antizapret-$CLIENT-$SERVER.ovpn"
 render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn-$CLIENT-$SERVER-udp.ovpn"
 render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$CLIENT-$SERVER-tcp.ovpn"
+render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$CLIENT-$SERVER.ovpn"
 
 echo "OpenVPN configuration files for client '$CLIENT' have been (re)created in '/root'"
