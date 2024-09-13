@@ -43,7 +43,7 @@ apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc
+DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl
 
 #
 # Ставим последнюю версию OpenVpn 2.6
