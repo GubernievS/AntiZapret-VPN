@@ -33,7 +33,15 @@
 # Для выключения DCO выполните команду:
 # /root/disable-openvpn-dco.sh
 
-set -e
+set -euo pipefail
+
+# Файл логов
+LOGFILE="/var/log/antizapret-vpn-setup.log"
+
+# Функция для логгирования
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOGFILE"
+}
 
 # Функция для обработки ошибок
 handle_error() {
@@ -44,17 +52,32 @@ handle_error() {
 # Устанавливаем ловушку для ERR, чтобы отслеживать ошибки
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-#
+# Проверка на выполнение от имени root
+if [[ $EUID -ne 0 ]]; then
+    log "Скрипт должен быть запущен от имени root. Запустите с sudo."
+    exit 1
+fi
+
+log "Начало установки AntiZapret VPN..."
+
 # Обновляем систему
-echo "Обновление системы..."
+log "Обновление системы..."
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef"
 apt-get autoremove -y
 
-#
-# Ставим необходимые пакеты
+# Проверка и установка необходимых пакетов
 echo "Установка необходимых пакетов..."
-DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl
+REQUIRED_PKGS=("git" "openvpn" "iptables" "easy-rsa" "ferm" "gawk" "knot-resolver" "python3-dnslib" "idn" "sipcalc" "curl")
+for pkg in "${REQUIRED_PKGS[@]}"; do
+    if ! dpkg -l | grep -qw "$pkg"; then
+        log "Установка пакета: $pkg"
+        DEBIAN_FRONTEND=noninteractive apt-get install -y "$pkg"
+    else
+        log "Пакет $pkg уже установлен."
+    fi
+done
+
 
 #
 # Ставим последнюю версию OpenVPN 2.6
@@ -67,28 +90,28 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa 
 
 #
 # Сохраняем include-hosts-custom.txt
-echo "Сохранение include-hosts-custom.txt..."
+log "Сохранение include-hosts-custom.txt..."
 mv /root/antizapret/config/include-hosts-custom.txt /root || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
-echo "Обновление antizapret до последней версии..."
+log "Обновление antizapret до последней версии..."
 rm -rf /root/antizapret
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
 # Восстанавливаем include-hosts-custom.txt
-echo "Восстановление include-hosts-custom.txt..."
+log "Восстановление include-hosts-custom.txt..."
 mv /root/include-hosts-custom.txt /root/antizapret/config || true
 
 #
 # Исправляем шаблон для корректной работы gawk начиная с версии 5
-echo "Исправление шаблона для gawk..."
+log "Исправление шаблона для gawk..."
 sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
-echo "Копирование и удаление файлов..."
+log "Копирование необходимых файлов и удаление ненужных..."
 find /root/antizapret -name '*.gitkeep' -delete
 rm -rf /root/antizapret/.git
 find /root/antizapret-vpn -name '*.gitkeep' -delete
@@ -97,41 +120,58 @@ rm -rf /root/antizapret-vpn
 
 #
 # Выставляем разрешения на запуск скриптов
-echo "Установка разрешений на выполнение скриптов..."
+log "Установка разрешений на выполнение скриптов..."
 find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
 
 #
 # Создаем пользователя 'client', его ключи 'antizapret-client', ключи сервера 'antizapret-server' и создаем *.ovpn файлы подключений в /root
-echo "Создание пользователя и генерация ключей..."
+log "Создание пользователя и генерация ключей..."
 /root/add-client.sh client
 
-#
-# Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
-echo "Добавление AdGuard DNS..."
-echo "
-policy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
+# Выбор DNS сервера
+log "Выбор DNS сервера..."
+echo "Выберите DNS сервер для использования:"
+echo "1) AdGuard DNS (рекомендуется)"
+echo "2) Google DNS"
+read -rp "Введите номер (1 или 2): " dns_choice
+
+case $dns_choice in
+    1)
+        log "Выбран AdGuard DNS."
+        DNS_SERVERS="'94.140.14.14', '94.140.15.15'"
+        ;;
+    2)
+        log "Выбран Google DNS."
+        DNS_SERVERS="'8.8.8.8', '8.8.4.4'"
+        ;;
+    *)
+        log "Неверный выбор. Используется AdGuard DNS по умолчанию."
+        DNS_SERVERS="'94.140.14.14', '94.140.15.15'"
+        ;;
+esac
+
+# Добавление выбранного DNS
+log "Добавление выбранного DNS..."
+echo "policy.add(policy.all(policy.FORWARD({$DNS_SERVERS})))" >> /etc/knot-resolver/kresd.conf
 
 #
 # Запуск всех необходимых служб при загрузке
-echo "Включение служб на автозапуск..."
-systemctl enable kresd@1
-systemctl enable antizapret-update.service
-systemctl enable antizapret-update.timer
-systemctl enable dnsmap
-systemctl enable openvpn-server@antizapret-udp
-systemctl enable openvpn-server@antizapret-tcp
-systemctl enable openvpn-server@vpn-udp
-systemctl enable openvpn-server@vpn-tcp
+log "Включение служб на автозапуск..."
+for service in kresd@1 antizapret-update.service antizapret-update.timer dnsmap openvpn-server@antizapret-udp openvpn-server@antizapret-tcp openvpn-server@vpn-udp openvpn-server@vpn-tcp; do
+    systemctl enable "$service"
+done
 
 #
 # Удаляем исключения из исключений антизапрета
-echo "Удаление исключений антизапрета..."
+log "Удаление исключений антизапрета..."
 sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 echo ""
-echo "AntiZapret-VPN успешно установлен! Перезагрузка..."
+log "AntiZapret-VPN успешно установлен! Перезагрузка через 5 секунд..."
+
+sleep 5
 
 #
 # Перезагружаем
