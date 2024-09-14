@@ -41,7 +41,7 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 
 Опционально можно:
 1. Установить обновления Knot Resolver, dnslib, OpenVPN и DCO
-2. Поставить патч для обхода блокировки протокола OpenVPN
+2. Установить патч для обхода блокировки протокола OpenVPN
 3. Включить DCO
 4. Добавить клиентов
 ***
