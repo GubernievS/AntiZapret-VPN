@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Скрипт для автоматического развертывания AntiZapret-VPN + обычный VPN
-# Версия от 14.09.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -41,6 +40,8 @@ fi
 
 echo ""
 echo "Installing AntiZapret-VPN + traditional VPN..."
+echo ""
+echo "Version from 15.09.2024"
 echo ""
 
 until [[ $UPGRADE =~ (y|n) ]]; do
