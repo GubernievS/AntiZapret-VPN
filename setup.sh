@@ -46,6 +46,11 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 mv /root/include-hosts-custom.txt /root/antizapret/config || true
 
 #
+# Удаляем исключения из исключений антизапрета
+sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
+sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
+
+#
 # Исправляем шаблон для корректной работы gawk начиная с версии 5
 sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
@@ -81,11 +86,6 @@ systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
-
-#
-# Удаляем исключения из исключений антизапрета
-sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
-sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 echo ""
 echo "AntiZapret-VPN successful installation! Rebooting..."
