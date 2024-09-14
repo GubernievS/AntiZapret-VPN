@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Добавление нового клиента
+#
+# chmod +x add-client.sh && ./add-client.sh [имя_клиента]
+#
 set -e
 
 mkdir /root/easyrsa3 || true
