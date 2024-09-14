@@ -57,13 +57,13 @@ until [[ $DCO =~ (y|n) ]]; do
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
-until [[ $DNS1 =~ (y|n) ]]; do
-	read -rp "Use AdGuard DNS for AntiZapret-VPN? [y/n]: " -e -i n DNS1
+until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
+	read -rp "Use AdGuard DNS for AntiZapret-VPN? [y/n]: " -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
-until [[ $DNS2 =~ (y|n) ]]; do
-	read -rp "Use AdGuard DNS for traditional VPN? [y/n]: " -e -i n DNS2
+until [[ $DNS_VPN =~ (y|n) ]]; do
+	read -rp "Use AdGuard DNS for traditional VPN? [y/n]: " -e -i n DNS_VPN
 done
 
 #
@@ -124,13 +124,13 @@ chmod +x /root/dnsmap/proxy.py
 
 #
 # Добавляем AdGuard DNS в AntiZapret-VPN
-if [ "$DNS1" = "y" ]; then
+if [ "$DNS_ANTIZAPRET" = "y" ]; then
 	echo -e "\npolicy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Добавляем AdGuard DNS в обычный VPN
-if [ "$DNS2" = "y" ]; then
+if [ "$DNS_VPN" = "y" ]; then
 	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-tcp.conf
