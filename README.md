@@ -73,7 +73,7 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 ```sh
 ./delete-client.sh [имя_клиента]
 ```
-После добавления нового клиента скопируйте новые файлы \*.ovpn с сервера из папки /root\
+После добавления нового клиента скопируйте новые файлы \*.ovpn с сервера из папки /root
 ***
 Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
 ```sh
