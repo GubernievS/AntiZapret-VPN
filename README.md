@@ -55,7 +55,7 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 ./patch-openvpn.sh
 ```
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы установили последнюю версию OpenVPN, то можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
+Если у вас Ubuntu 24.04 или Debian 12, или вы установили обновление OpenVPN, то можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
 Включить DCO
 ```sh
 ./enable-openvpn-dco.sh
