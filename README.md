@@ -35,7 +35,7 @@ OpenVPN позволяет нескольким клиентам использ�
 1. Устанавливать на чистую Ubuntu 22.04/24.04 или Debian 11*/12 (рекомендуется Ubuntu 24.04)
 2. В терминале под root выполнить
 ```sh
-apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && cd tmp && chmod +x setup.sh && ./setup.sh
+apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 ```
 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
