@@ -55,5 +55,8 @@ chmod +x ./configure
 make
 make install
 echo ""
-echo "Patch successful installation! Rebooting..."
-reboot
+echo "Patch successful installation!"
+if [ "$1" != "noreboot" ]; then
+	echo "Rebooting..."
+	reboot
+fi
