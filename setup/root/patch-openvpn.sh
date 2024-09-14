@@ -54,7 +54,6 @@ chmod +x ./configure
 ./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
 make
 make install
-rm -rf /root/openvpn
 echo ""
 echo "Patch successful installation! Rebooting..."
 reboot
