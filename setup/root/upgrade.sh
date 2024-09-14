@@ -27,5 +27,9 @@ DEBIAN_FRONTEND=noninteractive apt install --reinstall -y openvpn python3-pip
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --upgrade dnslib
 
 echo ""
-echo "Successful upgrade Knot Resolver, dnslib and OpenVPN! Rebooting..."
-reboot
+echo "Successful upgrade Knot Resolver, dnslib and OpenVPN!"
+
+if [ "$1" != "noreboot" ]; then
+	echo "Rebooting..."
+	reboot
+fi
