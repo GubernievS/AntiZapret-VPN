@@ -11,20 +11,20 @@
 # Установка:
 # 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11*/12 (рекомендуется Ubuntu 24.04)
 # 2. В терминале под root выполнить:
-# apt-get update && apt-get install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn && chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
+# apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn && cd antizapret-vpn && chmod +x setup.sh && ./setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
 set -e
 
 #
 # Обновляем систему
-apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef"
-apt-get autoremove -y
+apt update
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef"
+apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl gpg
+DEBIAN_FRONTEND=noninteractive apt install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl gpg
 
 #
 # Сохраняем include-hosts-custom.txt
