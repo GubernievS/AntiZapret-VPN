@@ -27,5 +27,8 @@ echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antiza
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-udp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-tcp.conf
 echo ""
-echo "Successful enable DCO! Rebooting..."
-reboot
+echo "Successful enable DCO!"
+if [ "$1" != "noreboot" ]; then
+	echo "Rebooting..."
+	reboot
+fi
