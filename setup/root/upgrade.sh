@@ -24,7 +24,7 @@ apt remove --purge -y python3-dnslib
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef"
 apt autoremove -y
 DEBIAN_FRONTEND=noninteractive apt install --reinstall -y openvpn python3-pip
-PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install dnslib
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --upgrade dnslib
 
 echo ""
 echo "Successful upgrade Knot Resolver, dnslib and OpenVPN! Rebooting..."
