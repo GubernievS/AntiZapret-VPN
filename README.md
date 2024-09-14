@@ -62,11 +62,11 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 ***
 Добавить нового клиента:
 ```sh
-./add-client.sh [имя_пользователя]
+./add-client.sh [имя_клиента]
 ```
 Удалить клиента:
 ```sh
-./delete-client.sh [имя_пользователя]
+./delete-client.sh [имя_клиента]
 ```
 После добавления нового клиента скопируйте новые файлы \*.ovpn с сервера из папки /root\
 ***
