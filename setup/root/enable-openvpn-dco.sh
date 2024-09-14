@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Включаем DCO (Data Channel Offload) на OpenVpn 2.6+
+# Включаем DCO (Data Channel Offload) на OpenVpn 2.6
 #
 # chmod +x enable-openvpn-dco.sh && ./enable-openvpn-dco.sh
 #
