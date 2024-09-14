@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Удаление клиента
+#
+# chmod +x delete-client.sh && ./delete-client.sh [имя_клиента]
+#
 set -e
 
 cd /root/easyrsa3
