@@ -39,12 +39,12 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
 Опционально можно:
-1. Установить последнюю версию OpenVPN 2.6
+1. Установить последнюю версию OpenVPN 2.6 м DCO
 2. Поставить патч для обхода блокировки протокола OpenVPN
 3. Включить DCO
 4. Добавить клиентов
 ***
-Установить последнюю версию OpenVPN 2.6
+Установить последнюю версию OpenVPN 2.6 (и DCO если был ранее установлен)
 ```sh
 ./upgrade-openvpn.sh
 ```
@@ -54,7 +54,7 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 ./patch-openvpn.sh
 ```
 ***
-Если у вас Ubuntu 24.04 или Debian 12, или вы обновили OpenVPN до версии 2.6 то вы можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
+Если у вас Ubuntu 24.04 или Debian 12, или вы установили последнюю версию OpenVPN, то можете включить модуль [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload), он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через VPN
 Включить DCO
 ```sh
 ./enable-openvpn-dco.sh
