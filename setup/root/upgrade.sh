@@ -27,7 +27,13 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 apt-get autoremove -y
 
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y openvpn python3-pip
-pip3 install dnslib --break-system-packages
+
+help_output=$(pip3 install --help)
+if echo "$help_output" | grep -q "--break-system-packages"; then
+	pip3 install dnslib --break-system-packages
+else
+	pip3 install dnslib
+fi
 
 echo ""
 echo "Successful upgrade Knot Resolver, dnslib and OpenVPN! Rebooting..."
