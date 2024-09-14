@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
+# Скрипт для автоматического развертывания AntiZapret-VPN + обычный VPN
 # Версия от 14.09.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
@@ -15,6 +15,55 @@
 # 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
 set -e
+
+if [ "$EUID" -ne 0 ]; then
+	echo "You need to run this as root permission!"
+	exit 1
+fi
+
+ID=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+VERSION=$(lsb_release -rs | cut -d '.' -f1)
+
+if [ $ID == "debian" ]; then
+	if [ $VERSION -lt 11 ]; then
+		echo "Your version of Debian is not supported!"
+		exit 2
+	fi
+elif [ $ID == "ubuntu" ]; then
+	if [ $VERSION -lt 22 ]; then
+		echo "Your version of Ubuntu is not supported!"
+		exit 3
+	fi
+elif [ $ID != "debian" ] && [ $ID != "ubuntu" ]; then
+	echo "Your version of Linux is not supported!"
+	exit 4
+fi
+
+echo ""
+echo "Installing AntiZapret-VPN + traditional VPN..."
+echo ""
+
+until [[ $UPGRADE =~ (y|n) ]]; do
+	read -rp "Upgrade Knot Resolver, dnslib, OpenVPN? [y/n]: " -e -i y UPGRADE
+done
+echo ""
+until [[ $PATCH =~ (y|n) ]]; do
+	read -rp "Install anti-censorship patch for OpenVPN? [y/n]: " -e -i y PATCH
+done
+echo ""
+until [[ $DCO =~ (y|n) ]]; do
+	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
+done
+echo ""
+echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
+until [[ $DNS1 =~ (y|n) ]]; do
+	read -rp "Use AdGuard DNS for AntiZapret-VPN? [y/n]: " -e -i n DNS1
+done
+echo ""
+echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
+until [[ $DNS2 =~ (y|n) ]]; do
+	read -rp "Use AdGuard DNS for traditional VPN? [y/n]: " -e -i n DNS2
+done
 
 #
 # Обновляем систему
@@ -73,9 +122,19 @@ chmod +x /root/dnsmap/proxy.py
 /root/add-client.sh client
 
 #
-# Добавляем AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
-echo "
-policy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
+# Добавляем AdGuard DNS в AntiZapret-VPN
+if [ "$DNS1" = "y" ]; then
+	echo -e "\npolicy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
+fi
+
+#
+# Добавляем AdGuard DNS в обычный VPN
+if [ "$DNS2" = "y" ]; then
+	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-udp.conf
+	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-udp.conf
+	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-tcp.conf
+	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-tcp.conf
+fi
 
 #
 # Запустим все необходимые службы при загрузке
@@ -88,8 +147,21 @@ systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 
+if [ "$UPGRADE" = "y" ]; then
+	/root/upgrade.sh noreboot
+fi
+
+if [ "$PATCH" = "y" ]; then
+	/root/patch-openvpn.sh noreboot
+fi
+
+if [ "$DCO" = "y" ]; then
+	/root/enable-openvpn-dco.sh noreboot
+fi
+
 echo ""
-echo "AntiZapret-VPN successful installation! Rebooting..."
+echo "AntiZapret-VPN successful installation!"
+echo "Rebooting..."
 
 #
 # Перезагружаем
