@@ -6,8 +6,6 @@
 #
 set -e
 
-#apt-get -y install apt-transport-https ca-certificates
-
 if [ -d "/root/openvpn" ]; then
 	cd /root/openvpn
 	make uninstall
@@ -21,19 +19,12 @@ echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.ni
 curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
-apt-get update
-apt-get remove --purge -y python3-dnslib
-DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef"
-apt-get autoremove -y
-
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y openvpn python3-pip
-
-help_output=$(pip3 install --help)
-if echo "$help_output" | grep -q "break-system-packages"; then
-	pip3 install dnslib --break-system-packages
-else
-	pip3 install dnslib
-fi
+apt update
+apt remove --purge -y python3-dnslib
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef"
+apt autoremove -y
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y openvpn python3-pip
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install dnslib
 
 echo ""
 echo "Successful upgrade Knot Resolver, dnslib and OpenVPN! Rebooting..."
