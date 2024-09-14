@@ -197,9 +197,9 @@ if __name__ == '__main__':
     p.add_argument("--address","-a",default="",
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
-    p.add_argument("--upstream","-u",default="8.8.8.8:53",
+    p.add_argument("--upstream","-u",default="1.1.1.1:53",
             metavar="<dns server:port>",
-                    help="Upstream DNS server:port (default:8.8.8.8:53)")
+                    help="Upstream DNS server:port (default:1.1.1.1:53)")
     p.add_argument("--tcp",action='store_true',default=False,
                     help="TCP proxy (default: UDP only)")
     p.add_argument("--timeout","-o",type=float,default=5,
@@ -227,6 +227,7 @@ if __name__ == '__main__':
     resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.iprange)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
     logger = DNSLogger(args.log,args.log_prefix)
+
     udp_server = DNSServer(resolver,
                            port=args.port,
                            address=args.address,
