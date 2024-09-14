@@ -11,7 +11,7 @@
 # Установка:
 # 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11*/12 (рекомендуется Ubuntu 24.04)
 # 2. В терминале под root выполнить:
-# apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && cd tmp && chmod +x setup.sh && ./setup.sh
+# apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
 set -e
@@ -56,11 +56,12 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
+script_dir=$(dirname "$(readlink -f "$0")")
 find /root/antizapret -name '*.gitkeep' -delete
 rm -rf /root/antizapret/.git
-find $PWD -name '*.gitkeep' -delete
-cp -r $PWD/setup/* / 
-rm -rf $PWD
+find $script_dir -name '*.gitkeep' -delete
+cp -r $script_dir/setup/* / 
+rm -rf $script_dir
 
 #
 # Выставляем разрешения на запуск скриптов
