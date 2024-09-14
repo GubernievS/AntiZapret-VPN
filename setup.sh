@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
-# Версия от 13.09.2024
+# Версия от 14.09.2024
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -12,26 +12,6 @@
 # 2. В терминале под root выполнить:
 # apt-get update && apt-get install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git antizapret-vpn && chmod +x antizapret-vpn/setup.sh && antizapret-vpn/setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
-#
-# Обсуждение скрипта: https://ntc.party/t/9270
-#
-# Изменить файл с предзаполненным списком антизапрета (include-hosts-custom.txt):
-# nano /root/antizapret/config/include-hosts-custom.txt
-# Потом выполнить команду для обновления списка антизапрета:
-# /root/antizapret/doall.sh
-#
-# Для добавления нового клиента выполните команду и введите имя:
-# /root/add-client.sh [имя_пользователя]
-# Скопируйте новые файлы *.ovpn с сервера из папки /root
-#
-# Для удаления клиента выполните команду и введите имя:
-# /root/delete-client.sh [имя_пользователя]
-#
-# Для включения DCO выполните команду:
-# /root/enable-openvpn-dco.sh
-#
-# Для выключения DCO выполните команду:
-# /root/disable-openvpn-dco.sh
 
 set -e
 
@@ -44,14 +24,6 @@ apt-get autoremove -y
 #
 # Ставим необходимые пакеты
 DEBIAN_FRONTEND=noninteractive apt-get install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl
-
-#
-# Ставим последнюю версию OpenVpn 2.6
-#mkdir -p /etc/apt/keyrings
-#curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
-#echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
-#apt-get update
-#DEBIAN_FRONTEND=noninteractive apt-get install -y openvpn
 
 #
 # Сохраняем include-hosts-custom.txt
