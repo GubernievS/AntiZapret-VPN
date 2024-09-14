@@ -19,17 +19,17 @@ set -e
 #
 # Обновляем систему
 apt update
-DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef"
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc curl gpg
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc curl gpg
 
 #
 # Если не был установлен dnslib то ставим python3-dnslib
 if ! python3 -c "import dnslib" 2>/dev/null; then
-	DEBIAN_FRONTEND=noninteractive apt install -y python3-dnslib
+	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y python3-dnslib
 fi
 
 #
