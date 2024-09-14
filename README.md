@@ -43,7 +43,7 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 1. Установить обновления Knot Resolver, dnslib, OpenVPN и DCO
 2. Установить патч для обхода блокировки протокола OpenVPN
 3. Включить DCO
-4. Включить AdGuard DNS (только при установки)
+4. Включить AdGuard DNS для: AntiZapret-VPN / обычного VPN (только при установке)
 5. Добавить клиентов (только после установки)
 ***
 Установить обновления Knot Resolver, dnslib, OpenVPN и DCO (если был установлен ранее)
