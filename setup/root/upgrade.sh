@@ -21,7 +21,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn
 
 apt update
 apt remove --purge -y python3-dnslib
-DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef"
+DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 apt autoremove -y
 DEBIAN_FRONTEND=noninteractive apt install --reinstall -y openvpn python3-pip
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --upgrade dnslib
