@@ -24,7 +24,13 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install -y git openvpn iptables easy-rsa ferm gawk knot-resolver python3-dnslib idn sipcalc curl gpg
+DEBIAN_FRONTEND=noninteractive apt install -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc curl gpg
+
+#
+# Если не был установлен dnslib то ставим python3-dnslib
+if ! python3 -c "import dnslib" 2>/dev/null; then
+	DEBIAN_FRONTEND=noninteractive apt install -y python3-dnslib
+fi
 
 #
 # Сохраняем include-hosts-custom.txt
