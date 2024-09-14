@@ -40,12 +40,12 @@ apt-get update && apt-get install -y git && git clone https://github.com/Guberni
 3. Дождаться перезагрузки сервера и скопировать файлы *.ovpn с сервера из папки /root
 
 Опционально можно:
-1. Установить последнюю версию Knot Resolver, dnslib, OpenVPN и DCO
+1. Установить обновления Knot Resolver, dnslib, OpenVPN и DCO
 2. Поставить патч для обхода блокировки протокола OpenVPN
 3. Включить DCO
 4. Добавить клиентов
 ***
-Установить последнюю версию Knot Resolver, dnslib, OpenVPN и DCO (если был установлен ранее)
+Установить обновления Knot Resolver, dnslib, OpenVPN и DCO (если был установлен ранее)
 ```sh
 ./upgrade.sh
 ```
