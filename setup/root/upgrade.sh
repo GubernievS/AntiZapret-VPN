@@ -29,7 +29,7 @@ apt-get autoremove -y
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y openvpn python3-pip
 
 help_output=$(pip3 install --help)
-if echo "$help_output" | grep -q "--break-system-packages"; then
+if echo "$help_output" | grep -q "break-system-packages"; then
 	pip3 install dnslib --break-system-packages
 else
 	pip3 install dnslib
