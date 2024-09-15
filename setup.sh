@@ -15,7 +15,7 @@
 
 set -e
 
-if [ "$EUID" -ne 0 ]; then
+if [[ "$EUID" -ne 0 ]]; then
 	echo "You need to run this as root permission!"
 	exit 1
 fi
@@ -23,17 +23,17 @@ fi
 ID=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
 VERSION=$(lsb_release -rs | cut -d '.' -f1)
 
-if [ $ID == "debian" ]; then
-	if [ $VERSION -lt 11 ]; then
+if [[ $ID == "debian" ]]; then
+	if [[ $VERSION -lt 11 ]]; then
 		echo "Your version of Debian is not supported!"
 		exit 2
 	fi
-elif [ $ID == "ubuntu" ]; then
-	if [ $VERSION -lt 22 ]; then
+elif [[ $ID == "ubuntu" ]]; then
+	if [[ $VERSION -lt 22 ]]; then
 		echo "Your version of Ubuntu is not supported!"
 		exit 3
 	fi
-elif [ $ID != "debian" ] && [ $ID != "ubuntu" ]; then
+elif [[ $ID != "debian" ]] && [[ $ID != "ubuntu" ]]; then
 	echo "Your version of Linux is not supported!"
 	exit 4
 fi
@@ -125,13 +125,13 @@ chmod +x /root/dnsmap/proxy.py
 
 #
 # Добавляем AdGuard DNS в AntiZapret VPN
-if [ "$DNS_ANTIZAPRET" = "y" ]; then
+if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
 	echo -e "\npolicy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Добавляем AdGuard DNS в обычный VPN
-if [ "$DNS_VPN" = "y" ]; then
+if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-tcp.conf
@@ -149,15 +149,15 @@ systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 
-if [ "$UPGRADE" = "y" ]; then
+if [[ "$UPGRADE" = "y" ]]; then
 	/root/upgrade.sh noreboot
 fi
 
-if [ "$PATCH" = "y" ]; then
+if [[ "$PATCH" = "y" ]]; then
 	/root/patch-openvpn.sh noreboot
 fi
 
-if [ "$DCO" = "y" ]; then
+if [[ "$DCO" = "y" ]]; then
 	/root/enable-openvpn-dco.sh noreboot
 fi
 
