@@ -56,7 +56,7 @@ make
 make install
 echo ""
 echo "Patch successful installation!"
-if [ "$1" != "noreboot" ]; then
+if [[ "$1" != "noreboot" ]]; then
 	echo "Rebooting..."
 	reboot
 fi
