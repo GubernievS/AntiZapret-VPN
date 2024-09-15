@@ -6,7 +6,7 @@
 #
 set -e
 
-if [ -d "/root/openvpn" ]; then
+if [[ -d "/root/openvpn" ]]; then
 	cd /root/openvpn
 	make uninstall
 fi
@@ -29,7 +29,7 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --upgrade dnslib
 echo ""
 echo "Successful upgrade Knot Resolver, dnslib and OpenVPN!"
 
-if [ "$1" != "noreboot" ]; then
+if [[ "$1" != "noreboot" ]]; then
 	echo "Rebooting..."
 	reboot
 fi
