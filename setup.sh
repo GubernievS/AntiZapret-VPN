@@ -65,6 +65,7 @@ echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing we
 until [[ $DNS_VPN =~ (y|n) ]]; do
 	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
+echo ""
 
 #
 # Обновляем систему
