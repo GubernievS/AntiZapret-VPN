@@ -58,14 +58,12 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	echo -e "Use AdGuard DNS for \e[1;92mAntiZapret VPN\e[0m? [y/n]: \c"
-	read -r -e -i n DNS_ANTIZAPRET
+	read -rp $'Use AdGuard DNS for \e[1;92mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_VPN =~ (y|n) ]]; do
-	echo -e "Use AdGuard DNS for \e[1;92mtraditional VPN\e[0m? [y/n]: \c"
-	read -r -e -i n DNS_VPN
+	read -rp $'Use AdGuard DNS for \e[1;92mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
 
 #
@@ -163,7 +161,7 @@ if [ "$DCO" = "y" ]; then
 fi
 
 echo ""
-echo "AntiZapret VPN + traditional VPN successful installation!"
+echo -e "\e[1;92mAntiZapret VPN + traditional VPN successful installation!\e[0m"
 echo "Rebooting..."
 
 #
