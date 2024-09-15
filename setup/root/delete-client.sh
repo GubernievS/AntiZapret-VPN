@@ -9,7 +9,7 @@ set -e
 cd /root/easyrsa3
 
 CLIENT=$1
-if [ -z "$CLIENT" ]
+if [[ -z "$CLIENT" ]]
 then
 	echo ""
 	echo "Tell me a name for the delete client OpenVPN"
@@ -21,14 +21,14 @@ then
 fi
 
 /usr/share/easy-rsa/easyrsa --batch revoke antizapret-$CLIENT
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "Failed to revoke certificate for client $CLIENT"
     exit 1
 fi
 
 /usr/share/easy-rsa/easyrsa gen-crl
 cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "Failed to update CRL"
     exit 2
 fi
