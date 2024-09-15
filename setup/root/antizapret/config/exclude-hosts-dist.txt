@@ -1,0 +1,1 @@
+# NOTE: only ZONES should be here. Not subdomains.
