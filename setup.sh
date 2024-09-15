@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Скрипт для автоматического развертывания AntiZapret-VPN + обычный VPN
+# Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -39,7 +39,7 @@ elif [ $ID != "debian" ] && [ $ID != "ubuntu" ]; then
 fi
 
 echo ""
-echo "Installing AntiZapret-VPN + traditional VPN..."
+echo -e "\e[1;92mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
 echo "Version from 15.09.2024"
 echo ""
@@ -58,12 +58,14 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp "Use AdGuard DNS for AntiZapret-VPN? [y/n]: " -e -i n DNS_ANTIZAPRET
+	echo -e "Use AdGuard DNS for \e[1;92mAntiZapret VPN\e[0m? [y/n]: \c"
+	read -r -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_VPN =~ (y|n) ]]; do
-	read -rp "Use AdGuard DNS for traditional VPN? [y/n]: " -e -i n DNS_VPN
+	echo -e "Use AdGuard DNS for \e[1;92mtraditional VPN\e[0m? [y/n]: \c"
+	read -r -e -i n DNS_VPN
 done
 
 #
@@ -123,7 +125,7 @@ chmod +x /root/dnsmap/proxy.py
 /root/add-client.sh client
 
 #
-# Добавляем AdGuard DNS в AntiZapret-VPN
+# Добавляем AdGuard DNS в AntiZapret VPN
 if [ "$DNS_ANTIZAPRET" = "y" ]; then
 	echo -e "\npolicy.add(policy.all(policy.FORWARD({'94.140.14.14', '94.140.15.15'})))" >> /etc/knot-resolver/kresd.conf
 fi
@@ -161,7 +163,7 @@ if [ "$DCO" = "y" ]; then
 fi
 
 echo ""
-echo "AntiZapret-VPN successful installation!"
+echo "AntiZapret VPN + traditional VPN successful installation!"
 echo "Rebooting..."
 
 #
