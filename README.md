@@ -76,7 +76,11 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 ```
 После добавления нового клиента скопируйте новые файлы \*.ovpn с сервера из папки /root
 ***
-Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
+Добавить свои сайты в список антизапрета (include-hosts-custom.txt)\
+Добавлять нужно только домены, например:
+>subdomain.example.com\
+example.com\
+com
 ```sh
 nano /root/antizapret/config/include-hosts-custom.txt
 ```
