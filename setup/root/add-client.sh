@@ -10,7 +10,7 @@ mkdir /root/easyrsa3 || true
 cd /root/easyrsa3
 
 CLIENT=$1
-if [ -z "$CLIENT" ]
+if [[ -z "$CLIENT" ]]
 then
 	echo ""
 	echo "Tell me a name for the new client OpenVPN"
@@ -53,7 +53,7 @@ load_key() {
 	CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
 	CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/antizapret-$CLIENT.crt")
 	CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/antizapret-$CLIENT.key")
-	if [ ! "$CA_CERT" ] || [ ! "$CLIENT_CERT" ] || [ ! "$CLIENT_KEY" ]
+	if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]
 	then
 		echo "Can't load client keys!"
 		exit 2
