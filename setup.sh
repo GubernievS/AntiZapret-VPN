@@ -39,7 +39,7 @@ elif [ $ID != "debian" ] && [ $ID != "ubuntu" ]; then
 fi
 
 echo ""
-echo -e "\e[1;92mInstalling AntiZapret VPN + traditional VPN\e[0m"
+echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
 echo "Version from 15.09.2024"
 echo ""
@@ -58,12 +58,12 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;92mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DNS_ANTIZAPRET
+	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
 until [[ $DNS_VPN =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;92mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
+	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
 
 #
@@ -161,7 +161,7 @@ if [ "$DCO" = "y" ]; then
 fi
 
 echo ""
-echo -e "\e[1;92mAntiZapret VPN + traditional VPN successful installation!\e[0m"
+echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
 echo "Rebooting..."
 
 #
