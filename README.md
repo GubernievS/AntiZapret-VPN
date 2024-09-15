@@ -1,4 +1,4 @@
-# AntiZapret VPN (версия без контейнера)
+# AntiZapret VPN + обычный VPN
 
 Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
 
