@@ -6,7 +6,7 @@
 #
 set -e
 
-version=$(openvpn --version | head -n 1 | awk '{print $2}')10
+version=$(openvpn --version | head -n 1 | awk '{print $2}')
 if [[ ! $version =~ ^2\.6 ]]; then
     echo "OpenVPN version is not 2.6. Exiting."
     exit 1
@@ -28,7 +28,7 @@ echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-ud
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-tcp.conf
 echo ""
 echo "Successful enable DCO!"
-if [ "$1" != "noreboot" ]; then
+if [[ "$1" != "noreboot" ]]; then
 	echo "Rebooting..."
 	reboot
 fi
