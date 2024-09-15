@@ -1,24 +1,24 @@
-# AntiZapret-VPN (версия без контейнера)
+# AntiZapret VPN (версия без контейнера)
 
-Скрипт для автоматического развертывания AntiZapret-VPN + обычный VPN
+Скрипт для автоматического развертывания AntiZapret VPN + обычный VPN
 
-Через AntiZapret-VPN работают только:
+Через AntiZapret VPN работают только:
 - Заблокированные сайты из единого реестра РФ, список автоматически обновляется раз в 6 часов
 - Сайты к которым ограничивается доступ без судебного решения (например youtube.com)
 - Сайты ограничивающие доступ из России (например intel.com, chatgpt.com)
 
-Список сайтов для AntiZapret-VPN предзаполнен (include-hosts-dist.txt)\
+Список сайтов для AntiZapret VPN предзаполнен (include-hosts-dist.txt)\
 Доступно ручное добавление своих сайтов (include-hosts-custom.txt)
 
 Все остальные сайты работают через вашего провайдера с максимальной доступной вам скоростью
 
-**Внимание!** Для правильной работы AntiZapret-VPN нужно [отключить DNS в браузере](https://www.google.ru/search?q=отключить+DNS+в+браузере)
+**Внимание!** Для правильной работы AntiZapret VPN нужно [отключить DNS в браузере](https://www.google.ru/search?q=отключить+DNS+в+браузере)
 
 Через обычный VPN работают все сайты, доступные с вашего сервера
 
 Ваш сервер должен находится за перелелами России, в противном случае разблокировка сайтов не гарантируется
 
-AntiZapret-VPN (antizapret-\*.ovpn) и обычный VPN (vpn-\*.ovpn) работают через [OpenVPN Connect](https://openvpn.net/client)\
+AntiZapret VPN (antizapret-\*.ovpn) и обычный VPN (vpn-\*.ovpn) работают через [OpenVPN Connect](https://openvpn.net/client)\
 Поддерживается подключение по UDP и TCP, или только по UDP (\*-udp.ovpn) или только по TCP (\*-tcp.ovpn)\
 Используются порты 50080 и 50443 и резервные порты 80 и 443 для обхода блокировок по портам
 
@@ -43,7 +43,7 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 1. Установить обновления Knot Resolver, dnslib, OpenVPN и DCO
 2. Установить патч для обхода блокировки протокола OpenVPN
 3. Включить DCO
-4. Включить AdGuard DNS для: AntiZapret-VPN / обычного VPN (только при установке)
+4. Включить AdGuard DNS для: AntiZapret/обычного VPN (только при установке)
 5. Добавить клиентов (только после установки)
 ***
 Установить обновления Knot Resolver, dnslib, OpenVPN и DCO (если был установлен ранее)
