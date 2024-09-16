@@ -98,7 +98,6 @@ mv /root/include-hosts-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
-sed -i "/\b\(youtube\|youtu\|ytimg\|ggpht\|googleusercontent\|cloudfront\|ftcdn\)\b/d" /root/antizapret/config/exclude-hosts-dist.txt
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
