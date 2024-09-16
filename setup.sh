@@ -98,7 +98,7 @@ mv /root/include-hosts-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
-sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
+sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode\|placehere\|delivembed\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
 # Исправляем шаблон для корректной работы gawk начиная с версии 5
