@@ -66,6 +66,7 @@ tiktok.com
 tiktokv.com
 tiktokcdn.com
 tiktokcdn-eu.com
+tiktokcdn-us.com
 ttwstatic.com
 tor.eff.org
 news.google.com
