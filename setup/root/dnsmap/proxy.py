@@ -93,7 +93,7 @@ class ProxyResolver(BaseResolver):
             if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
                 print('GOT AAAA or HTTPS')
                 reply = request.reply()
-                reply.header.rcode = getattr(RCODE, 'NXDOMAIN')
+                reply.header.rcode = getattr(RCODE, 'REFUSED')
                 return reply
 
             if request.q.qtype == QTYPE.A:
