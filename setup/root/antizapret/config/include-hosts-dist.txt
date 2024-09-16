@@ -62,6 +62,12 @@ chatfuel.com
 notion.so
 pornhub.com
 phncdn.com
+tiktok.com
+tiktokv.com
+tiktokcdn.com
+tiktokcdn-eu.com
+tiktokcdn-us.com
+ttwstatic.com
 tor.eff.org
 news.google.com
 play.google.com
