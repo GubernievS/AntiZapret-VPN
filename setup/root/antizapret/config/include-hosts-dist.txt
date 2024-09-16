@@ -60,6 +60,8 @@ claude.ai
 anthropic.com
 chatfuel.com
 notion.so
+pornhub.com
+phncdn.com
 tor.eff.org
 news.google.com
 play.google.com
@@ -68,8 +70,6 @@ bbc.co.uk
 bbci.co.uk
 radiojar.com
 xvideos.com
-pornhub.com
-phncdn.com
 doubleclick.net
 windscribe.com
 vpngate.net
