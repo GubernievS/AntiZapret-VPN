@@ -21,7 +21,7 @@ handle_error() {
 	echo ""
 	echo "Error occurred at line $1 while executing: $2"
 	echo ""
-	lsb_release -d | awk -F'\t' '{print $2}'
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r)"
 	date
 	exit 1
 }
