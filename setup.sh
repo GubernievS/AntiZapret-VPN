@@ -15,27 +15,43 @@
 
 set -e
 
+#
+# Обработка ошибок
+handle_error() {
+	echo ""
+	echo "Error occurred at line $1 while executing: $2"
+	echo ""
+	lsb_release -d | awk -F'\t' '{print $2}'
+	date
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
+#
+# Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo "You need to run this as root permission!"
-	exit 1
+	exit 2
 fi
 
+#
+# Проверка версии системы
 ID=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
 VERSION=$(lsb_release -rs | cut -d '.' -f1)
 
 if [[ $ID == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
 		echo "Your version of Debian is not supported!"
-		exit 2
+		exit 3
 	fi
 elif [[ $ID == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
 		echo "Your version of Ubuntu is not supported!"
-		exit 3
+		exit 4
 	fi
 elif [[ $ID != "debian" ]] && [[ $ID != "ubuntu" ]]; then
 	echo "Your version of Linux is not supported!"
-	exit 4
+	exit 5
 fi
 
 echo ""
@@ -44,6 +60,8 @@ echo ""
 echo "Version from 16.09.2024"
 echo ""
 
+#
+# Спрашиваем об обновлении и настройках
 until [[ $UPGRADE =~ (y|n) ]]; do
 	read -rp "Upgrade Knot Resolver, dnslib, OpenVPN? [y/n]: " -e -i y UPGRADE
 done
