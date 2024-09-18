@@ -194,7 +194,7 @@ if __name__ == '__main__':
     p.add_argument("--port","-p",type=int,default=53,
                     metavar="<port>",
                     help="Local proxy port (default:53)")
-    p.add_argument("--address","-a",default="",
+    p.add_argument("--address","-a",default="127.0.0.4",
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
     p.add_argument("--upstream","-u",default="1.1.1.1:53",
