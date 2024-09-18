@@ -58,7 +58,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
-echo "Version from 17.09.2024"
+echo "Version from 18.09.2024"
 echo ""
 
 #
@@ -103,8 +103,8 @@ if ! python3 -c "import dnslib" 2>/dev/null; then
 fi
 
 #
-# Сохраняем include-hosts-custom.txt
-mv /root/antizapret/config/include-hosts-custom.txt /root || true
+# Сохраняем пользовательские конфигурации в файлах *-custom.txt
+mv /root/antizapret/config/*-custom.txt /root || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -112,8 +112,8 @@ rm -rf /root/antizapret
 git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
 
 #
-# Восстанавливаем include-hosts-custom.txt
-mv /root/include-hosts-custom.txt /root/antizapret/config || true
+# Восстанавливаем пользовательские конфигурации
+mv /root/*-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
