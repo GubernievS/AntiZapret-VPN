@@ -75,12 +75,12 @@ until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 done
 echo ""
-echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
+echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites"
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
 	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DNS_ANTIZAPRET
 done
 echo ""
-echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites."
+echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites"
 until [[ $DNS_VPN =~ (y|n) ]]; do
 	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
