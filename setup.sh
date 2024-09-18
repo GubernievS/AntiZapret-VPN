@@ -58,7 +58,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
-echo "Version from 18.09.2024"
+echo "Version from 19.09.2024"
 echo ""
 
 #
@@ -169,7 +169,6 @@ fi
 # 10.30.0.0/15 => 172.30.0.0/15
 if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
-	sed -i 's/10\./172\./g' /etc/systemd/system/dnsmap.service
 	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-tcp.conf
 	sed -i 's/10\./172\./g' /etc/openvpn/server/antizapret-udp.conf
