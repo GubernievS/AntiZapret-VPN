@@ -85,6 +85,12 @@ until [[ $DNS_VPN =~ (y|n) ]]; do
 	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
 echo ""
+echo "Default IP address ranges:      10.29.0.0/20 and  10.30.0.0/15"
+echo "Alternative IP address ranges: 172.29.0.0/20 and 172.30.0.0/15"
+until [[ $IP =~ (y|n) ]]; do
+	read -rp "Use alternative ranges of IP addresses? [y/n]: " -e -i n IP
+done
+echo ""
 
 #
 # Обновляем систему
@@ -155,6 +161,21 @@ if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-udp.conf
 	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-tcp.conf
 	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-tcp.conf
+fi
+
+#
+# Используем альтернативные диапазоны ip-адресов
+# 10.29.0.0/20 => 172.29.0.0/20
+# 10.30.0.0/15 => 172.30.0.0/15
+if [[ "$IP" = "y" ]]; then
+	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
+	sed -i 's/10\./172\./g' /etc/systemd/system/dnsmap.service
+	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-udp.conf
+	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-tcp.conf
+	sed -i 's/10\./172\./g' /etc/openvpn/server/antizapret-udp.conf
+	sed -i 's/10\./172\./g' /etc/openvpn/server/antizapret-tcp.conf
+	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
+	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 fi
 
 #
