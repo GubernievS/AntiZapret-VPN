@@ -103,3 +103,5 @@ com
 Переустановить сервер\
 Обратно на сервер закачать папку /root/easyrsa3\
 Запустить скрипт установки
+***
+[![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
