@@ -128,7 +128,6 @@ sed -i "s/\\\_/_/" /root/antizapret/parse.sh
 script_dir=$(dirname "$(readlink -f "$0")")
 find /root/antizapret -name '*.gitkeep' -delete
 rm -rf /root/antizapret/.git
-rm -rf /root/antizapret/*.md
 find $script_dir -name '*.gitkeep' -delete
 cp -r $script_dir/setup/* / 
 rm -rf $script_dir
