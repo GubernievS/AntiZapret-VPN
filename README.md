@@ -108,6 +108,6 @@ com
 2. Как посмотреть активные соединения?
 
 > Посмотреть активные соединения можно в логах \*-status.log в папке /etc/openvpn/server/logs\
-Логи обновляеются каждый 30 мин.
+Логи обновляются каждые 30 секунд
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
