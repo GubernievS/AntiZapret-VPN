@@ -58,7 +58,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
-echo "Version from 19.09.2024"
+echo "Version from 23.09.2024"
 echo ""
 
 #
