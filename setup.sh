@@ -85,10 +85,10 @@ until [[ $DNS_VPN =~ (y|n) ]]; do
 	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
 done
 echo ""
-echo "Default IP address ranges:      10.29.0.0/20 and  10.30.0.0/15"
-echo "Alternative IP address ranges: 172.29.0.0/20 and 172.30.0.0/15"
+echo "Default IP address range:      10.28.0.0/14"
+echo "Alternative IP address range: 172.28.0.0/14"
 until [[ $IP =~ (y|n) ]]; do
-	read -rp "Use alternative ranges of IP addresses? [y/n]: " -e -i n IP
+	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n IP
 done
 echo ""
 
