@@ -26,10 +26,10 @@ link_socket_write_udp(struct link_socket *sock,\
 if (opcode == 7 || opcode == 8 || opcode == 10)\
 {\
 	srand(time(NULL));\
-	for (int i=0; i<;2 i++) {\
+	for (int i=0; i<2; i++) {\
 		int stuffing_len = rand() % 91 + 10;\
 		uint8_t stuffing_data[100];\
-		for (int j = 0; j < stuffing_len; j++) {\
+		for (int j=0; j<stuffing_len; j++) {\
 			stuffing_data[j] = rand() % 256;\
 		}\
 		struct buffer stuffing_buf = alloc_buf(100);\
