@@ -21,9 +21,7 @@ handle_error() {
 	echo ""
 	echo "Error occurred at line $1 while executing: $2"
 	echo ""
-	lsb_release -d | awk -F'\t' '{print $2}'
-	uname -r
-	date
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
 	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
@@ -105,33 +103,33 @@ DEBIAN_FRONTEND=noninteractive apt install --reinstall -y gpg curl
 
 #
 # AmneziaWG
-if [[ $ID == "ubuntu" ]]; then
-	if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
-		if ! grep -q "deb-src" /etc/apt/sources.list.d/ubuntu.sources; then
-			cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
-			sed -i 's/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
-		fi
-	else
-		if ! grep -q "^deb-src" /etc/apt/sources.list; then
-			cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
-			sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
-		fi
-	fi
-	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y software-properties-common
-	add-apt-repository -y ppa:amnezia/ppa
-elif [[ $ID == "debian" ]]; then
-	if ! grep -q "^deb-src" /etc/apt/sources.list; then
-		cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
-		sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
-	fi
-	if ! grep -q "^deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
-		echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
-	fi
-	if ! grep -q "^deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
-		echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
-	fi	
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57290828
-fi
+#if [[ $ID == "ubuntu" ]]; then
+#	if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
+#		if ! grep -q "deb-src" /etc/apt/sources.list.d/ubuntu.sources; then
+#			cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
+#			sed -i 's/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
+#		fi
+#	else
+#		if ! grep -q "^deb-src" /etc/apt/sources.list; then
+#			cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
+#			sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
+#		fi
+#	fi
+#	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y software-properties-common
+#	add-apt-repository -y ppa:amnezia/ppa
+#elif [[ $ID == "debian" ]]; then
+#	if ! grep -q "^deb-src" /etc/apt/sources.list; then
+#		cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
+#		sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
+#	fi
+#	if ! grep -q "^deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
+#		echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
+#	fi
+#	if ! grep -q "^deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
+#		echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
+#	fi	
+#	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57290828
+#fi
 
 #
 # Knot-Resolver
@@ -151,7 +149,7 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip amneziawg amneziawg-tools
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip #amneziawg amneziawg-tools
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
 
 #
