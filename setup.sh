@@ -124,9 +124,13 @@ elif [[ $ID == "debian" ]]; then
 		cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
 		sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
 	fi
+	if ! grep -q "^deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
+		echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
+	fi
+	if ! grep -q "^deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" /etc/apt/sources.list.d/amneziawg.sources.list; then
+		echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/amneziawg.sources.list
+	fi	
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57290828
-	echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
-	echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
 fi
 
 #
