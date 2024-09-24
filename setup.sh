@@ -163,17 +163,13 @@ chmod +x /root/dnsmap/proxy.py
 #
 # Добавляем AdGuard DNS в AntiZapret VPN
 if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
-	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/knot-resolver/kresd.conf
-	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/knot-resolver/kresd.conf
+	sed -i "s/'1.1.1.1', '1.0.0.1'/'94.140.14.14', '94.140.15.15', '1.1.1.1', '1.0.0.1'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Добавляем AdGuard DNS в обычный VPN
 if [[ "$DNS_VPN" = "y" ]]; then
-	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-udp.conf
-	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-udp.conf
-	sed -i 's/1.1.1.1/94.140.14.14/g' /etc/openvpn/server/vpn-tcp.conf
-	sed -i 's/1.0.0.1/94.140.15.15/g' /etc/openvpn/server/vpn-tcp.conf
+	sed -i '/push "dhcp-option DNS 1.1.1.1"/i\push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"' /etc/openvpn/server/*.conf
 fi
 
 #
