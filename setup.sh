@@ -65,7 +65,7 @@ echo ""
 # Спрашиваем о настройках
 echo ""
 until [[ $PATCH =~ (y|n) ]]; do
-	read -rp "Install anti-censorship patch for OpenVPN? [y/n]: " -e -i y PATCH
+	read -rp "Install anti-censorship patch for OpenVPN? (UDP only) [y/n]: " -e -i y PATCH
 done
 echo ""
 until [[ $DCO =~ (y|n) ]]; do
@@ -92,8 +92,7 @@ echo ""
 #
 # Удалим скомпилированный OpenVPN
 if [[ -d "/root/openvpn" ]]; then
-	cd /root/openvpn
-	make uninstall
+	make -C /root/openvpn uninstall
 	rm -rf /root/openvpn
 fi
 
