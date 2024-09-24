@@ -62,10 +62,7 @@ echo "Version from 23.09.2024"
 echo ""
 
 #
-# Спрашиваем об обновлении и настройках
-until [[ $UPGRADE =~ (y|n) ]]; do
-	read -rp "Upgrade Knot Resolver, dnslib, OpenVPN? [y/n]: " -e -i y UPGRADE
-done
+# Спрашиваем о настройках
 echo ""
 until [[ $PATCH =~ (y|n) ]]; do
 	read -rp "Install anti-censorship patch for OpenVPN? [y/n]: " -e -i y PATCH
@@ -93,6 +90,57 @@ done
 echo ""
 
 #
+# Удалим скомпилированный OpenVPN
+if [[ -d "/root/openvpn" ]]; then
+	cd /root/openvpn
+	make uninstall
+	rm -rf /root/openvpn
+fi
+
+#
+# Добавляем репозитории
+mkdir -p /etc/apt/keyrings
+
+apt update
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y gpg curl
+
+#
+# AmneziaWG
+if [[ $ID == "ubuntu" ]]; then
+	if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
+		if ! grep -q "deb-src" /etc/apt/sources.list.d/ubuntu.sources; then
+			cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
+			sed -i 's/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
+		fi
+	else
+		if ! grep -q "^deb-src" /etc/apt/sources.list; then
+			cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
+			sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
+		fi
+	fi
+	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y software-properties-common
+	add-apt-repository -y ppa:amnezia/ppa
+elif [[ $ID == "debian" ]]; then
+	if ! grep -q "^deb-src" /etc/apt/sources.list; then
+		cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
+		sed -i 's/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
+	fi
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 57290828
+	echo "deb https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
+	echo "deb-src https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" >>/etc/apt/sources.list.d/amneziawg.sources.list
+fi
+
+#
+# Knot-Resolver
+curl -fsSL https://pkg.labs.nic.cz/gpg -o /usr/share/keyrings/cznic-labs-pkg.gpg
+echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
+
+#
+# OpenVPN
+curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
+
+#
 # Обновляем систему
 apt update
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
@@ -100,13 +148,8 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc curl gpg
-
-#
-# Если не был установлен dnslib то ставим python3-dnslib
-if ! python3 -c "import dnslib" 2>/dev/null; then
-	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y python3-dnslib
-fi
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip amneziawg amneziawg-tools
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
@@ -165,8 +208,7 @@ fi
 
 #
 # Используем альтернативные диапазоны ip-адресов
-# 10.29.0.0/20 => 172.29.0.0/20
-# 10.30.0.0/15 => 172.30.0.0/15
+# 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
 	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-udp.conf
@@ -187,10 +229,6 @@ systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
-
-if [[ "$UPGRADE" = "y" ]]; then
-	/root/upgrade.sh noreboot
-fi
 
 if [[ "$PATCH" = "y" ]]; then
 	/root/patch-openvpn.sh noreboot
