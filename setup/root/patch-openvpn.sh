@@ -13,8 +13,8 @@ version=$(openvpn --version | head -n 1 | awk '{print $2}')
 DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl tar perl build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
 rm -rf /root/openvpn
 mkdir -p /root/openvpn
-curl -L -o openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
-tar --strip-components=1 -xvzf openvpn.tar.gz -C /root/openvpn
+curl -L -o /root/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
+tar --strip-components=1 -xvzf /root/openvpn.tar.gz -C /root/openvpn
 rm -f /root/openvpn.tar.gz
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
 link_socket_write_udp(struct link_socket *sock,\
@@ -53,11 +53,10 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 }\
 \
 \/\* write a TCP or UDP packet to link \*\/' "/root/openvpn/src/openvpn/socket.h"
-cd /root/openvpn
-chmod +x ./configure
-./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
-make
-make install
+chmod +x /root/openvpn/configure
+/root/openvpn/configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
+make -C /root/openvpn
+make -C /root/openvpn install
 echo ""
 echo "Patch successful installation!"
 if [[ "$1" != "noreboot" ]]; then
