@@ -53,10 +53,11 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 }\
 \
 \/\* write a TCP or UDP packet to link \*\/' "/root/openvpn/src/openvpn/socket.h"
-chmod +x /root/openvpn/configure
-/root/openvpn/configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
-make -C /root/openvpn
-make -C /root/openvpn install
+cd /root/openvpn
+chmod +x ./configure
+./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
+make
+make install
 echo ""
 echo "Patch successful installation!"
 if [[ "$1" != "noreboot" ]]; then
