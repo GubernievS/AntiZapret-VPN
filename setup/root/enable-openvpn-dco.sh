@@ -15,7 +15,7 @@ fi
 apt update
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 apt autoremove -y
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y linux-headers-$(uname -r) openvpn-dco-dkms
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
 modprobe ovpn_dco_v2
 sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
