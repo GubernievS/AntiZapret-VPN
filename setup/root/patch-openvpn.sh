@@ -18,34 +18,38 @@ tar --strip-components=1 -xvzf openvpn.tar.gz -C /root/openvpn
 rm -f /root/openvpn.tar.gz
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
 link_socket_write_udp(struct link_socket *sock,\
-                      struct buffer *buf,\
-                      struct link_socket_actual *to)\
+					struct buffer *buf,\
+					struct link_socket_actual *to)\
 {\
-    uint16_t stuffing_sent = 0;\
-    uint8_t opcode = *BPTR(buf) >> 3;\
+	uint16_t stuffing_sent = 0;\
+	uint8_t opcode = *BPTR(buf) >> 3;\
 if (opcode == 7 || opcode == 8 || opcode == 10)\
 {\
-    uint8_t stuffing_data[] = {0x01, 0x00, 0x00, 0x00, 0x01};\
-    size_t stuffing_len = sizeof(stuffing_data);\
-    struct buffer stuffing_buf = clone_buf(buf);\
-    buf_clear(&stuffing_buf);\
-    buf_write(&stuffing_buf, stuffing_data, stuffing_len);\
-    for (int i=0; i<100; i++)\
-    {\
+	srand(time(NULL));\
+	for (int i=0; i<;2 i++) {\
+		int stuffing_len = rand() % 91 + 10;\
+		uint8_t stuffing_data[100];\
+		for (int j = 0; j < stuffing_len; j++) {\
+			stuffing_data[j] = rand() % 256;\
+		}\
+		struct buffer stuffing_buf = alloc_buf(100);\
+		buf_write(&stuffing_buf, stuffing_data, stuffing_len);\
+		for (int j=0; j<100; j++) {\
 #ifdef _WIN32\
-        stuffing_sent =+ link_socket_write_win32(sock, &stuffing_buf, to);\
+			stuffing_sent =+ link_socket_write_win32(sock, &stuffing_buf, to);\
 #else\
-        stuffing_sent =+ link_socket_write_udp_posix(sock, &stuffing_buf, to);\
+			stuffing_sent =+ link_socket_write_udp_posix(sock, &stuffing_buf, to);\
 #endif\
-    }\
-    free_buf(&stuffing_buf);\
+		}\
+		free_buf(&stuffing_buf);\
+	}\
 }\
 #ifdef _WIN32\
-    stuffing_sent =+ link_socket_write_win32(sock, buf, to);\
+	stuffing_sent =+ link_socket_write_win32(sock, buf, to);\
 #else\
-    stuffing_sent =+ link_socket_write_udp_posix(sock, buf, to);\
+	stuffing_sent =+ link_socket_write_udp_posix(sock, buf, to);\
 #endif\
-    return stuffing_sent;\
+	return stuffing_sent;\
 }\
 \
 \/\* write a TCP or UDP packet to link \*\/' "/root/openvpn/src/openvpn/socket.h"
