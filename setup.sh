@@ -71,12 +71,12 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites"
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DNS_ANTIZAPRET
+	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*.ovpn)? [y/n]: ' -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers, malware, and phishing websites"
 until [[ $DNS_VPN =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m? [y/n]: ' -e -i n DNS_VPN
+	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m (vpn-*.ovpn)? [y/n]: ' -e -i n DNS_VPN
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
