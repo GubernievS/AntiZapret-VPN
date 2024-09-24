@@ -4,11 +4,10 @@
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
-# Протестировано на Ubuntu 22.04/24.04 и Debian 11*/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
-# * Debian 11 требует установки обновления dnslib
+# Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core Память: 1 Gb Хранилище: 10 Gb
 #
 # Установка:
-# 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11*/12 (рекомендуется Ubuntu 24.04)
+# 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 # 2. В терминале под root выполнить:
 # apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn) с сервера из папки /root
@@ -56,7 +55,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
-echo "Version from 23.09.2024"
+echo "Version from 24.09.2024"
 echo ""
 
 #
