@@ -163,7 +163,7 @@ chmod +x /root/dnsmap/proxy.py
 #
 # Добавляем AdGuard DNS в AntiZapret VPN
 if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
-	sed -i "/policy.FORWARD/i\\\tpolicy.FORWARD({'94.140.14.14', '94.140.15.15'})," /etc/knot-resolver/kresd.conf
+	sed -i "s/'1.1.1.1', '1.0.0.1'/'94.140.14.14', '94.140.15.15'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
