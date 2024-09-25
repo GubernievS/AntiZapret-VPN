@@ -62,7 +62,7 @@ echo ""
 # Спрашиваем о настройках
 echo ""
 until [[ $PATCH =~ (y|n) ]]; do
-	read -rp "Install anti-censorship patch for OpenVPN? (UDP only) [y/n]: " -e -i y PATCH
+	read -rp "Install anti-censorship patch for OpenVPN (UDP only)? [y/n]: " -e -i y PATCH
 done
 echo ""
 until [[ $DCO =~ (y|n) ]]; do
