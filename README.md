@@ -101,5 +101,12 @@ com
 
 > Посмотреть активные соединения можно в логах \*-status.log в папке /etc/openvpn/server/logs\
 Логи обновляются каждые 30 секунд
+
+3. Какие IP используются?
+
+> DNS антизапрета = 10.29.0.1\
+AntiZapret VPN = 10.29.0.0/16\
+Обычный VPN = 10.28.0.0/16\
+Подменные IP = 10.30.0.0/15
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
