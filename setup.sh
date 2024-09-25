@@ -161,6 +161,16 @@ chmod +x /root/dnsmap/proxy.py
 /root/add-client.sh client
 
 #
+# Используем альтернативные диапазоны ip-адресов
+# 10.28.0.0/14 => 172.28.0.0/14
+if [[ "$IP" = "y" ]]; then
+	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
+	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
+	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
+	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
+fi
+
+#
 # Добавляем AdGuard DNS в AntiZapret VPN
 if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
 	sed -i "s/'1.1.1.1', '1.0.0.1'/'94.140.14.14', '94.140.15.15', '76.76.2.44', '76.76.10.44'/" /etc/knot-resolver/kresd.conf
@@ -170,16 +180,6 @@ fi
 # Добавляем AdGuard DNS в обычный VPN
 if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
-fi
-
-#
-# Используем альтернативные диапазоны ip-адресов
-# 10.28.0.0/14 => 172.28.0.0/14
-if [[ "$IP" = "y" ]]; then
-	sed -i 's/ 10\./ 172\./g' /root/dnsmap/proxy.py
-	sed -i 's/ 10\./ 172\./g' /etc/openvpn/server/*.conf
-	sed -i 's/ 10\./ 172\./g' /etc/knot-resolver/kresd.conf
-	sed -i 's/ 10\./ 172\./g' /etc/ferm/ferm.conf
 fi
 
 #
