@@ -177,10 +177,7 @@ fi
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
-	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-udp.conf
-	sed -i 's/10\./172\./g' /etc/openvpn/server/vpn-tcp.conf
-	sed -i 's/10\./172\./g' /etc/openvpn/server/antizapret-udp.conf
-	sed -i 's/10\./172\./g' /etc/openvpn/server/antizapret-tcp.conf
+	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 fi
