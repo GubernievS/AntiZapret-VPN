@@ -50,7 +50,7 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 ./patch-openvpn.sh
 ```
 ***
-Включить [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (он заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)
+Включить [DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)
 ```sh
 ./enable-openvpn-dco.sh
 ```
