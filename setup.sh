@@ -55,8 +55,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
 echo ""
-echo "Version from 25.09.2024"
-echo ""
+echo "Version from 26.09.2024"
 
 #
 # Спрашиваем о настройках
@@ -64,6 +63,15 @@ echo ""
 until [[ $PATCH =~ (y|n) ]]; do
 	read -rp "Install anti-censorship patch for OpenVPN (UDP only)? [y/n]: " -e -i y PATCH
 done
+if [[ "$PATCH" == "y" ]]; then
+	echo ""
+	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
+	echo "    1) Strong     - Recommended for all"
+	echo "    2) Error-free - If the strong patch causes a connection error on your device or router"
+	until [[ $ALGORITHM =~ ^[1-2]$ ]]; do
+		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
+	done
+fi
 echo ""
 until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
@@ -194,7 +202,7 @@ systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 
 if [[ "$PATCH" = "y" ]]; then
-	/root/patch-openvpn.sh noreboot
+	/root/patch-openvpn.sh "$ALGORITHM" noreboot
 fi
 
 if [[ "$DCO" = "y" ]]; then
