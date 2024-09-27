@@ -61,7 +61,7 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 ***
 Добавить нового клиента
 ```sh
-./add-client.sh [имя_клиента]
+./add-client.sh [имя_клиента] [срок_действия]
 ```
 Удалить клиента
 ```sh
