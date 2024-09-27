@@ -201,6 +201,10 @@ systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 
+#
+# Отключим ненужные службы
+systemctl disable ufw
+
 if [[ "$PATCH" = "y" ]]; then
 	/root/patch-openvpn.sh "$ALGORITHM" noreboot
 fi
