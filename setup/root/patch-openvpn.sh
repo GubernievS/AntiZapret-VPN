@@ -49,23 +49,28 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	for (int i = 0; i < 2; i++) {\
 		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
-		if (ALGORITHM == 1 && i == 0) {\
-			data[0] = 1;\
-			data[1] = 0;\
-			data[2] = 0;\
-			data[3] = 0;\
-			data[4] = 1;\
-			for (int k = 5; k < data_len; k++) {\
-				data[k] = rand() % 256;\
+		if (ALGORITHM == 1) {\
+			if (i == 0) {\
+				data[0] = 1;\
+				data[1] = 0;\
+				data[2] = 0;\
+				data[3] = 0;\
+				data[4] = 1;\
+				for (int k = 5; k < data_len; k++) {\
+					data[k] = rand() % 256;\
+				}\
 			}\
-		}\
-		else if (ALGORITHM == 1 && i != 0) {\
-			for (int k = 0; k < data_len; k++) {\
-				data[k] = rand() % 256;\
+			else {\
+				for (int k = 0; k < data_len; k++) {\
+					data[k] = rand() % 256;\
+				}\
 			}\
 		}\
 		struct buffer data_buffer;\
-		if (ALGORITHM == 2) {\
+		if (ALGORITHM == 1) {\
+			data_buffer = alloc_buf(data_len);\
+		}\
+		else {\
 			data_buffer = clone_buf(buf);\
 			buf_read(&data_buffer, data, buffer_len);\
 			buf_clear(&data_buffer);\
@@ -73,9 +78,6 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 			for (int k = buffer_len; k < data_len; k++) {\
 				data[k] = rand() % 256;\
 			}\
-		}\
-		else {\
-			data_buffer = alloc_buf(data_len);\
 		}\
 		buf_write(&data_buffer, data, data_len);\
 		int data_repeat = rand() % 101 + 100;\
