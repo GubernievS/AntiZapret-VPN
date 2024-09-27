@@ -47,7 +47,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	uint16_t buffer_len = BLEN(buf);\
 	srand(time(NULL));\
 	for (int i = 0; i < 2; i++) {\
-		uint16_t data_len = rand() % (101 - buffer_len) + buffer_len;\
+		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
 		if (ALGORITHM == 1 && i == 0) {\
 			data[0] = 1;\
