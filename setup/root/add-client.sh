@@ -21,6 +21,11 @@ then
 	done
 fi
 
+CLIENT_CERT_EXPIRE=$2
+if [[ -z "$CLIENT_CERT_EXPIRE" ]]; then
+  CLIENT_CERT_EXPIRE=3650
+fi
+
 export EASYRSA_CERT_EXPIRE=3650
 
 set +e
@@ -51,8 +56,8 @@ render() {
 
 load_key() {
 	CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
-	CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/antizapret-$CLIENT.crt")
-	CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/antizapret-$CLIENT.key")
+	CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT.crt")
+	CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/$CLIENT.key")
 	if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]
 	then
 		echo "Can't load client keys!"
@@ -92,30 +97,34 @@ then
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 fi
 
-if [[ ! -f ./pki/issued/antizapret-$CLIENT.crt ]] || \
-   [[ ! -f ./pki/private/antizapret-$CLIENT.key ]]
+if [[ ! -f ./pki/issued/$CLIENT.crt ]] || \
+   [[ ! -f ./pki/private/$CLIENT.key ]]
 then
-	EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-client-full antizapret-$CLIENT nopass
-	cp ./pki/issued/antizapret-$CLIENT.crt /etc/openvpn/client/keys/antizapret-$CLIENT.crt
-	cp ./pki/private/antizapret-$CLIENT.key /etc/openvpn/client/keys/antizapret-$CLIENT.key
+	EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT nopass
+	cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
+	cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
 else
 	echo "The specified client was already found, please choose another name for new client OpenVPN"
 fi
 
-if [[ ! -f /etc/openvpn/client/keys/antizapret-$CLIENT.crt ]] || \
-   [[ ! -f /etc/openvpn/client/keys/antizapret-$CLIENT.key ]]
+if [[ ! -f /etc/openvpn/client/keys/$CLIENT.crt ]] || \
+   [[ ! -f /etc/openvpn/client/keys/$CLIENT.key ]]
 then
-	cp ./pki/issued/antizapret-$CLIENT.crt /etc/openvpn/client/keys/antizapret-$CLIENT.crt
-	cp ./pki/private/antizapret-$CLIENT.key /etc/openvpn/client/keys/antizapret-$CLIENT.key
+	cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
+	cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
 fi
 
 load_key
 
-render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret-$CLIENT-$SERVER-udp.ovpn"
-render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/antizapret-$CLIENT-$SERVER-tcp.ovpn"
-render "/etc/openvpn/client/templates/antizapret.conf" > "/root/antizapret-$CLIENT-$SERVER.ovpn"
-render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn-$CLIENT-$SERVER-udp.ovpn"
-render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$CLIENT-$SERVER-tcp.ovpn"
-render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$CLIENT-$SERVER.ovpn"
+NAME="$CLIENT"
+NAME="${NAME#antizapret-}"
+NAME="${NAME#vpn-}"
+
+render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret-$NAME-$SERVER-udp.ovpn"
+render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/antizapret-$NAME-$SERVER-tcp.ovpn"
+render "/etc/openvpn/client/templates/antizapret.conf" > "/root/antizapret-$NAME-$SERVER.ovpn"
+render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn-$NAME-$SERVER-udp.ovpn"
+render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$NAME-$SERVER-tcp.ovpn"
+render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$NAME-$SERVER.ovpn"
 
 echo "OpenVPN configuration files for client '$CLIENT' have been (re)created in '/root'"
