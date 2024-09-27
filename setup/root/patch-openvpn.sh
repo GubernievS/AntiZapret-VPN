@@ -49,7 +49,9 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	for (int i = 0; i < 2; i++) {\
 		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
+		struct buffer data_buffer;\
 		if (ALGORITHM == 1) {\
+			data_buffer = alloc_buf(data_len);\
 			if (i == 0) {\
 				data[0] = 1;\
 				data[1] = 0;\
@@ -65,10 +67,6 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 					data[k] = rand() % 256;\
 				}\
 			}\
-		}\
-		struct buffer data_buffer;\
-		if (ALGORITHM == 1) {\
-			data_buffer = alloc_buf(data_len);\
 		}\
 		else {\
 			data_buffer = clone_buf(buf);\
