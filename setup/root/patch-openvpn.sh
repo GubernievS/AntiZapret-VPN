@@ -87,7 +87,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 #endif\
 		}\
 		free_buf(&data_buffer);\
-		if (ALGORITHM == 1) { usleep(1000 * data_repeat); }\
+		usleep(data_repeat * 1000);\
 	}\
 }\
 #ifdef _WIN32\
