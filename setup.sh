@@ -66,7 +66,7 @@ done
 if [[ "$PATCH" == "y" ]]; then
 	echo ""
 	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
-	echo "    1) Strong     - Recommended for all"
+	echo "    1) Strong     - Recommended for default"
 	echo "    2) Error-free - If the strong patch causes a connection error on your device or router"
 	until [[ $ALGORITHM =~ ^[1-2]$ ]]; do
 		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
