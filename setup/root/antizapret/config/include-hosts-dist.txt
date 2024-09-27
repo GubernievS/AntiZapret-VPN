@@ -69,6 +69,10 @@ tiktokcdn-eu.com
 tiktokcdn-us.com
 ttwstatic.com
 lookerstudio.google.com
+discord.com
+discord.gg
+discordapp.com
+discordapp.net
 tor.eff.org
 news.google.com
 play.google.com
