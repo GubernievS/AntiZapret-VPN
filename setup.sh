@@ -179,7 +179,7 @@ if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
 #	sed -i 's/10\./172\./g' /etc/wireguard/*.conf
-else
+#else
 #	sed -i 's/172\./10\./g' /etc/wireguard/*.conf
 fi
 
