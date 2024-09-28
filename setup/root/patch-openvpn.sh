@@ -104,9 +104,7 @@ chmod +x ./configure
 ./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
 make
 make install
+systemctl daemon-reload
+systemctl restart openvpn-server@*
 echo ""
-echo "Patch successful installation!"
-if [[ "$1" != "noreboot" && "$2" != "noreboot" ]]; then
-	echo "Rebooting..."
-	reboot
-fi
+echo "OpenVPN patch installed successfully!"
