@@ -186,7 +186,7 @@ if [[ "$IP" = "y" ]]; then
 #	if ! grep -q "^Address = 172.28.8.1/24" "/etc/wireguard/vpn.conf"; then
 #		sed -i "/^Address/iAddress = 172.28.8.1/24" "/etc/wireguard/vpn.conf"
 #	fi
-else
+#else
 #	sed -i '/^Address = 172.29.8.1\/24$/d' /etc/wireguard/antizapret.conf
 #	sed -i '/^Address = 172.28.8.1\/24$/d' /etc/wireguard/vpn.conf
 fi
