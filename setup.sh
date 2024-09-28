@@ -34,20 +34,20 @@ fi
 
 #
 # Проверка версии системы
-ID=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
 VERSION=$(lsb_release -rs | cut -d '.' -f1)
 
-if [[ $ID == "debian" ]]; then
+if [[ $OS == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
 		echo "Your version of Debian is not supported!"
 		exit 3
 	fi
-elif [[ $ID == "ubuntu" ]]; then
+elif [[ $OS == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
 		echo "Your version of Ubuntu is not supported!"
 		exit 4
 	fi
-elif [[ $ID != "debian" ]] && [[ $ID != "ubuntu" ]]; then
+elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
 	echo "Your version of Linux is not supported!"
 	exit 5
 fi
@@ -130,6 +130,18 @@ DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables e
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
 
 #
+# Ставим WireGuard
+if [[ ${OS} == 'ubuntu' ]]; then
+	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y wireguard #iptables resolvconf qrencode
+elif [[ ${OS} == 'debian' ]]; then
+	if ! grep -rqs "^deb .* $(lsb_release -cs)-backports" /etc/apt/; then
+		echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
+		apt update
+	fi
+	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y -t $(lsb_release -cs)-backports wireguard
+fi
+
+#
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
 mv /root/antizapret/config/*-custom.txt /root || true
 
@@ -203,7 +215,9 @@ systemctl enable openvpn-server@vpn-tcp
 
 #
 # Отключим ненужные службы
-systemctl disable ufw
+if systemctl list-unit-files | grep -q "^ufw.service"; then
+	systemctl disable ufw
+fi
 
 if [[ "$PATCH" = "y" ]]; then
 	/root/patch-openvpn.sh "$ALGORITHM" noreboot
