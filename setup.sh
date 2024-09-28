@@ -179,16 +179,16 @@ if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
 
-	if ! grep -q "^Address = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"; then
-		sed -i "/^Address/iAddress = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"
-	fi
+#	if ! grep -q "^Address = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"; then
+#		sed -i "/^Address/iAddress = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"
+#	fi
 
-	if ! grep -q "^Address = 172.28.8.1/24" "/etc/wireguard/vpn.conf"; then
-		sed -i "/^Address/iAddress = 172.28.8.1/24" "/etc/wireguard/vpn.conf"
-	fi
+#	if ! grep -q "^Address = 172.28.8.1/24" "/etc/wireguard/vpn.conf"; then
+#		sed -i "/^Address/iAddress = 172.28.8.1/24" "/etc/wireguard/vpn.conf"
+#	fi
 else
-	sed -i '/^Address = 172.29.8.1\/24$/d' /etc/wireguard/antizapret.conf
-	sed -i '/^Address = 172.28.8.1\/24$/d' /etc/wireguard/vpn.conf
+#	sed -i '/^Address = 172.29.8.1\/24$/d' /etc/wireguard/antizapret.conf
+#	sed -i '/^Address = 172.28.8.1\/24$/d' /etc/wireguard/vpn.conf
 fi
 
 #
