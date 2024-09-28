@@ -10,7 +10,7 @@
 # 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 # 2. В терминале под root выполнить:
 # apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
-# 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn) с сервера из папки /root
+# 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root
 
 set -e
 
@@ -25,11 +25,16 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+	echo "OpenVZ and LXC is not supported!"
+	exit 2
+fi
+
 #
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo "You need to run this as root permission!"
-	exit 2
+	exit 3
 fi
 
 #
@@ -40,16 +45,16 @@ VERSION=$(lsb_release -rs | cut -d '.' -f1)
 if [[ $OS == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
 		echo "Your version of Debian is not supported!"
-		exit 3
+		exit 4
 	fi
 elif [[ $OS == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
 		echo "Your version of Ubuntu is not supported!"
-		exit 4
+		exit 5
 	fi
 elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
 	echo "Your version of Linux is not supported!"
-	exit 5
+	exit 6
 fi
 
 echo ""
@@ -79,12 +84,12 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*.ovpn)? [y/n]: ' -e -i n DNS_ANTIZAPRET
+	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i n DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
 until [[ $DNS_VPN =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m (vpn-*.ovpn)? [y/n]: ' -e -i n DNS_VPN
+	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m (vpn-*)? [y/n]: ' -e -i n DNS_VPN
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
@@ -165,10 +170,6 @@ find /root -name "*.sh" -execdir chmod u+x {} +
 chmod +x /root/dnsmap/proxy.py
 
 #
-# Создаем пользователя 'antizapret-client', его ключи, ключи сервера 'antizapret-server' и создаем *.ovpn файлы подключений в /root
-/root/add-client.sh antizapret-client
-
-#
 # Используем альтернативные диапазоны ip-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$IP" = "y" ]]; then
@@ -176,6 +177,18 @@ if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
+	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
+
+	if ! grep -q "^Address = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"; then
+		sed -i "/^Address/iAddress = 172.29.8.1/24" "/etc/wireguard/antizapret.conf"
+	fi
+
+	if ! grep -q "^Address = 172.28.8.1/24" "/etc/wireguard/vpn.conf"; then
+		sed -i "/^Address/iAddress = 172.28.8.1/24" "/etc/wireguard/vpn.conf"
+	fi
+else
+	sed -i '/^Address = 172.29.8.1\/24$/d' /etc/wireguard/antizapret.conf
+	sed -i '/^Address = 172.28.8.1\/24$/d' /etc/wireguard/vpn.conf
 fi
 
 #
@@ -188,10 +201,21 @@ fi
 # Добавляем AdGuard DNS в обычный VPN
 if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client.conf
 fi
 
 #
-# Запустим все необходимые службы при загрузке
+# Создаем в OpenVPN пользователя 'antizapret-client' и создаем *.ovpn файлы подключений в /root
+/root/add-client.sh ovpn antizapret-client
+
+#
+# Создаем в WireGuard несколько пользователя 'antizapret-client' и создаем *.conf файлы подключений в /root
+/root/add-client.sh wg antizapret-client1
+/root/add-client.sh wg antizapret-client2
+/root/add-client.sh wg antizapret-client3
+
+#
+# Включим все нужные службы
 systemctl enable kresd@1
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
@@ -200,6 +224,8 @@ systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
+systemctl enable wg-quick@antizapret
+systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
