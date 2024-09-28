@@ -18,7 +18,7 @@ set -e
 # Обработка ошибок
 handle_error() {
 	echo ""
-	echo "Error occurred at line $1 while executing: $2"
+	echo "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	echo ""
 	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
 	exit 1
@@ -59,8 +59,9 @@ fi
 
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
+echo "OpenVPN + WireGuard"
 echo ""
-echo "Version from 26.09.2024"
+echo "Version from 29.09.2024"
 
 #
 # Спрашиваем о настройках
@@ -231,12 +232,14 @@ fi
 
 if [[ "$DCO" = "y" ]]; then
 	if ! /root/enable-openvpn-dco.sh; then
-	echo "OpenVPN DCO has not been enabled! Please run './enable-openvpn-dco.sh' manually after rebooting"
+	echo ""
+	echo "\e[1;31mOpenVPN DCO has not been enabled!\e[0m Please run './enable-openvpn-dco.sh' manually after rebooting"
 fi
 fi
 
 echo ""
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
+echo ""
 echo "Rebooting..."
 
 #
