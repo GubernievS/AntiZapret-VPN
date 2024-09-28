@@ -201,7 +201,7 @@ fi
 /root/add-client.sh ovpn antizapret-client
 
 #
-# Создаем в WireGuard несколько пользователя 'antizapret-client' и создаем *.conf файлы подключений в /root
+# Создаем в WireGuard несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
 /root/add-client.sh wg antizapret-client1
 /root/add-client.sh wg antizapret-client2
 /root/add-client.sh wg antizapret-client3
@@ -226,11 +226,13 @@ if systemctl list-unit-files | grep -q "^ufw.service"; then
 fi
 
 if [[ "$PATCH" = "y" ]]; then
-	/root/patch-openvpn.sh "$ALGORITHM" noreboot
+	/root/patch-openvpn.sh "$ALGORITHM"
 fi
 
 if [[ "$DCO" = "y" ]]; then
-	/root/enable-openvpn-dco.sh noreboot
+	if ! /root/enable-openvpn-dco.sh; then
+	echo "OpenVPN DCO has not been enabled! Please run './enable-openvpn-dco.sh' manually after rebooting"
+fi
 fi
 
 echo ""
