@@ -59,9 +59,9 @@ apt update && apt install -y git && git clone https://github.com/GubernievS/Anti
 ./disable-openvpn-dco.sh
 ```
 ***
-Добавить нового клиента
+Добавить нового клиента (* - только для OpenVPN)
 ```sh
-./add-client.sh [имя_клиента] [срок_действия]
+./add-client.sh [ovpn/wg] [имя_клиента] [срок_действия*]
 ```
 Удалить клиента
 ```sh
