@@ -126,20 +126,8 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
-
-#
-# Ставим WireGuard
-if [[ ${OS} == 'ubuntu' ]]; then
-	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y wireguard #iptables resolvconf qrencode
-elif [[ ${OS} == 'debian' ]]; then
-	if ! grep -rqs "^deb .* $(lsb_release -cs)-backports" /etc/apt/; then
-		echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
-		apt update
-	fi
-	DEBIAN_FRONTEND=noninteractive apt install --reinstall -y -t $(lsb_release -cs)-backports wireguard
-fi
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
