@@ -8,7 +8,7 @@ set -e
 
 version=$(openvpn --version | head -n 1 | awk '{print $2}')
 if [[ ! $version =~ ^2\.6 ]]; then
-    echo "OpenVPN version is not 2.6. Exiting."
+    echo "Enabling OpenVPN DCO is not possible, as OpenVPN version 2.6 is required"
     exit 1
 fi
 
