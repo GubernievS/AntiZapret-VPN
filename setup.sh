@@ -178,9 +178,9 @@ if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
-#	sed -i 's/10\./172\./g' /etc/wireguard/*.conf 2>/dev/null
-#else
-#	sed -i 's/172\./10\./g' /etc/wireguard/*.conf 2>/dev/null
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/10\./172\./g' {} +
+else
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/172\./10\./g' {} +
 fi
 
 #
