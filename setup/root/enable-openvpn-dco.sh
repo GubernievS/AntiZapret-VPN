@@ -13,7 +13,7 @@ if [[ ! $version =~ ^2\.6 ]]; then
 fi
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+DEBIAN_FRONTEND=noninteractive apt upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 apt autoremove -y
 DEBIAN_FRONTEND=noninteractive apt install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
 modprobe -r ovpn_dco_v2
