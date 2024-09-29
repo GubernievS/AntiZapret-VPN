@@ -167,7 +167,7 @@ rm -rf $script_dir
 #
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod u+x {} +
-chmod +x /root/dnsmap/proxy.py
+chmod u+x /root/dnsmap/proxy.py
 
 #
 # Используем альтернативные диапазоны ip-адресов
