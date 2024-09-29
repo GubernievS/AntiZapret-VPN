@@ -58,7 +58,7 @@ elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
 fi
 
 echo ""
-echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN\e[0m"
+echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard"
 echo "Version from 29.09.2024"
 
