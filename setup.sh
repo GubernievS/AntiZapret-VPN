@@ -137,6 +137,13 @@ elif [[ $OS == "debian" ]]; then
 	echo "deb-src [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" | tee -a /etc/apt/sources.list.d/amnezia.list
 fi
 
+if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
+	if ! grep -qE '^[^#]*deb-src' /etc/apt/sources.list.d/ubuntu.sources; then
+		cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
+		sed -i 's/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
+	fi
+fi
+
 #
 # Обновляем систему
 apt update
