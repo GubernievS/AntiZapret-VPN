@@ -55,7 +55,7 @@ render() {
 }
 
 # OpenVPN
-if [[ "$TYPE" == "ovpn" ]]; then
+if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 
 	CLIENT_CERT_EXPIRE=$3
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
