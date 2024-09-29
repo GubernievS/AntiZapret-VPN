@@ -253,7 +253,7 @@ fi
 if [[ "$DCO" = "y" ]]; then
 	if ! /root/enable-openvpn-dco.sh; then
 	echo ""
-	echo -e "\e[1;31mOpenVPN DCO has not been enabled!\e[0m Please run './enable-openvpn-dco.sh' manually after rebooting"
+	echo -e "\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting"
 fi
 fi
 
