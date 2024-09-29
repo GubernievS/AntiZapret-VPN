@@ -111,7 +111,7 @@ fi
 mkdir -p /etc/apt/keyrings
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y gpg curl
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y gnupg2 curl
 
 #
 # Knot-Resolver
@@ -124,6 +124,20 @@ curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
+# AmneziaWG
+gpg --keyserver keyserver.ubuntu.com --recv-keys 75c9dd72c799870e310542e24166f2c257290828
+gpg --export 75c9dd72c799870e310542e24166f2c257290828 | tee /usr/share/keyrings/amnezia.gpg > /dev/null
+
+rm -f /etc/apt/sources.list.d/amnezia.list || true
+if [[ $OS == "ubuntu" ]]; then
+	echo "deb [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list.d/amnezia.list
+	echo "deb-src [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list.d/amnezia.list
+elif [[ $OS == "debian" ]]; then
+	echo "deb [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" | tee -a /etc/apt/sources.list.d/amnezia.list
+	echo "deb-src [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" | tee -a /etc/apt/sources.list.d/amnezia.list
+fi
+
+#
 # Обновляем систему
 apt update
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
@@ -131,7 +145,7 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard amneziawg amneziawg-tools
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
 
 #
