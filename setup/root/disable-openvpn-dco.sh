@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Выключаем DCO (Data Channel Offload) на OpenVpn 2.6+
+# Выключаем DCO (Data Channel Offload) на OpenVpn 2.6
 #
 # chmod +x disable-openvpn-dco.sh && ./disable-openvpn-dco.sh
 #
