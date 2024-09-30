@@ -144,8 +144,8 @@ else
 		source /etc/wireguard/key
 	fi
 
-	if grep -q -E "^#Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" || \
-	   grep -q -E "^#Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
+	if grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" || \
+	   grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
 		echo "A client with the specified name was already created, please choose another name"
 		exit
 	fi
