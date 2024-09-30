@@ -22,7 +22,7 @@ if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
 	echo "    1) OpenVPN"
 	echo "    2) WireGuard"
 	until [[ $TYPE =~ ^[1-2]$ ]]; do
-		read -rp "Type choice [1-2]: " -e -i 1 TYPE
+		read -rp "Type choice [1-2]: " -e TYPE
 	done
 fi
 
