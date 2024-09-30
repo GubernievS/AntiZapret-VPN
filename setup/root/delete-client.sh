@@ -58,14 +58,14 @@ if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT
 	if [[ $? -ne 0 ]]; then
 		echo "Failed to revoke certificate for client '$CLIENT', please check if the client exists"
-		exit 1
+		exit 11
 	fi
 
 	/usr/share/easy-rsa/easyrsa gen-crl
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	if [[ $? -ne 0 ]]; then
 		echo "Failed to update CRL"
-		exit 2
+		exit 12
 	fi
 
 	rm -f /root/antizapret-$NAME-*.ovpn
@@ -87,7 +87,7 @@ else
 if ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" && \
    ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
 	echo "Failed to delete client '$CLIENT', please check if the client exists"
-	exit 11
+	exit 21
 fi
 
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/antizapret.conf"
