@@ -100,7 +100,7 @@ done
 echo ""
 
 #
-# Удалим скомпилированный OpenVPN
+# Удалим скомпилированный патченный OpenVPN
 if [[ -d "/root/openvpn" ]]; then
 	make -C /root/openvpn uninstall || true
 	rm -rf /root/openvpn
