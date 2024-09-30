@@ -41,7 +41,7 @@ NAME="${NAME#antizapret-}"
 NAME="${NAME#vpn-}"
 
 # OpenVPN
-if [[ "$TYPE" == "ovpn" ]]; then
+if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 
 	cd /root/easyrsa3
 
