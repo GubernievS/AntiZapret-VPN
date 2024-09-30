@@ -26,6 +26,16 @@ if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
 	done
 fi
 
+echo ""
+echo "Existing client names:"
+# OpenVPN
+if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
+	tail -n +2 /root/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
+# WireGuard
+else
+	grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//'
+fi
+
 CLIENT=$2
 if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]+$ ]]; then
 	echo ""
