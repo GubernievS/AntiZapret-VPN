@@ -6,6 +6,15 @@
 #
 set -e
 
+handle_error() {
+	echo ""
+	echo "Error occurred at line $1 while executing: $2"
+	echo ""
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
 version=$(openvpn --version | head -n 1 | awk '{print $2}')
 if [[ ! $version =~ ^2\.6 ]]; then
 	echo "Enabling OpenVPN DCO is not possible, as OpenVPN version 2.6 is required"
