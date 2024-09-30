@@ -71,7 +71,7 @@ if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 		CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/$CLIENT.key")
 		if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]; then
 			echo "Can't load client keys!"
-			exit 1
+			exit 11
 		fi
 	}
 
@@ -165,7 +165,7 @@ else
 		fi
 		if [[ $i == 255 ]]; then
 			echo "The WireGuard subnet can support only 253 clients"
-			exit 12
+			exit 22
 		fi
 	done
 
@@ -194,7 +194,7 @@ AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
 		fi
 		if [[ $i == 255 ]]; then
 			echo "The WireGuard subnet can support only 253 clients"
-			exit 13
+			exit 23
 		fi
 	done
 
