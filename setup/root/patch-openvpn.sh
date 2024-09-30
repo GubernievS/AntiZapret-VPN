@@ -6,6 +6,16 @@
 # chmod +x patch-openvpn.sh && ./patch-openvpn.sh
 #
 set -e
+
+handle_error() {
+	echo ""
+	echo "Error occurred at line $1 while executing: $2"
+	echo ""
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
 if [[ "$1" == "1" || "$1" == "2" ]]; then
 	ALGORITHM="$1"
 else
@@ -17,6 +27,7 @@ else
 		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
 	done
 fi
+
 apt update
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 apt autoremove -y
