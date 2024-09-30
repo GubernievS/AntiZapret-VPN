@@ -60,7 +60,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard"
-echo "Version from 29.09.2024"
+echo "Version from 30.09.2024"
 
 #
 # Спрашиваем о настройках
