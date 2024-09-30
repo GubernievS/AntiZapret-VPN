@@ -179,7 +179,7 @@ PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
 
-	if systemctl is-active --quiet wg-quick@antizapret 2>/dev/null; then
+	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
 		wg syncconf antizapret <(wg-quick strip antizapret)
 	fi
 
@@ -208,7 +208,7 @@ PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/vpn.conf"
 
-	if systemctl is-active --quiet wg-quick@vpn 2>/dev/null; then
+	if systemctl is-active --quiet wg-quick@vpn 2> /dev/null; then
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
