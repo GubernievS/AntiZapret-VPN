@@ -12,6 +12,30 @@
 # apt update && apt install -y git && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 # 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root
 
+#
+# Удаление или перемещение файлов и папок при обновлении
+systemctl disable openvpn-generate-keys 2> /dev/null
+systemctl disable openvpn-server@antizapret 2> /dev/null
+rm -f /etc/sysctl.d/10-conntrack.conf
+rm -f /etc/systemd/network/eth.network
+rm -f /etc/systemd/network/host.network
+rm -f /etc/systemd/system/openvpn-generate-keys.service
+rm -f /etc/openvpn/server/antizapret.conf
+rm -f /etc/openvpn/client/templates/openvpn-udp-unified.conf
+rm -f /etc/openvpn/client/templates/openvpn-tcp-unified.conf
+rm -f /root/upgrade.sh
+rm -f /root/generate.sh
+rm -f /root/Enable-OpenVPN-DCO.sh
+rm -f /root/upgrade-openvpn.sh
+if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
+	mkdir /root/easyrsa3
+	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki
+fi
+rm -rf /root/easy-rsa-ipsec
+systemctl daemon-reload
+
+#
+# Завершим выполнение скрипта при ошибке
 set -e
 
 #
@@ -178,9 +202,9 @@ if [[ "$IP" = "y" ]]; then
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/10\./172\./g' {} +
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
 else
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/172\./10\./g' {} +
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
 fi
 
 #
