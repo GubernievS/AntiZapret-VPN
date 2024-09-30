@@ -14,13 +14,16 @@
 
 #
 # Удаление или перемещение файлов и папок при обновлении
+systemctl stop openvpn-generate-keys 2> /dev/null
 systemctl disable openvpn-generate-keys 2> /dev/null
+systemctl stop openvpn-server@antizapret 2> /dev/null
 systemctl disable openvpn-server@antizapret 2> /dev/null
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/systemd/network/eth.network
 rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
 rm -f /etc/openvpn/server/antizapret.conf
+rm -f /etc/openvpn/server/logs/*
 rm -f /etc/openvpn/client/templates/openvpn-udp-unified.conf
 rm -f /etc/openvpn/client/templates/openvpn-tcp-unified.conf
 rm -f /root/upgrade.sh
