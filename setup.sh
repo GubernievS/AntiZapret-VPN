@@ -32,6 +32,7 @@ if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki
 fi
 rm -rf /root/easy-rsa-ipsec
+apt purge python3-dnslib > /dev/null 2>&1
 systemctl daemon-reload
 
 #
