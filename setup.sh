@@ -30,6 +30,8 @@ rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
+rm -f /root/antizapret/temp/*
+rm -f /root/antizapret/result/*
 if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 	mkdir /root/easyrsa3
 	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki
