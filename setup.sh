@@ -176,6 +176,10 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 mv /root/*-custom.txt /root/antizapret/config || true
 
 #
+# Удаляем исключения из исключений антизапрета
+sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode\|placehere\|delivembed\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
+
+#
 # Копируем нужные файлы и папки, удаляем не нужные
 script_dir=$(dirname "$(readlink -f "$0")")
 find /root/antizapret -name '*.gitkeep' -delete
