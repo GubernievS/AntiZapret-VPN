@@ -147,7 +147,7 @@ else
 	if grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" || \
 	   grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
 		echo "A client with the specified name was already created, please choose another name"
-		exit
+		exit 0
 	fi
 
 	CLIENT_PRIVATE_KEY=$(wg genkey)
