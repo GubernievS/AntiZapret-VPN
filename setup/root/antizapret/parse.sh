@@ -7,17 +7,13 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
 # Extract domains from list
-awk -F ';' '{print $2}' temp/list.csv | sort -u | awk '/^$/ {next} /\\/ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]*+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld | grep -Fv 'xn--' > result/hostlist_original.txt
+awk -F ';' '{print $2}' temp/list.csv | sort -u | awk '/^$/ {next} /\\/ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]*+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld | grep -Fv 'xn--' > temp/hostlist_original.txt
 
 # Generate zones from domains
-# FIXME: nxdomain list parsing is disabled due to its instability on z-i
-###cat exclude.txt temp/nxdomain.txt > temp/exclude.txt
-
-sort -u config/exclude-hosts-{dist,custom}.txt | grep -v '^#' > temp/exclude-hosts.txt
+sort -u config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | grep -v '^#' > temp/exclude-hosts.txt
 #sort -u config/exclude-ips-{dist,custom}.txt | grep -v '^#' > temp/exclude-ips.txt
-sort -u config/include-hosts-{dist,custom}.txt | grep -v '^#' > temp/include-hosts.txt
+sort -u config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | grep -v '^#' > temp/hostlist_original_with_include.txt
 sort -u config/include-ips-{dist,custom}.txt | grep -v '^#' > temp/include-ips.txt
-sort -u temp/include-hosts.txt result/hostlist_original.txt > temp/hostlist_original_with_include.txt
 
 awk -F ';' '{split($1, a, /\|/); for (i in a) {print a[i]";"$2}}' temp/list.csv | \
  grep -f config/exclude-hosts-by-ips-dist.txt | awk -F ';' '{print $2}' >> temp/exclude-hosts.txt
