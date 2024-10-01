@@ -88,7 +88,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard"
-echo "Version from 30.09.2024"
+echo "Version from 02.10.2024"
 
 #
 # Спрашиваем о настройках
@@ -160,7 +160,7 @@ apt autoremove -y
 #
 # Ставим необходимые пакеты
 DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard
-PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall  dnslib
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
