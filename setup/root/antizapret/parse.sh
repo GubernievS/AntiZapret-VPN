@@ -7,7 +7,7 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
 # Extract domains from list
-awk -F ';' '{print $2}' temp/list.csv | sort -u | awk '/^$/ {next} /\\/ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]*+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld | grep -Fv 'xn--' > temp/hostlist_original.txt
+awk -F ';' '{print $2}' temp/list.csv | sort -u | awk '/^$/ {next} /\\/ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]*+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld > temp/hostlist_original.txt
 
 # Generate zones from domains
 sort -u config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | grep -v '^#' > temp/exclude-hosts.txt
@@ -40,7 +40,7 @@ fi
 #	awk -F ';' '($1 ~ /^([0-9]{1,3}\.){3}[0-9]{1,3}/) && (($2 == "" && $3 == "") || ($1 == $2)) {gsub(/\|/, RS); print $1}' | \
 #	awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' | sort -u > result/iplist_blockedbyip_noid2971.txt
 
-awk -F ';' '$1 ~ /\// {print $1}' temp/include-ips.txt | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}' | sort -u > temp/blocked-ranges.txt
+awk -F ';' '$1 ~ /\// {print $1}' temp/include-ips.txt | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}' | sort -u > result/blocked-ranges.txt
 
 
 # Generate OpenVPN route file
@@ -50,7 +50,7 @@ do
 	C_NET="$(echo $line | awk -F '/' '{print $1}')"
 	C_NETMASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
 	echo $"push \"route ${C_NET} ${C_NETMASK}\"" >> result/openvpn-blocked-ranges.txt
-done < temp/blocked-ranges.txt
+done < result/blocked-ranges.txt
 
 
 # Generate dnsmasq aliases
