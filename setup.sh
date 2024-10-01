@@ -180,10 +180,6 @@ mv /root/*-custom.txt /root/antizapret/config || true
 sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode\|placehere\|delivembed\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
 
 #
-# Исправляем шаблон для корректной работы gawk начиная с версии 5
-sed -i "s/\\\_/_/" /root/antizapret/parse.sh
-
-#
 # Копируем нужные файлы и папки, удаляем не нужные
 script_dir=$(dirname "$(readlink -f "$0")")
 find /root/antizapret -name '*.gitkeep' -delete
