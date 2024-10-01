@@ -54,11 +54,11 @@ done < result/blocked-ranges.txt
 
 
 # Generate dnsmasq aliases
-echo -n > result/dnsmasq-aliases-alt.conf
-while read -r line
-do
-	echo "server=/$line/127.0.0.1" >> result/dnsmasq-aliases-alt.conf
-done < result/hostlist_zones.txt
+#echo -n > result/dnsmasq-aliases-alt.conf
+#while read -r line
+#do
+#	echo "server=/$line/127.0.0.1" >> result/dnsmasq-aliases-alt.conf
+#done < result/hostlist_zones.txt
 
 
 # Generate knot-resolver aliases
@@ -72,11 +72,11 @@ echo '}' >> result/knot-aliases-alt.conf
 
 
 # Generate squid zone file
-echo -n > result/squid-whitelist-zones.conf
-while read -r line
-do
-	echo ".$line" >> result/squid-whitelist-zones.conf
-done < result/hostlist_zones.txt
+#echo -n > result/squid-whitelist-zones.conf
+#while read -r line
+#do
+#	echo ".$line" >> result/squid-whitelist-zones.conf
+#done < result/hostlist_zones.txt
 
 
 # Print results
