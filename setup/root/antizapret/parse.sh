@@ -7,24 +7,29 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
 # Extract domains from list
-awk -F ';' '{print $2}' temp/list.csv | sort -u | awk '/^$/ {next} /\\/ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]*+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld > temp/hostlist_original.txt
+awk -F ';' '{print $2}' temp/list.csv | awk '!/\./ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld > temp/hostlist_original.txt
 
 # Generate zones from domains
-sort -u config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | grep -v '^#' > temp/exclude-hosts.txt
+sed '/^www\./s/^www\.//; /^#/d' config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | sort -u > temp/exclude-hosts.txt
 #sort -u config/exclude-ips-{dist,custom}.txt | grep -v '^#' > temp/exclude-ips.txt
-sort -u config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | grep -v '^#' > temp/hostlist_original_with_include.txt
-sort -u config/include-ips-{dist,custom}.txt | grep -v '^#' > temp/include-ips.txt
+sed '/^www\./s/^www\.//; /^#/d' config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | sort -u > temp/hostlist_original_with_include.txt
+sed '/^#/d' config/include-ips-{dist,custom}.txt | sort -u > temp/include-ips.txt
+
+input_file="temp/hostlist_original_with_include.txt"
+output_file="temp/hostlist_unique_with_include.txt"
+
+grep -vFf <(grep -E '^[^.]+$' "$input_file" | sed 's/^/./') "$input_file" | grep -vFf <(grep -E '^[^.]+\.[^.]+$' "$input_file" | sed 's/^/./') > "$output_file"
 
 awk -F ';' '{split($1, a, /\|/); for (i in a) {print a[i]";"$2}}' temp/list.csv | \
  grep -f config/exclude-hosts-by-ips-dist.txt | awk -F ';' '{print $2}' >> temp/exclude-hosts.txt
 
-awk -f scripts/getzones.awk temp/hostlist_original_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
+awk -f scripts/getzones.awk temp/hostlist_unique_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
 
 if [[ "$RESOLVE_NXDOMAIN" == "yes" ]];
 then
 	timeout 2h scripts/resolve-dns-nxdomain.py result/hostlist_zones.txt > temp/nxdomain-exclude-hosts.txt
 	cat temp/nxdomain-exclude-hosts.txt >> temp/exclude-hosts.txt
-	awk -f scripts/getzones.awk temp/hostlist_original_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
+	awk -f scripts/getzones.awk temp/hostlist_unique_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
 fi
 
 # Generate a list of IP addresses
