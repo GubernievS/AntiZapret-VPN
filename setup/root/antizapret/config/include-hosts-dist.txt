@@ -1,3 +1,4 @@
+# Cвой список и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
 youtube.com
 googlevideo.com
 ytimg.com
@@ -31,6 +32,7 @@ theins.ru
 acf.international
 rutracker.cc
 x.com
+# Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список примерный и скопирован не весь)
 copilot.microsoft.com
 bing.com
 4pda.to
@@ -76,6 +78,7 @@ discordapp.net
 cloudfront.net
 loudflareinsights.com
 soapui.org
+# Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
 news.google.com
 play.google.com
