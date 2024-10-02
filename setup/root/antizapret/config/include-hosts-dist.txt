@@ -73,6 +73,9 @@ discord.com
 discord.gg
 discordapp.com
 discordapp.net
+cloudfront.net
+loudflareinsights.com
+soapui.org
 tor.eff.org
 news.google.com
 play.google.com
