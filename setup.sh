@@ -67,6 +67,8 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 3
 fi
 
+cd /root
+
 #
 # Проверка версии системы
 OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
