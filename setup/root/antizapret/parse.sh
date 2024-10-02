@@ -12,24 +12,24 @@ awk -F ';' '{print $2}' temp/list.csv | awk '!/\./ {next} /^[а-яА-Яa-zA-Z0-9
 # Generate zones from domains
 sed '/^www\./s/^www\.//; /^#/d' config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | sort -u > temp/exclude-hosts.txt
 #sort -u config/exclude-ips-{dist,custom}.txt | grep -v '^#' > temp/exclude-ips.txt
-sed '/^www\./s/^www\.//; /^#/d' config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | sort -u > temp/hostlist_original_with_include.txt
+sed '/^www\./s/^www\.//; /^#/d' config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | sort -u > temp/include-hosts.txt
 sed '/^#/d' config/include-ips-{dist,custom}.txt | sort -u > temp/include-ips.txt
 
-input_file="temp/hostlist_original_with_include.txt"
-output_file="temp/hostlist_unique_with_include.txt"
+input_file="temp/include-hosts.txt"
+output_file="temp/include-hosts-deduplicated.txt"
 
 grep -vFf <(grep -E '^[^.]+$' "$input_file" | sed 's/^/./') "$input_file" | grep -vFf <(grep -E '^[^.]+\.[^.]+$' "$input_file" | sed 's/^/./') > "$output_file"
 
 awk -F ';' '{split($1, a, /\|/); for (i in a) {print a[i]";"$2}}' temp/list.csv | \
  grep -f config/exclude-hosts-by-ips-dist.txt | awk -F ';' '{print $2}' >> temp/exclude-hosts.txt
 
-awk -f scripts/getzones.awk temp/hostlist_unique_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
+awk -f scripts/getzones.awk temp/include-hosts-deduplicated.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
 
 if [[ "$RESOLVE_NXDOMAIN" == "yes" ]];
 then
 	timeout 2h scripts/resolve-dns-nxdomain.py result/hostlist_zones.txt > temp/nxdomain-exclude-hosts.txt
 	cat temp/nxdomain-exclude-hosts.txt >> temp/exclude-hosts.txt
-	awk -f scripts/getzones.awk temp/hostlist_unique_with_include.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
+	awk -f scripts/getzones.awk temp/include-hosts-deduplicated.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
 fi
 
 # Generate a list of IP addresses
