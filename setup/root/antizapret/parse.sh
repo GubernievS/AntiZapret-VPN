@@ -32,7 +32,8 @@ sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/i
 
 # Очищаем список доменов
 awk -f scripts/getzones.awk temp/include-hosts.txt > temp/getzones.txt
-awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/getzones.txt > result/blocked-hosts.txt
+awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/getzones.txt > temp/blocked-hosts.txt
+grep -vFf <(grep -E '^([^.]*\.){0,1}[^.]*$' temp/blocked-hosts.txt | sed 's/^/./') temp/blocked-hosts.txt > result/blocked-hosts.txt
 
 # Заблокированные IP-адреса
 awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/include-ips.txt > result/blocked-ranges.txt
