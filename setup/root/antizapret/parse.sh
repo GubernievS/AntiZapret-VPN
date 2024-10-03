@@ -1,94 +1,60 @@
 #!/bin/bash
 set -e
 
-source config/config.sh
+handle_error() {
+	echo ""
+	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
+	echo ""
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-# Extract domains from list
-awk -F ';' '{print $2}' temp/list.csv | awk '!/\./ {next} /^[а-яА-Яa-zA-Z0-9\-_\.\*]+$/ {gsub(/\*\./, ""); gsub(/\.$/, ""); print}' | CHARSET=UTF-8 idn --no-tld > temp/hostlist_original.txt
+# Обрабатываем список заблокированных ресурсов
+# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
+awk -F ';' '{
+	if ($2 ~ /\./ && $2 ~ /^[а-яА-Яa-zA-Z0-9\-_\.\*]+$/) {
+		gsub(/^\*\./, "", $2);	# Удаление *. в начале
+		gsub(/\.$/, "", $2);	# Удаление . в конце
+		print $2				# Выводим только доменные имена
+	}
+}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/list.txt
 
-# Generate zones from domains
-sed '/^www\./s/^www\.//; /^#/d' config/exclude-hosts-{dist,custom}.txt temp/nxdomain.txt | sort -u > temp/exclude-hosts.txt
-#sort -u config/exclude-ips-{dist,custom}.txt | grep -v '^#' > temp/exclude-ips.txt
-sed '/^www\./s/^www\.//; /^#/d' config/include-hosts-{dist,custom}.txt temp/hostlist_original.txt | sort -u > temp/include-hosts.txt
-sed '/^#/d' config/include-ips-{dist,custom}.txt | sort -u > temp/include-ips.txt
+# Удалим домены больше 4-ого уровня и дубли
+sed -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/list.txt | sort -u > temp/blocked-hosts.txt
 
-input_file="temp/include-hosts.txt"
-output_file="temp/include-hosts-deduplicated.txt"
+# Подготавливаем исходные файлы для обработки
+( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/exclude-hosts-{dist,custom}.txt && cat temp/nxdomain.txt ) > temp/exclude-hosts.txt
+( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/include-hosts-{dist,custom}.txt && cat temp/blocked-hosts.txt) > temp/include-hosts.txt
+sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/include-ips-{dist,custom}.txt > temp/include-ips.txt
 
-grep -vFf <(grep -E '^[^.]+$' "$input_file" | sed 's/^/./') "$input_file" | grep -vFf <(grep -E '^[^.]+\.[^.]+$' "$input_file" | sed 's/^/./') > "$output_file"
+# Очищаем список доменов
+awk -f scripts/getzones.awk temp/include-hosts.txt | grep -vFxf temp/exclude-hosts.txt > result/blocked-hosts.txt
 
-awk -F ';' '{split($1, a, /\|/); for (i in a) {print a[i]";"$2}}' temp/list.csv | \
- grep -f config/exclude-hosts-by-ips-dist.txt | awk -F ';' '{print $2}' >> temp/exclude-hosts.txt
-
-awk -f scripts/getzones.awk temp/include-hosts-deduplicated.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
-
-if [[ "$RESOLVE_NXDOMAIN" == "yes" ]];
-then
-	timeout 2h scripts/resolve-dns-nxdomain.py result/hostlist_zones.txt > temp/nxdomain-exclude-hosts.txt
-	cat temp/nxdomain-exclude-hosts.txt >> temp/exclude-hosts.txt
-	awk -f scripts/getzones.awk temp/include-hosts-deduplicated.txt | grep -v -F -x -f temp/exclude-hosts.txt | sort -u > result/hostlist_zones.txt
-fi
-
-# Generate a list of IP addresses
-#awk -F';' '$1 ~ /\// {print $1}' temp/list.csv | grep -P '([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}' -o | sort -Vu > result/iplist_special_range.txt
-
-#awk -F ';' '($1 ~ /^([0-9]{1,3}\.){3}[0-9]{1,3}/) {gsub(/\|/, RS, $1); print $1}' temp/list.csv | \
-#	awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' | sort -u > result/iplist_all.txt
-
-#awk -F ';' '($1 ~ /^([0-9]{1,3}\.){3}[0-9]{1,3}/) && (($2 == "" && $3 == "") || ($1 == $2)) {gsub(/\|/, RS); print $1}' temp/list.csv | \
-#	awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' | sort -u > result/iplist_blockedbyip.txt
-
-#grep -F -v '33-4/2018' temp/list.csv | grep -F -v '33а-5536/2019' | \
-#	awk -F ';' '($1 ~ /^([0-9]{1,3}\.){3}[0-9]{1,3}/) && (($2 == "" && $3 == "") || ($1 == $2)) {gsub(/\|/, RS); print $1}' | \
-#	awk '/^([0-9]{1,3}\.){3}[0-9]{1,3}$/' | sort -u > result/iplist_blockedbyip_noid2971.txt
-
-awk -F ';' '$1 ~ /\// {print $1}' temp/include-ips.txt | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}' | sort -u > result/blocked-ranges.txt
-
+# Заблокированные IP-адреса
+awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/include-ips.txt > result/blocked-ranges.txt
 
 # Generate OpenVPN route file
 echo -n > result/openvpn-blocked-ranges.txt
 while read -r line
 do
-	C_NET="$(echo $line | awk -F '/' '{print $1}')"
-	C_NETMASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
-	echo $"push \"route ${C_NET} ${C_NETMASK}\"" >> result/openvpn-blocked-ranges.txt
+	IP="$(echo $line | awk -F '/' '{print $1}')"
+	MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
+	echo $"push \"route ${IP} ${MASK}\"" >> result/openvpn-blocked-ranges.txt
 done < result/blocked-ranges.txt
 
-
-# Generate dnsmasq aliases
-#echo -n > result/dnsmasq-aliases-alt.conf
-#while read -r line
-#do
-#	echo "server=/$line/127.0.0.1" >> result/dnsmasq-aliases-alt.conf
-#done < result/hostlist_zones.txt
-
-
 # Generate knot-resolver aliases
-echo 'blocked_hosts = {' > result/knot-aliases-alt.conf
+echo 'blocked_hosts = {' > result/blocked-hosts.conf
 while read -r line
 do
 	line="$line."
-	echo "${line@Q}," >> result/knot-aliases-alt.conf
-done < result/hostlist_zones.txt
-echo '}' >> result/knot-aliases-alt.conf
-
-
-# Generate squid zone file
-#echo -n > result/squid-whitelist-zones.conf
-#while read -r line
-#do
-#	echo ".$line" >> result/squid-whitelist-zones.conf
-#done < result/hostlist_zones.txt
-
+	echo "${line@Q}," >> result/blocked-hosts.conf
+done < result/blocked-hosts.txt
+echo '}' >> result/blocked-hosts.conf
 
 # Print results
-echo "Blocked domains: $(wc -l result/hostlist_zones.txt)" >&2
-#echo "iplist_all: $(wc -l result/iplist_all.txt)" >&2
-#echo "iplist_special_range: $(wc -l result/iplist_special_range.txt)" >&2
-#echo "iplist_blockedbyip: $(wc -l result/iplist_blockedbyip.txt)" >&2
-#echo "iplist_blockedbyip_noid2971: $(wc -l result/iplist_blockedbyip_noid2971.txt)" >&2
+echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 
 exit 0
