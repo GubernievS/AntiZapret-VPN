@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cp result/knot-aliases-alt.conf /etc/knot-resolver/knot-aliases-alt.conf
+cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
 systemctl restart kresd@1.service
 
 cp result/openvpn-blocked-ranges.txt /etc/openvpn/server/ccd/DEFAULT
