@@ -140,6 +140,11 @@ if [[ -d "/root/openvpn" ]]; then
 fi
 
 #
+# Отключим ipv6 до перезагрузки
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+#
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
 
