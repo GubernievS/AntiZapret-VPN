@@ -20,28 +20,27 @@ if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
 	echo ""
 	echo "Please choose the VPN type:"
 	echo "    1) OpenVPN"
-	echo "    2) WireGuard"
+	echo "    2) WireGuard/AmneziaWG"
 	until [[ $TYPE =~ ^[1-2]$ ]]; do
 		read -rp "Type choice [1-2]: " -e TYPE
 	done
 fi
 
-echo ""
-echo "Existing client names:"
-# OpenVPN
-if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
-	tail -n +2 /root/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
-# WireGuard
-else
-	grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//'
-fi
-
 CLIENT=$2
-if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+	echo ""
+	echo "Existing client names:"
+	# OpenVPN
+	if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
+		tail -n +2 /root/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
+	# WireGuard/AmneziaWG
+	else
+		grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//'
+	fi
 	echo ""
 	echo "Tell me a name for the client to delete"
-	echo "The name must consist of alphanumeric character, it may also include an underscore or a dash"
-	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]+$ ]]; do
+	echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
+	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; do
 		read -rp "Client name: " -e CLIENT
 	done
 fi
@@ -73,28 +72,25 @@ if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 	rm -f /etc/openvpn/client/keys/$CLIENT.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT.key
 
-	systemctl restart openvpn-server@antizapret-udp
-	systemctl restart openvpn-server@antizapret-tcp
-	systemctl restart openvpn-server@vpn-udp
-	systemctl restart openvpn-server@vpn-tcp
+	kill -SIGHUP $(pgrep openvpn)
 
 	echo "OpenVPN client '$CLIENT' successfull deleted"
 
-# WireGuard
+# WireGuard/AmneziaWG
 else
-
-
-if ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" && \
-   ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
-	echo "Failed to delete client '$CLIENT', please check if the client exists"
-	exit 21
-fi
+	if ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" && \
+	   ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
+		echo "Failed to delete client '$CLIENT', please check if the client exists"
+		exit 21
+	fi
 
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/antizapret.conf"
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/vpn.conf"
 
 	rm -f /root/antizapret-$NAME.conf
 	rm -f /root/vpn-$NAME.conf
+	rm -f /root/antizapret-$NAME-am.conf
+	rm -f /root/vpn-$NAME-am.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
 		wg syncconf antizapret <(wg-quick strip antizapret)
@@ -104,7 +100,7 @@ fi
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
-	echo "WireGuard client '$CLIENT' successfull deleted"
+	echo "WireGuard/AmneziaWG client '$CLIENT' successfull deleted"
 
 fi
 

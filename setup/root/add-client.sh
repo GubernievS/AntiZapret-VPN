@@ -20,18 +20,18 @@ if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
 	echo ""
 	echo "Please choose the VPN type:"
 	echo "    1) OpenVPN"
-	echo "    2) WireGuard"
+	echo "    2) WireGuard/AmneziaWG"
 	until [[ $TYPE =~ ^[1-2]$ ]]; do
 		read -rp "Type choice [1-2]: " -e TYPE
 	done
 fi
 
 CLIENT=$2
-if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	echo ""
 	echo "Tell me a name for the new client"
-	echo "The name must consist of alphanumeric character, it may also include an underscore or a dash"
-	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]+$ ]]; do
+	echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
+	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; do
 		read -rp "Client name: " -e CLIENT
 	done
 fi
@@ -44,11 +44,11 @@ NAME="${NAME#vpn-}"
 render() {
 	local IFS=''
 	local File="$1"
-	while read -r line ; do
-		while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]] ; do
-		local LHS=${BASH_REMATCH[1]}
-		local RHS="$(eval echo "\"$LHS\"")"
-		line=${line//$LHS/$RHS}
+	while read -r line; do
+		while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]]; do
+			local LHS=${BASH_REMATCH[1]}
+			local RHS="$(eval echo "\"$LHS\"")"
+			line=${line//$LHS/$RHS}
 		done
 		echo "$line"
 	done < $File
@@ -59,7 +59,11 @@ if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 
 	CLIENT_CERT_EXPIRE=$3
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
-	  CLIENT_CERT_EXPIRE=3650
+		echo ""
+		echo "Enter a valid client certificate expiration period (1 to 3650 days)"
+		until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
+			read -rp "Certificate expiration days (1-3650): " -e -i 3650 CLIENT_CERT_EXPIRE
+		done
 	fi
 
 	mkdir /root/easyrsa3 || true
@@ -128,9 +132,11 @@ if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$NAME-$SERVER_IP-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$NAME-$SERVER_IP.ovpn"
 
+	kill -SIGHUP $(pgrep openvpn)
+
 	echo "OpenVPN configuration files for the client '$CLIENT' have been (re)created in '/root'"
 
-# WireGuard
+# WireGuard/AmneziaWG
 else
 
 	if [[ ! -f "/etc/wireguard/key" ]]; then
@@ -144,15 +150,26 @@ else
 		source /etc/wireguard/key
 	fi
 
-	if grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" || \
-	   grep -q -E "^# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
+	client_block_antizapret=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
+	client_block_vpn=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
+	if [[ -n "$client_block_antizapret" ]]; then
+		CLIENT_PRIVATE_KEY=$(echo "$client_block_antizapret" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PUBLIC_KEY=$(echo "$client_block_antizapret" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRESHARED_KEY=$(echo "$client_block_antizapret" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
 		echo "A client with the specified name was already created, please choose another name"
-		exit 0
+	elif [[ -n "$client_block_vpn" ]]; then
+		CLIENT_PRIVATE_KEY=$(echo "$client_block_vpn" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PUBLIC_KEY=$(echo "$client_block_vpn" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRESHARED_KEY=$(echo "$client_block_vpn" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
+		echo "A client with the specified name was already created, please choose another name"
+	else
+		CLIENT_PRIVATE_KEY=$(wg genkey)
+		CLIENT_PUBLIC_KEY=$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)
+		CLIENT_PRESHARED_KEY=$(wg genpsk)
 	fi
-
-	CLIENT_PRIVATE_KEY=$(wg genkey)
-	CLIENT_PUBLIC_KEY=$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)
-	CLIENT_PRESHARED_KEY=$(wg genpsk)
+	
+	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/antizapret.conf"
+	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/vpn.conf"
 
 	# AntiZapret
 
@@ -164,12 +181,13 @@ else
 			break
 		fi
 		if [[ $i == 255 ]]; then
-			echo "The WireGuard subnet can support only 253 clients"
+			echo "The WireGuard/AmneziaWG subnet can support only 253 clients"
 			exit 22
 		fi
 	done
 
 	render "/etc/wireguard/templates/antizapret-client.conf" > "/root/antizapret-$NAME.conf"
+	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret-$NAME-am.conf"
 
 	echo -e "
 # Client = ${CLIENT}
@@ -193,12 +211,13 @@ AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
 			break
 		fi
 		if [[ $i == 255 ]]; then
-			echo "The WireGuard subnet can support only 253 clients"
+			echo "The WireGuard/AmneziaWG subnet can support only 253 clients"
 			exit 23
 		fi
 	done
 
 	render "/etc/wireguard/templates/vpn-client.conf" > "/root/vpn-$NAME.conf"
+	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn-$NAME-am.conf"
 
 	echo -e "
 # Client = ${CLIENT}
@@ -212,6 +231,6 @@ AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/vpn.conf"
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
-	echo "WireGuard configuration files for the client '$CLIENT' have been created in '/root'"
+	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root'"
 
 fi

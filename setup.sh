@@ -33,12 +33,17 @@ rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
 rm -f /root/antizapret/temp/*
 rm -f /root/antizapret/result/*
+rm -f /usr/share/keyrings/amnezia.gpg
+rm -f /etc/apt/sources.list.d/amnezia.list
+rm -f /etc/apt/sources.list.d/amneziawg.sources
+rm -f /etc/apt/sources.list.d/amneziawg.sources.list
 if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 	mkdir /root/easyrsa3
 	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki
 fi
 rm -rf /root/easy-rsa-ipsec
-apt purge python3-dnslib > /dev/null 2>&1
+rm -rf /root/.gnupg
+apt purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
 systemctl daemon-reload
 
 #
@@ -93,7 +98,7 @@ fi
 
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
-echo "OpenVPN + WireGuard"
+echo "OpenVPN + WireGuard + AmneziaWG "
 echo "Version from 02.10.2024"
 
 #
@@ -256,7 +261,7 @@ fi
 # Добавляем AdGuard DNS в обычный VPN
 if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client.conf
+	sed -i "s/1.1.1.1, 1.0.0.1/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
@@ -264,7 +269,7 @@ fi
 /root/add-client.sh ovpn antizapret-client
 
 #
-# Создаем в WireGuard несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
+# Создаем в WireGuard/AmneziaWG несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
 /root/add-client.sh wg antizapret-client1
 /root/add-client.sh wg antizapret-client2
 /root/add-client.sh wg antizapret-client3
