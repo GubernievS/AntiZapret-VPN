@@ -68,6 +68,7 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 3
 fi
 
+script_dir=$(dirname "$(readlink -f "$0")")
 cd /root
 
 #
@@ -203,7 +204,7 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
-mv /root/antizapret/config/*-custom.txt /root || true
+mv /root/antizapret/config/*-custom.txt $script_dir || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -212,7 +213,7 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 
 #
 # Восстанавливаем пользовательские конфигурации
-mv /root/*-custom.txt /root/antizapret/config || true
+mv $script_dir/*-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
@@ -220,7 +221,6 @@ sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
-script_dir=$(dirname "$(readlink -f "$0")")
 find /root/antizapret -name '*.gitkeep' -delete
 rm -rf /root/antizapret/.git
 find $script_dir -name '*.gitkeep' -delete
