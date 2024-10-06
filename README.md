@@ -38,7 +38,7 @@ WireGuard не позволяет нескольким клиентам испо
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 AmneziaWG работает в [режиме обфускации Wireguard](https://habr.com/ru/companies/amnezia/articles/807539)
 
-По умолчанию [используется](https://habr.com/ru/companies/amnezia/articles/807539/) быстрый Cloudflare DNS, опционально можно включить AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
+По умолчанию используется быстрый Cloudflare DNS, опционально можно включить AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
