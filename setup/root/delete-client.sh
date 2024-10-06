@@ -72,7 +72,7 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	rm -f /etc/openvpn/client/keys/$CLIENT.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT.key
 
-	pids=$(pgrep openvpn)
+	pids=$(pgrep openvpn || true)
 	if [ -n "$pids" ]; then
 	  kill -SIGHUP $pids
 	fi
