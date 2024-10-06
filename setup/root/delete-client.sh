@@ -72,7 +72,10 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	rm -f /etc/openvpn/client/keys/$CLIENT.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT.key
 
-	kill -SIGHUP $(pgrep openvpn)
+	pids=$(pgrep openvpn)
+	if [ -n "$pids" ]; then
+	  kill -SIGHUP $pids
+	fi
 
 	echo "OpenVPN client '$CLIENT' successfull deleted"
 
