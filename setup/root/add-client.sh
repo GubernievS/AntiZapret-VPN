@@ -132,7 +132,10 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$NAME-$SERVER_IP-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$NAME-$SERVER_IP.ovpn"
 
-	kill -SIGHUP $(pgrep openvpn)
+	pids=$(pgrep openvpn)
+	if [ -n "$pids" ]; then
+	  kill -SIGHUP $pids
+	fi
 
 	echo "OpenVPN configuration files for the client '$CLIENT' have been (re)created in '/root'"
 
