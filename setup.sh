@@ -72,7 +72,7 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 3
 fi
 
-script_dir=$(dirname "$(readlink -f "$0")")
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 cd /root
 
 #
@@ -167,6 +167,12 @@ curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
+# Добавим репозиторий Debian Backports для поиска текущей версии linux-headers
+if [[ $OS == "debian" ]]; then
+	echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
+fi
+
+#
 # AmneziaWG
 #gpg --keyserver keyserver.ubuntu.com --recv-keys 75c9dd72c799870e310542e24166f2c257290828
 #gpg --export 75c9dd72c799870e310542e24166f2c257290828 | tee /usr/share/keyrings/amnezia.gpg > /dev/null
@@ -208,7 +214,7 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
-mv /root/antizapret/config/*-custom.txt $script_dir || true
+mv /root/antizapret/config/*-custom.txt $SCRIPT_DIR || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -217,7 +223,7 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 
 #
 # Восстанавливаем пользовательские конфигурации
-mv $script_dir/*-custom.txt /root/antizapret/config || true
+mv $SCRIPT_DIR/*-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
@@ -227,9 +233,9 @@ sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode
 # Копируем нужные файлы и папки, удаляем не нужные
 find /root/antizapret -name '*.gitkeep' -delete
 rm -rf /root/antizapret/.git
-find $script_dir -name '*.gitkeep' -delete
-cp -r $script_dir/setup/* / 
-rm -rf $script_dir
+find $SCRIPT_DIR -name '*.gitkeep' -delete
+cp -r $SCRIPT_DIR/setup/* / 
+rm -rf $SCRIPT_DIR
 
 #
 # Выставляем разрешения на запуск скриптов
@@ -293,14 +299,17 @@ if systemctl list-unit-files | grep -q "^ufw.service"; then
 fi
 
 if [[ "$PATCH" = "y" ]]; then
-	/root/patch-openvpn.sh "$ALGORITHM"
+	if ! /root/patch-openvpn.sh "$ALGORITHM"; then
+		echo ""
+		echo -e "\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run './patch-openvpn.sh' after rebooting"
+	fi
 fi
 
 if [[ "$DCO" = "y" ]]; then
 	if ! /root/enable-openvpn-dco.sh; then
-	echo ""
-	echo -e "\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting"
-fi
+		echo ""
+		echo -e "\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting"
+	fi
 fi
 
 echo ""
