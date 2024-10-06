@@ -148,17 +148,17 @@ else
 		source /etc/wireguard/key
 	fi
 
-	client_block_antizapret=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
-	client_block_vpn=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
-	if [[ -n "$client_block_antizapret" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$client_block_antizapret" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PUBLIC_KEY=$(echo "$client_block_antizapret" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PRESHARED_KEY=$(echo "$client_block_antizapret" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
+	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
+	CLIENT_BLOCK_VPN=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
+	if [[ -n "$CLIENT_BLOCK_ANTIZAPRET" ]]; then
+		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
 		echo "A client with the specified name was already created, please choose another name"
-	elif [[ -n "$client_block_vpn" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$client_block_vpn" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PUBLIC_KEY=$(echo "$client_block_vpn" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PRESHARED_KEY=$(echo "$client_block_vpn" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
+	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
+		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
 		echo "A client with the specified name was already created, please choose another name"
 	else
 		CLIENT_PRIVATE_KEY=$(wg genkey)
