@@ -122,7 +122,7 @@ done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
 until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i n DNS_ANTIZAPRET
+	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i y DNS_ANTIZAPRET
 done
 echo ""
 echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
