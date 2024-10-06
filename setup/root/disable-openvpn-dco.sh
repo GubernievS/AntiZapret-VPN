@@ -33,7 +33,6 @@ echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:AES-128-CBC:AES-192-CBC:AES-256-
 disable-dco" >> /etc/openvpn/server/vpn-udp.conf
 echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:AES-128-CBC:AES-192-CBC:AES-256-CBC\"
 disable-dco" >> /etc/openvpn/server/vpn-tcp.conf
-systemctl daemon-reload
 systemctl restart openvpn-server@*
 echo ""
 echo "Successful disable OpenVPN DCO!"
