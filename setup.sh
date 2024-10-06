@@ -268,7 +268,7 @@ fi
 
 #
 # Создаем в OpenVPN пользователя 'antizapret-client' и создаем *.ovpn файлы подключений в /root
-/root/add-client.sh ov antizapret-client
+/root/add-client.sh ov antizapret-client 3650
 
 #
 # Создаем в WireGuard/AmneziaWG несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
