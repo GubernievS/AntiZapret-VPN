@@ -132,7 +132,7 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$NAME-$SERVER_IP-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$NAME-$SERVER_IP.ovpn"
 
-	pids=$(pgrep openvpn)
+	pids=$(pgrep openvpn || true)
 	if [ -n "$pids" ]; then
 	  kill -SIGHUP $pids
 	fi
