@@ -2,7 +2,7 @@
 #
 # Добавление нового клиента (* - только для OpenVPN)
 #
-# chmod +x add-client.sh && ./add-client.sh [ovpn/wg] [имя_клиента] [срок_действия*]
+# chmod +x add-client.sh && ./add-client.sh [ov/wg] [имя_клиента] [срок_действия*]
 #
 set -e
 
@@ -16,7 +16,7 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 TYPE=$1
-if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
+if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
 	echo ""
 	echo "Please choose the VPN type:"
 	echo "    1) OpenVPN"
@@ -55,7 +55,7 @@ render() {
 }
 
 # OpenVPN
-if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
+if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
 	CLIENT_CERT_EXPIRE=$3
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then

@@ -2,7 +2,7 @@
 #
 # Удаление клиента
 #
-# chmod +x delete-client.sh && ./delete-client.sh [ovpn/wg] [имя_клиента]
+# chmod +x delete-client.sh && ./delete-client.sh [ov/wg] [имя_клиента]
 #
 set -e
 
@@ -16,7 +16,7 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 TYPE=$1
-if [[ "$TYPE" != "ovpn" && "$TYPE" != "wg" ]]; then
+if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
 	echo ""
 	echo "Please choose the VPN type:"
 	echo "    1) OpenVPN"
@@ -31,7 +31,7 @@ if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	echo ""
 	echo "Existing client names:"
 	# OpenVPN
-	if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
+	if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		tail -n +2 /root/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
 	# WireGuard/AmneziaWG
 	else
@@ -50,7 +50,7 @@ NAME="${NAME#antizapret-}"
 NAME="${NAME#vpn-}"
 
 # OpenVPN
-if [[ "$TYPE" == "ovpn" || "$TYPE" == "1" ]]; then
+if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
 	cd /root/easyrsa3
 

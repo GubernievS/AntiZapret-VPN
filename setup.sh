@@ -98,8 +98,8 @@ fi
 
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
-echo "OpenVPN + WireGuard + AmneziaWG "
-echo "Version from 02.10.2024"
+echo "OpenVPN + WireGuard + AmneziaWG"
+echo "Version from 06.10.2024"
 
 #
 # Спрашиваем о настройках
@@ -266,7 +266,7 @@ fi
 
 #
 # Создаем в OpenVPN пользователя 'antizapret-client' и создаем *.ovpn файлы подключений в /root
-/root/add-client.sh ovpn antizapret-client
+/root/add-client.sh ov antizapret-client
 
 #
 # Создаем в WireGuard/AmneziaWG несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
