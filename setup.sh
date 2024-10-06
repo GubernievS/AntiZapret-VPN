@@ -154,7 +154,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 mkdir -p /etc/apt/keyrings
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl #gnupg2
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl gpg #gnupg2
 
 #
 # Knot-Resolver
