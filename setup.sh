@@ -25,8 +25,7 @@ rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
 rm -f /etc/openvpn/server/antizapret.conf
 rm -f /etc/openvpn/server/logs/*
-rm -f /etc/openvpn/client/templates/openvpn-udp-unified.conf
-rm -f /etc/openvpn/client/templates/openvpn-tcp-unified.conf
+rm -f /etc/openvpn/client/templates/*-unified.conf
 rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
@@ -34,9 +33,7 @@ rm -f /root/upgrade-openvpn.sh
 rm -f /root/antizapret/temp/*
 rm -f /root/antizapret/result/*
 rm -f /usr/share/keyrings/amnezia.gpg
-rm -f /etc/apt/sources.list.d/amnezia.list
-rm -f /etc/apt/sources.list.d/amneziawg.sources
-rm -f /etc/apt/sources.list.d/amneziawg.sources.list
+rm -f /etc/apt/sources.list.d/amnezia*
 rm -f /etc/wireguard/templates/*-client.conf
 find /root -type f -name "*.conf" ! -name "*-wg.conf" ! -name "*-am.conf" -exec rm {} +
 if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
