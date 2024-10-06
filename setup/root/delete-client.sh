@@ -87,10 +87,8 @@ else
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/antizapret.conf"
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/vpn.conf"
 
-	rm -f /root/antizapret-$NAME.conf
-	rm -f /root/vpn-$NAME.conf
-	rm -f /root/antizapret-$NAME-am.conf
-	rm -f /root/vpn-$NAME-am.conf
+	rm -f /root/antizapret-$NAME-*.conf
+	rm -f /root/vpn-$NAME-*.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
 		wg syncconf antizapret <(wg-quick strip antizapret)

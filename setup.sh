@@ -37,6 +37,8 @@ rm -f /usr/share/keyrings/amnezia.gpg
 rm -f /etc/apt/sources.list.d/amnezia.list
 rm -f /etc/apt/sources.list.d/amneziawg.sources
 rm -f /etc/apt/sources.list.d/amneziawg.sources.list
+rm -f /etc/wireguard/templates/*-client.conf
+find /root -type f -name "*.conf" ! -name "*-wg.conf" ! -name "*-am.conf" -exec rm {} +
 if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 	mkdir /root/easyrsa3
 	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki

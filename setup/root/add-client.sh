@@ -186,7 +186,7 @@ else
 		fi
 	done
 
-	render "/etc/wireguard/templates/antizapret-client.conf" > "/root/antizapret-$NAME.conf"
+	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret-$NAME-wg.conf"
 	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret-$NAME-am.conf"
 
 	echo -e "
@@ -216,7 +216,7 @@ AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
 		fi
 	done
 
-	render "/etc/wireguard/templates/vpn-client.conf" > "/root/vpn-$NAME.conf"
+	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/vpn-$NAME-wg.conf"
 	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn-$NAME-am.conf"
 
 	echo -e "
