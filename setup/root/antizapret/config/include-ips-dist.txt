@@ -1,0 +1,2 @@
+# Discord voice (discord-rumow2-1)
+66.22.216.0/23
