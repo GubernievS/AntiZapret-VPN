@@ -1,2 +1,3 @@
 # Discord voice (https://bgp.tools/rir-owner/us.discord1)
 66.22.192.0/18
+195.62.89.0/24
