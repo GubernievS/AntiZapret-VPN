@@ -5,6 +5,8 @@ ytimg.com
 ggpht.com
 googleapis.com
 gstatic.com
+youtu.be
+googleusercontent.com
 gvt1.com
 gvt2.com
 gvt3.com
@@ -33,6 +35,12 @@ acf.international
 rutracker.cc
 x.com
 conversations.im
+roskomsvoboda.org
+amazfitwatchfaces.com
+buymeacoffee.com
+cloudflare.com
+redgifs.com
+
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
 gaming.amazon.com
@@ -219,7 +227,14 @@ discordapp.net
 cloudfront.net
 loudflareinsights.com
 soapui.org
-conversations.im
+spotify.com
+githubcopilot.com
+getoutline.com
+code.org
+swagger.io
+readybot.io
+seekvectorlogo.net
+
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
 news.google.com
