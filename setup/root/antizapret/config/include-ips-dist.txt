@@ -1,2 +1,2 @@
-# Discord voice (discord-rumow2-1)
-66.22.216.0/23
+# Discord voice (https://bgp.tools/rir-owner/us.discord1)
+66.22.192.0/18
