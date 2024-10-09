@@ -213,8 +213,8 @@ DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables e
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
-# Сохраняем пользовательские конфигурации в файлах *-custom.txt
-mv /root/antizapret/config/*-custom.txt $SCRIPT_DIR || true
+# Сохраняем пользовательские конфигурации в файлах *-hosts-custom.txt
+mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR || true
 
 #
 # Обновляем antizapret до последней версии из репозитория
@@ -223,7 +223,7 @@ git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
 
 #
 # Восстанавливаем пользовательские конфигурации
-mv $SCRIPT_DIR/*-custom.txt /root/antizapret/config || true
+mv $SCRIPT_DIR/*-hosts-custom.txt /root/antizapret/config || true
 
 #
 # Удаляем исключения из исключений антизапрета
