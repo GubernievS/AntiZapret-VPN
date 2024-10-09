@@ -219,7 +219,6 @@ mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR || true
 #
 # Копируем нужные файлы и папки, удаляем не нужные
 rm -rf /root/antizapret
-find $SCRIPT_DIR -name '*.gitkeep' -delete
 cp -r $SCRIPT_DIR/setup/* / 
 rm -rf $SCRIPT_DIR
 
