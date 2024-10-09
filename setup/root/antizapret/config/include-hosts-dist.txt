@@ -69,7 +69,7 @@ releases.hashicorp.com
 community.infineon.com
 download.jetbrains.com
 documentation.meraki.com
-software-static.download.prss.microsoft.com
+download.prss.microsoft.com
 account.mongodb.com
 cloud.mongodb.com
 cloud.oracle.com
