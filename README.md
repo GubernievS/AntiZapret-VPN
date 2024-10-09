@@ -125,5 +125,6 @@ AntiZapret VPN = 10.29.0.0/16\
 Обычный VPN = 10.28.0.0/16\
 Подменные IP = 10.30.0.0/15
 ***
-![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)\
-Поблагодарить и поддержать проект можно на карту: 5536914118120611
+[![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
+
+Поблагодарить и поддержать проект можно так же на карту: 5536914118120611
