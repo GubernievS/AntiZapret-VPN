@@ -217,25 +217,15 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR || true
 
 #
-# Обновляем antizapret до последней версии из репозитория
+# Копируем нужные файлы и папки, удаляем не нужные
 rm -rf /root/antizapret
-git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git /root/antizapret
+find $SCRIPT_DIR -name '*.gitkeep' -delete
+cp -r $SCRIPT_DIR/setup/* / 
+rm -rf $SCRIPT_DIR
 
 #
 # Восстанавливаем пользовательские конфигурации
 mv $SCRIPT_DIR/*-hosts-custom.txt /root/antizapret/config || true
-
-#
-# Удаляем исключения из исключений антизапрета
-sed -i "/\b\(googleusercontent\|cloudfront\|deviantart\|multikland\|synchroncode\|placehere\|delivembed\)\b/d" /root/antizapret/config/exclude-regexp-dist.awk
-
-#
-# Копируем нужные файлы и папки, удаляем не нужные
-find /root/antizapret -name '*.gitkeep' -delete
-rm -rf /root/antizapret/.git
-find $SCRIPT_DIR -name '*.gitkeep' -delete
-cp -r $SCRIPT_DIR/setup/* / 
-rm -rf $SCRIPT_DIR
 
 #
 # Выставляем разрешения на запуск скриптов

@@ -31,7 +31,7 @@ sed -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/list.txt | sort -u > temp/blocked-hos
 ( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/include-hosts-{dist,custom}.txt && cat temp/blocked-hosts.txt) > temp/include-hosts.txt
 
 # Очищаем список доменов
-awk -f scripts/getzones.awk temp/include-hosts.txt > temp/getzones.txt
+awk -f getzones.awk temp/include-hosts.txt > temp/getzones.txt
 awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/getzones.txt > temp/blocked-hosts.txt
 grep -vFf <(grep -E '^([^.]*\.){0,1}[^.]*$' temp/blocked-hosts.txt | sed 's/^/./') temp/blocked-hosts.txt > result/blocked-hosts.txt
 
