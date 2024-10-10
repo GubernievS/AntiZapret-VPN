@@ -99,7 +99,7 @@ com
 /root/antizapret/doall.sh
 ```
 ***
-Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270)
+Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
 ***
