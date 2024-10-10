@@ -425,4 +425,4 @@
 # Temporary
 length($1) > 30 && !/wixmp/ {next}
 /xn--/ {next}
-/^[0-9]/ {next}
+#/^[0-9]/ {next}
