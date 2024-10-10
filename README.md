@@ -1,6 +1,6 @@
 # AntiZapret VPN + обычный VPN
 
-Скрипт для установки на своём сервере AntiZapret VPN и обычного VPN, работает по протоколам OpenVPN, WireGuard и AmneziaWG
+Скрипт для установки на своём сервере AntiZapret VPN и обычного VPN, работает по протоколам OpenVPN (есть патч для обхода блокировки), WireGuard и AmneziaWG
 
 AntiZapret VPN реализует технологию [раздельного туннелирования](https://encyclopedia.kaspersky.ru/glossary/split-tunneling)
 
