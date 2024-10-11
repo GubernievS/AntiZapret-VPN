@@ -21,18 +21,20 @@ awk -F ';' '{
 		gsub(/\.$/, "", $2);	# Удаление . в конце
 		print $2				# Выводим только доменные имена
 	}
-}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/list.txt
+}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
 
-# Удалим домены больше 4-ого уровня и дубли
-sed -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/list.txt | sort -u > temp/blocked-hosts.txt
+# Удалим домены больше 4-ого уровня
+sed -i -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/blocked-hosts.txt
 
 # Подготавливаем исходные файлы для обработки
-( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/exclude-hosts-{dist,custom}.txt && cat temp/nxdomain.txt ) > temp/exclude-hosts.txt
-( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/include-hosts-{dist,custom}.txt && cat temp/blocked-hosts.txt) > temp/include-hosts.txt
+( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/exclude-hosts-{dist,custom}.txt && cat temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/include-hosts-{dist,custom}.txt && cat temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
 
 # Очищаем список доменов
-awk -f getzones.awk temp/include-hosts.txt > temp/getzones.txt
-awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/getzones.txt > temp/blocked-hosts.txt
+awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/cleared-blocked-hosts.txt
+# Убираем домены из исключений
+awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/cleared-blocked-hosts.txt > temp/blocked-hosts.txt
+# Убираем домены у которых уже есть домены верхнего уровня
 grep -vFf <(grep -E '^([^.]*\.){0,1}[^.]*$' temp/blocked-hosts.txt | sed 's/^/./') temp/blocked-hosts.txt > result/blocked-hosts.txt
 
 # Generate knot-resolver aliases

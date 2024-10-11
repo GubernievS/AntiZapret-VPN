@@ -1,3 +1,4 @@
+# Правила для пропуска строк
 (/duckdns/) {next}
 (/linode\.com/) {next}
 (/upcloud\.com/) {next}
@@ -426,3 +427,8 @@
 length($1) > 30 && !/wixmp/ {next}
 /xn--/ {next}
 #/^[0-9]/ {next}
+
+# Обработка каждой строки
+{
+    print
+}
