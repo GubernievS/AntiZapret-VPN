@@ -154,7 +154,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 mkdir -p /etc/apt/keyrings
 
 apt update
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl gpg #gnupg2
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl gpg
 
 #
 # Knot-Resolver
@@ -173,35 +173,6 @@ if [[ $OS == "debian" ]]; then
 fi
 
 #
-# AmneziaWG
-#gpg --keyserver keyserver.ubuntu.com --recv-keys 75c9dd72c799870e310542e24166f2c257290828
-#gpg --export 75c9dd72c799870e310542e24166f2c257290828 | tee /usr/share/keyrings/amnezia.gpg > /dev/null
-
-#rm -f /etc/apt/sources.list.d/amnezia.list || true
-#rm -f /etc/apt/sources.list.d/amneziawg.sources || true
-#rm -f /etc/apt/sources.list.d/amneziawg.sources.list || true
-
-#if [[ $OS == "ubuntu" ]]; then
-#	echo "deb [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list.d/amnezia.list
-#	echo "deb-src [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list.d/amnezia.list
-#elif [[ $OS == "debian" ]]; then
-#	echo "deb [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" | tee -a /etc/apt/sources.list.d/amnezia.list
-#	echo "deb-src [signed-by=/usr/share/keyrings/amnezia.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main" | tee -a /etc/apt/sources.list.d/amnezia.list
-#fi
-
-#if [[ -e /etc/apt/sources.list.d/ubuntu.sources ]]; then
-#	if ! grep -qE '^[^#]*deb-src' /etc/apt/sources.list.d/ubuntu.sources; then
-#		cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/amneziawg.sources
-#		sed -i '/^$/d; /^#/d; s/deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources
-#	fi
-#elif [[ -e /etc/apt/sources.list ]]; then
-#	if ! grep -q "^deb-src" /etc/apt/sources.list; then
-#		cp /etc/apt/sources.list /etc/apt/sources.list.d/amneziawg.sources.list
-#		sed -i '/^$/d; /^#/d; s/^deb/deb-src/' /etc/apt/sources.list.d/amneziawg.sources.list
-#	fi
-#fi
-
-#
 # Обновляем систему
 apt update
 DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
@@ -209,7 +180,7 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard #amneziawg
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
