@@ -288,18 +288,23 @@ if systemctl list-unit-files | grep -q "^ufw.service"; then
 	systemctl disable ufw
 fi
 
+ERRORS=""
+
 if [[ "$PATCH" = "y" ]]; then
 	if ! /root/patch-openvpn.sh "$ALGORITHM"; then
-		echo ""
-		echo -e "\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run './patch-openvpn.sh' after rebooting"
+		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run './patch-openvpn.sh' after rebooting\n"
 	fi
 fi
 
 if [[ "$DCO" = "y" ]]; then
 	if ! /root/enable-openvpn-dco.sh; then
-		echo ""
-		echo -e "\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting"
+		ERRORS+="\n\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting\n"
 	fi
+fi
+
+# Если есть ошибки, выводим их
+if [[ -n "$ERRORS" ]]; then
+	echo -e "$ERRORS"
 fi
 
 echo ""
