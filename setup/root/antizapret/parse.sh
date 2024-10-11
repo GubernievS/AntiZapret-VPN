@@ -24,7 +24,7 @@ awk -F ';' '{
 }' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
 
 # Удалим домены больше 4-ого уровня
-sed -i -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/blocked-hosts.txt
+#sed -i -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/blocked-hosts.txt
 
 # Подготавливаем исходные файлы для обработки
 ( sed -E '/^#/d; /^[[:space:]]*$/d; s/^[[:space:]]+//; s/[[:space:]]+$//' config/exclude-hosts-{dist,custom}.txt && cat temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
