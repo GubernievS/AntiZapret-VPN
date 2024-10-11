@@ -226,7 +226,6 @@ discord.gg
 discordapp.com
 discordapp.net
 discord.media
-cloudfront.net
 loudflareinsights.com
 soapui.org
 spotify.com
