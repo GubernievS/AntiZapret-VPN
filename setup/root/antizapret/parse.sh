@@ -17,7 +17,6 @@ cd "$HERE"
 awk -F ';' '{
 	if ($2 ~ /\./ && $2 ~ /^[а-яА-Яa-zA-Z0-9\-_\.\*]+$/) {
 		gsub(/^\*\./, "", $2);	# Удаление *. в начале
-		gsub(/^www\./, "", $2);	# Удаление www. в начале
 		gsub(/\.$/, "", $2);	# Удаление . в конце
 		print $2				# Выводим только доменные имена
 	}
@@ -32,8 +31,10 @@ sed -i -E 's/^.*\.(.*\..*\..*\..*)$/\1/' temp/blocked-hosts.txt
 
 # Очищаем список доменов
 awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/cleared-blocked-hosts.txt
+
 # Убираем домены из исключений
 awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/cleared-blocked-hosts.txt > temp/blocked-hosts.txt
+
 # Убираем домены у которых уже есть домены верхнего уровня
 grep -vFf <(grep -E '^([^.]*\.){0,1}[^.]*$' temp/blocked-hosts.txt | sed 's/^/./') temp/blocked-hosts.txt > result/blocked-hosts.txt
 
