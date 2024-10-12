@@ -146,8 +146,14 @@ fi
 
 #
 # Отключим ipv6 до перезагрузки
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
+if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1
+fi
+
+if [ -f /proc/sys/net/ipv6/conf/default/disable_ipv6 ]; then
+    sysctl -w net.ipv6.conf.default.disable_ipv6=1
+fi
+
 
 #
 # Добавляем репозитории
