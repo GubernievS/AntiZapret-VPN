@@ -20,7 +20,7 @@ AntiZapret VPN реализует технологию [раздельного �
 
 Ваш сервер должен находиться за пределами России, в противном случае разблокировка сайтов не гарантируется
 
-AntiZapret VPN (antizapret-\*) и обычный VPN (vpn-\*) подключаются через VPN клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG for Windows](https://github.com/amnezia-vpn/amneziawg-windows-client/releases)
+AntiZapret VPN (antizapret-\*) и обычный VPN (vpn-\*) подключаются через VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG for Windows](https://github.com/amnezia-vpn/amneziawg-windows-client/releases)
 
 **OpenVPN** (\*.ovpn)\
 Поддерживается подключение по UDP и TCP, а также возможность подключения только по UDP (\*-udp.ovpn) или только по TCP (\*-tcp.ovpn)\
