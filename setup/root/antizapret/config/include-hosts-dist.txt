@@ -238,6 +238,7 @@ seekvectorlogo.net
 cesium.com
 dyson.com
 dyson.nl
+informit.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
