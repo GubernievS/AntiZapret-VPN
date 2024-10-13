@@ -52,7 +52,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 ```sh
 apt update && apt install -y git && cd /root && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root
+3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn или *.conf) с сервера из папки /root
 
 Опционально можно:
 1. Установить патч для обхода блокировки протокола OpenVPN
