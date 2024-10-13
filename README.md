@@ -66,7 +66,9 @@ apt update && apt install -y git && cd /root && git clone https://github.com/Gub
 ./patch-openvpn.sh
 ```
 ***
-Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)
+Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)\
+При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM и AES-256-GCM\
+Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 ```sh
 ./enable-openvpn-dco.sh
 ```
@@ -130,6 +132,7 @@ com
 > Добавить диапазон в правила фаервола ferm в файле /etc/ferm/whitelist.conf\
 Добавить диапазон в настройках OpenVPN в файл /etc/openvpn/server/ccd/DEFAULT\
 Добавить диапазон в клиентских конфигурациях WireGuard/AmneziaWG (файлы с расширением *.conf), указав его в строке AllowedIPs
+Перезагрузить сервер
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
