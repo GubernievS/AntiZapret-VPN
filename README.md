@@ -107,7 +107,7 @@ com
 Хостинги в Европе для VPN принимающие рубли: [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) с бонусом 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
 ***
 ### FAQ
-1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn), WireGuard/AmneziaWG (\*.conf)
+1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)
 > Скачать с сервера папки /root/easyrsa3 и /etc/wireguard (можно без подпапки templates)\
 Переустановить сервер\
 Обратно на сервер закачать папки /root/easyrsa3 и /etc/wireguard\
@@ -127,9 +127,9 @@ com
 
 4. Как добавить диапазон IP-адресов для работы через AntiZapret VPN
 
-> 1. Добавить диапазон IP-адресов в правила фаервола ferm, отредактировав файл /etc/ferm/whitelist.conf
-2. Включить диапазон в настройках OpenVPN, добавив его в файл /etc/openvpn/server/ccd/DEFAULT
-3. Добавить диапазон в клиентские конфигурации WireGuard/AmneziaWG (файлы с расширением *.conf), добавив его в строку AllowedIPs
+> Добавить диапазон IP-адресов в правила фаервола ferm, отредактировав файл /etc/ferm/whitelist.conf\
+Включить диапазон в настройках OpenVPN, добавив его в файл /etc/openvpn/server/ccd/DEFAULT\
+Добавить диапазон в клиентские конфигурации WireGuard/AmneziaWG (файлы с расширением *.conf), добавив его в строку AllowedIPs
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
