@@ -21,11 +21,15 @@ EXCLUDE_REGEXP_PATH='config/exclude-regexp-dist.awk'
 INCLUDE_HOSTS_LINK='https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/include-hosts-dist.txt'
 INCLUDE_HOSTS_PATH='config/include-hosts-dist.txt'
 
+UPDATE_LINK='https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh'
+UPDATE_PATH='update.sh'
+
 curl -f --fail-early --compressed -o $DUMP_PATH $DUMP_LINK || exit 1
 curl -f --fail-early --compressed -o $NXDOMAIN_PATH $NXDOMAIN_LINK || exit 1
 curl -f --fail-early --compressed -o $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK || exit 1
 curl -f --fail-early --compressed -o $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK || exit 1
 curl -f --fail-early --compressed -o $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK || exit 1
+curl -f --fail-early --compressed -o $UPDATE_PATH $UPDATE_LINK || exit 1
 
 SIZE="$(curl -sI "$DUMP_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
 [[ "$SIZE" != "$(stat -c '%s' $DUMP_PATH)" ]] && echo "$DUMP_PATH size differs" && exit 2
@@ -41,6 +45,9 @@ SIZE="$(curl -sI "$EXCLUDE_REGEXP_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-le
 
 SIZE="$(curl -sI "$INCLUDE_HOSTS_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
 [[ "$SIZE" != "$(stat -c '%s' $INCLUDE_HOSTS_PATH)" ]] && echo "$INCLUDE_HOSTS_PATH size differs" && exit 2
+
+SIZE="$(curl -sI "$UPDATE_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
+[[ "$SIZE" != "$(stat -c '%s' $UPDATE_PATH)" ]] && echo "$UPDATE_PATH size differs" && exit 2
 
 iconv -f cp1251 -t utf8 temp/dump.csv > temp/list.csv
 
