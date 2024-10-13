@@ -116,6 +116,8 @@ if [[ "$PATCH" == "y" ]]; then
 	done
 fi
 echo ""
+echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, and boosts data speeds"
+echo "OpenVPN DCO supports only the AES-128-GCM and AES-256-GCM encryption protocols"
 until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 done
