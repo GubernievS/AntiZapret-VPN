@@ -4,6 +4,8 @@ set -e
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
+rm -f temp/*
+
 DUMP_LINK='https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv'
 DUMP_PATH='temp/dump.csv'
 
