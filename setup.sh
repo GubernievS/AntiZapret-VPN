@@ -154,7 +154,6 @@ if [ -f /proc/sys/net/ipv6/conf/default/disable_ipv6 ]; then
     sysctl -w net.ipv6.conf.default.disable_ipv6=1
 fi
 
-
 #
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
