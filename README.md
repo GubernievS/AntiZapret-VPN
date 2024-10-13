@@ -127,9 +127,9 @@ com
 
 4. Как добавить диапазон IP-адресов для работы через AntiZapret VPN
 
-> Добавить диапазон IP-адресов в правила фаервола ferm, отредактировав файл /etc/ferm/whitelist.conf\
-Включить диапазон в настройках OpenVPN, добавив его в файл /etc/openvpn/server/ccd/DEFAULT\
-Добавить диапазон в клиентские конфигурации WireGuard/AmneziaWG (файлы с расширением *.conf), добавив его в строку AllowedIPs
+> Добавить диапазон в правила фаервола ferm в файле /etc/ferm/whitelist.conf\
+Добавить диапазон в настройках OpenVPN в файл /etc/openvpn/server/ccd/DEFAULT\
+Добавить диапазон в клиентских конфигурациях WireGuard/AmneziaWG (файлы с расширением *.conf), указав его в строке AllowedIPs
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
