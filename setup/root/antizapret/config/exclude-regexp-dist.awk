@@ -428,6 +428,53 @@ length($1) > 30 && !/wixmp/ {next}
 /xn--/ {next}
 #/^[0-9]/ {next}
 
+# 14.10.2024
+(/login/) {next}
+(/signin/) {next}
+(/bank/) {next}
+(/secure/) {next}
+(/verify/) {next}
+(/account/) {next}
+(/billing/) {next}
+(/password/) {next}
+(/invoice/) {next}
+(/casino/) {next}
+(/bet/) {next}
+(/poker/) {next}
+(/blackjack/) {next}
+(/roulette/) {next}
+(/slots/) {next}
+(/winbig/) {next}
+(/jackpot/) {next}
+(/1win/) {next}
+(/admiralx/) {next}
+(/escort/) {next}
+(/striptiz/) {next}
+(/massaj/) {next}
+(/stavki/) {next}
+(/vulkan/) {next}
+(/sloty/) {next}
+(/prostitutki/) {next}
+(/intim/) {next}
+(/kokain/) {next}
+(/xanax/) {next}
+(/xanaks/) {next}
+(/anasha/) {next}
+(/escort/) {next}
+(/pytana/) {next}
+(/prostitutka/) {next}
+(/metadon/) {next}
+(/mefedron/) {next}
+(/krokodil/) {next}
+(/amfetamin/) {next}
+(/drug/) {next}
+(/narcotic/) {next}
+(/meth/) {next}
+(/weed/) {next}
+(/vzyatka/) {next}
+(/bribe/) {next}
+(/russianbrides/) {next}
+
 # Обработка каждой строки
 {
     print
