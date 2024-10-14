@@ -131,7 +131,7 @@ com
 
 > Добавить диапазон в правила фаервола ferm в файле /etc/ferm/whitelist.conf\
 Добавить диапазон в настройках OpenVPN в файл /etc/openvpn/server/ccd/DEFAULT\
-Добавить диапазон в клиентских конфигурациях WireGuard/AmneziaWG (файлы с расширением *.conf), указав его в строке AllowedIPs
+Добавить диапазон в клиентских конфигурациях WireGuard/AmneziaWG (файлы с расширением *.conf), указав его в строке AllowedIPs\
 Перезагрузить сервер
 
 ***
