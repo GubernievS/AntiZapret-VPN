@@ -474,6 +474,9 @@ length($1) > 30 && !/wixmp/ {next}
 (/vzyatka/) {next}
 (/bribe/) {next}
 (/russianbrides/) {next}
+(/gamble/) {next}
+(/blacksprut/) {next}
+(/ecstasy/) {next}
 
 # Обработка каждой строки
 {
