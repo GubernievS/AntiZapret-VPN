@@ -192,20 +192,13 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-hosts-custom.txt
-mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR || true
+mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
 find $SCRIPT_DIR -name '*.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r $SCRIPT_DIR/setup/* /
-
-#
-# Восстанавливаем пользовательские конфигурации
-mv $SCRIPT_DIR/*-hosts-custom.txt /root/antizapret/config || true
-
-#
-# Удаляем папку с установочными файлами
 rm -rf $SCRIPT_DIR
 
 #
