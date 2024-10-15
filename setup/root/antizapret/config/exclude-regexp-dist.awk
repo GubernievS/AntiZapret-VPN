@@ -491,6 +491,13 @@ length($1) > 30 && !/wixmp/ {next}
 (/pornp/) {next}
 (/pussy/) {next}
 (/pusy/) {next}
+(/putana/) {next}
+(/qasino/) {next}
+(/sexo/) {next}
+(/erotic/) {next}
+(/cassa/) {next}
+(/prava/) {next}
+(/blowjob/) {next}
 
 # Обработка каждой строки
 {
