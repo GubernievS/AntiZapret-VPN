@@ -34,6 +34,6 @@ curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_H
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $PARSE_PATH $PARSE_LINK
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK
+curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK & # Запустим в фоновом режиме
 
 exit 0
