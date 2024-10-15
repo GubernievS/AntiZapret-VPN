@@ -21,14 +21,14 @@ EXCLUDE_REGEXP_PATH="config/exclude-regexp-dist.awk"
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/include-hosts-dist.txt"
 INCLUDE_HOSTS_PATH="config/include-hosts-dist.txt"
 
-UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
-UPDATE_PATH="update.sh"
-
 PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
 PARSE_PATH="parse.sh"
 
+UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
+UPDATE_PATH="update.sh"
+
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DUMP_PATH $DUMP_LINK
-iconv -f cp1251 -t utf8 temp/dump.csv > temp/list.csv
+iconv -f cp1251 -t utf8 $DUMP_PATH > temp/list.csv
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $NXDOMAIN_PATH $NXDOMAIN_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
