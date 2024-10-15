@@ -484,6 +484,9 @@ length($1) > 30 && !/wixmp/ {next}
 (/cosino/) {next}
 (/porno/) {next}
 (/porn0/) {next}
+(/xxx/) {next}
+(/porevo/) {next}
+(/bdsm/) {next}
 
 # Обработка каждой строки
 {
