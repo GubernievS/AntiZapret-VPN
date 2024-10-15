@@ -17,7 +17,6 @@ cd "$HERE"
 awk -F ';' '{
 	if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
 		gsub(/^\*\./, "", $2);	# Удаление *. в начале
-		gsub(/^www\./, "", $2);	# Удаление www. в начале
 		gsub(/\.$/, "", $2);	# Удаление . в конце
 		print $2				# Выводим только доменные имена
 	}
@@ -35,11 +34,12 @@ awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/b
 
 cp temp/blocked-hosts3.txt temp/blocked-hosts4.txt
 # Находим дубли и если домен повторяется больше 2-х раз добавляем домен верхнего уровня
-# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше 7
+# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
 awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 1) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 1) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
 
 # Убираем домены у которых уже есть домены верхнего уровня
-grep -vFf <(grep -E '^([^.]*\.){0,1}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./') temp/blocked-hosts4.txt > temp/blocked-hosts5.txt
+grep -vFf <(grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./') temp/blocked-hosts4.txt > temp/blocked-hosts5.txt
 
 # Еще раз убираем домены из исключений
 awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts5.txt | sort -u > result/blocked-hosts.txt
