@@ -477,6 +477,13 @@ length($1) > 30 && !/wixmp/ {next}
 (/gamble/) {next}
 (/blacksprut/) {next}
 (/ecstasy/) {next}
+(/broker/) {next}
+(/cas1no/) {next}
+(/caseno/) {next}
+(/casinno/) {next}
+(/cosino/) {next}
+(/porno/) {next}
+(/porn0/) {next}
 
 # Обработка каждой строки
 {
