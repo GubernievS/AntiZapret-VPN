@@ -476,6 +476,8 @@ length($1) > 30 && !/wixmp/ {next}
 (/russianbrides/) {next}
 (/gamble/) {next}
 (/blacksprut/) {next}
+
+# 15.10.2024
 (/ecstasy/) {next}
 (/broker/) {next}
 (/cas1no/) {next}
@@ -492,12 +494,24 @@ length($1) > 30 && !/wixmp/ {next}
 (/pussy/) {next}
 (/pusy/) {next}
 (/putana/) {next}
+(/putanu/) {next}
+(/putany/) {next}
 (/qasino/) {next}
-(/sexo/) {next}
+(/sex/) {next}
 (/erotic/) {next}
 (/cassa/) {next}
 (/prava/) {next}
 (/blowjob/) {next}
+(/dosug/) {next}
+(/amphetamin/) {next}
+(/propiska/) {next}
+(/malina/) {next}
+(/bordel/) {next}
+(/steroid/) {next}
+(/slot/) {next}
+(/e1dorado/) {next}
+(/plati/) {next}
+(/proctitytki/) {next}
 
 # Обработка каждой строки
 {
