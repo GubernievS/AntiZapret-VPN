@@ -5,7 +5,7 @@
 AntiZapret VPN реализует технологию [раздельного туннелирования](https://encyclopedia.kaspersky.ru/glossary/split-tunneling)
 
 Через AntiZapret VPN работают только (список сайтов автоматически обновляется раз в сутки):
-- Заблокированные Роскомнадзором сайты и IP-адреса (только для discord.com)
+- Заблокированные Роскомнадзором сайты и IP-адреса (например для discord.com)
 - Сайты, доступ к которым ограничивается незаконно (например youtube.com)
 - Сайты, ограничивающие доступ из России (например intel.com, chatgpt.com)
 
@@ -102,6 +102,20 @@ com
 /root/antizapret/doall.sh
 ```
 ***
+Добавить свои IP-адреса в список антизапрета (include-ips-custom.txt)
+```sh
+nano /root/antizapret/config/include-ips-custom.txt
+```
+Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:
+>8.8.8.8/32\
+10.20.0.0/16\
+20.30.40.0/24
+
+После этого нужно обновить список антизапрета
+```sh
+/root/antizapret/doall.sh
+```
+***
 Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
 ***
 Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
@@ -110,30 +124,23 @@ com
 Хостинги в Европе для VPN принимающие рубли: [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) с бонусом 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
 ***
 ### FAQ
-1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)
+1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
 > Скачать с сервера папки /root/easyrsa3 и /etc/wireguard (можно без подпапки templates)\
 Переустановить сервер\
 Обратно на сервер закачать папки /root/easyrsa3 и /etc/wireguard\
 Запустить скрипт установки
 
-2. Как посмотреть активные соединения
+2. Как посмотреть активные соединения?
 
 > Посмотреть активные соединения OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs (Логи обновляются каждые 30 секунд)\
 Посмотреть активные соединения WireGuard/AmneziaWG можно командой wg show
 
-3. Какие IP используются
+3. Какие IP используются?
 
 > DNS антизапрета = 10.29.0.1\
 Клиенты AntiZapret VPN = 10.29.0.0/16\
 Клиенты обычного VPN = 10.28.0.0/16\
 Подменные IP = 10.30.0.0/15
-
-4. Как добавить диапазон IP-адресов для работы через AntiZapret VPN
-
-> Добавить диапазон в правила фаервола ferm в файле /etc/ferm/whitelist.conf\
-Добавить диапазон в настройках OpenVPN в файл /etc/openvpn/server/ccd/DEFAULT\
-Добавить диапазон в клиентских конфигурациях WireGuard/AmneziaWG (файлы с расширением *.conf), указав его в строке AllowedIPs\
-Перезагрузить сервер
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)

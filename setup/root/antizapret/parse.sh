@@ -4,59 +4,114 @@ set -e
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-echo "Parse blocked hosts"
+if [[ -z "$1" || "$1" == "ips" ]]; then
+	echo "Parse blocked ips"
 
-# Обрабатываем список заблокированных ресурсов
-# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-awk -F ';' '{
-	if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
-		gsub(/^\*\./, "", $2);	# Удаление *. в начале
-		gsub(/\.$/, "", $2);	# Удаление . в конце
-		print $2				# Выводим только доменные имена
-	}
-}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
+	# Подготавливаем исходные файлы для обработки
+	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips-{dist,custom}.txt | sort -u > temp/include-ips.txt
+	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips-custom.txt | sort -u > temp/exclude-ips.txt
 
-# Подготавливаем исходные файлы для обработки
-( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/exclude-hosts-{dist,custom}.txt && echo && \
-sed -E 's/^www[0-9]*\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+	# Убираем IP-адреса из исключений
+	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/blocked-ips.txt
 
-( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/include-hosts-{dist,custom}.txt && echo && \
-sed -E 's/^www[0-9]*\.//' temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
+	# Заблокированные IP-адреса
+	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/blocked-ips.txt > result/blocked-ranges.txt
 
-# Очищаем список доменов
-awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/blocked-hosts2.txt
+	# Создаем файл для OpenVPN
+	echo -n > result/DEFAULT
+	while read -r line
+	do
+		IP="$(echo $line | awk -F '/' '{print $1}')"
+		MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
+		echo $"push \"route ${IP} ${MASK}\"" >> result/DEFAULT
+	done < result/blocked-ranges.txt
 
-# Убираем домены из исключений
-awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts2.txt > temp/blocked-hosts3.txt
+	# Обновляем файл
+	cp result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
 
-cp temp/blocked-hosts3.txt temp/blocked-hosts4.txt
-# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
-# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
-awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
-awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+	# Создаем файл для WireGuard/AmneziaWG
+	awk '{printf ", %s", $0}' result/blocked-ranges.txt > result/ips
+	# Обновляем файл
+	cp result/ips /etc/wireguard/ips
 
-# Убираем домены у которых уже есть домены верхнего уровня
-grep -vFf <(grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./') temp/blocked-hosts4.txt > temp/blocked-hosts5.txt
+	# Создаем файл для ferm
+	echo "@def \$WHITELIST = (" > result/whitelist.conf
+	cat result/blocked-ranges.txt >> result/whitelist.conf
+	echo ");" >> result/whitelist.conf
 
-# Еще раз убираем домены из исключений
-awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts5.txt | sort -u > result/blocked-hosts.txt
+	# Обновляем файл и перезапускаем сервис только если файл изменился
+	if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
+		cp result/whitelist.conf /etc/ferm/whitelist.conf
+		if systemctl is-active --quiet ferm; then
+			echo "Restart ferm"
+			systemctl restart ferm
+		fi
+		if systemctl is-active --quiet dnsmap; then
+			echo "Restart dnsmap"
+			systemctl restart dnsmap
+		fi
+	fi
+fi
 
-# Создаем файл для knot-resolver
-echo 'blocked_hosts = {' > result/blocked-hosts.conf
-while read -r line
-do
-	line="$line."
-	echo "${line@Q}," >> result/blocked-hosts.conf
-done < result/blocked-hosts.txt
-echo '}' >> result/blocked-hosts.conf
+if [[ -z "$1" || "$1" == "hosts" ]]; then
+	echo "Parse blocked hosts"
 
-# Выводим результат
-echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
+	# Обрабатываем список заблокированных ресурсов
+	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
+	awk -F ';' '{
+		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
+			gsub(/^\*\./, "", $2);	# Удаление *. в начале
+			gsub(/\.$/, "", $2);	# Удаление . в конце
+			print $2				# Выводим только доменные имена
+		}
+	}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
 
-if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
-	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
-	echo "Restart kresd@1.service"
-	systemctl restart kresd@1.service
+	# Подготавливаем исходные файлы для обработки
+	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/exclude-hosts-{dist,custom}.txt && echo && \
+		sed -E 's/^www[0-9]*\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/include-hosts-{dist,custom}.txt && echo && \
+		sed -E 's/^www[0-9]*\.//' temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
+
+	# Очищаем список доменов
+	awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/blocked-hosts2.txt
+
+	# Убираем домены из исключений
+	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts2.txt > temp/blocked-hosts3.txt
+
+	# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
+	# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
+	cp temp/blocked-hosts3.txt temp/blocked-hosts4.txt
+	awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
+		temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+	awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
+		temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+
+	# Убираем домены у которых уже есть домены верхнего уровня
+	grep -vFf <(grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./') temp/blocked-hosts4.txt > temp/blocked-hosts5.txt
+
+	# Еще раз убираем домены из исключений
+	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts5.txt | sort -u > result/blocked-hosts.txt
+
+	# Создаем файл для knot-resolver
+	echo 'blocked_hosts = {' > result/blocked-hosts.conf
+	while read -r line
+	do
+		line="$line."
+		echo "${line@Q}," >> result/blocked-hosts.conf
+	done < result/blocked-hosts.txt
+	echo '}' >> result/blocked-hosts.conf
+
+	# Обновляем файл и перезапускаем сервис только если файл изменился
+	if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
+		cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+		if systemctl is-active --quiet kresd@1; then
+			echo "Restart kresd@1"
+			systemctl restart kresd@1
+		fi
+	fi
+
+	# Выводим результат
+	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 fi
 
 exit 0

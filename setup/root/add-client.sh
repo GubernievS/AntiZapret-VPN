@@ -137,6 +137,7 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 # WireGuard/AmneziaWG
 else
 
+	IPS=$(cat /etc/wireguard/ips)
 	if [[ ! -f "/etc/wireguard/key" ]]; then
 		PRIVATE_KEY=$(wg genkey)
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)

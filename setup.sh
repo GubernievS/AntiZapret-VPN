@@ -32,6 +32,7 @@ rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
 rm -f /root/antizapret/temp/*
 rm -f /root/antizapret/result/*
+rm -f /root/antizapret/process.sh
 rm -f /usr/share/keyrings/amnezia.gpg
 rm -f /etc/apt/sources.list.d/amnezia*
 rm -f /etc/wireguard/templates/*-client.conf
@@ -230,6 +231,10 @@ if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
 fi
+
+#
+# Создаем список исключений IP-адресов
+/root/antizapret/parse.sh ips
 
 #
 # Создаем в OpenVPN пользователя 'antizapret-client' и создаем *.ovpn файлы подключений в /root
