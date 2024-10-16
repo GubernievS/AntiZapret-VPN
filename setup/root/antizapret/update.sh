@@ -23,6 +23,9 @@ EXCLUDE_REGEXP_PATH="config/exclude-regexp-dist.awk"
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/include-hosts-dist.txt"
 INCLUDE_HOSTS_PATH="config/include-hosts-dist.txt"
 
+INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/include-ips-dist.txt"
+INCLUDE_IPS_PATH="config/include-ips-dist.txt"
+
 PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
 PARSE_PATH="parse.sh"
 
@@ -47,6 +50,9 @@ curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_R
 
 echo "Downloading: $INCLUDE_HOSTS_PATH"
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+
+echo "Downloading: $INCLUDE_IPS_PATH"
+curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 
 echo "Downloading: $PARSE_PATH"
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $PARSE_PATH $PARSE_LINK
