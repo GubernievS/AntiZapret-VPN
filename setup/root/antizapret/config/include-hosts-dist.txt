@@ -1,4 +1,4 @@
-# Cвой список и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
+# Список от GubernievS и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
 youtube.com
 googlevideo.com
 ytimg.com
@@ -41,6 +41,11 @@ buymeacoffee.com
 cloudflare.com
 redgifs.com
 one.one.one.one
+discord.com
+discord.gg
+discordapp.com
+discordapp.net
+discord.media
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
@@ -221,11 +226,6 @@ tiktokcdn-eu.com
 tiktokcdn-us.com
 ttwstatic.com
 lookerstudio.google.com
-discord.com
-discord.gg
-discordapp.com
-discordapp.net
-discord.media
 loudflareinsights.com
 soapui.org
 spotify.com
