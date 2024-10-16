@@ -6,7 +6,7 @@ SECONDS=0
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-bash < ./update.sh
+cat ./update.sh | bash
 ./parse.sh
 
 echo "Execution time: $SECONDS seconds"
