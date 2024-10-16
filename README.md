@@ -115,6 +115,9 @@ nano /root/antizapret/config/include-ips-custom.txt
 ```sh
 /root/antizapret/doall.sh
 ```
+
+После этого клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться\
+А созданным клиентам WireGuard/AmneziaWG нужно добавить эти IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
 Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
 ***
