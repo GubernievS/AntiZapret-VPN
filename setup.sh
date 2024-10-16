@@ -98,11 +98,10 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
-echo "Version from 06.10.2024"
+echo ""
 
 #
 # Спрашиваем о настройках
-echo ""
 until [[ $PATCH =~ (y|n) ]]; do
 	read -rp "Install anti-censorship patch for OpenVPN (UDP only)? [y/n]: " -e -i y PATCH
 done
@@ -116,8 +115,7 @@ if [[ "$PATCH" == "y" ]]; then
 	done
 fi
 echo ""
-echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, and boosts data speeds"
-echo "OpenVPN DCO supports only the AES-128-GCM and AES-256-GCM encryption protocols"
+echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM and AES-256-GCM encryption protocols"
 until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 done
