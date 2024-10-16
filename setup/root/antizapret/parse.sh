@@ -23,8 +23,11 @@ awk -F ';' '{
 }' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
 
 # Подготавливаем исходные файлы для обработки
-( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts-{dist,custom}.txt && echo && cat temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts-{dist,custom}.txt && echo && cat temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
+( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/exclude-hosts-{dist,custom}.txt && echo && \
+sed -E 's/^www[0-9]*\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+
+( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/include-hosts-{dist,custom}.txt && echo && \
+sed -E 's/^www[0-9]*\.//' temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
 
 # Очищаем список доменов
 awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/blocked-hosts2.txt
@@ -33,10 +36,10 @@ awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/blocked-host
 awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts2.txt > temp/blocked-hosts3.txt
 
 cp temp/blocked-hosts3.txt temp/blocked-hosts4.txt
-# Находим дубли и если домен повторяется больше 2-х раз добавляем домен верхнего уровня
+# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
 # Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
-awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 1) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
-awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 1) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
+awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
 
 # Убираем домены у которых уже есть домены верхнего уровня
 grep -vFf <(grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./') temp/blocked-hosts4.txt > temp/blocked-hosts5.txt
@@ -44,7 +47,7 @@ grep -vFf <(grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/.
 # Еще раз убираем домены из исключений
 awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts5.txt | sort -u > result/blocked-hosts.txt
 
-# Generate knot-resolver aliases
+# Создаем файл для knot-resolver
 echo 'blocked_hosts = {' > result/blocked-hosts.conf
 while read -r line
 do
@@ -53,7 +56,7 @@ do
 done < result/blocked-hosts.txt
 echo '}' >> result/blocked-hosts.conf
 
-# Print results
+# Выводим результат
 echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 
 exit 0
