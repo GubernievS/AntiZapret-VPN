@@ -15,7 +15,7 @@ if [[ -z "$1" || "$1" == "ips" ]]; then
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/blocked-ips.txt
 
 	# Заблокированные IP-адреса
-	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/blocked-ips.txt > result/blocked-ranges.txt
+	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/blocked-ips.txt > result/blocked-ips.txt
 
 	# Создаем файл для OpenVPN
 	echo -n > result/DEFAULT
@@ -24,19 +24,19 @@ if [[ -z "$1" || "$1" == "ips" ]]; then
 		IP="$(echo $line | awk -F '/' '{print $1}')"
 		MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
 		echo $"push \"route ${IP} ${MASK}\"" >> result/DEFAULT
-	done < result/blocked-ranges.txt
+	done < result/blocked-ips.txt
 
 	# Обновляем файл
 	cp result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
 
 	# Создаем файл для WireGuard/AmneziaWG
-	awk '{printf ", %s", $0}' result/blocked-ranges.txt > result/ips
+	awk '{printf ", %s", $0}' result/blocked-ips.txt > result/ips
 	# Обновляем файл
 	cp result/ips /etc/wireguard/ips
 
 	# Создаем файл для ferm
 	echo "@def \$WHITELIST = (" > result/whitelist.conf
-	cat result/blocked-ranges.txt >> result/whitelist.conf
+	cat result/blocked-ips.txt >> result/whitelist.conf
 	echo ");" >> result/whitelist.conf
 
 	# Обновляем файл и перезапускаем сервис только если файл изменился
@@ -51,6 +51,9 @@ if [[ -z "$1" || "$1" == "ips" ]]; then
 			systemctl restart dnsmap
 		fi
 	fi
+
+	# Выводим результат
+	echo "Blocked ips: $(wc -l result/blocked-ips.txt)"
 fi
 
 if [[ -z "$1" || "$1" == "hosts" ]]; then
