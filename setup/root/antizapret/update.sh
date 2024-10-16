@@ -4,6 +4,8 @@ set -e
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
+echo "Update antizapret files"
+
 rm -f temp/*
 
 DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
@@ -24,6 +26,9 @@ INCLUDE_HOSTS_PATH="config/include-hosts-dist.txt"
 PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
 PARSE_PATH="parse.sh"
 
+DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
+DOALL_PATH="doall.sh"
+
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
 
@@ -34,7 +39,7 @@ curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_H
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $PARSE_PATH $PARSE_LINK
-# Запустим в фоновом режиме
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK &
+curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DOALL_PATH $DOALL_LINK
+curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK
 
 exit 0

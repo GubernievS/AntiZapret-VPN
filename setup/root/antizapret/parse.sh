@@ -1,16 +1,10 @@
 #!/bin/bash
 set -e
 
-handle_error() {
-	echo ""
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
-	echo ""
-	exit 1
-}
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
+
+echo "Parse blocked hosts"
 
 # Обрабатываем список заблокированных ресурсов
 # Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -58,5 +52,11 @@ echo '}' >> result/blocked-hosts.conf
 
 # Выводим результат
 echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
+
+if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
+	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+	echo "Restart kresd@1.service"
+	systemctl restart kresd@1.service
+fi
 
 exit 0
