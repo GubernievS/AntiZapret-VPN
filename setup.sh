@@ -191,7 +191,7 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-hosts-custom.txt
-mv /root/antizapret/config/*-hosts-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
+mv /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
