@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 WorkingDirectory=/root/antizapret
-ExecStart=/bin/bash -c 'bash < /root/antizapret/doall.sh'
+ExecStart=/bin/bash -c 'cat /root/antizapret/update.sh | bash'
 
 [Install]
 WantedBy=multi-user.target
