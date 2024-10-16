@@ -190,7 +190,7 @@ DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables e
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
-# Сохраняем пользовательские конфигурации в файлах *-hosts-custom.txt
+# Сохраняем пользовательские конфигурации в файлах *-custom.txt
 mv /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
 
 #
