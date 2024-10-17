@@ -108,26 +108,17 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 fi
 
-# Обновляем файл и перезапускаем сервисы только если файл whitelist.conf изменился
-if [[ -f result/whitelist.conf && -f /etc/ferm/whitelist.conf ]] && \
-   ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
+# Обновляем файл и перезапускаем сервисы ferm, dnsmap и kresd@1 только если файл whitelist.conf изменился
+if [[ -f result/whitelist.conf ]] && ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
 	cp result/whitelist.conf /etc/ferm/whitelist.conf
+	RESTART_FERM_DNSMAP=true
 	RESTART_KRESD=true
-elif [[ ! -f /etc/ferm/whitelist.conf ]]; then
-	cp result/whitelist.conf /etc/ferm/whitelist.conf
-    RESTART_KRESD=true	
 fi
 
-# Обновляем файл и перезапускаем сервисы только если файл whitelist.conf или blocked-hosts.conf 
-if [[ -f result/blocked-hosts.conf && -f /etc/knot-resolver/blocked-hosts.conf ]] && \
-   ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
+# Обновляем файл и перезапускаем сервис kresd@1 только если файл blocked-hosts.conf изменился
+if [[ -f result/blocked-hosts.conf ]] && ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
 	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
-	RESTART_FERM_DNSMAP=true
 	RESTART_KRESD=true
-elif [[ ! -f /etc/knot-resolver/blocked-hosts.conf ]]; then
-    cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
-	RESTART_FERM_DNSMAP=true
-    RESTART_KRESD=true	
 fi
 
 if [[ "$RESTART_FERM_DNSMAP" = true ]]; then
