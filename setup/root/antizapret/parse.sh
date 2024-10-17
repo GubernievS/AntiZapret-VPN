@@ -67,19 +67,19 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 			gsub(/\.$/, "", $2);	# Удаление . в конце
 			print $2				# Выводим только доменные имена
 		}
-	}' temp/list.csv | CHARSET=UTF-8 idn --no-tld > temp/blocked-hosts.txt
-
-	# Подготавливаем исходные файлы для обработки
-	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/exclude-hosts-{dist,custom}.txt && echo && \
-		sed -E 's/^www[0-9]*\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//' config/include-hosts-{dist,custom}.txt && echo && \
-		sed -E 's/^www[0-9]*\.//' temp/blocked-hosts.txt) | sort -u > temp/include-hosts.txt
+	}' temp/list.csv | CHARSET=UTF-8 idn --no-tld | sort -u > temp/blocked-hosts.txt
 
 	# Очищаем список доменов
-	awk -f config/exclude-regexp-dist.awk temp/include-hosts.txt > temp/blocked-hosts2.txt
+	awk -f config/exclude-regexp-dist.awk temp/blocked-hosts.txt > temp/blocked-hosts2.txt
+
+	# Подготавливаем исходные файлы для обработки
+	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//; s/^m\.//' config/exclude-hosts-{dist,custom}.txt && echo && \
+		sed -E 's/^www[0-9]*\.//; s/^m\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//; s/^m\.//' config/include-hosts-{dist,custom}.txt && echo && \
+		sed -E 's/^www[0-9]*\.//; s/^m\.//' temp/blocked-hosts2.txt) | sort -u > temp/include-hosts.txt
 
 	# Убираем домены из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts2.txt > temp/blocked-hosts3.txt
+	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/include-hosts.txt > temp/blocked-hosts3.txt
 
 	# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
 	# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
