@@ -264,6 +264,9 @@ systemctl enable wg-quick@vpn
 if systemctl list-unit-files | grep -q "^ufw.service"; then
 	systemctl disable ufw
 fi
+if systemctl list-unit-files | grep -q "^firewalld.service"; then
+	systemctl disable firewalld
+fi
 
 ERRORS=""
 
