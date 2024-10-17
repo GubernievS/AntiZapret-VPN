@@ -222,15 +222,24 @@ fi
 #
 # Добавляем AdGuard DNS в AntiZapret VPN
 if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
-	sed -i "s/'1.1.1.1', '1.0.0.1'/'94.140.14.14', '94.140.15.15', '76.76.2.44', '76.76.10.44'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4'/'94.140.14.14', '94.140.15.15', '76.76.2.44', '76.76.10.44'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Добавляем AdGuard DNS в обычный VPN
 if [[ "$DNS_VPN" = "y" ]]; then
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
 fi
+
+#
+# Проверяем доступность DNS серверов для dnsmap и выберем первый рабочий
+for server in 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4; do
+	if dig @$server youtube.com +short > /dev/null; then
+		sed -i "s/1\.1\.1\.1/$server/g" /root/dnsmap/proxy.py
+		break
+	fi
+done
 
 #
 # Создаем список исключений IP-адресов
