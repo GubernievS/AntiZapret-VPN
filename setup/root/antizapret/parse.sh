@@ -77,11 +77,8 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 		temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
 
 	# Убираем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./' > temp/exclude-patterns2.txt || true
-	grep -vFf temp/exclude-patterns2.txt temp/blocked-hosts4.txt > temp/blocked-hosts5.txt || true
-
-	# Еще раз убираем домены из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/blocked-hosts5.txt | sort -u > result/blocked-hosts.txt
+	grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./' > temp/exclude-patterns.txt || true
+	grep -vFf temp/exclude-patterns.txt temp/blocked-hosts4.txt | sort -u > result/blocked-hosts.txt || true
 
 	# Создаем файл для knot-resolver
 	echo 'blocked_hosts = {' > result/blocked-hosts.conf
