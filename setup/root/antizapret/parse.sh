@@ -104,7 +104,7 @@ if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; th
 		echo "Restart dnsmap"
 		systemctl restart dnsmap
 	fi
-	$RESTART_KRESD=true
+	RESTART_KRESD=true
 fi
 
 # Обновляем файл и перезапускаем сервис kresd@1 только если файл whitelist.conf или blocked-hosts.conf изменился
