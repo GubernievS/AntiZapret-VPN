@@ -186,7 +186,7 @@ apt autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils
+DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
