@@ -1,6 +1,15 @@
 #!/bin/bash
 set -e
 
+handle_error() {
+	echo ""
+	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
+	echo ""
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
@@ -99,10 +108,29 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 fi
 
-# Обновляем файл и перезапускаем сервисы ferm и dnsmap только если файл whitelist.conf изменился
+# Обновляем файл и перезапускаем сервисы только если файл whitelist.conf изменился
 if [[ -f result/whitelist.conf && -f /etc/ferm/whitelist.conf ]] && \
    ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
 	cp result/whitelist.conf /etc/ferm/whitelist.conf
+	RESTART_KRESD=true
+elif [[ ! -f /etc/ferm/whitelist.conf ]]; then
+	cp result/whitelist.conf /etc/ferm/whitelist.conf
+    RESTART_KRESD=true	
+fi
+
+# Обновляем файл и перезапускаем сервисы только если файл whitelist.conf или blocked-hosts.conf 
+if [[ -f result/blocked-hosts.conf && -f /etc/knot-resolver/blocked-hosts.conf ]] && \
+   ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
+	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+	RESTART_FERM_DNSMAP=true
+	RESTART_KRESD=true
+elif [[ ! -f /etc/knot-resolver/blocked-hosts.conf ]]; then
+    cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+	RESTART_FERM_DNSMAP=true
+    RESTART_KRESD=true	
+fi
+
+if [[ "$RESTART_FERM_DNSMAP" = true ]]; then
 	if systemctl is-active --quiet ferm; then
 		echo "Restart ferm"
 		systemctl restart ferm
@@ -111,15 +139,9 @@ if [[ -f result/whitelist.conf && -f /etc/ferm/whitelist.conf ]] && \
 		echo "Restart dnsmap"
 		systemctl restart dnsmap
 	fi
-	RESTART_KRESD=true
 fi
 
-# Обновляем файл и перезапускаем сервис kresd@1 только если файл whitelist.conf или blocked-hosts.conf 
-
-if [[ -f result/blocked-hosts.conf && -f /etc/knot-resolver/blocked-hosts.conf ]] && \
-   ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1 || \
-   [[ "$RESTART_KRESD" = true ]]; then
-	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+if [[ "$RESTART_KRESD" = true ]]; then
 	if systemctl is-active --quiet kresd@1; then
 		echo "Restart kresd@1"
 		systemctl restart kresd@1
