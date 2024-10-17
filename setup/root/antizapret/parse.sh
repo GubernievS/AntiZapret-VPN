@@ -39,19 +39,6 @@ if [[ -z "$1" || "$1" == "ips" ]]; then
 	cat result/blocked-ips.txt >> result/whitelist.conf
 	echo ");" >> result/whitelist.conf
 
-	# Обновляем файл и перезапускаем сервис только если файл изменился
-	if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
-		cp result/whitelist.conf /etc/ferm/whitelist.conf
-		if systemctl is-active --quiet ferm; then
-			echo "Restart ferm"
-			systemctl restart ferm
-		fi
-		if systemctl is-active --quiet dnsmap; then
-			echo "Restart dnsmap"
-			systemctl restart dnsmap
-		fi
-	fi
-
 	# Выводим результат
 	echo "Blocked ips: $(wc -l result/blocked-ips.txt)"
 fi
@@ -81,12 +68,6 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	# Убираем домены из исключений
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/include-hosts.txt > temp/blocked-hosts3.txt
 
-sed 's/[[:space:]]+//g; s/^/./' temp/exclude-hosts.txt > temp/exclude-patterns.txt
-
-grep -vFf temp/exclude-hosts.txt temp/include-hosts.txt > temp/blocked-hosts3.txt
-grep -vFf temp/exclude-patterns.txt temp/include-hosts.txt > temp/blocked-hosts3.txt
-
-
 	# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
 	# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
 	cp temp/blocked-hosts3.txt temp/blocked-hosts4.txt
@@ -111,17 +92,31 @@ grep -vFf temp/exclude-patterns.txt temp/include-hosts.txt > temp/blocked-hosts3
 	done < result/blocked-hosts.txt
 	echo '}' >> result/blocked-hosts.conf
 
-	# Обновляем файл и перезапускаем сервис только если файл изменился
-	if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1; then
-		cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
-		if systemctl is-active --quiet kresd@1; then
-			echo "Restart kresd@1"
-			systemctl restart kresd@1
-		fi
-	fi
-
 	# Выводим результат
 	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
+fi
+
+# Обновляем файл и перезапускаем сервисы ferm и dnsmap только если файл whitelist.conf изменился
+if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
+	cp result/whitelist.conf /etc/ferm/whitelist.conf
+	if systemctl is-active --quiet ferm; then
+		echo "Restart ferm"
+		systemctl restart ferm
+	fi
+	if systemctl is-active --quiet dnsmap; then
+		echo "Restart dnsmap"
+		systemctl restart dnsmap
+	fi
+	$RESTART_KRESD=true
+fi
+
+# Обновляем файл и перезапускаем сервис kresd@1 только если файл whitelist.conf или blocked-hosts.conf изменился
+if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1 || [[ "$RESTART_KRESD" = true ]]; then
+	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+	if systemctl is-active --quiet kresd@1; then
+		echo "Restart kresd@1"
+		systemctl restart kresd@1
+	fi
 fi
 
 exit 0
