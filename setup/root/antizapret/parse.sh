@@ -77,8 +77,14 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 		temp/blocked-hosts3.txt >> temp/blocked-hosts4.txt
 
 	# Убираем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){0,2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./' > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/blocked-hosts4.txt | sort -u > result/blocked-hosts.txt
+	grep -E '^([^.]*\.){2}[^.]*$' temp/blocked-hosts4.txt | sed 's/^/./' > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/blocked-hosts4.txt | sort -u > temp/blocked-hosts5.txt
+
+	grep -E '^([^.]*\.){1}[^.]*$' temp/blocked-hosts5.txt | sed 's/^/./' > temp/exclude-patterns2.txt
+	grep -vFf temp/exclude-patterns2.txt temp/blocked-hosts5.txt | sort -u > temp/blocked-hosts6.txt
+
+	grep -E '^([^.]*\.){0}[^.]*$' temp/blocked-hosts6.txt | sed 's/^/./' > temp/exclude-patterns3.txt
+	grep -vFf temp/exclude-patterns3.txt temp/blocked-hosts6.txt | sort -u > result/blocked-hosts.txt
 
 	# Создаем файл для knot-resolver
 	echo 'blocked_hosts = {' > result/blocked-hosts.conf
@@ -94,7 +100,8 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 fi
 
 # Обновляем файл и перезапускаем сервисы ferm и dnsmap только если файл whitelist.conf изменился
-if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
+if [[ -f result/whitelist.conf && -f /etc/ferm/whitelist.conf ]] && \
+   ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; then
 	cp result/whitelist.conf /etc/ferm/whitelist.conf
 	if systemctl is-active --quiet ferm; then
 		echo "Restart ferm"
@@ -107,8 +114,11 @@ if ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf > /dev/null 2>&1; th
 	RESTART_KRESD=true
 fi
 
-# Обновляем файл и перезапускаем сервис kresd@1 только если файл whitelist.conf или blocked-hosts.conf изменился
-if ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1 || [[ "$RESTART_KRESD" = true ]]; then
+# Обновляем файл и перезапускаем сервис kresd@1 только если файл whitelist.conf или blocked-hosts.conf 
+
+if [[ -f result/blocked-hosts.conf && -f /etc/knot-resolver/blocked-hosts.conf ]] && \
+   ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf > /dev/null 2>&1 || \
+   [[ "$RESTART_KRESD" = true ]]; then
 	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
 	if systemctl is-active --quiet kresd@1; then
 		echo "Restart kresd@1"
