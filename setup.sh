@@ -30,9 +30,6 @@ rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
-rm -f /root/antizapret/temp/*
-rm -f /root/antizapret/result/*
-rm -f /root/antizapret/process.sh
 rm -f /usr/share/keyrings/amnezia.gpg
 rm -f /etc/apt/sources.list.d/amnezia*
 rm -f /etc/wireguard/templates/*-client.conf
