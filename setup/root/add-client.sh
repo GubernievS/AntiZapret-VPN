@@ -143,22 +143,14 @@ else
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
 		PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
+		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
+		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
+		systemctl disable wg-quick@antizapret
+		systemctl disable wg-quick@vpn
+		systemctl enable --now wg-quick@antizapret
+		systemctl enable --now wg-quick@vpn
 	else
 		source /etc/wireguard/key
-	fi
-
-	if [[ ! -f "/etc/wireguard/antizapret.conf" ]]; then
-		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
-		if systemctl is-enabled --quiet wg-quick@antizapret; then
-			systemctl restart wg-quick@antizapret
-		fi
-	fi
-
-	if [[ ! -f "/etc/wireguard/vpn.conf" ]]; then
-		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
-		if systemctl is-enabled --quiet wg-quick@vpn; then
-			systemctl restart wg-quick@vpn
-		fi
 	fi
 
 	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
