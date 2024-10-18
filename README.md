@@ -121,7 +121,9 @@ nano /root/antizapret/config/include-ips-custom.txt
 ***
 Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
 ***
-Инструкция по настройке на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
+### Настройка на роутерах
+OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
+WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) и [MikroTik](https://ntc.party/t/11455)
 ***
 ### Где купить сервер?
 Хостинги в Европе для VPN принимающие рубли: [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) с бонусом 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
