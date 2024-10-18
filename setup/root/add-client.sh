@@ -149,10 +149,12 @@ else
 
 	if [[ ! -f "/etc/wireguard/antizapret.conf" ]]; then
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
+		systemctl restart wg-quick@antizapret
 	fi
 
 	if [[ ! -f "/etc/wireguard/vpn.conf" ]]; then
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
+		systemctl restart wg-quick@vpn
 	fi
 
 	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
