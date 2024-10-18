@@ -246,11 +246,11 @@ done
 /root/antizapret/parse.sh ips
 
 #
-# Настраиваем сервер OpenVPN, создаем пользователя 'antizapret-client' и *.ovpn файлы подключений в /root
+# Настраиваем и включаем сервер OpenVPN, создаем пользователя 'antizapret-client' и *.ovpn файлы подключений в /root
 /root/add-client.sh ov antizapret-client 3650
 
 #
-# Настраиваем сервер WireGuard/AmneziaWG, создаем пользователя 'antizapret-client' и *.conf файлы подключений в /root
+# Настраиваем и включаем сервер WireGuard/AmneziaWG, создаем пользователя 'antizapret-client' и *.conf файлы подключений в /root
 /root/add-client.sh wg antizapret-client
 
 #
