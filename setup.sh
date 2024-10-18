@@ -14,10 +14,10 @@
 
 #
 # Удаление или перемещение файлов и папок при обновлении
-systemctl stop openvpn-generate-keys 2> /dev/null
-systemctl disable openvpn-generate-keys 2> /dev/null
-systemctl stop openvpn-server@antizapret 2> /dev/null
-systemctl disable openvpn-server@antizapret 2> /dev/null
+systemctl stop openvpn-generate-keys > /dev/null
+systemctl disable openvpn-generate-keys > /dev/null
+systemctl stop openvpn-server@antizapret > /dev/null
+systemctl disable openvpn-server@antizapret > /dev/null
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/systemd/network/eth.network
@@ -43,7 +43,7 @@ if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 fi
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
-apt purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
+apt purge python3-dnslib gnupg2 amneziawg > /dev/null
 systemctl daemon-reload
 
 #
@@ -254,7 +254,7 @@ done
 /root/add-client.sh wg antizapret-client
 
 #
-# Включим все нужные службы
+# Включим нужные службы
 systemctl enable kresd@1
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
@@ -268,12 +268,8 @@ systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
-if systemctl list-unit-files | grep -q "^ufw.service"; then
-	systemctl disable ufw
-fi
-if systemctl list-unit-files | grep -q "^firewalld.service"; then
-	systemctl disable firewalld
-fi
+systemctl disable ufw > /dev/null || true
+systemctl disable firewalld > /dev/null || true
 
 ERRORS=""
 
