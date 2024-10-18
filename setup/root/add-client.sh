@@ -106,6 +106,10 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+		systemctl enable --now --force openvpn-server@antizapret-udp
+		systemctl enable --now --force openvpn-server@antizapret-tcp
+		systemctl enable --now --force openvpn-server@vpn-udp
+		systemctl enable --now --force openvpn-server@vpn-tcp
 	fi
 
 	if [[ ! -f ./pki/issued/$CLIENT.crt ]] || \
@@ -145,10 +149,8 @@ else
 		PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
-		systemctl disable wg-quick@antizapret
-		systemctl disable wg-quick@vpn
-		systemctl enable --now wg-quick@antizapret
-		systemctl enable --now wg-quick@vpn
+		systemctl enable --now --force wg-quick@antizapret
+		systemctl enable --now --force wg-quick@vpn
 	else
 		source /etc/wireguard/key
 	fi
