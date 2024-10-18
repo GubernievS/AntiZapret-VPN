@@ -86,15 +86,11 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		/usr/share/easy-rsa/easyrsa init-pki
 		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
-		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
-		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 		echo "Created new PKI and CA"
 	fi
 
 	if [[ ! -f ./pki/crl.pem ]]; then
 		/usr/share/easy-rsa/easyrsa gen-crl
-		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 		echo "Created new CRL"
 	fi
 
