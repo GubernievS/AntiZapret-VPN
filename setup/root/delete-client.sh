@@ -90,11 +90,11 @@ else
 	rm -f /root/antizapret-$NAME-*.conf
 	rm -f /root/vpn-$NAME-*.conf
 
-	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
+	if systemctl is-active --quiet wg-quick@antizapret; then
 		wg syncconf antizapret <(wg-quick strip antizapret)
 	fi
 
-	if systemctl is-active --quiet wg-quick@vpn 2> /dev/null; then
+	if systemctl is-active --quiet wg-quick@vpn; then
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
