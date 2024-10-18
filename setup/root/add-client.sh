@@ -149,14 +149,14 @@ else
 
 	if [[ ! -f "/etc/wireguard/antizapret.conf" ]]; then
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
-		if systemctl is-enabled --quiet wg-quick@antizapret 2> /dev/null; then
+		if systemctl is-enabled --quiet wg-quick@antizapret; then
 			systemctl restart wg-quick@antizapret
 		fi
 	fi
 
 	if [[ ! -f "/etc/wireguard/vpn.conf" ]]; then
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
-		if systemctl is-enabled --quiet wg-quick@vpn 2> /dev/null; then
+		if systemctl is-enabled --quiet wg-quick@vpn; then
 			systemctl restart wg-quick@vpn
 		fi
 	fi
@@ -208,7 +208,7 @@ PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/antizapret.conf"
 
-	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
+	if systemctl is-active --quiet wg-quick@antizapret; then
 		wg syncconf antizapret <(wg-quick strip antizapret)
 	fi
 
@@ -238,7 +238,7 @@ PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/vpn.conf"
 
-	if systemctl is-active --quiet wg-quick@vpn 2> /dev/null; then
+	if systemctl is-active --quiet wg-quick@vpn; then
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
