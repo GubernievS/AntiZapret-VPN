@@ -251,9 +251,7 @@ done
 
 #
 # Создаем в WireGuard/AmneziaWG несколько пользователей 'antizapret-client' и создаем *.conf файлы подключений в /root
-/root/add-client.sh wg antizapret-client1
-/root/add-client.sh wg antizapret-client2
-/root/add-client.sh wg antizapret-client3
+/root/add-client.sh wg antizapret-client
 
 #
 # Включим все нужные службы

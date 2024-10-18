@@ -143,14 +143,20 @@ else
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
 		PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
-		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
-		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
 	else
 		source /etc/wireguard/key
 	fi
 
-	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
-	CLIENT_BLOCK_VPN=$(awk "/# Client = ${CLIENT}/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
+	if [[ ! -f "/etc/wireguard/antizapret.conf" ]]; then
+		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
+	fi
+
+	if [[ ! -f "/etc/wireguard/vpn.conf" ]]; then
+		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
+	fi
+
+	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
+	CLIENT_BLOCK_VPN=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
 	if [[ -n "$CLIENT_BLOCK_ANTIZAPRET" ]]; then
 		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
 		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
@@ -166,9 +172,9 @@ else
 		CLIENT_PUBLIC_KEY=$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)
 		CLIENT_PRESHARED_KEY=$(wg genpsk)
 	fi
-	
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/antizapret.conf"
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" "/etc/wireguard/vpn.conf"
+
+	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/antizapret.conf
+	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/vpn.conf
 
 	# AntiZapret
 
@@ -188,13 +194,13 @@ else
 	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret-$NAME-wg.conf"
 	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret-$NAME-am.conf"
 
-	echo -e "
-# Client = ${CLIENT}
+	echo -e "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
-AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
+AllowedIPs = ${CLIENT_IP}/32
+" >> "/etc/wireguard/antizapret.conf"
 
 	if systemctl is-active --quiet wg-quick@antizapret 2> /dev/null; then
 		wg syncconf antizapret <(wg-quick strip antizapret)
@@ -218,13 +224,13 @@ AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/antizapret.conf"
 	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/vpn-$NAME-wg.conf"
 	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn-$NAME-am.conf"
 
-	echo -e "
-# Client = ${CLIENT}
+	echo -e "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
-AllowedIPs = ${CLIENT_IP}/32" >> "/etc/wireguard/vpn.conf"
+AllowedIPs = ${CLIENT_IP}/32
+" >> "/etc/wireguard/vpn.conf"
 
 	if systemctl is-active --quiet wg-quick@vpn 2> /dev/null; then
 		wg syncconf vpn <(wg-quick strip vpn)
