@@ -122,7 +122,7 @@ nano /root/antizapret/config/include-ips-custom.txt
 Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
 ***
 ### Настройка на роутерах
-OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)
+OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
 WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) и [MikroTik](https://ntc.party/t/11455)
 ***
 ### Где купить сервер?
