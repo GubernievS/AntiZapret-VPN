@@ -14,10 +14,10 @@
 
 #
 # Удаление или перемещение файлов и папок при обновлении
-systemctl stop openvpn-generate-keys > /dev/null
-systemctl disable openvpn-generate-keys > /dev/null
-systemctl stop openvpn-server@antizapret > /dev/null
-systemctl disable openvpn-server@antizapret > /dev/null
+systemctl stop openvpn-generate-keys > /dev/null 2>&1
+systemctl disable openvpn-generate-keys > /dev/null 2>&1
+systemctl stop openvpn-server@antizapret > /dev/null 2>&1
+systemctl disable openvpn-server@antizapret > /dev/null 2>&1
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/systemd/network/eth.network
@@ -40,8 +40,7 @@ if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 fi
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
-apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null
-systemctl daemon-reload
+apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
 
 #
 # Завершим выполнение скрипта при ошибке
