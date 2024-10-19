@@ -40,7 +40,7 @@ if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 fi
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
-apt purge python3-dnslib gnupg2 amneziawg > /dev/null
+apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null
 systemctl daemon-reload
 
 #
@@ -156,8 +156,8 @@ fi
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
 
-apt update
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y curl gpg
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg
 
 #
 # Knot-Resolver
@@ -177,13 +177,13 @@ fi
 
 #
 # Обновляем систему
-apt update
-DEBIAN_FRONTEND=noninteractive apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt autoremove -y
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
