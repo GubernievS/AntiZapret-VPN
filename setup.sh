@@ -40,6 +40,7 @@ if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
 fi
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
+rm -rf /root/dnsmap
 apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
 
 #
@@ -199,13 +200,13 @@ rm -rf $SCRIPT_DIR
 #
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod u+x {} +
-chmod u+x /root/dnsmap/proxy.py
+chmod u+x /root/antizapret/dnsmap/proxy.py
 
 #
 # Используем альтернативные диапазоны ip-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$IP" = "y" ]]; then
-	sed -i 's/10\./172\./g' /root/dnsmap/proxy.py
+	sed -i 's/10\./172\./g' /root/antizapret/dnsmap/proxy.py
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
@@ -232,7 +233,7 @@ fi
 # Проверяем доступность DNS серверов для dnsmap и выберем первый рабочий
 for server in 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4; do
 	if dig @$server youtube.com +short > /dev/null; then
-		sed -i "s/1\.1\.1\.1/$server/g" /root/dnsmap/proxy.py
+		sed -i "s/1\.1\.1\.1/$server/g" /root/antizapret/dnsmap/proxy.py
 		break
 	fi
 done

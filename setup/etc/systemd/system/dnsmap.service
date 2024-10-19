@@ -4,8 +4,10 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-WorkingDirectory=/root/dnsmap
-ExecStart=/root/dnsmap/proxy.py
+LimitNPROC=infinity
+LimitNOFILE=65535
+WorkingDirectory=/root/antizapret/dnsmap
+ExecStart=/root/antizapret/dnsmap/proxy.py
 
 [Install]
 WantedBy=multi-user.target
