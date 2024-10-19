@@ -54,6 +54,8 @@ render() {
 	done < $File
 }
 
+mkdir /root/vpn > /dev/null 2>&1 || true
+
 # OpenVPN
 if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
@@ -66,8 +68,8 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		done
 	fi
 
-	mkdir /root/easyrsa3 || true
-	cd /root/easyrsa3
+	mkdir /etc/openvpn/easyrsa3 > /dev/null 2>&1 || true
+	cd /etc/openvpn/easyrsa3
 
 	load_key() {
 		CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
@@ -132,15 +134,15 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	fi
 
 	load_key
+	FILE_NAME="${NAME}-${SERVER_IP}"
+	render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/vpn/antizapret-$FILE_NAME-udp.ovpn"
+	render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/vpn/antizapret-$FILE_NAME-tcp.ovpn"
+	render "/etc/openvpn/client/templates/antizapret.conf" > "/root/vpn/antizapret-$FILE_NAME.ovpn"
+	render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn/vpn-$FILE_NAME-udp.ovpn"
+	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn/vpn-$FILE_NAME-tcp.ovpn"
+	render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn/vpn-$FILE_NAME.ovpn"
 
-	render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret-$NAME-$SERVER_IP-udp.ovpn"
-	render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/antizapret-$NAME-$SERVER_IP-tcp.ovpn"
-	render "/etc/openvpn/client/templates/antizapret.conf" > "/root/antizapret-$NAME-$SERVER_IP.ovpn"
-	render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn-$NAME-$SERVER_IP-udp.ovpn"
-	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn-$NAME-$SERVER_IP-tcp.ovpn"
-	render "/etc/openvpn/client/templates/vpn.conf" > "/root/vpn-$NAME-$SERVER_IP.ovpn"
-
-	echo "OpenVPN configuration files for the client '$CLIENT' have been (re)created in '/root'"
+	echo "OpenVPN configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
 
 # WireGuard/AmneziaWG
 else
@@ -199,8 +201,10 @@ else
 		fi
 	done
 
-	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret-$NAME-wg.conf"
-	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret-$NAME-am.conf"
+	FILE_NAME="${NAME}-${SERVER_IP}"
+	FILE_NAME="${FILE_NAME:0:18}"
+	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/vpn/antizapret-$FILE_NAME-wg.conf"
+	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/vpn/antizapret-$FILE_NAME-am.conf"
 
 	echo -e "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
@@ -229,8 +233,10 @@ AllowedIPs = ${CLIENT_IP}/32
 		fi
 	done
 
-	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/vpn-$NAME-wg.conf"
-	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn-$NAME-am.conf"
+	FILE_NAME="${NAME}-${SERVER_IP}"
+	FILE_NAME="${FILE_NAME:0:25}"
+	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/vpn/vpn-$FILE_NAME-wg.conf"
+	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn/vpn-$FILE_NAME-am.conf"
 
 	echo -e "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
@@ -244,6 +250,6 @@ AllowedIPs = ${CLIENT_IP}/32
 		wg syncconf vpn <(wg-quick strip vpn)
 	fi
 
-	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root'"
+	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
 
 fi

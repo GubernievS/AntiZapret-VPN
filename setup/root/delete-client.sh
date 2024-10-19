@@ -32,7 +32,7 @@ if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	echo "Existing client names:"
 	# OpenVPN
 	if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
-		tail -n +2 /root/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
+		tail -n +2 pki/index.txt | grep "^V" | cut -d '=' -f 2
 	# WireGuard/AmneziaWG
 	else
 		grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//'
@@ -52,7 +52,7 @@ NAME="${NAME#vpn-}"
 # OpenVPN
 if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
-	cd /root/easyrsa3
+	cd /etc/openvpn/easyrsa3
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT
 	if [[ $? -ne 0 ]]; then
@@ -67,8 +67,8 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		exit 12
 	fi
 
-	rm -f /root/antizapret-$NAME-*.ovpn
-	rm -f /root/vpn-$NAME-*.ovpn
+	rm -f /root/vpn/antizapret-$NAME-*.ovpn
+	rm -f /root/vpn/vpn-$NAME-*.ovpn
 	rm -f /etc/openvpn/client/keys/$CLIENT.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT.key
 
@@ -87,8 +87,8 @@ else
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/antizapret.conf
 	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/vpn.conf
 
-	rm -f /root/antizapret-$NAME-*.conf
-	rm -f /root/vpn-$NAME-*.conf
+	rm -f /root/vpn/antizapret-$NAME-*.conf
+	rm -f /root/vpn/vpn-$NAME-*.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
 		wg syncconf antizapret <(wg-quick strip antizapret)

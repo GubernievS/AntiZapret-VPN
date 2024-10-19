@@ -33,11 +33,11 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 apt-get autoremove -y
 version=$(openvpn --version | head -n 1 | awk '{print $2}')
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
-rm -rf /root/openvpn
-mkdir -p /root/openvpn
-curl -L -o /root/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
-tar --strip-components=1 -xvzf /root/openvpn.tar.gz -C /root/openvpn
-rm -f /root/openvpn.tar.gz
+rm -rf /usr/local/src/openvpn
+mkdir -p /usr/local/src/openvpn
+curl -L -o /usr/local/src/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
+tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
+rm -f /usr/local/src/openvpn.tar.gz
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
 link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
@@ -109,8 +109,8 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	return buffer_sent;\
 }\
 \
-\/\* write a TCP or UDP packet to link \*\/' "/root/openvpn/src/openvpn/socket.h"
-cd /root/openvpn
+\/\* write a TCP or UDP packet to link \*\/' "/usr/local/src/openvpn/src/openvpn/socket.h"
+cd /usr/local/src/openvpn
 chmod +x ./configure
 ./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
 make

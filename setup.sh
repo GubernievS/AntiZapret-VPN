@@ -10,7 +10,7 @@
 # 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 # 2. В терминале под root выполнить:
 # apt update && apt install -y git && cd /root && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
-# 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root
+# 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
 
 #
 # Удаление или перемещение файлов и папок при обновлении
@@ -26,21 +26,23 @@ rm -f /etc/systemd/system/openvpn-generate-keys.service
 rm -f /etc/openvpn/server/antizapret.conf
 rm -f /etc/openvpn/server/logs/*
 rm -f /etc/openvpn/client/templates/*
+rm -f /etc/wireguard/templates/*
+rm -f /etc/apt/sources.list.d/amnezia*
+rm -f /usr/share/keyrings/amnezia.gpg
 rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
-rm -f /usr/share/keyrings/amnezia.gpg
-rm -f /etc/apt/sources.list.d/amnezia*
-rm -f /etc/wireguard/templates/*
-find /root -maxdepth 1 -type f -name "*.conf" ! -name "*-wg.conf" ! -name "*-am.conf" -exec rm {} +
-if [ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]; then
-	mkdir /root/easyrsa3
-	mv /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki
-fi
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
+if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
+	mkdir /root/easyrsa3 > /dev/null 2>&1
+	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
+fi
+mv -f /root/*.ovpn /root/vpn > /dev/null 2>&1
+mv -f /root/*.conf /root/vpn > /dev/null 2>&1
+mv -f /root/openvpn /usr/local/src/openvpn > /dev/null 2>&1
 apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
 
 #
@@ -137,19 +139,19 @@ echo ""
 
 #
 # Удалим скомпилированный патченный OpenVPN
-if [[ -d "/root/openvpn" ]]; then
-	make -C /root/openvpn uninstall || true
-	rm -rf /root/openvpn
+if [[ -d "/usr/local/src/openvpn" ]]; then
+	make -C /usr/local/src/openvpn uninstall || true
+	rm -rf /usr/local/src/openvpn
 fi
 
 #
 # Отключим ipv6 до перезагрузки
 if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
-    sysctl -w net.ipv6.conf.all.disable_ipv6=1
+	sysctl -w net.ipv6.conf.all.disable_ipv6=1
 fi
 
 if [ -f /proc/sys/net/ipv6/conf/default/disable_ipv6 ]; then
-    sysctl -w net.ipv6.conf.default.disable_ipv6=1
+	sysctl -w net.ipv6.conf.default.disable_ipv6=1
 fi
 
 #
@@ -188,7 +190,15 @@ PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
 # Сохраняем пользовательские конфигурации в файлах *-custom.txt
-mv /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
+mv -f /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
+
+#
+# Восстанавливаем из бэкапа пользователей vpn
+mv -f /root/easyrsa3 $SCRIPT_DIR/setup/etc/openvpn || true
+mv -f /etc/wireguard/antizapret.conf $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /etc/wireguard/vpn.conf $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /etc/wireguard/key $SCRIPT_DIR/setup/etc/wireguard || true
+rm -rf /root/wireguard
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
@@ -243,11 +253,11 @@ done
 /root/antizapret/parse.sh ips
 
 #
-# Настраиваем и включаем сервер OpenVPN, создаем пользователя 'antizapret-client' и *.ovpn файлы подключений в /root
+# Настраиваем и включаем сервер OpenVPN, создаем пользователя 'antizapret-client' и *.ovpn файлы подключений в папке /root/vpn
 /root/add-client.sh ov antizapret-client 3650
 
 #
-# Настраиваем и включаем сервер WireGuard/AmneziaWG, создаем пользователя 'antizapret-client' и *.conf файлы подключений в /root
+# Настраиваем и включаем сервер WireGuard/AmneziaWG, создаем пользователя 'antizapret-client' и *.conf файлы подключений в папке /root/vpn
 /root/add-client.sh wg antizapret-client
 
 #

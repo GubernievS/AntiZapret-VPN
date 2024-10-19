@@ -52,7 +52,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 ```sh
 apt update && apt install -y git && cd /root && git clone https://github.com/GubernievS/AntiZapret-VPN.git tmp && chmod +x tmp/setup.sh && tmp/setup.sh
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn или *.conf) с сервера из папки /root\
+3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn или *.conf) с сервера из папки /root/vpn\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 
 Опционально можно:
@@ -78,15 +78,15 @@ apt update && apt install -y git && cd /root && git clone https://github.com/Gub
 ./disable-openvpn-dco.sh
 ```
 ***
-Добавить нового клиента (* - только для OpenVPN)
+Добавить нового клиента (срок действия в днях - только для OpenVPN)
 ```sh
-./add-client.sh [ov/wg] [имя_клиента] [срок_действия*]
+./add-client.sh [ov/wg] [имя_клиента] [срок_действия]
 ```
 Удалить клиента
 ```sh
 ./delete-client.sh [ov/wg] [имя_клиента]
 ```
-После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root
+После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
 ***
 Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
 ```sh
@@ -130,9 +130,10 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) 
 ***
 ### FAQ
 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
-> Скачать с сервера папки /root/easyrsa3 и /etc/wireguard (можно без подпапки templates)\
+> Для OpenVPN скачать с сервера папку /etc/openvpn/easyrsa3\
+Для WireGuard/AmneziaWG скачать с сервера папку /etc/wireguard\
 Переустановить сервер\
-Обратно на сервер закачать папки /root/easyrsa3 и /etc/wireguard\
+Обратно на сервер в папку /root закачать папки easyrsa3 и wireguard\
 Запустить скрипт установки
 
 2. Как посмотреть активные соединения?
