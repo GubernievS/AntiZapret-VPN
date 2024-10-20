@@ -101,5 +101,3 @@ else
 	echo "WireGuard/AmneziaWG client '$CLIENT' successfull deleted"
 
 fi
-
-
