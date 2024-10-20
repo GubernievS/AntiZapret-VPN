@@ -195,9 +195,9 @@ mv -f /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/con
 #
 # Восстанавливаем из бэкапа пользователей vpn
 mv -f /root/easyrsa3 $SCRIPT_DIR/setup/etc/openvpn || true
-mv -f /etc/wireguard/antizapret.conf $SCRIPT_DIR/setup/etc/wireguard || true
-mv -f /etc/wireguard/vpn.conf $SCRIPT_DIR/setup/etc/wireguard || true
-mv -f /etc/wireguard/key $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /root/wireguard/antizapret.conf $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /root/wireguard/vpn.conf $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /root/wireguard/key $SCRIPT_DIR/setup/etc/wireguard || true
 rm -rf /root/wireguard
 
 #
