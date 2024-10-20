@@ -40,7 +40,7 @@ AmneziaWG работает в [режиме обфускации Wireguard](http
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент: antizapret-client
 
-По умолчанию используются Cloudflare DNS и Google DNS, Вместо них можно включить AdGuard DNS для блокировки рекламы, отслеживающих модулей и фишинга
+По умолчанию используются [Cloudflare DNS](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google DNS](https://ru.wikipedia.org/wiki/Google_Public_DNS), Вместо них можно включить [AdGuard DNS](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
