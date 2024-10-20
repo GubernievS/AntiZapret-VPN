@@ -256,6 +256,10 @@ AllowedIPs = ${CLIENT_IP}/32
 # Recreate
 else
 
+	rm -rf /root/vpn/old
+	mkdir /root/vpn/old
+	mv -f /root/vpn/* /root/vpn/old > /dev/null 2>&1
+
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
 		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | while read -r line; do
