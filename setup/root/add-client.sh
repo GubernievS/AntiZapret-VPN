@@ -258,7 +258,7 @@ else
 
 	rm -rf /root/vpn/old
 	mkdir /root/vpn/old
-	mv -f /root/vpn/* /root/vpn/old > /dev/null 2>&1
+	mv -f /root/vpn/*.* /root/vpn/old > /dev/null 2>&1
 
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
