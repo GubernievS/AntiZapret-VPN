@@ -69,10 +69,12 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	awk -f config/exclude-regexp-dist.awk temp/blocked-hosts.txt > temp/blocked-hosts2.txt
 
 	# Подготавливаем исходные файлы для обработки
-	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//; s/^m\.//' config/exclude-hosts-*.txt && echo && \
-		sed -E 's/^www[0-9]*\.//; s/^m\.//' temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g; s/^www[0-9]*\.//; s/^m\.//' config/include-hosts-*.txt && echo && \
-		sed -E 's/^www[0-9]*\.//; s/^m\.//' temp/blocked-hosts2.txt) | sort -u > temp/include-hosts.txt
+	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts-*.txt && \
+		echo && \
+		cat temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts-*.txt && \
+		echo && \
+		cat temp/blocked-hosts2.txt) | sort -u > temp/include-hosts.txt
 
 	# Убираем домены из исключений
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/include-hosts.txt > temp/blocked-hosts3.txt
