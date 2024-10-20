@@ -16,7 +16,7 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 TYPE=$1
-if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
+if [[ "$TYPE" != "ov" && "$TYPE" != "wg" && "$TYPE" != "recreate" ]]; then
 	echo ""
 	echo "Please choose the VPN type:"
 	echo "    1) OpenVPN"
@@ -27,13 +27,15 @@ if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
 fi
 
 CLIENT=$2
-if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
-	echo ""
-	echo "Tell me a name for the new client"
-	echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
-	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; do
-		read -rp "Client name: " -e CLIENT
-	done
+if [[ "$TYPE" != "recreate" ]]; then
+	if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+		echo ""
+		echo "Tell me a name for the new client"
+		echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
+		until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; do
+			read -rp "Client name: " -e CLIENT
+		done
+	fi
 fi
 
 SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
@@ -58,15 +60,6 @@ mkdir /root/vpn > /dev/null 2>&1 || true
 
 # OpenVPN
 if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
-
-	CLIENT_CERT_EXPIRE=$3
-	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
-		echo ""
-		echo "Enter a valid client certificate expiration period (1 to 3650 days)"
-		until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
-			read -rp "Certificate expiration days (1-3650): " -e -i 3650 CLIENT_CERT_EXPIRE
-		done
-	fi
 
 	mkdir /etc/openvpn/easyrsa3 > /dev/null 2>&1 || true
 	cd /etc/openvpn/easyrsa3
@@ -120,6 +113,14 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
 	if [[ ! -f ./pki/issued/$CLIENT.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT.key ]]; then
+		CLIENT_CERT_EXPIRE=$3
+		if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
+			echo ""
+			echo "Enter a valid client certificate expiration period (1 to 3650 days)"
+			until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
+				read -rp "Certificate expiration days (1-3650): " -e -i 3650 CLIENT_CERT_EXPIRE
+			done
+		fi
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT nopass
 		cp ./pki/issued/$CLIENT.crt /etc/openvpn/client/keys/$CLIENT.crt
 		cp ./pki/private/$CLIENT.key /etc/openvpn/client/keys/$CLIENT.key
@@ -145,10 +146,10 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	echo "OpenVPN configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
 
 # WireGuard/AmneziaWG
-else
+elif [[ "$TYPE" == "wg" || "$TYPE" == "2" ]]; then
 
 	IPS=$(cat /etc/wireguard/ips)
-	if [[ ! -f "/etc/wireguard/key" ]]; then
+	if [[ ! -f /etc/wireguard/key ]]; then
 		PRIVATE_KEY=$(wg genkey)
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
@@ -215,7 +216,7 @@ AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/antizapret.conf"
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
-		wg syncconf antizapret <(wg-quick strip antizapret)
+		wg syncconf antizapret <(wg-quick strip antizapret 2> /dev/null)
 	fi
 
 	# VPN
@@ -247,9 +248,28 @@ AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/vpn.conf"
 
 	if systemctl is-active --quiet wg-quick@vpn; then
-		wg syncconf vpn <(wg-quick strip vpn)
+		wg syncconf vpn <(wg-quick strip vpn 2> /dev/null)
 	fi
 
 	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
+
+# Recreate
+else
+
+	# OpenVPN
+	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
+		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | while read -r line; do
+			/root/add-client.sh ov "$line" > /dev/null
+			echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
+		done
+	fi
+
+	# WireGuard/AmneziaWG
+	if [[ -f /etc/wireguard/antizapret.conf ]]; then
+		grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//' | while read -r line; do
+			/root/add-client.sh wg "$line" > /dev/null
+			echo "WireGuard/AmneziaWG configuration files for the client '$line' have been recreated in '/root/vpn'"
+		done
+	fi
 
 fi
