@@ -66,57 +66,56 @@ apt update && apt install -y git && cd /root && git clone https://github.com/Gub
 ```sh
 ./patch-openvpn.sh
 ```
-***
-2. Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)\
-При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM и AES-256-GCM\
-Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
+
+2. Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) - это заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN\
 ```sh
 ./enable-openvpn-dco.sh
 ```
+>При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM и AES-256-GCM\
+Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
+
 3. Выключить OpenVPN DCO
 ```sh
 ./disable-openvpn-dco.sh
 ```
-***
+
 4. Добавить нового клиента (срок действия в днях - только для OpenVPN)
 ```sh
 ./add-client.sh [ov/wg] [имя_клиента] [срок_действия]
 ```
+
 5. Удалить клиента
 ```sh
 ./delete-client.sh [ov/wg] [имя_клиента]
 ```
-После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
-***
+>После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
+
 6. Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
 ```sh
 nano /root/antizapret/config/include-hosts-custom.txt
 ```
-Добавлять нужно только домены, например:
->subdomain.example.com\
+>Добавлять нужно только домены, например:
+subdomain.example.com\
 example.com\
 com
-
 После этого нужно обновить список антизапрета
 ```sh
 /root/antizapret/doall.sh
 ```
-***
+
 7. Добавить свои IP-адреса в список антизапрета (include-ips-custom.txt)
 ```sh
 nano /root/antizapret/config/include-ips-custom.txt
 ```
-Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:
->8.8.8.8/32\
+>Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:
+8.8.8.8/32\
 10.20.0.0/16\
 20.30.40.0/24
-
 После этого нужно обновить список антизапрета
 ```sh
 /root/antizapret/doall.sh
 ```
-
-После этого клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться\
+>После этого клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться\
 А созданным клиентам WireGuard/AmneziaWG нужно добавить эти IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
 Обсуждение скрипта на [ntc.party](https://ntc.party/t/9270) и [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
