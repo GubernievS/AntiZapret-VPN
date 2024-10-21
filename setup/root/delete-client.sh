@@ -32,10 +32,10 @@ if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	echo "Existing client names:"
 	# OpenVPN
 	if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
-		tail -n +2 pki/index.txt | grep "^V" | cut -d '=' -f 2
+		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
 	# WireGuard/AmneziaWG
 	else
-		grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//'
+		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 	fi
 	echo ""
 	echo "Tell me a name for the client to delete"
