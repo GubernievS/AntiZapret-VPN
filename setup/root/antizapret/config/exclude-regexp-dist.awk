@@ -528,6 +528,21 @@ length($1) > 30 && !/wixmp/ {next}
 (/game24/) {next}
 (/getx/) {next}
 
+#21.10.2024
+(/gamesgo/) {next}
+(/^gamma/) {next}
+(/ganja/) {next}
+(/zaym/) {next}
+(/stavochka/) {next}
+(/stav0chka/) {next}
+(/stavca/) {next}
+(/stawca/) {next}
+(/zadrot/) {next}
+(/prostitytki/) {next}
+(/prostitutku/) {next}
+(/prostitutok/) {next}
+(/prostitutky/) {next}
+
 # Обработка каждой строки
 {
     print
