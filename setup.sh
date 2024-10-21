@@ -33,6 +33,8 @@ rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
+rm -f /root/*.ovpn
+rm -f /root/*.conf
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
@@ -40,8 +42,6 @@ if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir /root/easyrsa3 > /dev/null 2>&1
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
 fi
-mv -f /root/*.ovpn /root/vpn > /dev/null 2>&1
-mv -f /root/*.conf /root/vpn > /dev/null 2>&1
 mv -f /root/openvpn /usr/local/src/openvpn > /dev/null 2>&1
 apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
 
@@ -145,7 +145,7 @@ if [[ -d "/usr/local/src/openvpn" ]]; then
 fi
 
 #
-# Отключим ipv6 до перезагрузки
+# Отключим ipv6
 if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
 	sysctl -w net.ipv6.conf.all.disable_ipv6=1
 fi
@@ -253,12 +253,10 @@ done
 /root/antizapret/parse.sh ips
 
 #
-# Настраиваем и включаем сервер OpenVPN, создаем пользователя 'antizapret-client' и *.ovpn файлы подключений в папке /root/vpn
-/root/add-client.sh ov antizapret-client 3650
-
-#
-# Настраиваем и включаем сервер WireGuard/AmneziaWG, создаем пользователя 'antizapret-client' и *.conf файлы подключений в папке /root/vpn
-/root/add-client.sh wg antizapret-client
+# Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
+# Пересоздаем для всех существующих пользователей файлы подключений в папке /root/vpn
+# Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
+/root/add-client.sh init
 
 #
 # Включим нужные службы
