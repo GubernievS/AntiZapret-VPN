@@ -16,18 +16,21 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 TYPE=$1
-if [[ "$TYPE" != "ov" && "$TYPE" != "wg" && "$TYPE" != "recreate" ]]; then
-	echo ""
-	echo "Please choose the VPN type:"
-	echo "    1) OpenVPN"
-	echo "    2) WireGuard/AmneziaWG"
-	until [[ $TYPE =~ ^[1-2]$ ]]; do
-		read -rp "Type choice [1-2]: " -e TYPE
-	done
-fi
 
-CLIENT=$2
-if [[ "$TYPE" != "recreate" ]]; then
+if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
+
+	if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
+		echo ""
+		echo "Please choose the VPN type:"
+		echo "    1) OpenVPN"
+		echo "    2) WireGuard/AmneziaWG"
+		until [[ $TYPE =~ ^[1-2]$ ]]; do
+			read -rp "Type choice [1-2]: " -e TYPE
+		done
+	fi
+
+	CLIENT=$2
+
 	if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 		echo ""
 		echo "Tell me a name for the new client"
@@ -36,12 +39,14 @@ if [[ "$TYPE" != "recreate" ]]; then
 			read -rp "Client name: " -e CLIENT
 		done
 	fi
-fi
 
-SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
-NAME="$CLIENT"
-NAME="${NAME#antizapret-}"
-NAME="${NAME#vpn-}"
+	mkdir /root/vpn > /dev/null 2>&1 || true
+	SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
+	NAME="$CLIENT"
+	NAME="${NAME#antizapret-}"
+	NAME="${NAME#vpn-}"
+
+fi
 
 render() {
 	local IFS=''
@@ -55,8 +60,6 @@ render() {
 		echo "$line"
 	done < $File
 }
-
-mkdir /root/vpn > /dev/null 2>&1 || true
 
 # OpenVPN
 if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
@@ -253,8 +256,8 @@ AllowedIPs = ${CLIENT_IP}/32
 
 	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
 
-# Recreate
-else
+# Init/Recreate
+elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 
 	rm -rf /root/vpn/old
 	mkdir /root/vpn/old
@@ -266,14 +269,29 @@ else
 			/root/add-client.sh ov "$line" > /dev/null
 			echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
 		done
+	elif [[ "$TYPE" == "init" ]]; then
+		/root/add-client.sh ov antizapret-client 3650
 	fi
 
 	# WireGuard/AmneziaWG
-	if [[ -f /etc/wireguard/antizapret.conf ]]; then
-		grep -E "^# Client" "/etc/wireguard/antizapret.conf" | cut -d '=' -f 2 | sed 's/^ *//' | while read -r line; do
+	if [[ -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
+		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r line; do
 			/root/add-client.sh wg "$line" > /dev/null
 			echo "WireGuard/AmneziaWG configuration files for the client '$line' have been recreated in '/root/vpn'"
 		done
+	elif [[ "$TYPE" == "init" ]]; then
+		/root/add-client.sh wg antizapret-client
 	fi
+
+# List
+elif [[ "$TYPE" == "list" ]]; then
+
+	echo ""
+	echo "OpenVPN existing client names:"
+	tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2
+	echo ""
+	echo "WireGuard/AmneziaWG existing client names:"
+	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
+	echo ""
 
 fi
