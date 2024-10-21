@@ -60,36 +60,35 @@ apt update && apt install -y git && cd /root && git clone https://github.com/Gub
 2. Включить OpenVPN DCO
 3. Включить AdGuard DNS (блокировка рекламы, отслеживающих модулей и фишинга) для: AntiZapret VPN и обычного VPN (только при установке)
 4. Использовать альтернативные диапазоны IP-адресов: 172... вместо 10... (только при установке)
-5. Добавить клиентов (только после установки)
 ***
 ### Настройка
-Установить патч для обхода блокировки протокола OpenVPN (работает только для UDP соединений)
+1. Установить патч для обхода блокировки протокола OpenVPN (работает только для UDP соединений)
 ```sh
 ./patch-openvpn.sh
 ```
 ***
-Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)\
+2. Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) (заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN)\
 При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM и AES-256-GCM\
 Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 ```sh
 ./enable-openvpn-dco.sh
 ```
-Выключить OpenVPN DCO
+3. Выключить OpenVPN DCO
 ```sh
 ./disable-openvpn-dco.sh
 ```
 ***
-Добавить нового клиента (срок действия в днях - только для OpenVPN)
+4. Добавить нового клиента (срок действия в днях - только для OpenVPN)
 ```sh
 ./add-client.sh [ov/wg] [имя_клиента] [срок_действия]
 ```
-Удалить клиента
+5. Удалить клиента
 ```sh
 ./delete-client.sh [ov/wg] [имя_клиента]
 ```
 После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
 ***
-Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
+6. Добавить свои сайты в список антизапрета (include-hosts-custom.txt)
 ```sh
 nano /root/antizapret/config/include-hosts-custom.txt
 ```
@@ -103,7 +102,7 @@ com
 /root/antizapret/doall.sh
 ```
 ***
-Добавить свои IP-адреса в список антизапрета (include-ips-custom.txt)
+7. Добавить свои IP-адреса в список антизапрета (include-ips-custom.txt)
 ```sh
 nano /root/antizapret/config/include-ips-custom.txt
 ```
