@@ -15,6 +15,7 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+mkdir /root/vpn > /dev/null 2>&1 || true
 TYPE=$1
 
 if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
@@ -40,7 +41,6 @@ if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
 		done
 	fi
 
-	mkdir /root/vpn > /dev/null 2>&1 || true
 	SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
 	NAME="$CLIENT"
 	NAME="${NAME#antizapret-}"
