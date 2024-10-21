@@ -149,6 +149,11 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) 
 Клиенты обычного VPN = 10.28.0.0/16\
 Подменные IP = 10.30.0.0/15
 
+4. Как запретить нескольким клиентам использовать один и тот же файл подключения (\*.ovpn) для одновременного подключения к серверу?
+
+> На сервере в папке /etc/openvpn/server во всех файлах .conf убрать строчку duplicate-cn
+Перезагрузить сервер
+
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
 
