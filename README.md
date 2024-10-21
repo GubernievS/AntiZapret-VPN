@@ -160,7 +160,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) 
 ```sh
 ./add-client.sh recreate
 ```
-В папке /root/vpn будут пересозданы все файлы подключений, прошлы файлы будет находится в папке /root/vpn/old
+В папке /root/vpn будут пересозданы все файлы подключений, прошлы файлы подключений будет перемещены в папку /root/vpn/old
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
