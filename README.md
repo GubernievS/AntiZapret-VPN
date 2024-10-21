@@ -139,8 +139,11 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) 
 
 2. Как посмотреть активные соединения?
 
-> Посмотреть активные соединения OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs (Логи обновляются каждые 30 секунд)\
-Посмотреть активные соединения WireGuard/AmneziaWG можно командой wg show
+> Посмотреть активные соединения OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs на сервере (Логи обновляются каждые 30 секунд)\
+Посмотреть активные соединения и статистику WireGuard/AmneziaWG можно командой:
+```sh
+wg show
+```
 
 3. Какие IP используются?
 
@@ -160,7 +163,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://ntc.party/t/11998) 
 ```sh
 ./add-client.sh recreate
 ```
-В папке /root/vpn будут пересозданы все файлы подключений, прошлы файлы подключений будет перемещены в папку /root/vpn/old
+В папке /root/vpn будут пересозданы все файлы подключений, прошлые файлы подключений будут перемещены в папку /root/vpn/old
 
 ***
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://pay.cloudtips.ru/p/b3f20611)
