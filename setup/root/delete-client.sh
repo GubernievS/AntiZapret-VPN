@@ -27,7 +27,7 @@ if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
 fi
 
 CLIENT=$2
-if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+if [[ -z "$CLIENT" || ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	echo ""
 	echo "Existing client names:"
 	# OpenVPN
