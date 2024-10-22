@@ -123,7 +123,7 @@ echo ""
 echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
 echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
 echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
-echo "    3) Yandex/NSDI (Russia)          - Use for periodic website loading problems"
+echo "    3) Yandex/NSDI (Russia)          - Use for website loading problems with other DNS"
 until [[ $DNS_ANTIZAPRET =~ ^[1-3]$ ]]; do
 	read -rp "Version choice [1-3]: " -e -i 1 DNS_ANTIZAPRET
 done
@@ -131,7 +131,7 @@ echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
 echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
-echo "    3) Yandex/NSDI (Russia)          - Use for periodic website loading problems"
+echo "    3) Yandex/NSDI (Russia)          - Use for website loading problems with other DNS"
 until [[ $DNS_VPN =~ ^[1-3]$ ]]; do
 	read -rp "Version choice [1-3]: " -e -i 1 DNS_VPN
 done
