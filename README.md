@@ -20,7 +20,9 @@ AntiZapret VPN реализует технологию [раздельного �
 
 Ваш сервер должен быть расположен за пределами России и стран бывшего Советского Союза, в противном случае разблокировка сайтов не гарантируется
 
-AntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-\*) подключаются через VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN (Windows)](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases)
+По умолчанию используются DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:\
+[AdGuard](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга\
+[Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx) с другими DNSAntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-\*) подключаются через VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN (Windows)](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases)
 
 **OpenVPN** (файлы \*.ovpn)\
 Поддерживается подключение по UDP и TCP, а также возможность подключения только по UDP (\*-udp.ovpn) или только по TCP (\*-tcp.ovpn)\
@@ -39,11 +41,6 @@ WireGuard не позволяет нескольким клиентам испо
 AmneziaWG работает в [режиме обфускации Wireguard](https://habr.com/ru/companies/amnezia/articles/807539)\
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент 'antizapret-client'
-
-По умолчанию используются DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:\
-[AdGuard](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга\
-[Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx) с другими DNS
-
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
