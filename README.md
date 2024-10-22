@@ -5,7 +5,7 @@
 AntiZapret VPN реализует технологию [раздельного туннелирования](https://encyclopedia.kaspersky.ru/glossary/split-tunneling)
 
 Через AntiZapret VPN работают только (список сайтов автоматически обновляется раз в сутки):
-- Заблокированные Роскомнадзором сайты и IP-адреса (например для discord.com)
+- Заблокированные Роскомнадзором сайты и IP-адреса (например discord.com)
 - Сайты, доступ к которым ограничивается незаконно (например youtube.com)
 - Сайты, ограничивающие доступ из России (например intel.com, chatgpt.com)
 
@@ -40,7 +40,10 @@ AmneziaWG работает в [режиме обфускации Wireguard](http
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент 'antizapret-client'
 
-По умолчанию используются [Cloudflare DNS](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google DNS](https://ru.wikipedia.org/wiki/Google_Public_DNS), Вместо них можно включить [AdGuard DNS](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга
+По умолчанию используются DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:\
+[AdGuard](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга\
+[Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx) с другими DNS
+
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
@@ -58,7 +61,7 @@ apt update && apt install -y git && cd /root && git clone https://github.com/Gub
 Опционально можно:
 1. Установить патч для обхода блокировки протокола OpenVPN
 2. Включить OpenVPN DCO
-3. Включить AdGuard DNS (блокировка рекламы, отслеживающих модулей и фишинга) для: AntiZapret VPN и обычного VPN (только при установке)
+3. Выбрать DNS для AntiZapret VPN и обычного VPN (только при установке)
 4. Использовать альтернативные диапазоны IP-адресов: 172... вместо 10... (только при установке)
 ***
 ### Настройка
