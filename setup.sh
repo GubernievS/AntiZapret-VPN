@@ -123,7 +123,7 @@ echo ""
 echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
 echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
 echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
-echo "    3) Yandex/NSDI (Russia)          - Use for website loading problems with other DNS"
+echo "    3) Yandex/NSDI (Russia)          - Use if website loading problems with other DNS"
 until [[ $DNS_ANTIZAPRET =~ ^[1-3]$ ]]; do
 	read -rp "Version choice [1-3]: " -e -i 1 DNS_ANTIZAPRET
 done
@@ -131,7 +131,7 @@ echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
 echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
-echo "    3) Yandex/NSDI (Russia)          - Use for website loading problems with other DNS"
+echo "    3) Yandex/NSDI (Russia)          - Use if website loading problems with other DNS"
 until [[ $DNS_VPN =~ ^[1-3]$ ]]; do
 	read -rp "Version choice [1-3]: " -e -i 1 DNS_VPN
 done
@@ -242,10 +242,10 @@ fi
 
 #
 # Настраиваем DNS в обычном VPN
-if [[ "$DNS_VPN" = "y" ]]; then
+if [[ "$DNS_VPN" = "2" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$DNS_VPN" = "y" ]]; then
+elif [[ "$DNS_VPN" = "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"\npush "dhcp-option DNS 195.208.4.1"\npush "dhcp-option DNS 195.208.5.1"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1, 195.208.4.1, 195.208.5.1/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
 fi
