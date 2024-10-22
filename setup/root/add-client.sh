@@ -258,8 +258,7 @@ AllowedIPs = ${CLIENT_IP}/32
 # Init/Recreate
 elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 
-	rm -rf /root/vpn/old
-	mkdir /root/vpn/old
+	mkdir /root/vpn/old > /dev/null 2>&1 || true
 	mv -f /root/vpn/*.* /root/vpn/old > /dev/null 2>&1 || true
 
 	# OpenVPN
