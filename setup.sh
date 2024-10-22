@@ -108,7 +108,7 @@ done
 if [[ "$PATCH" == "y" ]]; then
 	echo ""
 	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
-	echo "    1) Strong     - Recommended for default"
+	echo "    1) Strong     - Recommended by default"
 	echo "    2) Error-free - If the strong patch causes a connection error on your device or router"
 	until [[ $ALGORITHM =~ ^[1-2]$ ]]; do
 		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
@@ -120,14 +120,20 @@ until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 done
 echo ""
-echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
-until [[ $DNS_ANTIZAPRET =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i y DNS_ANTIZAPRET
+echo "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
+echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
+echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
+echo "    3) Yandex/NSDI (Russia)          - Use for periodic website loading problems"
+until [[ $DNS_ANTIZAPRET =~ ^[1-3]$ ]]; do
+	read -rp "Version choice [1-3]: " -e -i 1 DNS_ANTIZAPRET
 done
 echo ""
-echo "AdGuard DNS server is for blocking ads, trackers and phishing websites"
-until [[ $DNS_VPN =~ (y|n) ]]; do
-	read -rp $'Use AdGuard DNS for \e[1;32mtraditional VPN\e[0m (vpn-*)? [y/n]: ' -e -i n DNS_VPN
+echo "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
+echo "    1) Cloudflare/Google (Worldwide) - Fastest, recommended by default"
+echo "    2) AdGuard (Worldwide)           - For blocking ads, trackers and phishing websites"
+echo "    3) Yandex/NSDI (Russia)          - Use for periodic website loading problems"
+until [[ $DNS_VPN =~ ^[1-3]$ ]]; do
+	read -rp "Version choice [1-3]: " -e -i 1 DNS_VPN
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
@@ -227,16 +233,21 @@ else
 fi
 
 #
-# Добавляем AdGuard DNS в AntiZapret VPN
-if [[ "$DNS_ANTIZAPRET" = "y" ]]; then
+# Настраиваем DNS в AntiZapret VPN
+if [[ "$DNS_ANTIZAPRET" = "2" ]]; then
 	sed -i "s/'1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4'/'94.140.14.14', '94.140.15.15', '76.76.2.44', '76.76.10.44'/" /etc/knot-resolver/kresd.conf
+elif [[ "$DNS_ANTIZAPRET" = "3" ]]; then
+	sed -i "s/'1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4'/'77.88.8.8', '77.88.8.1', '195.208.4.1', '195.208.5.1'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
-# Добавляем AdGuard DNS в обычный VPN
+# Настраиваем DNS в обычном VPN
 if [[ "$DNS_VPN" = "y" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
+elif [[ "$DNS_VPN" = "y" ]]; then
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"\npush "dhcp-option DNS 195.208.4.1"\npush "dhcp-option DNS 195.208.5.1"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1, 195.208.4.1, 195.208.5.1/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
