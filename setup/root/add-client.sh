@@ -16,8 +16,8 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 mkdir /root/vpn > /dev/null 2>&1 || true
-TYPE=$1
 
+TYPE=$1
 if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
 
 	if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
@@ -31,8 +31,7 @@ if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
 	fi
 
 	CLIENT=$2
-
-	if [[ -z "$CLIENT" && ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+	if [[ -z "$CLIENT" || ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 		echo ""
 		echo "Tell me a name for the new client"
 		echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
@@ -266,8 +265,12 @@ elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
 		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | while read -r line; do
-			/root/add-client.sh ov "$line" > /dev/null
-			echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
+			if [[ "$line" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+				/root/add-client.sh ov "$line" > /dev/null
+				echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
+			else
+				echo "Client name '$line' format is invalid"
+			fi
 		done
 	elif [[ "$TYPE" == "init" ]]; then
 		/root/add-client.sh ov antizapret-client 3650
@@ -276,8 +279,12 @@ elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 	# WireGuard/AmneziaWG
 	if [[ -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
 		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r line; do
-			/root/add-client.sh wg "$line" > /dev/null
-			echo "WireGuard/AmneziaWG configuration files for the client '$line' have been recreated in '/root/vpn'"
+			if [[ "$line" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+				/root/add-client.sh wg "$line" > /dev/null
+				echo "WireGuard/AmneziaWG configuration files for the client '$line' have been recreated in '/root/vpn'"
+			else
+				echo "Client name '$line' format is invalid"
+			fi
 		done
 	elif [[ "$TYPE" == "init" ]]; then
 		/root/add-client.sh wg antizapret-client
