@@ -20,8 +20,8 @@ AntiZapret VPN реализует технологию [раздельного �
 
 AntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-\*) подключаются через VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN (Windows)](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases)
 
-По умолчанию используются DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:\
-- [AdGuard](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга\
+По умолчанию используются DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:
+- [AdGuard](https://adguard-dns.io/ru/public-dns.html) для блокировки рекламы, отслеживающих модулей и фишинга
 - [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx) с другими DNS
 
 Ваш сервер должен быть расположен за пределами России и стран бывшего Советского Союза, в противном случае разблокировка сайтов не гарантируется
