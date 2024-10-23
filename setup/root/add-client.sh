@@ -190,6 +190,9 @@ PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
 	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
 
+	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
+	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
+
 	# AntiZapret
 
 	BASE_CLIENT_IP=$(grep "^Address" /etc/wireguard/antizapret.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)
