@@ -83,8 +83,8 @@ else
 		exit 21
 	fi
 
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/antizapret.conf
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/vpn.conf
+	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
+	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
 
 	rm -f /root/vpn/antizapret-$NAME-*.conf
 	rm -f /root/vpn/vpn-$NAME-*.conf
