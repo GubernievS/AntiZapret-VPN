@@ -28,6 +28,7 @@ rm -f /etc/openvpn/server/logs/*
 rm -f /etc/openvpn/client/templates/*
 rm -f /etc/wireguard/templates/*
 rm -f /etc/apt/sources.list.d/amnezia*
+rm -f /var/lib/knot-resolver/*
 rm -f /usr/share/keyrings/amnezia.gpg
 rm -f /root/upgrade.sh
 rm -f /root/generate.sh
@@ -38,7 +39,6 @@ rm -f /root/*.conf
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
-rm -rf /var/lib/knot-resolver
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir /root/easyrsa3 > /dev/null 2>&1
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
