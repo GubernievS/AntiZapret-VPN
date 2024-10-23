@@ -30,9 +30,10 @@ fi
 
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get autoremove -y
 version=$(openvpn --version | head -n 1 | awk '{print $2}')
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
+apt-get autoremove -y
+apt-get autoclean
 rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
 curl -L -o /usr/local/src/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
