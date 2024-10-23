@@ -485,7 +485,7 @@ length($1) > 30 && !/wixmp/ {next}
 (/caseno/) {next}
 (/casinno/) {next}
 (/cosino/) {next}
-(/porno/) {next}
+#(/porno/) {next}
 (/porn0/) {next}
 (/xxx/) {next}
 (/porevo/) {next}
