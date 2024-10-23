@@ -155,7 +155,7 @@ elif [[ "$TYPE" == "wg" || "$TYPE" == "2" ]]; then
 		PRIVATE_KEY=$(wg genkey)
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
-		PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
+PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
 		systemctl stop wg-quick@antizapret
@@ -209,7 +209,7 @@ elif [[ "$TYPE" == "wg" || "$TYPE" == "2" ]]; then
 	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/vpn/antizapret-$FILE_NAME-wg.conf"
 	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/vpn/antizapret-$FILE_NAME-am.conf"
 
-	echo -e "# Client = ${CLIENT}
+	echo "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
@@ -241,7 +241,7 @@ AllowedIPs = ${CLIENT_IP}/32
 	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/vpn/vpn-$FILE_NAME-wg.conf"
 	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/vpn/vpn-$FILE_NAME-am.conf"
 
-	echo -e "# Client = ${CLIENT}
+	echo "# Client = ${CLIENT}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
