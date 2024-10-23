@@ -101,6 +101,13 @@ echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
 echo ""
 
+PATCH=""
+ALGORITHM=""
+DCO=""
+DNS_ANTIZAPRET=""
+DNS_VPN=""
+IP=""
+
 #
 # Спрашиваем о настройках
 until [[ $PATCH =~ (y|n) ]]; do
