@@ -158,6 +158,9 @@ if [[ -d "/usr/local/src/openvpn" ]]; then
 	rm -rf /usr/local/src/openvpn
 fi
 
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
+
 #
 # Отключим ipv6
 if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
@@ -171,9 +174,6 @@ fi
 #
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
-
-apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg
 
 #
 # Knot-Resolver
@@ -195,11 +195,12 @@ fi
 # Обновляем систему
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get autoremove -y
 
 #
 # Ставим необходимые пакеты
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils
+apt-get autoremove -y
+apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
