@@ -86,6 +86,9 @@ else
 	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
 	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
 
+	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
+	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
+
 	rm -f /root/vpn/antizapret-$NAME-*.conf
 	rm -f /root/vpn/vpn-$NAME-*.conf
 
