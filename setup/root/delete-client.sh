@@ -78,7 +78,7 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
 # WireGuard/AmneziaWG
 else
-	if ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" "/etc/wireguard/vpn.conf"; then
+	if ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/antizapret.conf" && ! grep -q "# Client = ${CLIENT}" "/etc/wireguard/vpn.conf"; then
 		echo "Failed to delete client '$CLIENT', please check if the client exists"
 		exit 21
 	fi
