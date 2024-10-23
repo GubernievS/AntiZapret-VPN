@@ -168,17 +168,18 @@ PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		source /etc/wireguard/key
 	fi
 
-	CLIENT_BLOCK_ANTIZAPRET=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/antizapret.conf")
-	CLIENT_BLOCK_VPN=$(awk "/# Client = ${CLIENT}\$/,/AllowedIPs/" "/etc/wireguard/vpn.conf")
+	CLIENT_BLOCK_ANTIZAPRET=$(sed -n "/^# Client = ${CLIENT}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)
+	CLIENT_BLOCK_VPN=$(sed -n "/^# Client = ${CLIENT}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)
+
 	if [[ -n "$CLIENT_BLOCK_ANTIZAPRET" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')
 		echo "A client with the specified name was already created, please choose another name"
 	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | awk -F' = ' '{print $2}')
-		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | awk -F' = ' '{print $2}')
+		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')
 		echo "A client with the specified name was already created, please choose another name"
 	else
 		CLIENT_PRIVATE_KEY=$(wg genkey)
