@@ -186,8 +186,8 @@ PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		CLIENT_PRESHARED_KEY=$(wg genpsk)
 	fi
 
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/antizapret.conf
-	sed -i "/^# Client = ${CLIENT}\$/,/^$/d" /etc/wireguard/vpn.conf
+	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
+	sed -i "/^# Client = ${CLIENT}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
 
 	# AntiZapret
 
