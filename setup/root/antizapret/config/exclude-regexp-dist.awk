@@ -543,6 +543,22 @@ length($1) > 30 && !/wixmp/ {next}
 (/prostitutok/) {next}
 (/prostitutky/) {next}
 
+#24.10.2024
+(/minet/) {next}
+(/casoo/) {next}
+(/casiino/) {next}
+(/casin/) {next}
+(/tabletka/) {next}
+(/farma/) {next}
+(/pasport/) {next}
+(/payment/) {next}
+(/korona/) {next}
+(/devki/) {next}
+(/devochki/) {next}
+(/individualky/) {next}
+(/girlss/) {next}
+(/money/) {next}
+
 # Обработка каждой строки
 {
     print
