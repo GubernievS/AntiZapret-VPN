@@ -6,6 +6,8 @@ Wants=network-online.target
 [Service]
 WorkingDirectory=/root/antizapret
 ExecStart=/bin/bash -c 'cat /root/antizapret/doall.sh | bash'
+Restart=on-failure
+RestartSec=60
 
 [Install]
 WantedBy=multi-user.target
