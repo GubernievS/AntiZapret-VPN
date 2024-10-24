@@ -249,6 +249,11 @@ guilded.gg
 #download.nvidia.com
 spiceworks.com
 pornolab.net
+urban-vpn.com
+supercell.com
+clashofclans.com
+senumy.com
+play.xbox.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
