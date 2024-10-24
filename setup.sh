@@ -204,8 +204,9 @@ apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
-# Сохраняем пользовательские конфигурации в файлах *-custom.txt
+# Сохраняем пользовательские конфигурации в файлах *-custom.txt и custom.sh
 mv -f /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
+mv -f /root/antizapret/custom.sh $SCRIPT_DIR/setup/root/antizapret/custom.sh || true
 
 #
 # Восстанавливаем из бэкапа пользователей vpn
