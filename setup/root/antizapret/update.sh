@@ -40,7 +40,6 @@ UPDATE_PATH="update.sh"
 
 echo "Downloading: $DUMP_PATH"
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DUMP_PATH $DUMP_LINK
-iconv -f cp1251 -t utf8 $DUMP_PATH > temp/list.csv
 
 echo "Downloading: $NXDOMAIN_PATH"
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $NXDOMAIN_PATH $NXDOMAIN_LINK
@@ -68,5 +67,13 @@ curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DOALL_PAT
 
 echo "Downloading: $UPDATE_PATH"
 curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK
+
+DUMP_SIZE="$(curl -sI "$DUMP_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
+[[ "$DUMP_SIZE" != "$(stat -c '%s' $DUMP_PATH)" ]] && echo "$DUMP_PATH size differs" && exit 1
+
+NXDOMAIN_SIZE="$(curl -sI "$NXDOMAIN_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
+[[ "$NXDOMAIN_SIZE" != "$(stat -c '%s' $NXDOMAIN_PATH)" ]] && echo "$NXDOMAIN_PATH size differs" && exit 1
+
+iconv -f cp1251 -t utf8 $DUMP_PATH > temp/list.csv
 
 exit 0
