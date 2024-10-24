@@ -224,8 +224,8 @@ rm -rf $SCRIPT_DIR
 
 #
 # Выставляем разрешения на запуск скриптов
-find /root -name "*.sh" -execdir chmod u+x {} +
-chmod u+x /root/antizapret/dnsmap/proxy.py
+find /root -name "*.sh" -execdir chmod +x {} +
+chmod +x /root/antizapret/dnsmap/proxy.py
 
 #
 # Используем альтернативные диапазоны ip-адресов
