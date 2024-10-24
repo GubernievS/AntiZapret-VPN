@@ -8,5 +8,6 @@ cd "$HERE"
 
 cat ./update.sh | bash
 ./parse.sh
+[[ -f "./custom.sh" ]] && ./custom.sh
 
 echo "Execution time: $SECONDS seconds"
