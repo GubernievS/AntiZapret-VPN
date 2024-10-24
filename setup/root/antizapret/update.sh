@@ -38,41 +38,33 @@ DOALL_PATH="doall.sh"
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
 
-echo "Downloading: $DUMP_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DUMP_PATH $DUMP_LINK
+function download {
+	local path=$1
+	local link=$2
+	echo "Downloading: $path"
+	curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o "$path.tmp" "$link"
+	size1="$(stat -c '%s' "$path.tmp")"
+	size2="$(curl -sI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
+	if [[ "$size1" != "$size2" ]]; then
+		echo "Failed to download $path! Size differs"
+		exit 1
+	fi
+	mv "$path.tmp" "$path"
+	if [[ "$path" == *.sh ]]; then
+		chmod +x "$path"
+	fi
+}
 
-echo "Downloading: $NXDOMAIN_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $NXDOMAIN_PATH $NXDOMAIN_LINK
-
-echo "Downloading: $EXCLUDE_HOSTS_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
-
-echo "Downloading: $EXCLUDE_REGEXP_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
-
-echo "Downloading: $INCLUDE_HOSTS_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
-
-echo "Downloading: $INCLUDE_IPS_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
-
-echo "Downloading: $EXCLUDE_IPS_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $EXCLUDE_IPS_PATH $EXCLUDE_IPS_LINK
-
-echo "Downloading: $PARSE_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $PARSE_PATH $PARSE_LINK
-
-echo "Downloading: $DOALL_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $DOALL_PATH $DOALL_LINK
-
-echo "Downloading: $UPDATE_PATH"
-curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o $UPDATE_PATH $UPDATE_LINK
-
-DUMP_SIZE="$(curl -sI "$DUMP_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
-[[ "$DUMP_SIZE" != "$(stat -c '%s' $DUMP_PATH)" ]] && echo "$DUMP_PATH size differs" && exit 1
-
-NXDOMAIN_SIZE="$(curl -sI "$NXDOMAIN_LINK" | awk 'BEGIN {IGNORECASE=1;} /content-length/ {sub(/[ \t\r\n]+$/, "", $2); print $2}')"
-[[ "$NXDOMAIN_SIZE" != "$(stat -c '%s' $NXDOMAIN_PATH)" ]] && echo "$NXDOMAIN_PATH size differs" && exit 1
+download $DUMP_PATH $DUMP_LINK
+download $NXDOMAIN_PATH $NXDOMAIN_LINK
+download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
+download $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
+download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
+download $EXCLUDE_IPS_PATH $EXCLUDE_IPS_LINK
+download $PARSE_PATH $PARSE_LINK
+download $DOALL_PATH $DOALL_LINK
+download $UPDATE_PATH $UPDATE_LINK
 
 iconv -f cp1251 -t utf8 $DUMP_PATH > temp/list.csv
 
