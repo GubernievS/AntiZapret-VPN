@@ -246,7 +246,7 @@ cisecurity.org
 outflank.nl
 tria.ge
 guilded.gg
-download.nvidia.com
+#download.nvidia.com
 spiceworks.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
