@@ -565,6 +565,7 @@ length($1) > 30 && !/wixmp/ {next}
 (/vu1kan/) {next}
 (/casi[0-9]*/) {next}
 (/cazzino/) {next}
+(/gambling/) {next}
 
 # Обработка каждой строки
 {
