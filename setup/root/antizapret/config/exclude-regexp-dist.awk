@@ -559,6 +559,12 @@ length($1) > 30 && !/wixmp/ {next}
 (/girlss/) {next}
 (/money/) {next}
 (/feya/) {next}
+(/cassino/) {next}
+(/cash/) {next}
+(/voucher/) {next}
+(/vu1kan/) {next}
+(/casi[0-9]*/) {next}
+(/cazzino/) {next}
 
 # Обработка каждой строки
 {
