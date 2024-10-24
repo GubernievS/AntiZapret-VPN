@@ -248,6 +248,7 @@ tria.ge
 guilded.gg
 #download.nvidia.com
 spiceworks.com
+pornolab.net
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
