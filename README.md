@@ -22,7 +22,7 @@ AntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-
 
 По умолчанию используются быстрые DNS от [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS), вместо них можно использовать:\
 	1. [AdGuard](https://adguard-dns.io/ru/public-dns.html) и [резервный AdGuard](https://docs.controld.com/docs/free-dns) для блокировки рекламы, отслеживающих модулей и фишинга\
-2. [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx) с другими DNS
+2. [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) если есть проблемы с загрузкой сайтов (например lampa.mx, adtv.ae) с другими DNS
 
 Ваш сервер должен быть расположен за пределами России и стран бывшего Советского Союза, в противном случае разблокировка сайтов не гарантируется
 
