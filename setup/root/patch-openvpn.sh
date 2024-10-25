@@ -30,13 +30,13 @@ fi
 
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-version=$(openvpn --version | head -n 1 | awk '{print $2}')
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev libpam0g-dev automake libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove -y
 apt-get autoclean
+VERSION=$(openvpn --version | head -n 1 | awk '{print $2}')
 rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
-curl -L -o /usr/local/src/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$version.tar.gz
+curl -L -o /usr/local/src/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
