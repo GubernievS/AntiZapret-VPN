@@ -42,9 +42,9 @@ function download {
 	local path=$1
 	local link=$2
 	echo "Downloading: $path"
-	curl -f --retry 3 --retry-delay 30 --retry-all-errors --compressed -o "$path.tmp" "$link"
+	curl -fL --retry 3 --retry-delay 30 --retry-all-errors --compressed "$link" -o "$path.tmp"
 	size1="$(stat -c '%s' "$path.tmp")"
-	size2="$(curl -sI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
+	size2="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
 	if [[ "$size1" != "$size2" ]]; then
 		echo "Failed to download $path! Size differs"
 		exit 1
