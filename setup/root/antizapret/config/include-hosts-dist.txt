@@ -96,6 +96,12 @@ vaio.com
 viperatech.com
 cart.webex.com
 xerox.com
+xerox.co.uk
+xerox.de
+xerox.it
+xerox.fr
+xerox.nl
+xerox.es
 gallery.zetalliance.org
 adafruit.com
 airbrake.io
