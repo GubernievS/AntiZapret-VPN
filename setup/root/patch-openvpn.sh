@@ -36,7 +36,7 @@ apt-get autoclean
 VERSION=$(openvpn --version | head -n 1 | awk '{print $2}')
 rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
-curl -L -o /usr/local/src/openvpn.tar.gz https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz
+curl -fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
