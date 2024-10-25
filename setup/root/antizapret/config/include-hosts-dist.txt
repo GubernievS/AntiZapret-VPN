@@ -75,7 +75,7 @@ releases.hashicorp.com
 community.infineon.com
 download.jetbrains.com
 documentation.meraki.com
-software-static.download.prss.microsoft.com
+microsoft.com
 account.mongodb.com
 cloud.mongodb.com
 cloud.oracle.com
@@ -197,7 +197,7 @@ wonderclub.com
 wunderground.com
 yourdictionary.com
 zoosk.com
-copilot.microsoft.com
+#copilot.microsoft.com
 bing.com
 4pda.to
 habr.com
