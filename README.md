@@ -23,8 +23,8 @@ AntiZapret VPN реализует технологию [раздельного �
 AntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-\*) подключаются через VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN (Windows)](https://openvpn.net/community-downloads), [WireGuard](https://www.wireguard.com/install), [Amnezia VPN](https://amnezia.org/ru/downloads), [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases) и тд
 
 **Варианты DNS:**
-1. [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS) - быстрые и надежные - рекомендуется для обычного VPN\
-2. [AdGuard](https://adguard-dns.io/ru/public-dns.html) и [резервный AdGuard](https://docs.controld.com/docs/free-dns) - для блокировки рекламы, отслеживающих модулей и фишинга\
+1. [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS) - быстрые и надежные - рекомендуется для обычного VPN
+2. [AdGuard](https://adguard-dns.io/ru/public-dns.html) и [резервный AdGuard](https://docs.controld.com/docs/free-dns) - для блокировки рекламы, отслеживающих модулей и фишинга
 3. [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) - если есть проблемы с загрузкой сайтов (например lampa.mx, adtv.ae, google.com) - рекомендуется для AntiZapret VPN
 
 **OpenVPN** (файлы \*.ovpn)\
