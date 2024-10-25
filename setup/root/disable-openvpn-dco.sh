@@ -15,9 +15,9 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-version=$(openvpn --version | head -n 1 | awk '{print $2}')
-if [[ ! $version =~ ^2\.6 ]]; then
-    echo "OpenVPN version is not 2.6. Exiting."
+VERSION=$(openvpn --version | head -n 1 | awk '{print $2}')
+if [[ ! "$VERSION" =~ ^2\.6 ]]; then
+	echo "Cannot disable DCO because OpenVPN version 2.6 is required"
     exit 1
 fi
 
