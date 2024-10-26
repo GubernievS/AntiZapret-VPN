@@ -75,7 +75,6 @@ releases.hashicorp.com
 community.infineon.com
 download.jetbrains.com
 documentation.meraki.com
-microsoft.com
 account.mongodb.com
 cloud.mongodb.com
 cloud.oracle.com
@@ -203,7 +202,11 @@ wonderclub.com
 wunderground.com
 yourdictionary.com
 zoosk.com
-#copilot.microsoft.com
+go.microsoft.com
+download.microsoft.com
+update.microsoft.com
+software-static.download.prss.microsoft.com
+copilot.microsoft.com
 bing.com
 4pda.to
 habr.com
@@ -257,10 +260,12 @@ spiceworks.com
 pornolab.net
 urban-vpn.com
 supercell.com
-clashofclans.com
 senumy.com
 play.xbox.com
 coursera.org
+brawlstarsgame.com
+clashofclans.com
+clashroyaleapp.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
