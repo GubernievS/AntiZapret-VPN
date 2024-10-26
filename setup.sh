@@ -107,6 +107,7 @@ DCO=""
 DNS_ANTIZAPRET=""
 DNS_VPN=""
 IP=""
+PORT=""
 
 #
 # Спрашиваем о настройках
@@ -148,6 +149,10 @@ echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
 until [[ $IP =~ (y|n) ]]; do
 	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n IP
+done
+echo ""
+until [[ $PORT =~ (y|n) ]]; do
+	read -rp "Use backup ports 80 and 443 for OpenVPN? [y/n]: " -e -i y PORT
 done
 echo ""
 
@@ -258,6 +263,13 @@ if [[ "$DNS_VPN" = "2" ]]; then
 elif [[ "$DNS_VPN" = "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"\npush "dhcp-option DNS 195.208.4.1"\npush "dhcp-option DNS 195.208.5.1"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1, 195.208.4.1, 195.208.5.1/" /etc/knot-resolver/kresd.conf /etc/wireguard/templates/vpn-client*.conf
+fi
+
+#
+# Не используем резервные порты 80 и 443 для OpenVPN
+if [[ "$PORT" = "n" ]]; then
+	sed -i '/ \(80\|443\)/s/^/#/' /etc/openvpn/client/templates/*.conf
+	sed -i '/ \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
 fi
 
 #
