@@ -205,7 +205,7 @@ zoosk.com
 go.microsoft.com
 download.microsoft.com
 update.microsoft.com
-software-static.download.prss.microsoft.com
+prss.microsoft.com
 copilot.microsoft.com
 bing.com
 4pda.to
