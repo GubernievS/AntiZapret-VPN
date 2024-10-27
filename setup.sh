@@ -274,9 +274,11 @@ fi
 
 #
 # Проверяем доступность DNS серверов для dnsmap и выберем первый рабочий
-for server in 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4; do
-	if dig @$server youtube.com +short > /dev/null; then
-		sed -i "s/1\.1\.1\.1/$server/g" /root/antizapret/dnsmap/proxy.py
+DNS_SERVERS=$(awk '/^nameserver/ {print $2}' /etc/resolv.conf | paste -sd ' ')
+DNS_SERVERS="$DNS_SERVERS 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+for DNS_SERVER in $DNS_SERVERS; do
+	if dig @$DNS_SERVER youtube.com +short +dnssec > /dev/null; then
+		sed -i "s/1\.1\.1\.1/$DNS_SERVER/g" /root/antizapret/dnsmap/proxy.py
 		break
 	fi
 done
