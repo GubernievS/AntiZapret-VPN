@@ -25,7 +25,7 @@ AntiZapret VPN (файлы antizapret-\*) и обычный VPN (файлы vpn-
 **Варианты DNS:**
 1. [Cloudflare](https://ru.wikipedia.org/wiki/1.1.1.1) и [Google](https://ru.wikipedia.org/wiki/Google_Public_DNS) - быстрые и надежные - рекомендуется для обычного VPN
 2. [AdGuard](https://adguard-dns.io/ru/public-dns.html) и [резервный AdGuard](https://docs.controld.com/docs/free-dns) - для блокировки рекламы, отслеживающих модулей и фишинга
-3. [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) - если есть проблемы с загрузкой сайтов (например lampa.mx, adtv.ae, google.com) - рекомендуется для AntiZapret VPN
+3. [Yandex (Базовый)](https://dns.yandex.ru) и [НСДИ](https://www.diera.ru/blog/nsdi-dns) - если есть проблемы с загрузкой сайтов (например lampa.mx, adtv.ae) - рекомендуется для AntiZapret VPN
 
 **OpenVPN** (файлы \*.ovpn)\
 Поддерживается подключение по UDP и TCP, а также возможность подключения только по UDP (\*-udp.ovpn) или только по TCP (\*-tcp.ovpn)\
