@@ -567,6 +567,19 @@ length($1) > 30 && !/wixmp/ {next}
 (/cazzino/) {next}
 (/gambling/) {next}
 
+#28.10.2024
+(/dengi/) {next}
+(/invst/) {next}
+(/invest/) {next}
+(/trade/) {next}
+(/trading/) {next}
+(/traid/) {next}
+(/forex/) {next}
+(/offsite/) {next}
+(/global/) {next}
+(/welvura/) {next}
+(/passport/) {next}
+
 # Обработка каждой строки
 {
     print
