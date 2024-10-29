@@ -266,6 +266,7 @@ coursera.org
 brawlstarsgame.com
 clashofclans.com
 clashroyaleapp.com
+meta.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
