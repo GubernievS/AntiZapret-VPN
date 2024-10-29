@@ -1,9 +1,9 @@
 Для того чтобы подключение antizapret-\*.ovpn заработало как надо на роутерах TP-Link, надо в antizapret-\*.ovpn дописать:
 
 ```
-route 10.28.0.0 255.252.0.0
-route 0.0.0.0 128.0.0.0 net_gateway
-route 128.0.0.0 128.0.0.0 net_gateway
+route 10.29.0.0 255.255.248.0
+route 10.30.0.0 255.254.0.0
+route 0.0.0.0 0.0.0.0 net_gateway
 sndbuf 1048576
 rcvbuf 1048576
 ```
