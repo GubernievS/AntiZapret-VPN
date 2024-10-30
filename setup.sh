@@ -145,7 +145,7 @@ until [[ $IP =~ (y|n) ]]; do
 done
 echo ""
 until [[ $PORT =~ (y|n) ]]; do
-	read -rp "Use backup ports 80 and 443 for OpenVPN? [y/n]: " -e -i y PORT
+	read -rp "Use backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y PORT
 done
 echo ""
 
