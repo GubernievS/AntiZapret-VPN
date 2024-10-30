@@ -122,11 +122,11 @@ nano /root/antizapret/config/include-ips-custom.txt
 >После этого клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться\
 А созданным клиентам WireGuard/AmneziaWG нужно добавить эти IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
-Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869)
+Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869) (для просмотра 4pda нужен VPN)
 ***
 ### Настройка на роутерах
 OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
-WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948) и [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005)
+WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN)
 ***
 ### Где купить сервер
 Хорошие сервера в Европе для VPN принимающие рубли (ссылки для регистрации): [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) с бонусом 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
