@@ -133,7 +133,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10%
 - [aeza.net](https://aeza.net/?ref=529527) - ссылка для регистрации с бонусом 15% если пополнение сделать в течении 24 часов с момента регистрации
 
-Недорогие сервера с ограничением скорости до 100 Mbit/s принимающие рубли:
+Недорогие сервера в Европе с ограничением скорости до 100 Mbit/s принимающие рубли:
 - PROMO-Platinum от [h2.nexus](https://h2.nexus) - оплата через СБП, могут быть проблемы с подключением по WireGuard/AmneziaWG
 - SWE-PROMO (Стокгольм) от [aeza.net](https://aeza.net/?ref=529527) - доступность для заказа SWE-PROMO можно отслеживать через [aezastatus_bot](https://t.me/aezastatus_bot)
 ***
