@@ -131,7 +131,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 ### Где купить сервер
 Хорошие и быстрые сервера в Европе принимающие рубли (ссылки для регистрации): [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) с бонусом 10% и [aeza.net](https://aeza.net/?ref=529527) с бонусом 15% (если пополнение сделать в течении 24 часов с момента регистрации)
 
-Недорогие сервера с ограничением скорости до 100 Mbit/s принимающие рубли: PROMO-Platinum от [h2.nexus](https://h2.nexus) (оплата через СПБ) и SWE-PROMO (Стокгольм) от Aeza (доступность для заказа можно отслеживать через [aezastatus_bot](https://t.me/aezastatus_bot))
+Недорогие сервера с ограничением скорости до 100 Mbit/s принимающие рубли: PROMO-Platinum от [h2.nexus](https://h2.nexus) (оплата через СБП) и SWE-PROMO (Стокгольм) от Aeza (доступность для заказа можно отслеживать через [aezastatus_bot](https://t.me/aezastatus_bot))
 ***
 ### FAQ
 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
