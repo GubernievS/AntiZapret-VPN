@@ -41,13 +41,21 @@ UPDATE_PATH="update.sh"
 function download {
 	local path=$1
 	local link=$2
+	local min_size_mb=$3
 	echo "Downloading: $path"
 	curl -fL "$link" -o "$path.tmp"
 	size1="$(stat -c '%s' "$path.tmp")"
 	size2="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
 	if [[ "$size1" != "$size2" ]]; then
-		echo "Failed to download $path! Size differs"
+		echo "Failed to download $path! Size on server is different"
 		exit 1
+	fi
+	if [[ -n "$min_size_mb" ]]; then
+		min_size_bytes=$((min_size_mb * 1024 * 1024))
+		if [[ "$size1" -lt "$min_size_bytes" ]]; then
+			echo "Failed to download $path! File size is less than ${min_size_mb} MB"
+			exit 2
+		fi
 	fi
 	mv "$path.tmp" "$path"
 	if [[ "$path" == *.sh ]]; then
@@ -55,14 +63,7 @@ function download {
 	fi
 }
 
-download $DUMP_PATH $DUMP_LINK
-
-FILE_SIZE=$(stat -c%s "$DUMP_PATH")
-if [[ "$FILE_SIZE" -lt 52428800 ]]; then
-	echo "Failed to download $DUMP_PATH! File size is less than 50 MB"
-	exit 2
-fi
-
+download $DUMP_PATH $DUMP_LINK 50
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
