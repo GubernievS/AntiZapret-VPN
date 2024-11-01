@@ -44,15 +44,15 @@ function download {
 	local min_size_mb=$3
 	echo "Downloading: $path"
 	curl -fL "$link" -o "$path.tmp"
-	size1="$(stat -c '%s' "$path.tmp")"
-	size2="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
-	if [[ "$size1" != "$size2" ]]; then
+	local_size="$(stat -c '%s' "$path.tmp")"
+	remote_size="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
+	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
 		exit 1
 	fi
 	if [[ -n "$min_size_mb" ]]; then
-		min_size_bytes=$((min_size_mb * 1024 * 1024))
-		if [[ "$size1" -lt "$min_size_bytes" ]]; then
+		min_size=$((min_size_mb * 1024 * 1024))
+		if [[ "$local_size" -lt "$min_size" ]]; then
 			echo "Failed to download $path! File size is less than ${min_size_mb} MB"
 			exit 2
 		fi
