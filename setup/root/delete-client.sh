@@ -27,7 +27,7 @@ if [[ "$TYPE" != "ov" && "$TYPE" != "wg" ]]; then
 fi
 
 CLIENT=$2
-if [[ -z "$CLIENT" || ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
+if [[ -z "$CLIENT" || ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 	echo ""
 	echo "Existing client names:"
 	# OpenVPN
@@ -39,8 +39,8 @@ if [[ -z "$CLIENT" || ! "$CLIENT" =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; then
 	fi
 	echo ""
 	echo "Tell me a name for the client to delete"
-	echo "The name client must consist of 1 to 18 alphanumeric characters, it may also include an underscore or a dash"
-	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,18}$ ]]; do
+	echo "The name client must consist of 1 to 32 alphanumeric characters, it may also include an underscore or a dash"
+	until [[ $CLIENT =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
 		read -rp "Client name: " -e CLIENT
 	done
 fi
@@ -89,8 +89,8 @@ else
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
 
-	rm -f /root/vpn/antizapret-$NAME-*.conf
-	rm -f /root/vpn/vpn-$NAME-*.conf
+	rm -f /root/vpn/antizapret-"${NAME:0:18}"-*.conf
+	rm -f /root/vpn/vpn-"${NAME:0:25}"-*.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
 		wg syncconf antizapret <(wg-quick strip antizapret 2> /dev/null)
