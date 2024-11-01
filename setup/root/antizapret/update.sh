@@ -56,6 +56,13 @@ function download {
 }
 
 download $DUMP_PATH $DUMP_LINK
+
+FILE_SIZE=$(stat -c%s "$DUMP_PATH")
+if [[ "$FILE_SIZE" -lt 52428800 ]]; then
+	echo "Failed to download $DUMP_PATH! File size less than 50 MB"
+	exit 2
+else
+
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
