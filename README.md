@@ -123,7 +123,7 @@ nano /root/antizapret/config/include-ips-custom.txt
 А созданным клиентам WireGuard/AmneziaWG нужно добавить эти IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
 ### Пообщаться
-Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869) (для просмотра 4pda нужен VPN)
+Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869) (для просмотра 4pda нужен VPN)\
 Приватная группа в [telegram](https://t.me/+XJwXHTmMvUk3NTli)
 ***
 ### Настройка на роутерах
