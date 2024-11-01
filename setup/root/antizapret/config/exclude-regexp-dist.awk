@@ -594,6 +594,7 @@ length($1) > 30 && !/wixmp/ {next}
 (/slottica/) {next}
 (/fontan/) {next}
 (/jopa/) {next}
+(/klubnika/) {next}
 
 # Обработка каждой строки
 {
