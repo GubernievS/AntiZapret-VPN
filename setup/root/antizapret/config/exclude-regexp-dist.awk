@@ -580,6 +580,20 @@ length($1) > 30 && !/wixmp/ {next}
 (/welvura/) {next}
 (/passport/) {next}
 
+#01.11.2024
+(/caino/) {next}
+(/cazinno/) {next}
+(/casin0/) {next}
+(/casi1no/) {next}
+(/kacino/) {next}
+(/kazzino/) {next}
+(/cocaine/) {next}
+(/businessinvest/) {next}
+(/syka/) {next}
+(/seeds/) {next}
+(/slottica/) {next}
+(/fontan/) {next}
+
 # Обработка каждой строки
 {
     print
