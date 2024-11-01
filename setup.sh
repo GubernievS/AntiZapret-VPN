@@ -101,6 +101,7 @@ DNS_ANTIZAPRET=""
 DNS_VPN=""
 IP=""
 PORT=""
+DUPLICATE=""
 
 #
 # Спрашиваем о настройках
@@ -146,6 +147,10 @@ done
 echo ""
 until [[ $PORT =~ (y|n) ]]; do
 	read -rp "Use backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y PORT
+done
+echo ""
+until [[ $DUPLICATE =~ (y|n) ]]; do
+	read -rp "Allow multiple concurrent OpenVPN connections for duplicate name clients? [y/n]: " -e -i y DUPLICATE
 done
 echo ""
 
@@ -259,6 +264,12 @@ fi
 if [[ "$PORT" = "n" ]]; then
 	sed -i '/ \(80\|443\)/s/^/#/' /etc/openvpn/client/templates/*.conf
 	sed -i '/ \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
+fi
+
+#
+# Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
+if [[ "$PORT" = "n" ]]; then
+	sed -i '/duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
 #
