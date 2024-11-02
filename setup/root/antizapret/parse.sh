@@ -57,13 +57,14 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
+	iconv -f cp1251 -t utf8 temp/dump.csv | \
 	awk -F ';' '{
 		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
 			gsub(/^\*\./, "", $2);	# Удаление *. в начале
 			gsub(/\.$/, "", $2);	# Удаление . в конце
 			print $2				# Выводим только доменные имена
 		}
-	}' temp/list.csv | CHARSET=UTF-8 idn --no-tld | sort -u > temp/blocked-hosts.txt
+	}' | CHARSET=UTF-8 idn --no-tld | sort -u > temp/blocked-hosts.txt
 
 	# Очищаем список доменов
 	awk -f config/exclude-regexp-dist.awk temp/blocked-hosts.txt > temp/blocked-hosts2.txt
@@ -110,6 +111,11 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
 fi
 
+if [[ -z "$1" || "$1" == "adblock" ]]; then
+	echo "Parse ad blocking hosts"
+
+fi
+
 # Обновляем файл и перезапускаем сервисы ferm, dnsmap и kresd@1 только если файл whitelist.conf изменился
 if [[ -f result/whitelist.conf ]] && ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf; then
 	cp result/whitelist.conf /etc/ferm/whitelist.conf
@@ -120,6 +126,12 @@ fi
 # Обновляем файл и перезапускаем сервис kresd@1 только если файл blocked-hosts.conf изменился
 if [[ -f result/blocked-hosts.conf ]] && ! diff -q result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf; then
 	cp result/blocked-hosts.conf /etc/knot-resolver/blocked-hosts.conf
+	RESTART_KRESD=true
+fi
+
+# Обновляем файл и перезапускаем сервис kresd@1 только если файл adblock-hosts.rpz изменился
+if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
+	cp result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz
 	RESTART_KRESD=true
 fi
 
