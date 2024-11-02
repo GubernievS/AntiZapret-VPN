@@ -74,6 +74,4 @@ download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
 download $UPDATE_PATH $UPDATE_LINK
 
-iconv -f cp1251 -t utf8 $DUMP_PATH > temp/list.csv
-
 exit 0
