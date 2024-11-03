@@ -596,6 +596,30 @@ length($1) > 30 && !/wixmp/ {next}
 (/jopa/) {next}
 (/klubnika/) {next}
 
+#03.11.2024
+(/caz1no/) {next}
+(/azurefd.net/) {next}
+(/bonus/) {next}
+(/appspot.com/) {next}
+(/zak-ladka/) {next}
+(/zakladka/) {next}
+(/cloudfront.net/) {next}
+(/athleticpharma/) {next}
+(/sharewood.xyz/) {next}
+(/zagonka/) {next}
+(/otsos/) {next}
+(/narco-shop/) {next}
+(/klad.cc/) {next}
+(/win-now/) {next}
+(/propisku/) {next}
+(/individualku/) {next}
+(/individualka/) {next}
+(/malvinki/) {next}
+(/casmr.ru/) {next}
+(/qqq-ttss.su/) {next}
+(/seks/) {next}
+(/xnxx/) {next}
+
 # Обработка каждой строки
 {
     print
