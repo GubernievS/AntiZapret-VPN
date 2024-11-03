@@ -146,7 +146,7 @@ until [[ $PORT =~ (y|n) ]]; do
 done
 echo ""
 until [[ $DUPLICATE =~ (y|n) ]]; do
-	read -rp "Allow multiple concurrent OpenVPN connections for duplicate name clients? [y/n]: " -e -i y DUPLICATE
+	read -rp "Allow multiple clients connect to OpenVPN using the same configuration file (*.ovpn)? [y/n]: " -e -i y DUPLICATE
 done
 echo ""
 
