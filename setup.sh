@@ -97,8 +97,8 @@ echo ""
 PATCH=""
 ALGORITHM=""
 DCO=""
-DNS_ANTIZAPRET=""
-DNS_VPN=""
+ADBLOCK=""
+DNS=""
 IP=""
 PORT=""
 DUPLICATE=""
@@ -123,20 +123,16 @@ until [[ $DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 done
 echo ""
-echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
-echo "    1) Cloudflare+Google  - The fastest and most reliable"
-echo "    2) Yandex(Basic)+NDNS - Use for problems loading sites from Russia - Recommended by default"
-echo "    3) AdGuard            - For blocking ads, trackers and phishing websites"
-until [[ $DNS_ANTIZAPRET =~ ^[1-3]$ ]]; do
-	read -rp "Version choice [1-3]: " -e -i 2 DNS_ANTIZAPRET
+until [[ $ADBLOCK =~ (y|n) ]]; do
+	read -rp $'Enable block ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i y ADBLOCK
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
-echo "    1) Cloudflare+Google  - The fastest and most reliable - Recommended by default"
-echo "    2) Yandex(Basic)+NDNS - Use for problems loading sites from Russia"
-echo "    3) AdGuard            - For blocking ads, trackers and phishing websites"
-until [[ $DNS_VPN =~ ^[1-3]$ ]]; do
-	read -rp "Version choice [1-3]: " -e -i 1 DNS_VPN
+echo "    1) Cloudflare+Google - The fastest and most reliable - Recommended by default"
+echo "    2) Yandex Basic      - Use for problems loading sites from Russia"
+echo "    3) AdGuard+replica   - For blocking ads, trackers and phishing"
+until [[ $DNS =~ ^[1-3]$ ]]; do
+	read -rp "DNS choice [1-3]: " -e -i 1 DNS
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
@@ -242,19 +238,17 @@ else
 fi
 
 #
-# Настраиваем DNS в AntiZapret VPN
-if [[ "$DNS_ANTIZAPRET" = "1" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '195.208.4.1', '195.208.5.1'/'1.1.1.1', '1.0.0.1', '8.8.8.8', '8.8.4.4'/" /etc/knot-resolver/kresd.conf
-elif [[ "$DNS_ANTIZAPRET" = "3" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '195.208.4.1', '195.208.5.1'/'94.140.14.14', '94.140.15.15', '76.76.2.44', '76.76.10.44'/" /etc/knot-resolver/kresd.conf
+# Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
+if [[ "$ADBLOCK" = "n" ]]; then
+	sed -i 's/policy.DENY/policy.PASS/' /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Настраиваем DNS в обычном VPN
-if [[ "$DNS_VPN" = "2" ]]; then
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"\npush "dhcp-option DNS 195.208.4.1"\npush "dhcp-option DNS 195.208.5.1"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1, 195.208.4.1, 195.208.5.1/" /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$DNS_VPN" = "3" ]]; then
+if [[ "$DNS" = "2" ]]; then
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
+elif [[ "$DNS" = "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
 fi
@@ -285,7 +279,7 @@ done
 
 #
 # Создаем список исключений IP-адресов
-/root/antizapret/parse.sh ips
+/root/antizapret/parse.sh ip
 
 #
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
