@@ -13,7 +13,7 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-if [[ -z "$1" || "$1" == "ips" ]]; then
+if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "Parse blocked ips"
 
 	# Подготавливаем исходные файлы для обработки
@@ -52,12 +52,12 @@ if [[ -z "$1" || "$1" == "ips" ]]; then
 	echo "Blocked ips: $(wc -l result/blocked-ips.txt)"
 fi
 
-if [[ -z "$1" || "$1" == "hosts" ]]; then
+if [[ -z "$1" || "$1" == "blocked" ]]; then
 	echo "Parse blocked hosts"
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	iconv -f cp1251 -t utf8 temp/dump.csv | \
+	iconv -f cp1251 -t utf8 temp/blocked.csv | \
 	awk -F ';' '{
 		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
 			gsub(/^\*\./, "", $2);	# Удаление *. в начале
@@ -108,12 +108,17 @@ if [[ -z "$1" || "$1" == "hosts" ]]; then
 	echo '}' >> result/blocked-hosts.conf
 
 	# Выводим результат
-	echo "Blocked domains: $(wc -l result/blocked-hosts.txt)"
+	echo "Blocked hosts: $(wc -l result/blocked-hosts.txt)"
 fi
 
 if [[ -z "$1" || "$1" == "adblock" ]]; then
 	echo "Parse ad blocking hosts"
 
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock.txt | sort -u > result/adblock-hosts.txt
+	sed 's/$/ CNAME *./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
+
+	# Выводим результат
+	echo "Ad blocking hosts: $(wc -l result/adblock-hosts.txt)"
 fi
 
 # Обновляем файл и перезапускаем сервисы ferm, dnsmap и kresd@1 только если файл whitelist.conf изменился
