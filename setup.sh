@@ -146,7 +146,7 @@ until [[ $PORT =~ (y|n) ]]; do
 done
 echo ""
 until [[ $DUPLICATE =~ (y|n) ]]; do
-	read -rp "Allow multiple clients connect to OpenVPN using the same configuration file (*.ovpn)? [y/n]: " -e -i y DUPLICATE
+	read -rp "Deny multiple clients connecting to OpenVPN with a duplicate configuration file (*.ovpn)? [y/n]: " -e -i n DUPLICATE
 done
 echo ""
 
@@ -262,7 +262,7 @@ fi
 
 #
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
-if [[ "$PORT" = "n" ]]; then
+if [[ "$DUPLICATE" = "n" ]]; then
 	sed -i '/duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
