@@ -8,8 +8,8 @@ echo "Update antizapret files"
 
 rm -f temp/*
 
-DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
-DUMP_PATH="temp/dump.csv"
+BLOCKED_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
+BLOCKED_PATH="temp/blocked.csv"
 
 NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_PATH="temp/nxdomain.txt"
@@ -28,6 +28,9 @@ EXCLUDE_IPS_PATH="config/exclude-ips-dist.txt"
 
 INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/include-ips-dist.txt"
 INCLUDE_IPS_PATH="config/include-ips-dist.txt"
+
+ADBLOCK_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
+ADBLOCK_PATH="temp/adblock.txt"
 
 PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
 PARSE_PATH="parse.sh"
@@ -63,13 +66,14 @@ function download {
 	fi
 }
 
-download $DUMP_PATH $DUMP_LINK 50
+download $BLOCKED_PATH $BLOCKED_LINK 50
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_REGEXP_PATH $EXCLUDE_REGEXP_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $EXCLUDE_IPS_PATH $EXCLUDE_IPS_LINK
+download $ADBLOCK_PATH $ADBLOCK_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
 download $UPDATE_PATH $UPDATE_LINK
