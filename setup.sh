@@ -262,7 +262,7 @@ fi
 
 #
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
-if [[ "$DUPLICATE" = "n" ]]; then
+if [[ "$DUPLICATE" = "y" ]]; then
 	sed -i '/duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
