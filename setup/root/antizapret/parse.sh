@@ -114,7 +114,8 @@ fi
 if [[ -z "$1" || "$1" == "adblock" ]]; then
 	echo "Parse ad blocking hosts"
 
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock.txt | sort -u > result/adblock-hosts.txt
+	sed -E 's/(\|[^-.]*)\*\./\1./g' temp/adblock.txt > temp/adblock2.txt
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock2.txt | sort -u > result/adblock-hosts.txt
 	sed 's/$/ CNAME *./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
 
 	# Выводим результат
