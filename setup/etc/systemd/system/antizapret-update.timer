@@ -1,8 +1,9 @@
 [Unit]
-Description=antizapret-vpn update every 24h
+Description=antizapret-vpn daily update between 3:00 and 6:00
 
 [Timer]
-OnUnitActiveSec=24h
+OnCalendar=*-*-* 03:00:00
+RandomizedDelaySec=3h
 
 [Install]
 WantedBy=timers.target
