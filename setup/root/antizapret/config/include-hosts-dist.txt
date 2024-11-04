@@ -272,6 +272,8 @@ blackfriday.com
 webex.com
 ipdata.co
 vehiclelifetimesolutions.schaeffler.com
+themoviedb.org
+tmdb.org
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
