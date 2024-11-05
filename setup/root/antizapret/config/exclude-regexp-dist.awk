@@ -641,6 +641,16 @@ length($1) > 30 && !/wixmp/ {next}
 (/asino/) {next}
 #(/777/) {next}
 (/casyno/) {next}
+(/udostoveren/) {next}
+(/cryptoboss/) {next}
+(/clubnika/) {next}
+(/cpravka/) {next}
+(/cpravki/) {next}
+(/cprawka/) {next}
+(/crash/) {next}
+(/ctavca/) {next}
+(/ctavka/) {next}
+(/ctaw/) {next}
 
 # Обработка каждой строки
 {
