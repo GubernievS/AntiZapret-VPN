@@ -18,6 +18,7 @@ rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
 rm -f /etc/openvpn/server/antizapret.conf
 rm -f /etc/openvpn/server/logs/*
+rm -f /etc/openvpn/server/keys/dh2048.pem
 rm -f /etc/openvpn/client/templates/*
 rm -f /etc/wireguard/templates/*
 rm -f /etc/apt/sources.list.d/amnezia*
