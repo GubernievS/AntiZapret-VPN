@@ -8,6 +8,15 @@ echo "Update antizapret files"
 
 rm -f temp/*
 
+UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
+UPDATE_PATH="update.sh"
+
+PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
+PARSE_PATH="parse.sh"
+
+DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
+DOALL_PATH="doall.sh"
+
 BLOCKED_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
 BLOCKED_PATH="temp/blocked.csv"
 
@@ -31,15 +40,6 @@ INCLUDE_IPS_PATH="config/include-ips-dist.txt"
 
 ADBLOCK_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADBLOCK_PATH="temp/adblock.txt"
-
-PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
-PARSE_PATH="parse.sh"
-
-DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
-DOALL_PATH="doall.sh"
-
-UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
-UPDATE_PATH="update.sh"
 
 function download {
 	local path=$1
@@ -66,6 +66,9 @@ function download {
 	fi
 }
 
+download $UPDATE_PATH $UPDATE_LINK
+download $PARSE_PATH $PARSE_LINK
+download $DOALL_PATH $DOALL_LINK
 download $BLOCKED_PATH $BLOCKED_LINK 50
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
@@ -74,8 +77,5 @@ download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $EXCLUDE_IPS_PATH $EXCLUDE_IPS_LINK
 download $ADBLOCK_PATH $ADBLOCK_LINK
-download $PARSE_PATH $PARSE_LINK
-download $DOALL_PATH $DOALL_LINK
-download $UPDATE_PATH $UPDATE_LINK
 
 exit 0
