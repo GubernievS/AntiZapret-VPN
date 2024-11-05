@@ -1,8 +1,10 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 # Правила для пропуска строк
+# Оригинал из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/exclude-regexp-dist.awk
 (/duckdns/) {next}
 (/linode\.com/) {next}
 (/upcloud\.com/) {next}
+#(/googleusercontent\.com/) {next}
 (/\.sl\.pt/) {next}
 (/\.biz\.ski/) {next}
 (/\.sloat\.biz/) {next}
@@ -156,9 +158,15 @@
 /seedbanda/ {next}
 #/gidonline/ {next}
 /^alco/ {next}
-(/\*/) {next}
-(/\\/) {next} 
-/svetacdn\.in/ {next}
+#/^www\.deviantart\.com$/ {next}
+#(/\.r\.cloudfront\.net/) {next}
+#(/\*/) {next}
+#(/\\/) {next}
+#/multikland\.net/ {next}
+#/synchroncode\.com/ {next}
+#/placehere\.link/ {next}
+#/delivembed\.cc/ {next}
+#/svetacdn\.in/ {next}
 /^a[bdfk]-[0-9]{5}/ {next}
 /^azimob[0-9]{5}/ {next}
 /^bets-.{2}-.{5}\./ {next}
@@ -620,7 +628,21 @@ length($1) > 30 && !/wixmp/ {next}
 (/seks/) {next}
 (/xnxx/) {next}
 
+#05.11.2024
+(/dipplom/) {next}
+(/prawa/) {next}
+(/marijuana/) {next}
+(/marihuana/) {next}
+(/gama-/) {next}
+(/leon-/) {next}
+(/sprawka/) {next}
+(/sprawo4ka/) {next}
+(/game4you/) {next}
+(/asino/) {next}
+#(/777/) {next}
+(/casyno/) {next}
+
 # Обработка каждой строки
 {
-    print
+	print
 }
