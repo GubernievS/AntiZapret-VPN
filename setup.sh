@@ -241,7 +241,7 @@ fi
 #
 # Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
 if [[ "$ADBLOCK" = "n" ]]; then
-	sed -i 's/policy.DENY/policy.PASS/' /etc/knot-resolver/kresd.conf
+	sed -i '/policy\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
 fi
 
 #
