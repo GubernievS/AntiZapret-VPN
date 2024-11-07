@@ -279,6 +279,7 @@ ubisoft.com
 serverkast.com
 alienwarearena.com
 hyundainews.com
+iherb.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
