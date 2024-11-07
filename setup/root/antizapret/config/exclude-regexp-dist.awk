@@ -315,7 +315,7 @@
 /^bbrrigght/ {next}
 /^beer/ {next}
 /^belochka/ {next}
-/^bet/ {next}
+#/^bet/ {next}
 /^bonus/ {next}
 
 # 25.07.2024
@@ -448,7 +448,7 @@ length($1) > 30 && !/wixmp/ {next}
 (/password/) {next}
 (/invoice/) {next}
 (/casino/) {next}
-(/bet/) {next}
+#(/bet/) {next}
 (/poker/) {next}
 (/blackjack/) {next}
 (/roulette/) {next}
