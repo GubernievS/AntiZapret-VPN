@@ -39,7 +39,7 @@ conversations.im
 roskomsvoboda.org
 amazfitwatchfaces.com
 buymeacoffee.com
-cloudflare.com
+#cloudflare.com
 redgifs.com
 one.one.one.one
 discord.com
