@@ -288,6 +288,9 @@ haydaygame.com
 clashmini.com
 squadbusters.com
 mo.co
+capacitorjs.com
+aistudio.google.com
+clickup.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
