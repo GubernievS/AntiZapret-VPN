@@ -261,13 +261,9 @@ guilded.gg
 spiceworks.com
 pornolab.net
 urban-vpn.com
-supercell.com
 senumy.com
 play.xbox.com
 coursera.org
-brawlstars.com
-clashofclans.com
-clashroyaleapp.com
 meta.com
 blackfriday.com
 webex.com
@@ -281,6 +277,17 @@ alienwarearena.com
 hyundainews.com
 iherb.com
 betterttv.net
+supercell.com
+clashroyale.com
+brawlstars.com
+clash.com
+clashofclans.com
+boombeach.com
+hayday.com
+haydaygame.com
+clashmini.com
+squadbusters.com
+mo.co
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
