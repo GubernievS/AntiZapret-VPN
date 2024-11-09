@@ -77,8 +77,8 @@ releases.hashicorp.com
 community.infineon.com
 download.jetbrains.com
 documentation.meraki.com
-account.mongodb.com
-cloud.mongodb.com
+#account.mongodb.com
+#cloud.mongodb.com
 cloud.oracle.com
 builds.parsec.app
 download.qt.io
@@ -309,6 +309,7 @@ home-connect.com
 aftermarket.schaeffler.com
 bosch-home.com
 aftermarket.zf.com
+mongodb.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
