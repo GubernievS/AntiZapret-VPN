@@ -308,6 +308,7 @@ app.zerossl.com
 home-connect.com
 aftermarket.schaeffler.com
 bosch-home.com
+aftermarket.zf.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
