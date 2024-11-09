@@ -291,6 +291,23 @@ mo.co
 capacitorjs.com
 aistudio.google.com
 clickup.com
+extremetech.com
+downloads.malwarebytes.com
+marketplace.atlassian.com
+vectorworks.net
+stalker2.com
+wk.cz
+macpaw.com
+redis.io
+#jabra.com
+fw-download.ubnt.com
+download.screamingfrog.co.uk
+etsy.com
+wetransfer.com
+app.zerossl.com
+home-connect.com
+aftermarket.schaeffler.com
+bosch-home.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
