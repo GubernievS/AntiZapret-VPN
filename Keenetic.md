@@ -1,4 +1,4 @@
-Для того чтобы подключение antizapret-\*.ovpn заработало как надо на роутерах Keenetic, надо в antizapret-\*.ovpn дописать:
+Для того чтобы подключение antizapret-\*.ovpn заработало как надо на роутерах Keenetic, надо в начало файла antizapret-\*.ovpn дописать:
 
 ```
 pull-filter ignore block-outside-dns
