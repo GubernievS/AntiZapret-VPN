@@ -17,7 +17,7 @@ signal.org
 hetzner.com
 lostfilm.tv
 licdn.com
-t-ru.org
+#t-ru.org
 rutrk.org
 nnm-club.ws
 nnmclub.ch
@@ -311,6 +311,7 @@ bosch-home.com
 aftermarket.zf.com
 mongodb.com
 mongodb.net
+notepad-plus-plus.org
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
