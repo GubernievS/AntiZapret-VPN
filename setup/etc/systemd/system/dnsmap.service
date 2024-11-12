@@ -8,6 +8,7 @@ LimitNPROC=infinity
 LimitNOFILE=65535
 WorkingDirectory=/root/antizapret/dnsmap
 ExecStart=/root/antizapret/dnsmap/proxy.py
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
