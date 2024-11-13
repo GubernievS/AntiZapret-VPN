@@ -101,7 +101,8 @@ DCO=""
 ADBLOCK=""
 DNS=""
 IP=""
-PORT=""
+TCP=""
+UDP=""
 DUPLICATE=""
 
 #
@@ -142,8 +143,12 @@ until [[ $IP =~ (y|n) ]]; do
 	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n IP
 done
 echo ""
-until [[ $PORT =~ (y|n) ]]; do
-	read -rp "Use backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y PORT
+until [[ $TCP =~ (y|n) ]]; do
+	read -rp "Use TCP backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y TCP
+done
+echo ""
+until [[ $UDP =~ (y|n) ]]; do
+	read -rp "Use UDP backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y UDP
 done
 echo ""
 until [[ $DUPLICATE =~ (y|n) ]]; do
@@ -255,10 +260,17 @@ elif [[ "$DNS" = "3" ]]; then
 fi
 
 #
-# Не используем резервные порты 80 и 443 для OpenVPN
-if [[ "$PORT" = "n" ]]; then
-	sed -i '/ \(80\|443\)/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/ \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
+# Не используем резервные порты 80 и 443 для OpenVPN TCP
+if [[ "$TCP" = "n" ]]; then
+	sed -i '/ \(80\|443\) tcp/s/^/#/' /etc/openvpn/client/templates/*.conf
+	sed -i '/tcp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
+fi
+
+#
+# Не используем резервные порты 80 и 443 для OpenVPN UDP
+if [[ "$UDP" = "n" ]]; then
+	sed -i '/ \(80\|443\) udp/s/^/#/' /etc/openvpn/client/templates/*.conf
+	sed -i '/udp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
 fi
 
 #
@@ -303,8 +315,8 @@ systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
-systemctl disable ufw || true
-systemctl disable firewalld || true
+systemctl disable ufw > /dev/null 2>&1 || true
+systemctl disable firewalld > /dev/null 2>&1 || true
 
 #
 # Сохраним текущие правила iptables для ferm
