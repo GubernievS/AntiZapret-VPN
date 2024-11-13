@@ -306,6 +306,10 @@ systemctl enable wg-quick@vpn
 systemctl disable ufw > /dev/null || true
 systemctl disable firewalld > /dev/null || true
 
+#
+# Сохраним текущие правила iptables для ferm
+import-ferm > /etc/ferm/ferm.d/iptables.conf
+
 ERRORS=""
 
 if [[ "$PATCH" = "y" ]]; then
