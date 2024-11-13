@@ -144,11 +144,11 @@ until [[ $IP =~ (y|n) ]]; do
 done
 echo ""
 until [[ $TCP =~ (y|n) ]]; do
-	read -rp "Use TCP backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y TCP
+	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y TCP
 done
 echo ""
 until [[ $UDP =~ (y|n) ]]; do
-	read -rp "Use UDP backup ports 80 and 443 for OpenVPN connections? [y/n]: " -e -i y UDP
+	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y UDP
 done
 echo ""
 until [[ $DUPLICATE =~ (y|n) ]]; do
