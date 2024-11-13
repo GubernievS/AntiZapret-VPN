@@ -152,6 +152,20 @@ done
 echo ""
 
 #
+# Остановим службы
+systemctl stop ferm || true
+systemctl stop kresd@1 || true
+systemctl stop dnsmap || true
+systemctl stop antizapret-update.service || true
+systemctl stop antizapret-update.timer || true
+systemctl stop openvpn-server@antizapret-udp || true
+systemctl stop openvpn-server@antizapret-tcp || true
+systemctl stop openvpn-server@vpn-udp || true
+systemctl stop openvpn-server@vpn-tcp || true
+systemctl stop wg-quick@antizapret || true
+systemctl stop wg-quick@vpn || true
+
+#
 # Удалим скомпилированный патченный OpenVPN
 if [[ -d "/usr/local/src/openvpn" ]]; then
 	make -C /usr/local/src/openvpn uninstall || true
@@ -291,9 +305,9 @@ done
 #
 # Включим нужные службы
 systemctl enable kresd@1
+systemctl enable dnsmap
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
-systemctl enable dnsmap
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
 systemctl enable openvpn-server@vpn-udp
@@ -303,8 +317,8 @@ systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
-systemctl disable ufw > /dev/null || true
-systemctl disable firewalld > /dev/null || true
+systemctl disable ufw || true
+systemctl disable firewalld || true
 
 #
 # Сохраним текущие правила iptables для ferm
