@@ -312,6 +312,10 @@ aftermarket.zf.com
 mongodb.com
 mongodb.net
 notepad-plus-plus.org
+g2a.com
+xboxdesignlab.xbox.com
+gamestop.com
+game.co.uk
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
