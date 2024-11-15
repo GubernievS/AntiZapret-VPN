@@ -317,6 +317,7 @@ xboxdesignlab.xbox.com
 gamestop.com
 game.co.uk
 ottg.app
+data-cdn.mbamupdates.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
