@@ -325,6 +325,7 @@ app.flourish.studio
 store.ubi.com
 accounts.autodesk.com
 appstreaming.autodesk.com
+help.autodesk.com
 databricks.com
 plugin-alliance.com
 devexpress.com
