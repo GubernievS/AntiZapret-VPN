@@ -377,6 +377,13 @@ shiksha.com
 moneypuck.com
 lightning.ai
 alphacoders.com
+www3.corsair.com
+kemono.su
+element14.com
+octopart.com
+community.sap.com
+home-connect.com
+home-connect.cn
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
