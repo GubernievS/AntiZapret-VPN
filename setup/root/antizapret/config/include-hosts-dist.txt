@@ -56,6 +56,7 @@ gaming.amazon.com
 login.amd.com
 bits.avcdn.net
 login.broadcom.com
+packages-prod.broadcom.com
 forums.chaos.com
 try.chaos.com
 cisco.com
@@ -116,6 +117,7 @@ boosteroid.com
 bradyid.com
 cambiumnetworks.com
 canva.com
+canva-apps.com
 citrix.com
 clevelandclinic.org
 copernicus.eu
@@ -326,6 +328,7 @@ store.ubi.com
 accounts.autodesk.com
 appstreaming.autodesk.com
 help.autodesk.com
+efulfillment.autodesk.com
 databricks.com
 plugin-alliance.com
 devexpress.com
@@ -356,6 +359,24 @@ singlekey-id.com
 monster.ie
 pcbway.com
 sentry.io
+blur.io
+ptc.com
+bsg.brave.com
+trionworlds.com
+capcut.com
+hume.ai
+promods.net
+metopera.org
+theaudiodb.com
+reka.ai
+familysearch.org
+login.norton.com
+myworld.leica-geosystems.com
+philscomputerlab.com
+shiksha.com
+moneypuck.com
+lightning.ai
+alphacoders.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
