@@ -13,6 +13,7 @@ systemctl stop openvpn-server@antizapret > /dev/null 2>&1
 systemctl disable openvpn-server@antizapret > /dev/null 2>&1
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
+rm -f /etc/sysctl.d/20-network.conf
 rm -f /etc/systemd/network/eth.network
 rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
