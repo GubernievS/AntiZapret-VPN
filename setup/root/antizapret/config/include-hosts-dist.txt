@@ -384,6 +384,8 @@ octopart.com
 community.sap.com
 home-connect.com
 home-connect.cn
+xmg.gg
+schenker-tech.de
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
