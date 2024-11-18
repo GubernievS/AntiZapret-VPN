@@ -60,8 +60,8 @@ if [[ -z "$1" || "$1" == "blocked" ]]; then
 	iconv -f cp1251 -t utf8 temp/blocked.csv | \
 	awk -F ';' '{
 		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
-			gsub(/^\*\./, "", $2);	# Удаление *. в начале
-			gsub(/\.$/, "", $2);	# Удаление . в конце
+			sub(/^\*\./, "", $2);	# Удаление *. в начале
+			sub(/\.$/, "", $2);		# Удаление . в конце
 			print $2				# Выводим только доменные имена
 		}
 	}' | CHARSET=UTF-8 idn --no-tld | sort -u > temp/blocked-hosts.txt
