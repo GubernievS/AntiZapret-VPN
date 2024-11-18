@@ -49,6 +49,7 @@ discordapp.net
 discord.media
 #store.fastly.steamstatic.com
 cloudflare-ech.com
+urban-vpn.com
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
@@ -261,7 +262,6 @@ guilded.gg
 #download.nvidia.com
 spiceworks.com
 pornolab.net
-urban-vpn.com
 senumy.com
 play.xbox.com
 coursera.org
