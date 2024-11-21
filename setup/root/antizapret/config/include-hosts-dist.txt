@@ -328,6 +328,10 @@ cloud.webscraper.io
 app.flourish.studio
 store.ubi.com
 store.ubisoft.com
+connect.ubisoft.com
+public-ubiservices.ubi.com
+upc.ubisoft.com
+ubistatic-a.ubisoft.com
 accounts.autodesk.com
 appstreaming.autodesk.com
 help.autodesk.com
