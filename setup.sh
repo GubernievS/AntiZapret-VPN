@@ -199,6 +199,7 @@ apt-get autoremove -y
 apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
+#
 # Сохраняем пользовательские настройки и пользовательский обработчик custom.sh
 mv -f /root/antizapret/config/* $SCRIPT_DIR/setup/root/antizapret/config || true
 mv -f /root/antizapret/custom.sh $SCRIPT_DIR/setup/root/antizapret/custom.sh || true
