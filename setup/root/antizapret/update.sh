@@ -9,6 +9,8 @@ echo "Update antizapret files"
 #
 # update
 mkdir -p download
+find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
+find /root/antizapret/config -type f -name '*-dist*' -delete
 #
 #
 
