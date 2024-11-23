@@ -262,7 +262,7 @@ AllowedIPs = ${CLIENT_IP}/32
 # Init/Recreate
 elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 
-	mv -f /root/vpn/*.* /root/vpn/old > /dev/null 2>&1 || true
+	mv -f /root/vpn/*.* /root/vpn/old &>/dev/null || true
 
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
