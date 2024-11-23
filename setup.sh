@@ -7,10 +7,10 @@
 
 #
 # Удаление или перемещение файлов и папок при обновлении
-systemctl stop openvpn-generate-keys > /dev/null 2>&1
-systemctl disable openvpn-generate-keys > /dev/null 2>&1
-systemctl stop openvpn-server@antizapret > /dev/null 2>&1
-systemctl disable openvpn-server@antizapret > /dev/null 2>&1
+systemctl stop openvpn-generate-keys &>/dev/null
+systemctl disable openvpn-generate-keys &>/dev/null
+systemctl stop openvpn-server@antizapret &>/dev/null
+systemctl disable openvpn-server@antizapret &>/dev/null
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/sysctl.d/20-network.conf
@@ -37,10 +37,10 @@ rm -rf /root/dnsmap
 rm -rf /root/antizapret/dnsmap
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir -p /root/easyrsa3
-	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
+	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
 fi
-mv -f /root/openvpn /usr/local/src/openvpn > /dev/null 2>&1
-apt-get purge python3-dnslib gnupg2 amneziawg > /dev/null 2>&1
+mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
+apt-get purge python3-dnslib gnupg2 amneziawg &>/dev/null
 
 #
 # Завершим выполнение скрипта при ошибке
@@ -242,7 +242,7 @@ fi
 #
 # Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
 if [[ "$ADBLOCK" = "n" ]]; then
-	sed -i '/policy\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
+	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -311,8 +311,8 @@ systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
-systemctl disable ufw > /dev/null 2>&1 || true
-systemctl disable firewalld > /dev/null 2>&1 || true
+systemctl disable ufw &>/dev/null || true
+systemctl disable firewalld &>/dev/null || true
 
 #
 # Сохраним текущие правила iptables для ferm
