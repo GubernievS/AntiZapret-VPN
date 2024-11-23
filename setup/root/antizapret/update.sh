@@ -6,6 +6,12 @@ cd "$HERE"
 
 echo "Update antizapret files"
 
+#
+# update
+mkdir -p download
+#
+#
+
 rm -f download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
