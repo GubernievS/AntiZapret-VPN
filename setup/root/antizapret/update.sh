@@ -50,7 +50,7 @@ ADBLOCK_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
 ADBLOCK_PATH="download/adblock.txt"
 
 function download {
-	local path=$1
+	local path="$HERE/$1"
 	local link=$2
 	local min_size_mb=$3
 	echo "$path"
