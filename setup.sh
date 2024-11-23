@@ -34,6 +34,7 @@ rm -f /root/*.conf
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
+rm -rf /root/antizapret/dnsmap
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir -p /root/easyrsa3
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
@@ -222,13 +223,13 @@ rm -rf $SCRIPT_DIR
 #
 # Выставляем разрешения на запуск скриптов
 find /root -name "*.sh" -execdir chmod +x {} +
-chmod +x /root/antizapret/dnsmap/proxy.py
+chmod +x /root/antizapret/proxy.py
 
 #
 # Используем альтернативные диапазоны ip-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$IP" = "y" ]]; then
-	sed -i 's/10\./172\./g' /root/antizapret/dnsmap/proxy.py
+	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
@@ -275,12 +276,12 @@ if [[ "$DUPLICATE" = "y" ]]; then
 fi
 
 #
-# Проверяем доступность DNS серверов для dnsmap и выберем первый рабочий
+# Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
 DNS_SERVERS=$(awk '/^nameserver/ {print $2}' /etc/resolv.conf | paste -sd ' ')
 DNS_SERVERS="$DNS_SERVERS 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
 for DNS_SERVER in $DNS_SERVERS; do
 	if dig @$DNS_SERVER fb.com +short +dnssec > /dev/null; then
-		sed -i "s/1\.1\.1\.1/$DNS_SERVER/g" /root/antizapret/dnsmap/proxy.py
+		sed -i "s/1\.1\.1\.1/$DNS_SERVER/g" /root/antizapret/proxy.py
 		break
 	fi
 done

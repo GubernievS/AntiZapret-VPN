@@ -6,8 +6,8 @@ Wants=network-online.target
 [Service]
 LimitNPROC=infinity
 LimitNOFILE=65535
-WorkingDirectory=/root/antizapret/dnsmap
-ExecStart=/root/antizapret/dnsmap/proxy.py
+WorkingDirectory=/root/antizapret
+ExecStart=/root/antizapret/proxy.py
 Restart=on-failure
 
 [Install]

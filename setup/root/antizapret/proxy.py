@@ -1,17 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
 
-import binascii,socket,struct
+import socket,struct,subprocess
 from collections import deque
 from ipaddress import IPv4Network
-
 from dnslib import DNSRecord,RCODE,QTYPE,A
 from dnslib.server import DNSServer,DNSHandler,BaseResolver,DNSLogger
-import subprocess
-import shlex
-import sys
 
 class ProxyResolver(BaseResolver):
     """
@@ -32,29 +28,28 @@ class ProxyResolver(BaseResolver):
         In practice this is actually fairly useful for testing but for a
         'real' transparent proxy option the DNSHandler logic needs to be
         modified (see PassthroughDNSHandler)
-
     """
 
-    def __init__(self,address,port,timeout,iprange,tablename='dnsmap'):
+    def __init__(self,address,port,timeout,iprange):
         self.address = address
         self.port = port
         self.timeout = timeout
         self.unassigned_addresses = deque([str(x) for x in IPv4Network(iprange).hosts()])
         self.ipmap = {}
-        self.tablename = tablename
 
         # Load existing mappings
-        output = subprocess.check_output(["./get_iptables_mappings.sh"])
-        for mapped in output.decode().split("\n"):
+        get_mappings = "iptables-legacy -w -t nat -nL dnsmap | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
+        output = subprocess.check_output(get_mappings, shell=True, encoding='utf-8')
+        for mapped in output.split("\n"):
             if mapped:
                 fake_addr, real_addr = mapped.split(' ')
                 self.add_mapping(real_addr, fake_addr) or sys.exit(1)
         #self.unassigned_addresses.remove()
 
-    def get_mapping(self, real_addr):
+    def get_mapping(self,real_addr):
         return self.ipmap.get(real_addr)
 
-    def add_mapping(self, real_addr, fake_addr=None):
+    def add_mapping(self,real_addr,fake_addr=None):
         if self.get_mapping(real_addr):
             # Real addr is already mapped
             print("Real addr {} is already mapped".format(real_addr))
@@ -76,9 +71,8 @@ class ProxyResolver(BaseResolver):
                 return False
             print('Mapping {} to {}'.format(fake_addr, real_addr))
             self.ipmap[real_addr]=fake_addr
-            subprocess.call(
-                ["./set_iptables.sh", real_addr, fake_addr]
-                )
+            set_mapping = f"iptables-legacy -w -t nat -A dnsmap -d '{fake_addr}' -j DNAT --to '{real_addr}'"
+            subprocess.call(set_mapping, shell=True, encoding='utf-8')
             return fake_addr
         return True
 
@@ -198,7 +192,7 @@ if __name__ == '__main__':
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
     p.add_argument("--upstream","-u",default="1.1.1.1:53",
-            metavar="<dns server:port>",
+                    metavar="<dns server:port>",
                     help="Upstream DNS server:port (default:1.1.1.1:53)")
     p.add_argument("--tcp",action='store_true',default=False,
                     help="TCP proxy (default: UDP only)")
@@ -212,7 +206,7 @@ if __name__ == '__main__':
     p.add_argument("--log-prefix",action='store_true',default=False,
                     help="Log prefix (timestamp/handler/resolver) (default: False)")
     p.add_argument("--iprange",default="10.30.0.0/15",
-            metavar="<ip/mask>",
+                    metavar="<ip/mask>",
                     help="Fake IP range (default:10.30.0.0/15)")
     args = p.parse_args()
 
