@@ -4,7 +4,7 @@ set -e
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-echo "Update antizapret files"
+echo "Update antizapret files:"
 
 #
 # update
@@ -53,7 +53,7 @@ function download {
 	local path=$1
 	local link=$2
 	local min_size_mb=$3
-	echo "Downloading: $path"
+	echo "$path"
 	curl -fL "$link" -o "$path.tmp"
 	local_size="$(stat -c '%s' "$path.tmp")"
 	remote_size="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
