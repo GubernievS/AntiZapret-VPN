@@ -15,7 +15,7 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-mkdir /root/vpn > /dev/null 2>&1 || true
+mkdir -p /root/vpn/old
 
 TYPE=$1
 if [[ "$TYPE" != "init" && "$TYPE" != "recreate" && "$TYPE" != "list" ]]; then
@@ -63,7 +63,7 @@ render() {
 # OpenVPN
 if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 
-	mkdir /etc/openvpn/easyrsa3 > /dev/null 2>&1 || true
+	mkdir -p /etc/openvpn/easyrsa3
 	cd /etc/openvpn/easyrsa3
 
 	load_key() {
@@ -262,7 +262,6 @@ AllowedIPs = ${CLIENT_IP}/32
 # Init/Recreate
 elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 
-	mkdir /root/vpn/old > /dev/null 2>&1 || true
 	mv -f /root/vpn/*.* /root/vpn/old > /dev/null 2>&1 || true
 
 	# OpenVPN

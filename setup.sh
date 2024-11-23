@@ -35,7 +35,7 @@ rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
-	mkdir /root/easyrsa3 > /dev/null 2>&1
+	mkdir -p /root/easyrsa3
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki > /dev/null 2>&1
 fi
 mv -f /root/openvpn /usr/local/src/openvpn > /dev/null 2>&1
@@ -188,12 +188,6 @@ curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
-# Добавим репозиторий Debian Backports для поиска текущей версии linux-headers
-if [[ $OS == "debian" ]]; then
-	echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
-fi
-
-#
 # Обновляем систему
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
@@ -205,9 +199,8 @@ apt-get autoremove -y
 apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
-#
-# Сохраняем пользовательские конфигурации в файлах *-custom.txt и custom.sh
-mv -f /root/antizapret/config/*-custom.txt $SCRIPT_DIR/setup/root/antizapret/config || true
+# Сохраняем пользовательские настройки и пользовательский обработчик custom.sh
+mv -f /root/antizapret/config/* $SCRIPT_DIR/setup/root/antizapret/config || true
 mv -f /root/antizapret/custom.sh $SCRIPT_DIR/setup/root/antizapret/custom.sh || true
 
 #
@@ -220,7 +213,7 @@ rm -rf /root/wireguard
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
-find $SCRIPT_DIR -name '*.gitkeep' -delete
+find "$SCRIPT_DIR" -name '.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r $SCRIPT_DIR/setup/* /
 rm -rf $SCRIPT_DIR

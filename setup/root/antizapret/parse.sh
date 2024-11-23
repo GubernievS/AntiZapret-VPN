@@ -13,12 +13,22 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
+#
+# update
+mkdir -p download
+find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
+find /root/antizapret/config -type f -name '*-dist*' -delete
+#
+#
+
+rm -f temp/*
+
 if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "Parse blocked ips"
 
 	# Подготавливаем исходные файлы для обработки
-	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips-*.txt | sort -u > temp/include-ips.txt
-	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips-*.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
+	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt download/exclude-ips.txt | sort -u > temp/exclude-ips.txt
 
 	# Убираем IP-адреса из исключений
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/blocked-ips.txt
@@ -57,7 +67,7 @@ if [[ -z "$1" || "$1" == "blocked" ]]; then
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	iconv -f cp1251 -t utf8 temp/blocked.csv | \
+	iconv -f cp1251 -t utf8 download/dump.csv | \
 	awk -F ';' '{
 		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
 			sub(/^\*\./, "", $2);	# Удаление *. в начале
@@ -67,13 +77,13 @@ if [[ -z "$1" || "$1" == "blocked" ]]; then
 	}' | CHARSET=UTF-8 idn --no-tld | sort -u > temp/blocked-hosts.txt
 
 	# Очищаем список доменов
-	awk -f config/exclude-regexp-dist.awk temp/blocked-hosts.txt > temp/blocked-hosts2.txt
+	awk -f download/exclude-hosts.awk temp/blocked-hosts.txt > temp/blocked-hosts2.txt
 
 	# Подготавливаем исходные файлы для обработки
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts-*.txt && \
+	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt download/exclude-hosts.txt && \
 		echo && \
-		cat temp/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts-*.txt && \
+		cat download/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
+	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts.txt download/include-hosts.txt && \
 		echo && \
 		cat temp/blocked-hosts2.txt) | sort -u > temp/include-hosts.txt
 
@@ -114,7 +124,7 @@ fi
 if [[ -z "$1" || "$1" == "adblock" ]]; then
 	echo "Parse ad blocking hosts"
 
-	sed -E 's/(\|[^-.]*)\*\./\1./g' temp/adblock.txt > temp/adblock2.txt
+	sed -E 's/(\|[^-.]*)\*\./\1./g' download/adblock.txt > temp/adblock2.txt
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock2.txt | sort -u > temp/adblock3.txt
 	sed '/^[0-9.]*$/d' temp/adblock3.txt > result/adblock-hosts.txt
 	sed 's/$/ CNAME ./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
