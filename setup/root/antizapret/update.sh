@@ -54,8 +54,8 @@ function download {
 	local link=$2
 	local min_size_mb=$3
 	echo "$path"
-	curl -fL "$link" -o "$path.tmp"
-	local_size="$(stat -c '%s' "$path.tmp")"
+	curl -fL "$link" -o "temp"
+	local_size="$(stat -c '%s' "temp")"
 	remote_size="$(curl -fsSLI "$link" | grep -i Content-Length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
 	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
@@ -68,7 +68,7 @@ function download {
 			exit 2
 		fi
 	fi
-	mv -f "$path.tmp" "$path"
+	mv -f "temp" "$path"
 	if [[ "$path" == *.sh ]]; then
 		chmod +x "$path"
 	fi
