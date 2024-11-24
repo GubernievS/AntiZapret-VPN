@@ -20,7 +20,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 
 	# Подготавливаем исходные файлы для обработки
 	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
-	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt download/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
 
 	# Убираем IP-адреса из исключений
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/blocked-ips.txt

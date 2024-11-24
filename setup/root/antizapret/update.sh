@@ -40,9 +40,6 @@ EXCLUDE_HOSTS_AWK_PATH="download/exclude-hosts.awk"
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
 INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 
-EXCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-ips.txt"
-EXCLUDE_IPS_PATH="download/exclude-ips.txt"
-
 INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-ips.txt"
 INCLUDE_IPS_PATH="download/include-ips.txt"
 
@@ -83,7 +80,6 @@ download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_HOSTS_AWK_PATH $EXCLUDE_HOSTS_AWK_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
-download $EXCLUDE_IPS_PATH $EXCLUDE_IPS_LINK
 download $ADBLOCK_PATH $ADBLOCK_LINK
 
 exit 0
