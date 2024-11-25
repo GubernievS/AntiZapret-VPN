@@ -21,7 +21,7 @@ cd "$HERE"
 rm -f temp/*
 
 if [[ -z "$1" || "$1" == "ip" ]]; then
-	echo "Parse ips"
+	echo "Parse ips..."
 
 	# Подготавливаем исходные файлы для обработки
 	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
@@ -60,7 +60,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "host" ]]; then
-	echo "Parse hosts"
+	echo "Parse hosts..."
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -119,7 +119,7 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "ad" ]]; then
-	echo "Parse adblock-hosts"
+	echo "Parse adblock-hosts..."
 
 	sed -E 's/(\|[^-.]*)\*\./\1./g' download/adblock.txt > temp/adblock2.txt
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock2.txt | sort -u > temp/adblock3.txt
