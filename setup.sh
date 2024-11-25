@@ -179,7 +179,7 @@ fi
 mkdir -p /etc/apt/keyrings
 
 #
-# Knot-Resolver
+# Knot Resolver
 curl -fsSL https://pkg.labs.nic.cz/gpg -o /usr/share/keyrings/cznic-labs-pkg.gpg
 echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 

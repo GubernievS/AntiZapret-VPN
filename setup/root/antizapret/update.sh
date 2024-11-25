@@ -1,18 +1,24 @@
 #!/bin/bash
-set -e
-
-HERE="$(dirname "$(readlink -f "${0}")")"
-cd "$HERE"
-
-echo "Update antizapret files:"
 
 #
 # update
 mkdir -p download
 find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
 find /root/antizapret/config -type f -name '*-dist*' -delete
+
+sed -i 's/blocked //g' /etc/knot-resolver/kresd.conf
+sed -i 's/blocked-//g' /etc/knot-resolver/kresd.conf
+sed -i 's/blocked_//g' /etc/knot-resolver/kresd.conf
+mv /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
 #
 #
+
+set -e
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+cd "$HERE"
+
+echo "Update antizapret files:"
 
 rm -f download/*
 
@@ -25,8 +31,8 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-BLOCKED_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
-BLOCKED_PATH="download/dump.csv"
+DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
+DUMP_PATH="download/dump.csv"
 
 NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
@@ -74,7 +80,7 @@ function download {
 download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
-download $BLOCKED_PATH $BLOCKED_LINK 90
+download $DUMP_PATH $DUMP_LINK 90
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_HOSTS_AWK_PATH $EXCLUDE_HOSTS_AWK_LINK
