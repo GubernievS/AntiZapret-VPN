@@ -2,7 +2,7 @@
 
 #
 # update
-rm -rf download
+rm -rf /root/download
 mkdir -p /root/antizapret/download
 find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
 find /root/antizapret/config -type f -name '*-dist*' -delete
