@@ -277,11 +277,10 @@ fi
 
 #
 # Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
-DNS_SERVERS=$(awk '/^nameserver/ {print $2}' /etc/resolv.conf | paste -sd ' ')
-DNS_SERVERS="$DNS_SERVERS 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
 for DNS_SERVER in $DNS_SERVERS; do
-	if dig @$DNS_SERVER fb.com +short +dnssec > /dev/null; then
-		sed -i "s/1\.1\.1\.1/$DNS_SERVER/g" /root/antizapret/proxy.py
+	if dig @$DNS_SERVER fb.com +short +dnssec &>/dev/null; then
+		sed -i "s/127\.0\.0\.53/$DNS_SERVER/g" /root/antizapret/proxy.py
 		break
 	fi
 done

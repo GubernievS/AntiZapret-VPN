@@ -93,11 +93,11 @@ else
 	rm -f /root/vpn/vpn-"${NAME:0:25}"-*.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
-		wg syncconf antizapret <(wg-quick strip antizapret 2> /dev/null)
+		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
 	fi
 
 	if systemctl is-active --quiet wg-quick@vpn; then
-		wg syncconf vpn <(wg-quick strip vpn 2> /dev/null)
+		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
 	fi
 
 	echo "WireGuard/AmneziaWG client '$CLIENT' successfull deleted"

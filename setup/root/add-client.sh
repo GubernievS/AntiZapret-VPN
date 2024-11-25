@@ -222,7 +222,7 @@ AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/antizapret.conf"
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
-		wg syncconf antizapret <(wg-quick strip antizapret 2> /dev/null)
+		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
 	fi
 
 	# VPN
@@ -254,7 +254,7 @@ AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/vpn.conf"
 
 	if systemctl is-active --quiet wg-quick@vpn; then
-		wg syncconf vpn <(wg-quick strip vpn 2> /dev/null)
+		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
 	fi
 
 	echo "WireGuard/AmneziaWG configuration files for the client '$CLIENT' have been (re)created in '/root/vpn'"
@@ -268,7 +268,7 @@ elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
 		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | while read -r line; do
 			if [[ "$line" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
-				/root/add-client.sh ov "$line" > /dev/null
+				/root/add-client.sh ov "$line" >/dev/null
 				echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
 			else
 				echo "Client name '$line' format is invalid"
@@ -282,7 +282,7 @@ elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 	if [[ -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
 		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r line; do
 			if [[ "$line" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
-				/root/add-client.sh wg "$line" > /dev/null
+				/root/add-client.sh wg "$line" >/dev/null
 				echo "WireGuard/AmneziaWG configuration files for the client '$line' have been recreated in '/root/vpn'"
 			else
 				echo "Client name '$line' format is invalid"
