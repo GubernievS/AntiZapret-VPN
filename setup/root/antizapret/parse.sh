@@ -9,7 +9,7 @@ find /root/antizapret/result -type f -name '*blocked-*' -delete
 sed -i 's/blocked //g' /etc/knot-resolver/kresd.conf
 sed -i 's/blocked-//g' /etc/knot-resolver/kresd.conf
 sed -i 's/blocked_//g' /etc/knot-resolver/kresd.conf
-mv /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
+mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
 #
 #
 
