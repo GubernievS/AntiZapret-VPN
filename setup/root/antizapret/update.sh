@@ -1,18 +1,4 @@
 #!/bin/bash
-
-#
-# update
-mkdir -p download
-find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
-find /root/antizapret/config -type f -name '*-dist*' -delete
-find /root/antizapret/result -type f -name '*blocked-*' -delete
-sed -i 's/blocked //g' /etc/knot-resolver/kresd.conf
-sed -i 's/blocked-//g' /etc/knot-resolver/kresd.conf
-sed -i 's/blocked_//g' /etc/knot-resolver/kresd.conf
-mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
-#
-#
-
 set -e
 
 handle_error() {
