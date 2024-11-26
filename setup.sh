@@ -264,7 +264,8 @@ fi
 
 #
 # Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
-for PROXY_DNS in "127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"; do
+DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+for PROXY_DNS in $DNS_SERVERS; do
 	if dig @$PROXY_DNS fb.com +short +dnssec &>/dev/null; then
 		sed -i "s/127\.0\.0\.53/$PROXY_DNS/g" /root/antizapret/proxy.py
 		break
