@@ -16,16 +16,37 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-if [[ "$1" == "1" || "$1" == "2" ]]; then
+if [[ "$1" == "0" || "$1" == "1" || "$1" == "2" ]]; then
 	ALGORITHM="$1"
 else
 	echo ""
 	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
+	echo "    0) None       - Do not install the anti-censorship patch, or remove it if already installed"
 	echo "    1) Strong     - Recommended by default"
-	echo "    2) Error-free - If the Strong patch causes a connection error on your device or Mikrotik router"
-	until [[ $ALGORITHM =~ ^[1-2]$ ]]; do
-		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
+	echo "    2) Error-free - Use it if the Strong patch causes a connection error, recommended for Mikrotik routers"
+	until [[ $ALGORITHM =~ ^[0-2]$ ]]; do
+		read -rp "Version choice [0-2]: " -e -i 1 ALGORITHM
 	done
+fi
+
+if [[ "$ALGORITHM" == "0" ]]; then
+	if [[ -d "/usr/local/src/openvpn" ]]; then
+		make -C /usr/local/src/openvpn uninstall || true
+		rm -rf /usr/local/src/openvpn
+		apt-get update
+		DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+		DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y openvpn
+		apt-get autoremove -y
+		apt-get autoclean
+		systemctl daemon-reload
+		systemctl restart openvpn-server@*
+		echo ""
+		echo "OpenVPN patch remove successfully!"
+		exit 0
+	fi
+	echo ""
+	echo "OpenVPN patch not installed!"
+	exit 0
 fi
 
 apt-get update
@@ -39,6 +60,7 @@ mkdir -p /usr/local/src/openvpn
 curl -fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
+
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
 link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
@@ -111,6 +133,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 }\
 \
 \/\* write a TCP or UDP packet to link \*\/' "/usr/local/src/openvpn/src/openvpn/socket.h"
+
 cd /usr/local/src/openvpn
 chmod +x ./configure
 ./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
