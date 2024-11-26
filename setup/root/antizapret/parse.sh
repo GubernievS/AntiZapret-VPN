@@ -159,7 +159,7 @@ if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/
 	RESTART_KRESD=true
 fi
 
-if [[ "$RESTART_FERM_DNSMAP" = true ]]; then
+if [[ "$RESTART_FERM_DNSMAP" == true ]]; then
 	if systemctl is-active --quiet ferm; then
 		echo "Restart ferm"
 		systemctl restart ferm
@@ -170,7 +170,7 @@ if [[ "$RESTART_FERM_DNSMAP" = true ]]; then
 	fi
 fi
 
-if [[ "$RESTART_KRESD" = true ]]; then
+if [[ "$RESTART_KRESD" == true ]]; then
 	if systemctl is-active --quiet kresd@1; then
 		echo "Restart kresd@1"
 		systemctl restart kresd@1
