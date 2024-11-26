@@ -141,7 +141,7 @@ until [[ $OPENVPN_80_443_UDP =~ (y|n) ]]; do
 done
 echo ""
 until [[ $OPENVPN_DUPLICATE =~ (y|n) ]]; do
-	read -rp "Deny multiple clients connecting to OpenVPN with a duplicate configuration file (*.ovpn)? [y/n]: " -e -i n OPENVPN_DUPLICATE
+	read -rp "Allow multiple clients connecting to OpenVPN using the same configuration file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
 
@@ -258,7 +258,7 @@ fi
 
 #
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
-if [[ "$OPENVPN_DUPLICATE" == "y" ]]; then
+if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
 	sed -i '/duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
