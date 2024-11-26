@@ -34,8 +34,10 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "Parse ips..."
 
 	# Подготавливаем исходные файлы для обработки
-	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
+	sed -i 's/\r//' config/exclude-ips.txt
+	sed -i 's/\r//' config/include-ips.txt
 	sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
 	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
@@ -87,6 +89,8 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 	awk -f download/exclude-hosts.awk temp/hosts.txt > temp/hosts2.txt
 
 	# Подготавливаем исходные файлы для обработки
+	sed -i 's/\r//' config/exclude-hosts.txt
+	sed -i 's/\r//' config/include-hosts.txt
 	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt download/exclude-hosts.txt && \
 		echo && \
 		cat download/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
