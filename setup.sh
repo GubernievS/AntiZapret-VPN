@@ -98,34 +98,20 @@ echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
 echo ""
 
-PATCH=""
-ALGORITHM=""
-DCO=""
-ADBLOCK=""
-DNS=""
-IP=""
-TCP=""
-UDP=""
-DUPLICATE=""
-
 #
 # Спрашиваем о настройках
-until [[ $PATCH =~ (y|n) ]]; do
-	read -rp "Install anti-censorship patch for OpenVPN (UDP only)? [y/n]: " -e -i y PATCH
+echo ""
+echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
+echo "    0) None       - Do not install the anti-censorship patch, or remove it if already installed"
+echo "    1) Strong     - Recommended by default"
+echo "    2) Error-free - Use it if the Strong patch causes a connection error, recommended for Mikrotik routers"
+until [[ $OPENVPN_PATCH =~ ^[0-2]$ ]]; do
+	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
-if [[ "$PATCH" == "y" ]]; then
-	echo ""
-	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
-	echo "    1) Strong     - Recommended by default"
-	echo "    2) Error-free - If the Strong patch causes a connection error on your device or Mikrotik router"
-	until [[ $ALGORITHM =~ ^[1-2]$ ]]; do
-		read -rp "Version choice [1-2]: " -e -i 1 ALGORITHM
-	done
-fi
 echo ""
 echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM and AES-256-GCM encryption protocols"
-until [[ $DCO =~ (y|n) ]]; do
-	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
+until [[ $OPENVPN_DCO =~ (y|n) ]]; do
+	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
 echo ""
 until [[ $ADBLOCK =~ (y|n) ]]; do
@@ -136,26 +122,26 @@ echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare+Google - The fastest and most reliable - Recommended by default"
 echo "    2) Yandex Basic      - Use for problems loading sites from Russia"
 echo "    3) AdGuard+replica   - For blocking ads, trackers and phishing"
-until [[ $DNS =~ ^[1-3]$ ]]; do
-	read -rp "DNS choice [1-3]: " -e -i 1 DNS
+until [[ $VPN_DNS =~ ^[1-3]$ ]]; do
+	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
-until [[ $IP =~ (y|n) ]]; do
-	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n IP
+until [[ $ALTERNATIVE_IP =~ (y|n) ]]; do
+	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n ALTERNATIVE_IP
 done
 echo ""
-until [[ $TCP =~ (y|n) ]]; do
-	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y TCP
+until [[ $OPENVPN_80_443_TCP =~ (y|n) ]]; do
+	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_TCP
 done
 echo ""
-until [[ $UDP =~ (y|n) ]]; do
-	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y UDP
+until [[ $OPENVPN_80_443_UDP =~ (y|n) ]]; do
+	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_UDP
 done
 echo ""
-until [[ $DUPLICATE =~ (y|n) ]]; do
-	read -rp "Deny multiple clients connecting to OpenVPN with a duplicate configuration file (*.ovpn)? [y/n]: " -e -i n DUPLICATE
+until [[ $OPENVPN_DUPLICATE =~ (y|n) ]]; do
+	read -rp "Deny multiple clients connecting to OpenVPN with a duplicate configuration file (*.ovpn)? [y/n]: " -e -i n OPENVPN_DUPLICATE
 done
 echo ""
 
@@ -229,7 +215,7 @@ chmod +x /root/antizapret/proxy.py
 #
 # Используем альтернативные диапазоны ip-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
-if [[ "$IP" = "y" ]]; then
+if [[ "$ALTERNATIVE_IP" == "y" ]]; then
 	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
@@ -242,46 +228,45 @@ fi
 
 #
 # Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
-if [[ "$ADBLOCK" = "n" ]]; then
+if [[ "$ADBLOCK" == "n" ]]; then
 	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Настраиваем DNS в обычном VPN
-if [[ "$DNS" = "2" ]]; then
+if [[ "$VPN_DNS" == "2" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$DNS" = "3" ]]; then
+elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN TCP
-if [[ "$TCP" = "n" ]]; then
+if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
 	sed -i '/ \(80\|443\) tcp/s/^/#/' /etc/openvpn/client/templates/*.conf
 	sed -i '/tcp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN UDP
-if [[ "$UDP" = "n" ]]; then
+if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
 	sed -i '/ \(80\|443\) udp/s/^/#/' /etc/openvpn/client/templates/*.conf
 	sed -i '/udp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
 fi
 
 #
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
-if [[ "$DUPLICATE" = "y" ]]; then
+if [[ "$OPENVPN_DUPLICATE" == "y" ]]; then
 	sed -i '/duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
 #
 # Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
-DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
-for DNS_SERVER in $DNS_SERVERS; do
-	if dig @$DNS_SERVER fb.com +short +dnssec &>/dev/null; then
-		sed -i "s/127\.0\.0\.53/$DNS_SERVER/g" /root/antizapret/proxy.py
+for PROXY_DNS in "127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"; do
+	if dig @$PROXY_DNS fb.com +short +dnssec &>/dev/null; then
+		sed -i "s/127\.0\.0\.53/$PROXY_DNS/g" /root/antizapret/proxy.py
 		break
 	fi
 done
@@ -320,22 +305,35 @@ import-ferm > /etc/ferm/iptables.conf || true
 
 ERRORS=""
 
-if [[ "$PATCH" = "y" ]]; then
-	if ! /root/patch-openvpn.sh "$ALGORITHM"; then
+if [[ "$OPENVPN_PATCH" != "0" ]]; then
+	if ! /root/patch-openvpn.sh "$OPENVPN_PATCH"; then
 		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run './patch-openvpn.sh' after rebooting\n"
 	fi
 fi
 
-if [[ "$DCO" = "y" ]]; then
+if [[ "$OPENVPN_DCO" == "y" ]]; then
 	if ! /root/enable-openvpn-dco.sh; then
 		ERRORS+="\n\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting\n"
 	fi
 fi
 
+#
 # Если есть ошибки, выводим их
 if [[ -n "$ERRORS" ]]; then
 	echo -e "$ERRORS"
 fi
+
+#
+# Сохраняем настройки
+echo "OPENVPN_PATCH=${OPENVPN_PATCH}
+OPENVPN_DCO=${OPENVPN_DCO}
+ADBLOCK=${ADBLOCK}
+VPN_DNS=${VPN_DNS}
+ALTERNATIVE_IP=${ALTERNATIVE_IP}
+OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
+OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
+OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
+PROXY_DNS=${PROXY_DNS}" > /root/antizapret/settings
 
 echo ""
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
