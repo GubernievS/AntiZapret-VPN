@@ -18,13 +18,12 @@ echo "Update antizapret files:"
 rm -f download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/update.sh"
-#UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
 
-PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/parse.sh"
+PARSE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/parse.sh"
 PARSE_PATH="parse.sh"
 
-DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
+DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/doall.sh"
 DOALL_PATH="doall.sh"
 
 DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv"
@@ -36,7 +35,7 @@ NXDOMAIN_PATH="download/nxdomain.txt"
 EXCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt"
 EXCLUDE_HOSTS_PATH="download/exclude-hosts.txt"
 
-EXCLUDE_HOSTS_AWK_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.awk"
+EXCLUDE_HOSTS_AWK_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/exclude-hosts.awk"
 EXCLUDE_HOSTS_AWK_PATH="download/exclude-hosts.awk"
 
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
