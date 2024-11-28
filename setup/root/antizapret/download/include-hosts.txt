@@ -86,7 +86,7 @@ builds.parsec.app
 download.qt.io
 master.qt.io
 ruckuswireless.com
-radarr.servarr.com
+servarr.com
 pkgs.tailscale.com
 account.templatemonster.com
 app.terraform.io
