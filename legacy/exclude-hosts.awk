@@ -90,7 +90,7 @@
 /fon-bet/ {next}
 /^hydra[0-9]{2}/ {next}
 /^intim[0-9]{2}/ {next}
-/^livetv[0-9]{2}/ {next}
+#/^livetv[0-9]{2}/ {next}
 /marafon/ {next}
 #/^melb/ {next}
 /^melm/ {next}
@@ -175,7 +175,7 @@
 /^goldfishka[0-9]{2,3}\./ {next}
 /^kinovod[0-9]{2,3}\.cc/ {next}
 /^lite-1x/ {next}
-/^livetv[0-9]{2,3}.me/ {next}
+#/^livetv[0-9]{2,3}.me/ {next}
 /^loot[0-9]{2,3}\.bet/ {next}
 /^melbet-/ {next}
 /^ox-[0-9]{5}/ {next}
@@ -233,7 +233,7 @@
 /^onex/ {next}
 /^omgomgomg5/ {next}
 /^official-/ {next}
-/^livetv[0-9]*\./ {next}
+#/^livetv[0-9]*\./ {next}
 /^lite-betwin/ {next}
 /^leon-official/ {next}
 /^leon-registration/ {next}
@@ -365,7 +365,7 @@
 /^go-game/ {next}
 /^klub/ {next}
 /^kraken/ {next}
-/^livetv[0-9]*\.me$/ {next}
+#/^livetv[0-9]*\.me$/ {next}
 /^maxbet/ {next}
 /^megamarket/ {next}
 /^moskva-prava/ {next}
