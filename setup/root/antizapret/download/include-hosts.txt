@@ -92,7 +92,7 @@ account.templatemonster.com
 app.terraform.io
 terraform.io
 themoviedb.org
-images.tmdb.org
+tmdb.org
 downloads.ultraedit.com
 vaio.com
 viperatech.com
