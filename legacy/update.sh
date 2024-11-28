@@ -32,9 +32,6 @@ DUMP_PATH="download/dump.csv"
 NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
 
-EXCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt"
-EXCLUDE_HOSTS_PATH="download/exclude-hosts.txt"
-
 EXCLUDE_HOSTS_AWK_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/exclude-hosts.awk"
 EXCLUDE_HOSTS_AWK_PATH="download/exclude-hosts.awk"
 
@@ -77,7 +74,6 @@ download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
 download $DUMP_PATH $DUMP_LINK 90
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
-download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $EXCLUDE_HOSTS_AWK_PATH $EXCLUDE_HOSTS_AWK_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
