@@ -118,10 +118,17 @@ fi
 if [[ -z "$1" || "$1" == "ad" ]]; then
 	echo "Parse adblock-hosts..."
 
-	sed -E 's/(\|[^-.]*)\*\./\1./g' download/adblock.txt > temp/adblock2.txt
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock2.txt | sort -u > temp/adblock3.txt
-	sed '/^[0-9.]*$/d' temp/adblock3.txt > result/adblock-hosts.txt
+	# Обрабатываем список с рекламными доменами для блокировки
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adblock-hosts.txt | sort -u > temp/adblock-hosts.txt
+	sed '/^[0-9.]*$/d' temp/adblock-hosts.txt > result/adblock-hosts.txt
+
+	# Обрабатываем список с исключениями из блокировки
+	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adblock-hosts.txt | sort -u > temp/adblock-pass-hosts.txt
+	sed '/^[0-9.]*$/d' temp/adblock-pass-hosts.txt > result/adblock-pass-hosts.txt
+
+	# Создаем файл для Knot Resolver
 	sed 's/$/ CNAME ./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
+	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/adblock-pass-hosts.txt >> result/adblock-hosts.rpz
 
 	# Выводим результат
 	echo "Adblock-hosts: $(wc -l result/adblock-hosts.txt)"
