@@ -76,7 +76,7 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 	# Подготавливаем исходные файлы для обработки
 	sed -i 's/\r//' config/exclude-hosts.txt
 	sed -i 's/\r//' config/include-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt download/exclude-hosts.txt && \
+	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt && \
 		echo && cat download/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
 	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts.txt download/include-hosts.txt && \
 		echo && cat temp/hosts2.txt) | sort -u > temp/include-hosts.txt
