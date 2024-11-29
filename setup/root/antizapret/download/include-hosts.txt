@@ -394,6 +394,7 @@ home-connect.cn
 xmg.gg
 schenker-tech.de
 yeggi.com
+omv-extras.org
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
