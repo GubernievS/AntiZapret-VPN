@@ -33,7 +33,7 @@ INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/ma
 INCLUDE_IPS_PATH="download/include-ips.txt"
 
 ADBLOCK_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
-ADBLOCK_PATH="download/adblock.txt"
+ADBLOCK_PATH="download/adblock-hosts.txt"
 
 function download {
 	local path="${HERE}/${1}"
