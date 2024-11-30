@@ -395,6 +395,12 @@ xmg.gg
 schenker-tech.de
 yeggi.com
 omv-extras.org
+notebooklm.google.com
+softwareupdate.vmware.com
+members.summerana.com
+anythingllm.com
+wikidot.com
+logo.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
