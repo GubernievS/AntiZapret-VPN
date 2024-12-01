@@ -10,13 +10,11 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "Parse ips..."
 
 	# Подготавливаем исходные файлы для обработки
-	sed -i 's/\r//' config/exclude-ips.txt
-	sed -i 's/\r//' config/include-ips.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt && echo ) | sort -u > temp/exclude-ips.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt && echo ) | sort -u > temp/include-ips.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
+	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
 
 	# Заблокированные IP-адреса
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
@@ -65,23 +63,17 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 	awk -f download/exclude-hosts.awk temp/hosts.txt > temp/hosts2.txt
 
 	# Подготавливаем исходные файлы для обработки
-	sed -i 's/\r//' config/exclude-hosts.txt
-	sed -i 's/\r//' config/include-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt && \
-		echo && cat download/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts.txt download/include-hosts.txt && \
-		echo && cat temp/hosts2.txt) | sort -u > temp/include-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt download/nxdomain.txt | sort -u > temp/exclude-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt temp/hosts2.txt | sort -u > temp/include-hosts.txt
 
 	# Убираем домены из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/include-hosts.txt > temp/hosts3.txt
+	grep -vFxf temp/exclude-hosts.txt temp/include-hosts.txt > temp/hosts3.txt
 
 	# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
 	# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
 	cp temp/hosts3.txt temp/hosts4.txt
-	awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
-		temp/hosts3.txt >> temp/hosts4.txt
-	awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
-		temp/hosts3.txt >> temp/hosts4.txt
+	awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/hosts3.txt >> temp/hosts4.txt
+	awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' temp/hosts3.txt >> temp/hosts4.txt
 
 	# Убираем домены у которых уже есть домены верхнего уровня
 	grep -E '^([^.]*\.){2}[^.]*$' temp/hosts4.txt | sed 's/^/./' > temp/exclude-patterns.txt
