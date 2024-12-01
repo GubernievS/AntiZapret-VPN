@@ -57,7 +57,7 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 			sub(/\.$/, "", $2);		# Удаление . в конце
 			print $2				# Выводим только доменные имена
 		}
-	}' | CHARSET=UTF-8 idn --no-tld | sort -u > temp/hosts.txt
+	}' | sort -u | CHARSET=UTF-8 idn --no-tld > temp/hosts.txt
 
 	# Очищаем список доменов
 	awk -f download/exclude-hosts.awk temp/hosts.txt > temp/hosts2.txt
