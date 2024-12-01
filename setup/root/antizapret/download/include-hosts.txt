@@ -51,7 +51,7 @@ discord.media
 cloudflare-ech.com
 urban-vpn.com
 viber.com
-viber.ru
+#viber.ru
 viber.me
 vb.me
 
