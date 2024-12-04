@@ -1,49 +1,28 @@
 #!/bin/bash
-
-#
-# update
-rm -rf /root/download
-mkdir -p /root/antizapret/download
-find /root/antizapret/config -type f -name '*-custom*' -exec bash -c 'mv "$0" "${0//-custom/}"' {} \;
-find /root/antizapret/config -type f -name '*-dist*' -delete
-find /root/antizapret/result -type f -name '*blocked-*' -delete
-sed -i 's/blocked //g' /etc/knot-resolver/kresd.conf
-sed -i 's/blocked-//g' /etc/knot-resolver/kresd.conf
-sed -i 's/blocked_//g' /etc/knot-resolver/kresd.conf
-mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
-#
-#
-
 set -e
-
-handle_error() {
-	echo ""
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
-	echo ""
-	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
-	exit 1
-}
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
+echo "Parse AntiZapret VPN files:"
+
 rm -f temp/*
 
 if [[ -z "$1" || "$1" == "ip" ]]; then
-	echo "Parse ips..."
+	echo "IPs..."
 
-	# Подготавливаем исходные файлы для обработки
-	sed -i 's/\r//' config/exclude-ips.txt
-	sed -i 's/\r//' config/include-ips.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-ips.txt && echo ) | sort -u > temp/exclude-ips.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-ips.txt download/include-ips.txt && echo ) | sort -u > temp/include-ips.txt
+	# Обрабатываем конфигурационные файлы
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
+	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
 
 	# Заблокированные IP-адреса
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
+
+	# Выводим результат
+	echo "IPs: $(wc -l result/ips.txt)"
 
 	# Создаем файл для OpenVPN
 	echo -n > result/DEFAULT
@@ -54,25 +33,64 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 		echo $"push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 	done < result/ips.txt
 
-	# Обновляем файл
-	cp result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
+	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
+	if [[ -f result/DEFAULT ]] && ! diff -q result/DEFAULT /etc/openvpn/server/ccd/DEFAULT; then
+		cp -v result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
+	fi
 
 	# Создаем файл для WireGuard/AmneziaWG
 	awk '{printf ", %s", $0}' result/ips.txt > result/ips
-	# Обновляем файл
-	cp result/ips /etc/wireguard/ips
 
-	# Создаем файл для ferm
-	echo "@def \$WHITELIST = (" > result/whitelist.conf
-	cat result/ips.txt >> result/whitelist.conf
-	echo ");" >> result/whitelist.conf
+	# Обновляем файл в WireGuard/AmneziaWG только если файл ips изменился
+	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
+		cp -v result/ips /etc/wireguard/ips
+	fi
 
+	# Обновляем IP-адреса в ANTIZAPRET-ACCEPT
+	if iptables -L ANTIZAPRET-ACCEPT &>/dev/null; then
+		iptables -w -F ANTIZAPRET-ACCEPT
+		while read -r line
+		do
+			iptables -w -A ANTIZAPRET-ACCEPT -d "$line" -j ACCEPT
+		done < result/ips.txt
+	fi
+
+fi
+
+if [[ -z "$1" || "$1" == "ad" ]]; then
+	echo "Adblock-hosts..."
+
+	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/adblock-hosts.txt
+	sed '/^[0-9.]*$/d' temp/adblock-hosts.txt > temp/adblock-hosts2.txt
+
+	# Обрабатываем список с исключениями из блокировки от AdGuard
+	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/adblock-pass-hosts.txt
+	sed '/^[0-9.]*$/d' temp/adblock-pass-hosts.txt | sort -u > result/adblock-pass-hosts.txt
+
+	# Обрабатываем список с рекламными доменами для блокировки от AdAway
+	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/adblock-hosts3.txt
+
+	# Объединяем AdGuard и AdAway
+	(cat temp/adblock-hosts2.txt && cat temp/adblock-hosts3.txt) | sort -u > result/adblock-hosts.txt
+	
 	# Выводим результат
-	echo "Ips: $(wc -l result/ips.txt)"
+	echo "Adblock-hosts: $(wc -l result/adblock-hosts.txt)"
+	echo "Adblock-pass-hosts: $(wc -l result/adblock-pass-hosts.txt)"
+
+	# Создаем файл для Knot Resolver
+	sed 's/$/ CNAME ./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
+	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/adblock-pass-hosts.txt >> result/adblock-hosts.rpz
+
+	# Обновляем файл в Knot Resolver только если файл adblock-hosts.rpz изменился
+	if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
+		cp -v result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz
+	fi
+
 fi
 
 if [[ -z "$1" || "$1" == "host" ]]; then
-	echo "Parse hosts..."
+	echo "Hosts..."
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -83,100 +101,51 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 			sub(/\.$/, "", $2);		# Удаление . в конце
 			print $2				# Выводим только доменные имена
 		}
-	}' | CHARSET=UTF-8 idn --no-tld | sort -u > temp/hosts.txt
+	}' | sort -u | CHARSET=UTF-8 idn --no-tld > temp/hosts.txt
 
-	# Очищаем список доменов
-	awk -f download/exclude-hosts.awk temp/hosts.txt > temp/hosts2.txt
+	# Удаляем не существующие домены
+	grep -vFxf download/nxdomain.txt temp/hosts.txt > temp/hosts2.txt
 
-	# Подготавливаем исходные файлы для обработки
-	sed -i 's/\r//' config/exclude-hosts.txt
-	sed -i 's/\r//' config/include-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/exclude-hosts.txt download/exclude-hosts.txt && \
-		echo && cat download/nxdomain.txt ) | sort -u > temp/exclude-hosts.txt
-	( sed -E '/^#/d; s/[[:space:]]+//g' config/include-hosts.txt download/include-hosts.txt && \
-		echo && cat temp/hosts2.txt) | sort -u > temp/include-hosts.txt
+	# Обрабатываем конфигурационные файлы
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/pass-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt | sort -u >> temp/hosts2.txt
 
-	# Убираем домены из исключений
-	awk 'NR==FNR {exclude[$0]; next} !($0 in exclude)' temp/exclude-hosts.txt temp/include-hosts.txt > temp/hosts3.txt
+	# Удаляем домены у которых уже есть домены верхнего уровня
+	grep -E '^([^.]*\.){6}[^.]*$' temp/hosts2.txt | sed 's/^/./' > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/hosts2.txt | sort -u > temp/hosts3.txt
 
-	# Находим дубли и если домен повторяется больше 10 раз добавляем домен верхнего уровня
-	# Пропускаем домены типа co.uk, net.ru, msk.ru и тд - длинна которых меньше или равна 6
-	cp temp/hosts3.txt temp/hosts4.txt
-	awk -F '.' '{ key = $(NF-1) "." $NF; if (length(key) > 6) count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
-		temp/hosts3.txt >> temp/hosts4.txt
-	awk -F '.' 'NF >= 3 { key = $(NF-2) "." $(NF-1) "." $NF; count[key]++ } END { for (k in count) if (count[k] > 10) print k }' \
-		temp/hosts3.txt >> temp/hosts4.txt
+	grep -E '^([^.]*\.){5}[^.]*$' temp/hosts3.txt | sed 's/^/./' > temp/exclude-patterns2.txt
+	grep -vFf temp/exclude-patterns2.txt temp/hosts3.txt | sort -u > temp/hosts4.txt
 
-	# Убираем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){2}[^.]*$' temp/hosts4.txt | sed 's/^/./' > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/hosts4.txt | sort -u > temp/hosts5.txt
+	grep -E '^([^.]*\.){4}[^.]*$' temp/hosts4.txt | sed 's/^/./' > temp/exclude-patterns3.txt
+	grep -vFf temp/exclude-patterns3.txt temp/hosts4.txt | sort -u > temp/hosts5.txt
 
-	grep -E '^([^.]*\.){1}[^.]*$' temp/hosts5.txt | sed 's/^/./' > temp/exclude-patterns2.txt
-	grep -vFf temp/exclude-patterns2.txt temp/hosts5.txt | sort -u > temp/hosts6.txt
+	grep -E '^([^.]*\.){3}[^.]*$' temp/hosts5.txt | sed 's/^/./' > temp/exclude-patterns4.txt
+	grep -vFf temp/exclude-patterns4.txt temp/hosts5.txt | sort -u > temp/hosts6.txt
 
-	grep -E '^([^.]*\.){0}[^.]*$' temp/hosts6.txt | sed 's/^/./' > temp/exclude-patterns3.txt
-	grep -vFf temp/exclude-patterns3.txt temp/hosts6.txt | sort -u > result/hosts.txt
+	grep -E '^([^.]*\.){2}[^.]*$' temp/hosts6.txt | sed 's/^/./' > temp/exclude-patterns5.txt
+	grep -vFf temp/exclude-patterns5.txt temp/hosts6.txt | sort -u > temp/hosts7.txt
 
-	# Создаем файл для Knot Resolver
-	echo 'hosts = {' > result/hosts.conf
-	while read -r line
-	do
-		line="$line."
-		echo "${line@Q}," >> result/hosts.conf
-	done < result/hosts.txt
-	echo '}' >> result/hosts.conf
+	grep -E '^([^.]*\.){1}[^.]*$' temp/hosts7.txt | sed 's/^/./' > temp/exclude-patterns6.txt
+	grep -vFf temp/exclude-patterns6.txt temp/hosts7.txt | sort -u > temp/hosts8.txt
+
+	grep -E '^([^.]*\.){0}[^.]*$' temp/hosts8.txt | sed 's/^/./' > temp/exclude-patterns7.txt
+	grep -vFf temp/exclude-patterns7.txt temp/hosts8.txt | sort -u > result/hosts.txt
 
 	# Выводим результат
 	echo "Hosts: $(wc -l result/hosts.txt)"
-fi
+	echo "Pass-hosts: $(wc -l result/pass-hosts.txt)"
 
-if [[ -z "$1" || "$1" == "ad" ]]; then
-	echo "Parse adblock-hosts..."
+	# Создаем файл для Knot Resolver
+	sed 's/$/ CNAME ./; p; s/^/*./' result/hosts.txt > result/hosts.rpz
+	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/pass-hosts.txt >> result/hosts.rpz
 
-	sed -E 's/(\|[^-.]*)\*\./\1./g' download/adblock.txt > temp/adblock2.txt
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' temp/adblock2.txt | sort -u > temp/adblock3.txt
-	sed '/^[0-9.]*$/d' temp/adblock3.txt > result/adblock-hosts.txt
-	sed 's/$/ CNAME ./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
-
-	# Выводим результат
-	echo "Adblock-hosts: $(wc -l result/adblock-hosts.txt)"
-fi
-
-# Обновляем файл и перезапускаем сервисы ferm, dnsmap и kresd@1 только если файл whitelist.conf изменился
-if [[ -f result/whitelist.conf ]] && ! diff -q result/whitelist.conf /etc/ferm/whitelist.conf; then
-	cp result/whitelist.conf /etc/ferm/whitelist.conf
-	RESTART_FERM_DNSMAP=true
-	RESTART_KRESD=true
-fi
-
-# Обновляем файл и перезапускаем сервис kresd@1 только если файл hosts.conf изменился
-if [[ -f result/hosts.conf ]] && ! diff -q result/hosts.conf /etc/knot-resolver/hosts.conf; then
-	cp result/hosts.conf /etc/knot-resolver/hosts.conf
-	RESTART_KRESD=true
-fi
-
-# Обновляем файл и перезапускаем сервис kresd@1 только если файл adblock-hosts.rpz изменился
-if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
-	cp result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz
-	RESTART_KRESD=true
-fi
-
-if [[ "$RESTART_FERM_DNSMAP" == true ]]; then
-	if systemctl is-active --quiet ferm; then
-		echo "Restart ferm"
-		systemctl restart ferm
+	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
+	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
+		cp -v result/hosts.rpz /etc/knot-resolver/hosts.rpz
+		echo "cache.clear()" | socat - /run/knot-resolver/control/1 &>/dev/null
 	fi
-	if systemctl is-active --quiet dnsmap; then
-		echo "Restart dnsmap"
-		systemctl restart dnsmap
-	fi
-fi
 
-if [[ "$RESTART_KRESD" == true ]]; then
-	if systemctl is-active --quiet kresd@1; then
-		echo "Restart kresd@1"
-		systemctl restart kresd@1
-	fi
 fi
 
 exit 0

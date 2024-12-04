@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-import socket,struct,subprocess
+import socket,struct,subprocess,os
 from collections import deque
 from ipaddress import IPv4Network
 from dnslib import DNSRecord,RCODE,QTYPE,A
@@ -37,14 +37,13 @@ class ProxyResolver(BaseResolver):
         self.unassigned_addresses = deque([str(x) for x in IPv4Network(iprange).hosts()])
         self.ipmap = {}
 
-        # Load existing mappings
-        get_mappings = "iptables-legacy -w -t nat -nL dnsmap | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
-        output = subprocess.check_output(get_mappings, shell=True, encoding='utf-8')
+        # Load existing mapping
+        get_mapping = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
+        output = subprocess.check_output(get_mapping, shell=True, encoding='utf-8')
         for mapped in output.split("\n"):
             if mapped:
                 fake_addr, real_addr = mapped.split(' ')
                 self.add_mapping(real_addr, fake_addr) or sys.exit(1)
-        #self.unassigned_addresses.remove()
 
     def get_mapping(self,real_addr):
         return self.ipmap.get(real_addr)
@@ -68,10 +67,10 @@ class ProxyResolver(BaseResolver):
                 fake_addr = self.unassigned_addresses.popleft()
             except IndexError:
                 print("ERROR: No IP addresses left!!!")
-                return False
+                os._exit(1)
             print('Mapping {} to {}'.format(fake_addr, real_addr))
             self.ipmap[real_addr]=fake_addr
-            set_mapping = f"iptables-legacy -w -t nat -A dnsmap -d '{fake_addr}' -j DNAT --to '{real_addr}'"
+            set_mapping = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d '{fake_addr}' -j DNAT --to '{real_addr}'"
             subprocess.call(set_mapping, shell=True, encoding='utf-8')
             return fake_addr
         return True
@@ -87,7 +86,6 @@ class ProxyResolver(BaseResolver):
             if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
                 print('GOT AAAA or HTTPS')
                 reply = request.reply()
-                reply.header.rcode = getattr(RCODE, 'REFUSED')
                 return reply
 
             if request.q.qtype == QTYPE.A:
@@ -127,7 +125,6 @@ class ProxyResolver(BaseResolver):
         except socket.timeout:
             reply = request.reply()
             reply.header.rcode = getattr(RCODE,'NXDOMAIN')
-
         return reply
 
 class PassthroughDNSHandler(DNSHandler):
@@ -152,7 +149,6 @@ class PassthroughDNSHandler(DNSHandler):
 
         reply = DNSRecord.parse(response)
         self.log_reply(reply)
-
         return response
 
 def send_tcp(data,host,port):

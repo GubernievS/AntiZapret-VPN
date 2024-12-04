@@ -1,5 +1,5 @@
 [Unit]
-Description=antizapret-vpn update
+Description=AntiZapret VPN update
 After=network-online.target
 Wants=network-online.target
 

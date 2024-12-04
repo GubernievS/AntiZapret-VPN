@@ -1,5 +1,5 @@
 [Unit]
-Description=antizapret-vpn daily update between 2:00 and 4:00
+Description=AntiZapret VPN daily update between 2:00 and 4:00
 
 [Timer]
 OnCalendar=*-*-* 02:00:00

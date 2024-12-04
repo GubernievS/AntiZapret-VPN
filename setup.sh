@@ -11,12 +11,18 @@ systemctl stop openvpn-generate-keys &>/dev/null
 systemctl disable openvpn-generate-keys &>/dev/null
 systemctl stop openvpn-server@antizapret &>/dev/null
 systemctl disable openvpn-server@antizapret &>/dev/null
+systemctl stop dnsmap &>/dev/null
+systemctl disable dnsmap &>/dev/null
+systemctl stop ferm &>/dev/null
+systemctl disable ferm &>/dev/null
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
+rm -f /etc/knot-resolver/hosts.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/sysctl.d/20-network.conf
 rm -f /etc/systemd/network/eth.network
 rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
+rm -f /etc/systemd/system/dnsmap.service
 rm -f /etc/openvpn/server/antizapret.conf
 rm -f /etc/openvpn/server/logs/*
 rm -f /etc/openvpn/server/keys/dh2048.pem
@@ -35,13 +41,14 @@ rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
 rm -rf /root/antizapret/dnsmap
+rm -rf /etc/ferm
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir -p /root/easyrsa3
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
 fi
 mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
-apt-get purge python3-dnslib gnupg2 amneziawg &>/dev/null
+apt-get purge python3-dnslib gnupg2 amneziawg ferm &>/dev/null
 
 #
 # Завершим выполнение скрипта при ошибке
@@ -58,6 +65,8 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+#
+# Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
 	echo "OpenVZ and LXC is not supported!"
 	exit 2
@@ -114,8 +123,8 @@ until [[ $OPENVPN_DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
 echo ""
-until [[ $ADBLOCK =~ (y|n) ]]; do
-	read -rp $'Enable block ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*)? [y/n]: ' -e -i y ADBLOCK
+until [[ $ANTIZAPRET_ADBLOCK =~ (y|n) ]]; do
+	read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
@@ -144,6 +153,10 @@ until [[ $OPENVPN_DUPLICATE =~ (y|n) ]]; do
 	read -rp "Allow multiple clients connecting to OpenVPN using the same configuration file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
+until [[ $INSTALL_SSHGUARD =~ (y|n) ]]; do
+	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
+done
+echo ""
 
 #
 # Удалим скомпилированный патченный OpenVPN
@@ -156,7 +169,7 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
-# Отключим ipv6
+# Отключим IPv6 на время установки
 if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
 	sysctl -w net.ipv6.conf.all.disable_ipv6=1
 fi
@@ -176,13 +189,24 @@ curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
+# Добавим репозиторий Debian Backports
+if [[ $OS == "debian" ]]; then
+	echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
+fi
+
+#
 # Обновляем систему
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa ferm gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat
+if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
+	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
+else
+	apt-get purge sshguard &>/dev/null || true
+fi
 apt-get autoremove -y
 apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
@@ -202,7 +226,7 @@ rm -rf /root/wireguard
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
-find "$SCRIPT_DIR" -name '.gitkeep' -delete
+find $SCRIPT_DIR -name '.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r $SCRIPT_DIR/setup/* /
 rm -rf $SCRIPT_DIR
@@ -217,9 +241,9 @@ chmod +x /root/antizapret/proxy.py
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$ALTERNATIVE_IP" == "y" ]]; then
 	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
+	sed -i 's/10\./172\./g' /root/antizapret/iptables-up.sh
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
-	sed -i 's/10\./172\./g' /etc/ferm/ferm.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
 	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
 else
@@ -228,7 +252,7 @@ fi
 
 #
 # Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
-if [[ "$ADBLOCK" == "n" ]]; then
+if [[ "$ANTIZAPRET_ADBLOCK" == "n" ]]; then
 	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
 fi
 
@@ -246,14 +270,14 @@ fi
 # Не используем резервные порты 80 и 443 для OpenVPN TCP
 if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
 	sed -i '/ \(80\|443\) tcp/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/tcp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
+	sed -i '/tcp.* \(80\|443\)/s/^/#/' /root/antizapret/iptables-up.sh
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN UDP
 if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
 	sed -i '/ \(80\|443\) udp/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/udp.* \(80\|443\)/s/^/#/' /etc/ferm/ferm.conf
+	sed -i '/udp.* \(80\|443\)/s/^/#/' /root/antizapret/iptables-up.sh
 fi
 
 #
@@ -267,7 +291,9 @@ fi
 DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
 for PROXY_DNS in $DNS_SERVERS; do
 	if dig @$PROXY_DNS fb.com +short +dnssec &>/dev/null; then
-		sed -i "s/127\.0\.0\.53/$PROXY_DNS/g" /root/antizapret/proxy.py
+		if [ "$PROXY_DNS" != "127.0.0.53" ]; then
+			sed -i "s/127\.0\.0\.53/$PROXY_DNS/g" /root/antizapret/proxy.py
+		fi
 		break
 	fi
 done
@@ -285,7 +311,7 @@ done
 #
 # Включим нужные службы
 systemctl enable kresd@1
-systemctl enable dnsmap
+systemctl enable antizapret
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
 systemctl enable openvpn-server@antizapret-udp
@@ -299,10 +325,6 @@ systemctl enable wg-quick@vpn
 # Отключим ненужные службы
 systemctl disable ufw &>/dev/null || true
 systemctl disable firewalld &>/dev/null || true
-
-#
-# Сохраним текущие правила iptables для ferm
-import-ferm > /etc/ferm/iptables.conf || true
 
 ERRORS=""
 
@@ -328,13 +350,14 @@ fi
 # Сохраняем настройки
 echo "OPENVPN_PATCH=${OPENVPN_PATCH}
 OPENVPN_DCO=${OPENVPN_DCO}
-ADBLOCK=${ADBLOCK}
+ANTIZAPRET_ADBLOCK=${ANTIZAPRET_ADBLOCK}
 VPN_DNS=${VPN_DNS}
 ALTERNATIVE_IP=${ALTERNATIVE_IP}
 OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
 OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
 OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
-PROXY_DNS=${PROXY_DNS}" > /root/antizapret/settings
+INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
+PROXY_DNS=${PROXY_DNS}" > /root/antizapret/setup
 
 echo ""
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
