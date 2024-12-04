@@ -1,4 +1,5 @@
 #!/bin/bash
+
 exec 2>/dev/null
 
 INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
