@@ -201,7 +201,7 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
 else
