@@ -266,7 +266,7 @@ elif [[ "$TYPE" == "init" || "$TYPE" == "recreate" ]]; then
 
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
-		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | while read -r line; do
+		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sort -u | while read -r line; do
 			if [[ "$line" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				/root/add-client.sh ov "$line" >/dev/null
 				echo "OpenVPN configuration files for the client '$line' have been recreated in '/root/vpn'"
