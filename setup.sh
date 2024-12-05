@@ -157,6 +157,10 @@ until [[ $INSTALL_SSHGUARD =~ (y|n) ]]; do
 	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
 done
 echo ""
+until [[ $PROTECT_SERVER =~ (y|n) ]]; do
+	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
+done
+echo ""
 
 #
 # Удалим скомпилированный патченный OpenVPN
@@ -287,6 +291,12 @@ if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
 fi
 
 #
+# Отключаем защиту от сетевых атак и сканирования
+if [[ "$PROTECT_SERVER" == "n" ]]; then
+	sed -i '/\(ANTIZAPRET-BLOCKLIST\|echo-request\)/s/^/#/' /root/antizapret/iptables-up.sh
+fi
+
+#
 # Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
 DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
 for PROXY_DNS in $DNS_SERVERS; do
@@ -357,6 +367,7 @@ OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
 OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
 OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
+PROTECT_SERVER=${PROTECT_SERVER}
 PROXY_DNS=${PROXY_DNS}" > /root/antizapret/setup
 
 echo ""
