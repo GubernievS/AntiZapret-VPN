@@ -6,7 +6,9 @@ INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 
 # filter
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
-iptables -w -D INPUT -i "$INTERFACE" -p icmp -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --set
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --update --seconds 10 --hitcount 5 -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACCEPT
