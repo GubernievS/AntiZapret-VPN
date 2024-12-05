@@ -18,6 +18,7 @@ iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACC
 iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable
 iptables -w -D FORWARD -s 172.28.0.0/15 -j ACCEPT
 iptables -w -D FORWARD -j REJECT --reject-with icmp-port-unreachable
+iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 iptables -w -F ANTIZAPRET-ACCEPT
 iptables -w -X ANTIZAPRET-ACCEPT
 
