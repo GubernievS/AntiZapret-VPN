@@ -16,6 +16,8 @@ fi
 # filter
 # INPUT connection tracking
 iptables -w -A INPUT -m conntrack --ctstate INVALID -j DROP
+# ICMP ignore
+iptables -w -A INPUT -i "$INTERFACE" -p icmp -j DROP
 # FORWARD connection tracking
 iptables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
