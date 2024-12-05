@@ -36,6 +36,8 @@ done < result/ips.txt
 iptables -w -A FORWARD -s 10.28.0.0/15 -j ACCEPT
 # REJECT other packets
 iptables -w -A FORWARD -j REJECT --reject-with icmp-port-unreachable
+# OUTPUT connection tracking
+iptables -w -A OUTPUT -m conntrack --ctstate INVALID -j DROP
 
 # nat
 # OpenVPN TCP port redirection for backup connections
