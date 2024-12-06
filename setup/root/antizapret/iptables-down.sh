@@ -7,6 +7,8 @@ INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 # filter
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -p tcp -m multiport --dports 22,80,443,50080,50443 -j ACCEPT
+iptables -w -D INPUT -i "$INTERFACE" -p udp -m multiport --dports 80,443,50080,50443,51080,51443,52080,52443 -j ACCEPT
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --set
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --update --seconds 10 --hitcount 5 -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
