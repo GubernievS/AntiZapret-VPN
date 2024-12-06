@@ -48,6 +48,7 @@ if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 fi
 mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
+/root/antizapret/iptables-down.sh &>/dev/null
 apt-get purge python3-dnslib gnupg2 amneziawg ferm &>/dev/null
 
 #
