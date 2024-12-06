@@ -16,11 +16,11 @@ fi
 # filter
 # INPUT connection tracking
 iptables -w -A INPUT -m conntrack --ctstate INVALID -j DROP
+# Ping ignore
+iptables -w -A INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 # Attack and scan protection
 iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --set
 iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --update --seconds 10 --hitcount 5 -j DROP
-# Ping ignore
-iptables -w -A INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 # FORWARD connection tracking
 iptables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
