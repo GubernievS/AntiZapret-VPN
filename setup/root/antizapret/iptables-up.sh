@@ -16,8 +16,11 @@ fi
 # filter
 # INPUT connection tracking
 iptables -w -A INPUT -m conntrack --ctstate INVALID -j DROP
-# Ping ignore
+# DROP ping request
 iptables -w -A INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
+# ACCEPT ports
+iptables -w -A INPUT -i "$INTERFACE" -p tcp -m multiport --dports 22,80,443,50080,50443 -j ACCEPT
+iptables -w -A INPUT -i "$INTERFACE" -p udp -m multiport --dports 80,443,50080,50443,51080,51443,52080,52443 -j ACCEPT
 # Attack and scan protection
 iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --set
 iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --update --seconds 10 --hitcount 5 -j DROP
