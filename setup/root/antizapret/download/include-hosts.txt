@@ -1,12 +1,14 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 # Список от GubernievS и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
 youtube.com
+youtubekids.com
 googlevideo.com
 ytimg.com
 ggpht.com
 googleapis.com
 gstatic.com
 youtu.be
+yt.be
 googleusercontent.com
 gvt1.com
 gvt2.com
