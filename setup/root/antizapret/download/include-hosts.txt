@@ -2,6 +2,7 @@
 # Список от GubernievS и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
 youtube.com
 youtube-nocookie.com
+youtubeeducation.com
 youtubekids.com
 googlevideo.com
 ytimg.com
