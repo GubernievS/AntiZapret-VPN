@@ -6,11 +6,13 @@ INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 
 # filter
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-newlist src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 200/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-connect --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist src -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-newlist src,dst
+ipset destroy antizapret-blocklist
+ipset destroy antizapret-newlist
 iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
-iptables -w -D INPUT -i "$INTERFACE" -p tcp -m multiport --dports 22,80,443,50080,50443 -j ACCEPT
-iptables -w -D INPUT -i "$INTERFACE" -p udp -m multiport --dports 80,443,50080,50443,51080,51443,52080,52443 -j ACCEPT
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --set
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m recent --name ANTIZAPRET-BLOCKLIST --update --seconds 10 --hitcount 11 -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACCEPT

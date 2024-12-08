@@ -206,7 +206,7 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 
 #
 # Ставим необходимые пакеты
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues ipset
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
 else
@@ -294,7 +294,7 @@ fi
 #
 # Отключаем защиту от сетевых атак и сканирования
 if [[ "$PROTECT_SERVER" == "n" ]]; then
-	sed -i '/\(ANTIZAPRET-BLOCKLIST\|echo-request\)/s/^/#/' /root/antizapret/iptables-up.sh
+	sed -i '/\(antizapret-blocklist\|antizapret-newlist\|echo-request\)/s/^/#/' /root/antizapret/iptables-up.sh
 fi
 
 #
