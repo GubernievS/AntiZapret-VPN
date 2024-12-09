@@ -406,11 +406,16 @@ yeggi.com
 omv-extras.org
 notebooklm.google.com
 softwareupdate.vmware.com
+docs.vmware.com
 members.summerana.com
 anythingllm.com
 wikidot.com
 logo.com
 pcmag.com
+foxitsoftware.com
+mixupload.com
+codeium.com
+gateway.pinata.cloud
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
