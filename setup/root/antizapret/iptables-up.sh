@@ -9,8 +9,8 @@ cd "$HERE"
 
 INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 if [[ -z "$INTERFACE" ]]; then
-    echo "Default network interface not found!"
-    exit 1
+	echo "Default network interface not found!"
+	exit 1
 fi
 
 # filter
