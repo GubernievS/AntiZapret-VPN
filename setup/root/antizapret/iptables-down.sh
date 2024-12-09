@@ -7,7 +7,7 @@ INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 # filter
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-newlist src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 200/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-connect --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-connect --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist src -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-newlist src,dst
 ipset destroy antizapret-blocklist
