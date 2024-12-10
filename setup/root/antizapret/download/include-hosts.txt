@@ -249,7 +249,7 @@ tiktokcdn-eu.com
 tiktokcdn-us.com
 ttwstatic.com
 lookerstudio.google.com
-loudflareinsights.com
+#cloudflareinsights.com
 soapui.org
 spotify.com
 githubcopilot.com
