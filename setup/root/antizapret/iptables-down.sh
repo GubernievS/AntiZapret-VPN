@@ -26,10 +26,6 @@ ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist6 src,dst
 ipset destroy antizapret-blocklist6
 ipset destroy antizapret-watchlist6
-# OpenVPN TCP ports attack and scan protection
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m bpf --bytecode "23,48 0 0 0,84 0 0 240,21 19 0 96,48 0 0 0,84 0 0 240,21 0 16 64,48 0 0 9,21 0 14 17,40 0 0 6,69 12 0 8191,177 0 0 0,72 0 0 2,21 0 9 50080,80 0 0 8,21 0 7 56,64 0 0 37,21 0 5 1,80 0 0 45,21 0 3 0,64 0 0 46,21 0 1 0,6 0 0 65535,6 0 0 0" -j ACCEPT
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m bpf --bytecode "23,48 0 0 0,84 0 0 240,21 19 0 96,48 0 0 0,84 0 0 240,21 0 16 64,48 0 0 9,21 0 14 17,40 0 0 6,69 12 0 8191,177 0 0 0,72 0 0 2,21 0 9 50443,80 0 0 8,21 0 7 56,64 0 0 37,21 0 5 1,80 0 0 45,21 0 3 0,64 0 0 46,21 0 1 0,6 0 0 65535,6 0 0 0" -j ACCEPT
-iptables -w -D INPUT -i "$INTERFACE" -p tcp -m conntrack --ctstate NEW -m multiport --dports 50080,50443 -j DROP
 # FORWARD connection tracking
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
