@@ -17,13 +17,13 @@ ip6tables -w -D INPUT -i "$INTERFACE" -p icmpv6 -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watchlist src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-conn --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist src -j DROP
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist src,dst --exist
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist src,dst
 ipset destroy antizapret-blocklist
 ipset destroy antizapret-watchlist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watchlist6 src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-conn --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist6 src -j DROP
-ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist6 src,dst --exist
+ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist6 src,dst
 ipset destroy antizapret-blocklist6
 ipset destroy antizapret-watchlist6
 # OpenVPN TCP ports attack and scan protection
