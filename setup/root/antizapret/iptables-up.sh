@@ -16,18 +16,34 @@ fi
 # filter
 # INPUT connection tracking
 iptables -w -A INPUT -m conntrack --ctstate INVALID -j DROP
-# DROP ping request
-iptables -w -A INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
+ip6tables -w -A INPUT -m conntrack --ctstate INVALID -j DROP
+# DROP all ICMP-packets except ICMP Fragmentation Needed and ICMPv6 Packet Too Big
+iptables -w -A INPUT -i "$INTERFACE" -p icmp --icmp-type fragmentation-needed -j ACCEPT
+iptables -w -A INPUT -i "$INTERFACE" -p icmp -j DROP
+ip6tables -w -A INPUT -i "$INTERFACE" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
+ip6tables -w -A INPUT -i "$INTERFACE" -p icmpv6 -j DROP
 # Attack and scan protection
 ipset create antizapret-blocklist hash:ip timeout 600
-ipset create antizapret-newlist hash:ip,port timeout 10
-iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-newlist src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
-iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-connect --hashlimit-htable-expire 10000 -j SET --add-set antizapret-blocklist src --exist
+ipset create antizapret-watchlist hash:ip,port timeout 20
+iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watchlist src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist src --exist
+iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-conn --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist src --exist
 iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist src -j DROP
-iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-newlist src,dst
+iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist src,dst
+ipset create antizapret-blocklist6 hash:ip timeout 600 family inet6
+ipset create antizapret-watchlist6 hash:ip,port timeout 20 family inet6
+ip6tables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watchlist6 src,dst -m hashlimit --hashlimit-above 1/min --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-name antizapret-port --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist6 src --exist
+ip6tables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100/min --hashlimit-burst 1000 --hashlimit-mode srcip --hashlimit-name antizapret-conn --hashlimit-htable-expire 20000 -j SET --add-set antizapret-blocklist6 src --exist
+ip6tables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-blocklist6 src -j DROP
+ip6tables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watchlist6 src,dst
+# OpenVPN TCP ports attack and scan protection
+iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m bpf --bytecode "23,48 0 0 0,84 0 0 240,21 19 0 96,48 0 0 0,84 0 0 240,21 0 16 64,48 0 0 9,21 0 14 17,40 0 0 6,69 12 0 8191,177 0 0 0,72 0 0 2,21 0 9 50080,80 0 0 8,21 0 7 56,64 0 0 37,21 0 5 1,80 0 0 45,21 0 3 0,64 0 0 46,21 0 1 0,6 0 0 65535,6 0 0 0" -j ACCEPT
+iptables -w -A INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m bpf --bytecode "23,48 0 0 0,84 0 0 240,21 19 0 96,48 0 0 0,84 0 0 240,21 0 16 64,48 0 0 9,21 0 14 17,40 0 0 6,69 12 0 8191,177 0 0 0,72 0 0 2,21 0 9 50443,80 0 0 8,21 0 7 56,64 0 0 37,21 0 5 1,80 0 0 45,21 0 3 0,64 0 0 46,21 0 1 0,6 0 0 65535,6 0 0 0" -j ACCEPT
+iptables -w -A INPUT -i "$INTERFACE" -p tcp -m conntrack --ctstate NEW -m multiport --dports 50080,50443 -j DROP
 # FORWARD connection tracking
 iptables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
+ip6tables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 # ANTIZAPRET-ACCEPT
 iptables -w -N ANTIZAPRET-ACCEPT
 iptables -w -A FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACCEPT
@@ -42,6 +58,7 @@ iptables -w -A FORWARD -s 10.28.0.0/15 -j ACCEPT
 iptables -w -A FORWARD -j REJECT --reject-with icmp-port-unreachable
 # OUTPUT connection tracking
 iptables -w -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -A OUTPUT -m conntrack --ctstate INVALID -j DROP
 
 # nat
 # OpenVPN TCP port redirection for backup connections
