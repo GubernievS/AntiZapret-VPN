@@ -417,6 +417,7 @@ mixupload.com
 codeium.com
 gateway.pinata.cloud
 ai.google.dev
+clients6.google.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
