@@ -419,6 +419,7 @@ gateway.pinata.cloud
 ai.google.dev
 alkalimakersuite-pa.clients6.google.com
 iaai.com
+erista.me
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
