@@ -54,10 +54,10 @@ discord.media
 #store.fastly.steamstatic.com
 cloudflare-ech.com
 urban-vpn.com
-#viber.com
-#viber.ru
-#viber.me
-#vb.me
+viber.com
+viber.ru
+viber.me
+vb.me
 sibnet.ru
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
