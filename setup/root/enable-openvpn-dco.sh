@@ -32,10 +32,10 @@ sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
 sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
 sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-udp.conf
 sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-tcp.conf
-echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antizapret-udp.conf
-echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/antizapret-tcp.conf
-echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-udp.conf
-echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM\"" >> /etc/openvpn/server/vpn-tcp.conf
+echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/antizapret-udp.conf
+echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/antizapret-tcp.conf
+echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/vpn-udp.conf
+echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/vpn-tcp.conf
 systemctl restart openvpn-server@*
 echo ""
 echo "Successful enable OpenVPN DCO!"

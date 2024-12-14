@@ -119,7 +119,7 @@ until [[ $OPENVPN_PATCH =~ ^[0-2]$ ]]; do
 	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
 echo ""
-echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM and AES-256-GCM encryption protocols"
+echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
 until [[ $OPENVPN_DCO =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
