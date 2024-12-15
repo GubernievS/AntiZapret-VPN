@@ -101,14 +101,17 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 		systemctl stop openvpn-server@antizapret-udp
 		systemctl stop openvpn-server@antizapret-tcp
+		systemctl stop openvpn-server@antizapret-no-cipher
 		systemctl stop openvpn-server@vpn-udp
 		systemctl stop openvpn-server@vpn-tcp
 		systemctl disable openvpn-server@antizapret-udp
 		systemctl disable openvpn-server@antizapret-tcp
+		systemctl disable openvpn-server@antizapret-no-cipher
 		systemctl disable openvpn-server@vpn-udp
 		systemctl disable openvpn-server@vpn-tcp
 		systemctl enable --now openvpn-server@antizapret-udp
 		systemctl enable --now openvpn-server@antizapret-tcp
+		systemctl enable --now openvpn-server@antizapret-no-cipher
 		systemctl enable --now openvpn-server@vpn-udp
 		systemctl enable --now openvpn-server@vpn-tcp
 	fi
@@ -140,6 +143,7 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	FILE_NAME="${NAME}-${SERVER_IP}"
 	render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/vpn/antizapret-$FILE_NAME-udp.ovpn"
 	render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/vpn/antizapret-$FILE_NAME-tcp.ovpn"
+	render "/etc/openvpn/client/templates/antizapret-no-cipher.conf" > "/root/vpn/antizapret-$FILE_NAME-no-cipher.ovpn"
 	render "/etc/openvpn/client/templates/antizapret.conf" > "/root/vpn/antizapret-$FILE_NAME.ovpn"
 	render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn/vpn-$FILE_NAME-udp.ovpn"
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn/vpn-$FILE_NAME-tcp.ovpn"

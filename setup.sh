@@ -327,6 +327,7 @@ systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
+systemctl enable openvpn-server@antizapret-no-cipher
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret
