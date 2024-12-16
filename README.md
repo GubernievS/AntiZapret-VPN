@@ -137,6 +137,8 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 
 Недорогие сервера в Европе с ограничением скорости до 100 Mbit/s принимающие рубли:
 - SWE-PROMO (Стокгольм) от [aeza.net](https://aeza.net/?ref=529527) - доступность для заказа SWE-PROMO можно отслеживать через [aezastatus_bot](https://t.me/aezastatus_bot)
+- PROMO-Platinum (Франкфурт-на-Майне) от [h2.nexus](https://h2.nexus)
+- PROMO-Platinum-NewYear (Франкфурт-на-Майне) от [h2.nexus](https://h2.nexus) - Ограниченный новогодний тариф с бесплатным гигабитом
 
 Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект
 ***
