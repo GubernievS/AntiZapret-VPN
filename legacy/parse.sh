@@ -132,7 +132,8 @@ fi
 
 # Обновляем файл и перезапускаем сервис kresd@1 только если файл adblock-hosts.rpz изменился
 if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
-	cp result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz
+	cp result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
+	mv -f /etc/knot-resolver/adblock-hosts.temp /etc/knot-resolver/adblock-hosts.rpz
 	RESTART_KRESD=true
 fi
 
