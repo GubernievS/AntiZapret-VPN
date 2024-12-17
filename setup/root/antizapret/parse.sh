@@ -84,7 +84,8 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 
 	# Обновляем файл в Knot Resolver только если файл adblock-hosts.rpz изменился
 	if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
-		cp -v result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz
+		cp -v result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
+		mv -f /etc/knot-resolver/adblock-hosts.temp /etc/knot-resolver/adblock-hosts.rpz
 	fi
 
 fi
@@ -142,7 +143,8 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
 	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
-		cp -v result/hosts.rpz /etc/knot-resolver/hosts.rpz
+		cp -v result/hosts.rpz /etc/knot-resolver/hosts.temp
+		mv -f /etc/knot-resolver/hosts.temp /etc/knot-resolver/hosts.rpz
 		echo "cache.clear()" | socat - /run/knot-resolver/control/1 &>/dev/null
 	fi
 
