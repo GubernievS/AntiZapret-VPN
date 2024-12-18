@@ -136,7 +136,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 
 cd /usr/local/src/openvpn
 chmod +x ./configure
-./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4
+./configure --enable-systemd=yes --disable-debug --disable-lzo --disable-lz4 --disable-ofb-cfb --disable-ntlm --disable-plugins --disable-management --disable-fragment --disable-port-share --disable-wolfssl-options-h
 make
 make install
 systemctl daemon-reload
