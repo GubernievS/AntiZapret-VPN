@@ -35,6 +35,7 @@ rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
+rm -f /root/create-swap.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
 rm -rf /root/easy-rsa-ipsec
@@ -372,6 +373,19 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
 PROXY_DNS=${PROXY_DNS}" > /root/antizapret/setup
+
+#
+# Создадим файл подкачки размером 512 Мб если его нет
+if [[ -z "$(swapon --show)" ]]; then
+	set +e
+	SWAPFILE="/swapfile"
+	SWAPSIZE=512
+	dd if=/dev/zero of=$SWAPFILE bs=1M count=$SWAPSIZE
+	chmod 600 "$SWAPFILE"
+	mkswap "$SWAPFILE"
+	swapon "$SWAPFILE"
+	echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
+fi
 
 echo ""
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
