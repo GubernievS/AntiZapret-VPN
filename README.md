@@ -49,7 +49,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 2. В терминале под root выполнить
 ```sh
-wget -O- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh | bash
+bash <(wget -qO- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh)
 ```
 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
