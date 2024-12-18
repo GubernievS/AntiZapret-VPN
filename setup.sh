@@ -81,7 +81,6 @@ if [[ "$EUID" -ne 0 ]]; then
 	exit 3
 fi
 
-SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 cd /root
 
 #
@@ -219,24 +218,29 @@ apt-get autoclean
 PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
+# Клонируем репозиторий
+rm -rf /tmp/antizapret
+git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
+
+#
 # Сохраняем пользовательские настройки и пользовательский обработчик custom.sh
-mv -f /root/antizapret/config/* $SCRIPT_DIR/setup/root/antizapret/config || true
-mv -f /root/antizapret/custom.sh $SCRIPT_DIR/setup/root/antizapret/custom.sh || true
+mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config || true
+mv -f /root/antizapret/custom.sh /tmp/antizapret/setup/root/antizapret/custom.sh || true
 
 #
 # Восстанавливаем из бэкапа пользователей vpn
-mv -f /root/easyrsa3 $SCRIPT_DIR/setup/etc/openvpn || true
-mv -f /root/wireguard/antizapret.conf $SCRIPT_DIR/setup/etc/wireguard || true
-mv -f /root/wireguard/vpn.conf $SCRIPT_DIR/setup/etc/wireguard || true
-mv -f /root/wireguard/key $SCRIPT_DIR/setup/etc/wireguard || true
+mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn || true
+mv -f /root/wireguard/antizapret.conf /tmp/antizapret/setup/etc/wireguard || true
+mv -f /root/wireguard/vpn.conf /tmp/antizapret/setup/etc/wireguard || true
+mv -f /root/wireguard/key /tmp/antizapret/setup/etc/wireguard || true
 rm -rf /root/wireguard
 
 #
 # Копируем нужные файлы и папки, удаляем не нужные
-find $SCRIPT_DIR -name '.gitkeep' -delete
+find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
-cp -r $SCRIPT_DIR/setup/* /
-rm -rf $SCRIPT_DIR
+cp -r /tmp/antizapret/setup/* /
+rm -rf /tmp/antizapret
 
 #
 # Выставляем разрешения на запуск скриптов
