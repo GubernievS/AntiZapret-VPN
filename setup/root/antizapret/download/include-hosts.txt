@@ -425,6 +425,9 @@ api.app.prod.grazie.aws.intellij.net
 stripe.com
 sora.com
 yithemes.com
+vans.com
+vans.it
+vans.de
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
