@@ -21,6 +21,7 @@ iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m hashli
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashlimit --hashlimit-above 500/hour --hashlimit-burst 500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-tcp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst
+iptables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 iptables -w -D OUTPUT -o "$INTERFACE" -p icmp --icmp-type fragmentation-needed -j ACCEPT
 iptables -w -D OUTPUT -o "$INTERFACE" -p icmp -j DROP
 ipset destroy antizapret-block
@@ -32,6 +33,7 @@ ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m hashl
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashlimit --hashlimit-above 500/hour --hashlimit-burst 500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-tcp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst
+ip6tables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 -j DROP
 ipset destroy antizapret-block6
