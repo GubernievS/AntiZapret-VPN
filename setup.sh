@@ -106,7 +106,6 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
-echo ""
 
 #
 # Спрашиваем о настройках
@@ -393,7 +392,6 @@ fi
 
 echo ""
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
-echo ""
 echo "Rebooting..."
 
 #
