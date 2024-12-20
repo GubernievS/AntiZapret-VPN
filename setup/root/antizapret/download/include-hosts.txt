@@ -428,6 +428,8 @@ yithemes.com
 vans.com
 vans.it
 vans.de
+remotethermo.com
+everyware-cloud.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
