@@ -49,9 +49,9 @@ if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 fi
 mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
-/root/antizapret/iptables-down.sh &>/dev/null
 apt-get purge -y python3-dnslib gnupg2 ferm libpam0g-dev &>/dev/null
 apt-get purge -y amneziawg &>/dev/null
+/root/antizapret/iptables-down.sh &>/dev/null
 
 #
 # Завершим выполнение скрипта при ошибке
@@ -320,7 +320,7 @@ done
 /root/antizapret/parse.sh ip
 
 #
-# Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
+# Настраиваем и запускаем сервера OpenVPN и WireGuard/AmneziaWG
 # Пересоздаем для всех существующих пользователей файлы подключений в папке /root/vpn
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/add-client.sh init
@@ -331,13 +331,6 @@ systemctl enable kresd@1
 systemctl enable antizapret
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
-systemctl enable openvpn-server@antizapret-udp
-systemctl enable openvpn-server@antizapret-tcp
-systemctl enable openvpn-server@antizapret-no-cipher
-systemctl enable openvpn-server@vpn-udp
-systemctl enable openvpn-server@vpn-tcp
-systemctl enable wg-quick@antizapret
-systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
