@@ -61,6 +61,7 @@ vb.me
 sibnet.ru
 whoer.net
 torrentfreak.com
+x.ai
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
