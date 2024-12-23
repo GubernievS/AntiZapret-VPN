@@ -320,7 +320,7 @@ done
 /root/antizapret/parse.sh ip
 
 #
-# Настраиваем и запускаем сервера OpenVPN и WireGuard/AmneziaWG
+# Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
 # Пересоздаем для всех существующих пользователей файлы подключений в папке /root/vpn
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/add-client.sh init
@@ -331,6 +331,13 @@ systemctl enable kresd@1
 systemctl enable antizapret
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
+systemctl enable openvpn-server@antizapret-udp
+systemctl enable openvpn-server@antizapret-tcp
+systemctl enable openvpn-server@antizapret-no-cipher
+systemctl enable openvpn-server@vpn-udp
+systemctl enable openvpn-server@vpn-tcp
+systemctl enable wg-quick@antizapret
+systemctl enable wg-quick@vpn
 
 #
 # Отключим ненужные службы
