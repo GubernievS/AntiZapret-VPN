@@ -58,13 +58,7 @@ viber.com
 viber.ru
 viber.me
 vb.me
-sibnet.ru
 whoer.net
-torrentfreak.com
-x.ai
-#livetv818.me
-#nnmstatic.win
-gold.razer.com
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
@@ -435,6 +429,8 @@ vans.it
 vans.de
 remotethermo.com
 everyware-cloud.com
+gold.razer.com
+x.ai
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
