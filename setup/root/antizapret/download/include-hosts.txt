@@ -64,6 +64,7 @@ torrentfreak.com
 x.ai
 #livetv818.me
 #nnmstatic.win
+gold.razer.com
 
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
 platform.activestate.com
