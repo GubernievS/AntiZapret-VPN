@@ -158,7 +158,7 @@ until [[ $INSTALL_SSHGUARD =~ (y|n) ]]; do
 	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
 done
 echo ""
-echo "Network attack and scan protection may block the work of some third-party applications!"
+echo "Warning! Network attack and scan protection may block the work of some third-party applications!"
 until [[ $PROTECT_SERVER =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
 done
