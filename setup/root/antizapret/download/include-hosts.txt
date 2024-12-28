@@ -439,7 +439,9 @@ freemyip.com
 static.monotype.com
 beacon3d.com
 wifimap.io
-app.element.io
+#app.element.io
+matrix.org
+vector.im
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
