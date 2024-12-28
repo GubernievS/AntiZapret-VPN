@@ -435,6 +435,7 @@ myfonts.com
 serato.com
 portal.cloud.hashicorp.com
 monotypefonts.com
+freemyip.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
