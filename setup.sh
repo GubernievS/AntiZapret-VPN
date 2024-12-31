@@ -52,6 +52,17 @@ mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev
 apt-get purge -y python3-dnslib gnupg2 ferm libpam0g-dev &>/dev/null
 apt-get purge -y amneziawg &>/dev/null
 /root/antizapret/iptables-down.sh &>/dev/null
+systemctl disable kresd@1
+systemctl disable antizapret
+systemctl disable antizapret-update.service
+systemctl disable antizapret-update.timer
+systemctl disable openvpn-server@antizapret-udp
+systemctl disable openvpn-server@antizapret-tcp
+systemctl disable openvpn-server@antizapret-no-cipher
+systemctl disable openvpn-server@vpn-udp
+systemctl disable openvpn-server@vpn-tcp
+systemctl disable wg-quick@antizapret
+systemctl disable wg-quick@vpn
 
 #
 # Завершим выполнение скрипта при ошибке
@@ -327,17 +338,6 @@ done
 
 #
 # Включим нужные службы
-systemctl disable kresd@1
-systemctl disable antizapret
-systemctl disable antizapret-update.service
-systemctl disable antizapret-update.timer
-systemctl disable openvpn-server@antizapret-udp
-systemctl disable openvpn-server@antizapret-tcp
-systemctl disable openvpn-server@antizapret-no-cipher
-systemctl disable openvpn-server@vpn-udp
-systemctl disable openvpn-server@vpn-tcp
-systemctl disable wg-quick@antizapret
-systemctl disable wg-quick@vpn
 systemctl enable kresd@1
 systemctl enable antizapret
 systemctl enable antizapret-update.service
