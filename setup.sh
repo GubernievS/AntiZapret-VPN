@@ -51,18 +51,31 @@ mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
 apt-get purge -y python3-dnslib gnupg2 ferm libpam0g-dev &>/dev/null
 apt-get purge -y amneziawg &>/dev/null
-/root/antizapret/iptables-down.sh &>/dev/null
-systemctl disable kresd@1
-systemctl disable antizapret
-systemctl disable antizapret-update.service
-systemctl disable antizapret-update.timer
-systemctl disable openvpn-server@antizapret-udp
-systemctl disable openvpn-server@antizapret-tcp
-systemctl disable openvpn-server@antizapret-no-cipher
-systemctl disable openvpn-server@vpn-udp
-systemctl disable openvpn-server@vpn-tcp
-systemctl disable wg-quick@antizapret
-systemctl disable wg-quick@vpn
+#/root/antizapret/iptables-down.sh &>/dev/null
+
+systemctl stop kresd@1 &>/dev/null
+systemctl stop antizapret &>/dev/null
+systemctl stop antizapret-update.service &>/dev/null
+systemctl stop antizapret-update.timer &>/dev/null
+systemctl stop openvpn-server@antizapret-udp &>/dev/null
+systemctl stop openvpn-server@antizapret-tcp &>/dev/null
+systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
+systemctl stop openvpn-server@vpn-udp &>/dev/null
+systemctl stop openvpn-server@vpn-tcp &>/dev/null
+systemctl stop wg-quick@antizapret &>/dev/null
+systemctl stop wg-quick@vpn &>/dev/null
+
+systemctl disable kresd@1 &>/dev/null
+systemctl disable antizapret &>/dev/null
+systemctl disable antizapret-update.service &>/dev/null
+systemctl disable antizapret-update.timer &>/dev/null
+systemctl disable openvpn-server@antizapret-udp &>/dev/null
+systemctl disable openvpn-server@antizapret-tcp &>/dev/null
+systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
+systemctl disable openvpn-server@vpn-udp &>/dev/null
+systemctl disable openvpn-server@vpn-tcp &>/dev/null
+systemctl disable wg-quick@antizapret &>/dev/null
+systemctl disable wg-quick@vpn &>/dev/null
 
 #
 # Завершим выполнение скрипта при ошибке
