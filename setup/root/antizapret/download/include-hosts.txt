@@ -442,6 +442,7 @@ wifimap.io
 #app.element.io
 matrix.org
 vector.im
+atelecom.biz
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
