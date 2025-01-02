@@ -443,6 +443,8 @@ wifimap.io
 matrix.org
 vector.im
 atelecom.biz
+coolstuffgames.com
+board-game.co.uk
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
