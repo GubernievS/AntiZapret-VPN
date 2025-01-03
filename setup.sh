@@ -15,6 +15,8 @@ systemctl stop dnsmap &>/dev/null
 systemctl disable dnsmap &>/dev/null
 systemctl stop ferm &>/dev/null
 systemctl disable ferm &>/dev/null
+systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
+systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/knot-resolver/hosts.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
@@ -27,6 +29,8 @@ rm -f /etc/openvpn/server/antizapret.conf
 rm -f /etc/openvpn/server/logs/*
 rm -f /etc/openvpn/server/keys/dh2048.pem
 rm -f /etc/openvpn/client/templates/*
+rm -f /etc/openvpn/client/templates/antizapret-no-cipher.conf
+rm -f /etc/openvpn/server/antizapret-no-cipher.conf
 rm -f /etc/wireguard/templates/*
 rm -f /etc/apt/sources.list.d/amnezia*
 rm -f /var/lib/knot-resolver/*
@@ -38,6 +42,8 @@ rm -f /root/upgrade-openvpn.sh
 rm -f /root/create-swap.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
+rm -f /root/vpn/antizapret-*-no-cipher.ovpn
+rm -f /root/vpn/old/antizapret-*-no-cipher.ovpn
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
@@ -59,7 +65,6 @@ systemctl stop antizapret-update.service &>/dev/null
 systemctl stop antizapret-update.timer &>/dev/null
 systemctl stop openvpn-server@antizapret-udp &>/dev/null
 systemctl stop openvpn-server@antizapret-tcp &>/dev/null
-systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
 systemctl stop openvpn-server@vpn-udp &>/dev/null
 systemctl stop openvpn-server@vpn-tcp &>/dev/null
 systemctl stop wg-quick@antizapret &>/dev/null
@@ -71,7 +76,6 @@ systemctl disable antizapret-update.service &>/dev/null
 systemctl disable antizapret-update.timer &>/dev/null
 systemctl disable openvpn-server@antizapret-udp &>/dev/null
 systemctl disable openvpn-server@antizapret-tcp &>/dev/null
-systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
 systemctl disable openvpn-server@vpn-udp &>/dev/null
 systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
@@ -357,7 +361,6 @@ systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
-systemctl enable openvpn-server@antizapret-no-cipher
 systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret

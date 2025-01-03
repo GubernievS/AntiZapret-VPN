@@ -99,21 +99,6 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-		systemctl stop openvpn-server@antizapret-udp
-		systemctl stop openvpn-server@antizapret-tcp
-		systemctl stop openvpn-server@antizapret-no-cipher
-		systemctl stop openvpn-server@vpn-udp
-		systemctl stop openvpn-server@vpn-tcp
-		systemctl disable openvpn-server@antizapret-udp
-		systemctl disable openvpn-server@antizapret-tcp
-		systemctl disable openvpn-server@antizapret-no-cipher
-		systemctl disable openvpn-server@vpn-udp
-		systemctl disable openvpn-server@vpn-tcp
-		systemctl enable --now openvpn-server@antizapret-udp
-		systemctl enable --now openvpn-server@antizapret-tcp
-		systemctl enable --now openvpn-server@antizapret-no-cipher
-		systemctl enable --now openvpn-server@vpn-udp
-		systemctl enable --now openvpn-server@vpn-tcp
 	fi
 
 	if [[ ! -f ./pki/issued/$CLIENT.crt ]] || \
@@ -143,7 +128,6 @@ if [[ "$TYPE" == "ov" || "$TYPE" == "1" ]]; then
 	FILE_NAME="${NAME}-${SERVER_IP}"
 	render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/vpn/antizapret-$FILE_NAME-udp.ovpn"
 	render "/etc/openvpn/client/templates/antizapret-tcp.conf" > "/root/vpn/antizapret-$FILE_NAME-tcp.ovpn"
-	render "/etc/openvpn/client/templates/antizapret-no-cipher.conf" > "/root/vpn/antizapret-$FILE_NAME-no-cipher.ovpn"
 	render "/etc/openvpn/client/templates/antizapret.conf" > "/root/vpn/antizapret-$FILE_NAME.ovpn"
 	render "/etc/openvpn/client/templates/vpn-udp.conf" > "/root/vpn/vpn-$FILE_NAME-udp.ovpn"
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/vpn/vpn-$FILE_NAME-tcp.ovpn"
@@ -162,12 +146,6 @@ elif [[ "$TYPE" == "wg" || "$TYPE" == "2" ]]; then
 PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
-		systemctl stop wg-quick@antizapret
-		systemctl stop wg-quick@vpn
-		systemctl disable wg-quick@antizapret
-		systemctl disable wg-quick@vpn
-		systemctl enable --now wg-quick@antizapret
-		systemctl enable --now wg-quick@vpn
 	else
 		source /etc/wireguard/key
 	fi
