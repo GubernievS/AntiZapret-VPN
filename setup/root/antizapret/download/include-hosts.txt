@@ -248,6 +248,7 @@ tiktokcdn.com
 tiktokcdn-eu.com
 tiktokcdn-us.com
 ttwstatic.com
+ttlivecdn.com
 lookerstudio.google.com
 #cloudflareinsights.com
 soapui.org
