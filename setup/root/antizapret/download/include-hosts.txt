@@ -242,7 +242,7 @@ chatfuel.com
 notion.so
 pornhub.com
 phncdn.com
-#tiktok.com
+tiktok.com
 tiktokv.com
 tiktokcdn.com
 #tiktokcdn-eu.com
