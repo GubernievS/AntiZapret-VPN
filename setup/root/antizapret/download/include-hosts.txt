@@ -242,12 +242,12 @@ chatfuel.com
 notion.so
 pornhub.com
 phncdn.com
-tiktok.com
-#tiktokv.com
-#tiktokcdn.com
+#tiktok.com
+tiktokv.com
+tiktokcdn.com
 #tiktokcdn-eu.com
 #tiktokcdn-us.com
-#ttwstatic.com
+ttwstatic.com
 #ttlivecdn.com
 lookerstudio.google.com
 #cloudflareinsights.com
@@ -354,6 +354,7 @@ pimeyes.com
 chat.groq.com
 console.groq.com
 download.teamviewer.com
+dl.teamviewer.com
 community.teamviewer.com
 freeimages.com
 3dwarehouse.sketchup.com
