@@ -8,12 +8,8 @@ INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
-# DROP all ICMP-packets except ICMP Fragmentation Needed and ICMPv6 Packet Too Big
-iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type fragmentation-needed -j ACCEPT
-iptables -w -D INPUT -i "$INTERFACE" -p icmp -j DROP
-ip6tables -w -D INPUT -i "$INTERFACE" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
-ip6tables -w -D INPUT -i "$INTERFACE" -p icmpv6 -j DROP
 # Attack and scan protection
+iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-port --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-udp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-tcp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
@@ -22,10 +18,10 @@ iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashli
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst
 iptables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-iptables -w -D OUTPUT -o "$INTERFACE" -p icmp --icmp-type fragmentation-needed -j ACCEPT
-iptables -w -D OUTPUT -o "$INTERFACE" -p icmp -j DROP
+iptables -w -D OUTPUT -o "$INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
 ipset destroy antizapret-block
 ipset destroy antizapret-watch
+ip6tables -w -D INPUT -i "$INTERFACE" -p icmpv6 --icmpv6-type echo-request -j DROP
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-port6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-udp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-tcp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
@@ -34,8 +30,7 @@ ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashl
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
-ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 -j DROP
+ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
 ipset destroy antizapret-block6
 ipset destroy antizapret-watch6
 # FORWARD connection tracking
