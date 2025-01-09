@@ -450,6 +450,7 @@ board-game.co.uk
 github.githubassets.com
 vscode.dev
 humblebundle.com
+geospy.ai
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
