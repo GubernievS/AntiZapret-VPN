@@ -17,6 +17,7 @@ systemctl stop ferm &>/dev/null
 systemctl disable ferm &>/dev/null
 systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
 systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
+
 rm -f /etc/knot-resolver/knot-aliases-alt.conf
 rm -f /etc/knot-resolver/hosts.conf
 rm -f /etc/sysctl.d/10-conntrack.conf
@@ -55,9 +56,9 @@ if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 fi
 mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
+
 apt-get purge -y python3-dnslib gnupg2 ferm libpam0g-dev &>/dev/null
 apt-get purge -y amneziawg &>/dev/null
-#/root/antizapret/iptables-down.sh &>/dev/null
 
 systemctl stop kresd@1 &>/dev/null
 systemctl stop antizapret &>/dev/null
@@ -81,6 +82,8 @@ systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
 
+iptables -F
+iptables -X
 #
 # Завершим выполнение скрипта при ошибке
 set -e
