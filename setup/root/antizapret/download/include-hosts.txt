@@ -453,6 +453,7 @@ humblebundle.com
 geospy.ai
 #captcha-delivery.com
 developer.nvidia.com
+pny.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
