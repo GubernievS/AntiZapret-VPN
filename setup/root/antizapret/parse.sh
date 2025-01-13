@@ -35,7 +35,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 
 	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
 	if [[ -f result/DEFAULT ]] && ! diff -q result/DEFAULT /etc/openvpn/server/ccd/DEFAULT; then
-		cp -v result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
+		cp -f result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
 	fi
 
 	# Создаем файл для WireGuard/AmneziaWG
@@ -43,7 +43,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 
 	# Обновляем файл в WireGuard/AmneziaWG только если файл ips изменился
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
-		cp -v result/ips /etc/wireguard/ips
+		cp -f result/ips /etc/wireguard/ips
 	fi
 
 	# Обновляем IP-адреса в ANTIZAPRET-ACCEPT
@@ -84,7 +84,7 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 
 	# Обновляем файл в Knot Resolver только если файл adblock-hosts.rpz изменился
 	if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
-		cp -v result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
+		cp -f result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
 		mv -f /etc/knot-resolver/adblock-hosts.temp /etc/knot-resolver/adblock-hosts.rpz
 	fi
 
@@ -143,7 +143,7 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
 	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
-		cp -v result/hosts.rpz /etc/knot-resolver/hosts.temp
+		cp -f result/hosts.rpz /etc/knot-resolver/hosts.temp
 		mv -f /etc/knot-resolver/hosts.temp /etc/knot-resolver/hosts.rpz
 		echo "cache.clear()" | socat - /run/knot-resolver/control/1 &>/dev/null
 	fi
