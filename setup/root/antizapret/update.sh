@@ -70,6 +70,6 @@ download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
-gunzip -f "$DUMP_PATH"
+gunzip -f "$DUMP_PATH" || { echo "Error unpacking $DUMP_PATH"; exit 3; }
 
 exit 0
