@@ -1,7 +1,7 @@
 [Unit]
 Description=AntiZapret VPN
-After=network-online.target wg-quick@* openvpn-server@*
-Wants=network-online.target wg-quick@* openvpn-server@*
+After=multi-user.target
+Wants=multi-user.target
 
 [Service]
 LimitNPROC=infinity
