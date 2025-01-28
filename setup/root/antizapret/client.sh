@@ -16,19 +16,17 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 getClientName(){
-	CLIENT_NAME=$2
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 		echo ""
 		echo "Enter the client's name"
 		echo "The client's name must consist of 1 to 32 alphanumeric characters, it may also include an underscore or a dash"
-		until [[ $CLIENT_NAME =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
+		until [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
 			read -rp "Client name: " -e CLIENT_NAME
 		done
 	fi
 }
 
 getClientCertExpire(){
-	CLIENT_CERT_EXPIRE=$3
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
 		echo ""
 		echo "Enter a valid client certificate expiration period (1 to 3650 days)"
@@ -86,9 +84,7 @@ addOpenVPN(){
 
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
-		if [[ -z "$CLIENT_CERT_EXPIRE" ]]; then
-			getClientCertExpire
-		fi
+		getClientCertExpire
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
 		cp ./pki/issued/$CLIENT_NAME.crt /etc/openvpn/client/keys/$CLIENT_NAME.crt
 		cp ./pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
@@ -346,11 +342,14 @@ if ! [[ "$OPTION" =~ ^[1-7]$ ]]; then
 	echo "	5) WireGuard/AmneziaWG - Delete client"
 	echo "	6) WireGuard/AmneziaWG - List clients"
 	echo "	7) (Re)create client profile files"
-	until [[ $OPTION =~ ^[1-7]$ ]]; do
+	until [[ "$OPTION" =~ ^[1-7]$ ]]; do
 		read -rp "Option choice [1-7]: " -e OPTION
 	done
 	echo ""
 fi
+
+CLIENT_NAME=$2
+CLIENT_CERT_EXPIRE=$3
 
 case "$OPTION" in
 	1)
