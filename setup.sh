@@ -151,16 +151,16 @@ echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
 echo "    0) None       - Do not install the anti-censorship patch, or remove it if already installed"
 echo "    1) Strong     - Recommended by default"
 echo "    2) Error-free - Use it if the Strong patch causes a connection error, recommended for Mikrotik routers"
-until [[ $OPENVPN_PATCH =~ ^[0-2]$ ]]; do
+until [[ "$OPENVPN_PATCH" =~ ^[0-2]$ ]]; do
 	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
 echo ""
 echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
-until [[ $OPENVPN_DCO =~ (y|n) ]]; do
+until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
 echo ""
-until [[ $ANTIZAPRET_ADBLOCK =~ (y|n) ]]; do
+until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
 	read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 done
 echo ""
@@ -168,34 +168,34 @@ echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare+Google - The fastest and most reliable - Recommended by default"
 echo "    2) Yandex Basic      - Use for problems loading sites from Russia"
 echo "    3) AdGuard+replica   - For blocking ads, trackers and phishing"
-until [[ $VPN_DNS =~ ^[1-3]$ ]]; do
+until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
-until [[ $ALTERNATIVE_IP =~ (y|n) ]]; do
+until [[ "$ALTERNATIVE_IP" =~ (y|n) ]]; do
 	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n ALTERNATIVE_IP
 done
 echo ""
-until [[ $OPENVPN_80_443_TCP =~ (y|n) ]]; do
+until [[ "$OPENVPN_80_443_TCP" =~ (y|n) ]]; do
 	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_TCP
 done
 echo ""
-until [[ $OPENVPN_80_443_UDP =~ (y|n) ]]; do
+until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
 	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_UDP
 done
 echo ""
-until [[ $OPENVPN_DUPLICATE =~ (y|n) ]]; do
+until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
 	read -rp "Allow multiple clients connecting to OpenVPN using the same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
-until [[ $INSTALL_SSHGUARD =~ (y|n) ]]; do
+until [[ "$INSTALL_SSHGUARD" =~ (y|n) ]]; do
 	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
 done
 echo ""
 echo "Warning! Network attack and scan protection may block the work of some third-party applications!"
-until [[ $PROTECT_SERVER =~ (y|n) ]]; do
+until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
 done
 echo ""
