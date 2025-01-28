@@ -51,7 +51,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 ```sh
 bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh)
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
+3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 
 При установке можно:
@@ -82,7 +82,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 ```sh
 /root/antizapret/client.sh [1-7] [имя_клиента] [срок_действия]
 ```
->После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/antizapret/client
+>После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
 4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
 ```sh
