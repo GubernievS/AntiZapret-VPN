@@ -49,8 +49,7 @@ rm -f /root/add-client.sh
 rm -f /root/delete-client.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
-rm -f /root/vpn/antizapret-*-no-cipher.ovpn
-rm -f /root/vpn/old/antizapret-*-no-cipher.ovpn
+rm -rf /root/vpn
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
@@ -358,7 +357,7 @@ done
 
 #
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
-# Пересоздаем для всех существующих пользователей файлы подключений в папке /root/vpn
+# Пересоздаем для всех существующих пользователей файлы подключений
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/antizapret/client.sh 7
 
