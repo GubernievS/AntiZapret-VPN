@@ -3,7 +3,7 @@
 # Патч для обхода блокировки протокола OpenVPN
 # Работает только для UDP соединений
 #
-# chmod +x patch-openvpn.sh && ./patch-openvpn.sh
+# chmod +x patch-openvpn.sh && ./patch-openvpn.sh [0-2]
 #
 set -e
 
@@ -16,7 +16,7 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-if [[ "$1" == "0" || "$1" == "1" || "$1" == "2" ]]; then
+if [[ "$1" =~ ^[0-2]$ ]]; then
 	ALGORITHM="$1"
 else
 	echo ""

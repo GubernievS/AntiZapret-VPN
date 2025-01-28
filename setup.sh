@@ -32,6 +32,7 @@ rm -f /etc/openvpn/server/keys/dh2048.pem
 rm -f /etc/openvpn/client/templates/*
 rm -f /etc/openvpn/client/templates/antizapret-no-cipher.conf
 rm -f /etc/openvpn/server/antizapret-no-cipher.conf
+rm -f /etc/openvpn/server/logs/antizapret-no-cipher*.log
 rm -f /etc/wireguard/templates/*
 rm -f /etc/apt/sources.list.d/amnezia*
 rm -f /var/lib/knot-resolver/*
@@ -41,6 +42,11 @@ rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
 rm -f /root/upgrade-openvpn.sh
 rm -f /root/create-swap.sh
+rm -f /root/disable-openvpn-dco.sh
+rm -f /root/enable-openvpn-dco.sh
+rm -f /root/patch-openvpn.sh
+rm -f /root/add-client.sh
+rm -f /root/delete-client.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
 rm -f /root/vpn/antizapret-*-no-cipher.ovpn
@@ -82,8 +88,8 @@ systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
 
-iptables -F
-iptables -X
+iptables -F &>/dev/null
+iptables -X &>/dev/null
 #
 # Завершим выполнение скрипта при ошибке
 set -e
@@ -182,7 +188,7 @@ until [[ $OPENVPN_80_443_UDP =~ (y|n) ]]; do
 done
 echo ""
 until [[ $OPENVPN_DUPLICATE =~ (y|n) ]]; do
-	read -rp "Allow multiple clients connecting to OpenVPN using the same configuration file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
+	read -rp "Allow multiple clients connecting to OpenVPN using the same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
 until [[ $INSTALL_SSHGUARD =~ (y|n) ]]; do
@@ -354,7 +360,7 @@ done
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
 # Пересоздаем для всех существующих пользователей файлы подключений в папке /root/vpn
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
-/root/add-client.sh init
+/root/antizapret/client.sh 7
 
 #
 # Включим нужные службы
@@ -377,14 +383,14 @@ systemctl disable firewalld &>/dev/null || true
 ERRORS=""
 
 if [[ "$OPENVPN_PATCH" != "0" ]]; then
-	if ! /root/patch-openvpn.sh "$OPENVPN_PATCH"; then
-		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run './patch-openvpn.sh' after rebooting\n"
+	if ! /root/antizapret/patch-openvpn.sh "$OPENVPN_PATCH"; then
+		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run '/root/antizapret/patch-openvpn.sh' after rebooting\n"
 	fi
 fi
 
 if [[ "$OPENVPN_DCO" == "y" ]]; then
-	if ! /root/enable-openvpn-dco.sh; then
-		ERRORS+="\n\e[1;31mOpenVPN DCO has not enabled!\e[0m Please run './enable-openvpn-dco.sh' after rebooting\n"
+	if ! /root/antizapret/openvpn-dco.sh "y"; then
+		ERRORS+="\n\e[1;31mOpenVPN DCO has not turn on!\e[0m Please run '/root/antizapret/openvpn-dco.sh' after rebooting\n"
 	fi
 fi
 

@@ -51,7 +51,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 ```sh
 bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh)
 ```
-3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn (например через MobaXtrem, FileZilla или WinSCP)\
+3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из папки /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 
 При установке можно:
@@ -66,35 +66,25 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 9. Включить защиту от сканирования и сетевых атак
 ***
 ### Настройка
-1. Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
+1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 ```sh
-./patch-openvpn.sh
+/root/antizapret/patch-openvpn.sh [0-2]
 ```
 
-2. Включить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) - это заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
+2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) - это заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
 ```sh
-./enable-openvpn-dco.sh
+/root/antizapret/openvpn-dco.sh [y/n]
 ```
 >При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM, AES-256-GCM и CHACHA20-POLY1305\
 Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 
-3. Выключить OpenVPN DCO
+3. Добавить/удалить клиента (срок действия в днях - только для OpenVPN)
 ```sh
-./disable-openvpn-dco.sh
+/root/antizapret/client.sh [1-7] [имя_клиента] [срок_действия]
 ```
+>После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/antizapret/client
 
-4. Добавить нового клиента (срок действия в днях - только для OpenVPN)
-```sh
-./add-client.sh [ov/wg] [имя_клиента] [срок_действия]
-```
-
-5. Удалить клиента
-```sh
-./delete-client.sh [ov/wg] [имя_клиента]
-```
->После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из папки /root/vpn
-
-6. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
+4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
 ```sh
 nano /root/antizapret/config/include-hosts.txt
 ```
@@ -107,7 +97,7 @@ com\
 /root/antizapret/doall.sh
 ```
 
-7. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
+5. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
@@ -170,13 +160,13 @@ wg show
 > На сервере в папке /etc/openvpn/server во всех файлах .conf убрать строчки duplicate-cn\
 Перезагрузить сервер
 
-5. Как пересоздать все файлы подключений (\*.ovpn и \*.conf) в папке /root/vpn?
+5. Как пересоздать все файлы подключений (\*.ovpn и \*.conf) в подпапках /root/antizapret/client?
 
 > Выполните команду
 ```sh
-./add-client.sh recreate
+/root/antizapret/client.sh 7
 ```
->В папке /root/vpn будут пересозданы все файлы подключений, прошлые файлы подключений будут перемещены в папку /root/vpn/old
+>В подпапках /root/antizapret/client будут пересозданы все файлы подключений
 
 6. Как работает опциональная защита от сканирования и сетевых атак?
 
