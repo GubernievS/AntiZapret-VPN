@@ -143,8 +143,6 @@ deleteOpenVPN(){
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
 
-	systemctl restart openvpn-server@*
-
 	echo "OpenVPN client '$CLIENT_NAME' successfull deleted"
 }
 
