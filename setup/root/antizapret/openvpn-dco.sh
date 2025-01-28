@@ -26,7 +26,7 @@ if [[ "$1" == "y" || "$1" == "n" ]]; then
 else
 	echo ""
 	echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
-	until [[ $DCO =~ (y|n) ]]; do
+	until [[ "$DCO" =~ (y|n) ]]; do
 		read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
 	done
 fi
