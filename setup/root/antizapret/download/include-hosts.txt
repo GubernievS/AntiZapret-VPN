@@ -467,6 +467,7 @@ cxstudio.clarabridge.net
 app.engagor.com
 openai.qualtrics.com
 magecomp.us
+pm.me
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
