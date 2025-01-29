@@ -21,7 +21,7 @@ if [[ ! "$VERSION" =~ ^2\.6 ]]; then
 	exit 1
 fi
 
-if [[ "$1" == "y" || "$1" == "n" ]]; then
+if [[ "$1" == [yn] ]]; then
 	DCO="$1"
 else
 	echo ""
@@ -31,7 +31,7 @@ else
 	done
 fi
 
-if [[ "DCO" == "y" ]]; then
+if [[ "$DCO" == "y" ]]; then
 	apt-get update
 	DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
