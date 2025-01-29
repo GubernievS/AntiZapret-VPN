@@ -149,7 +149,7 @@ deleteOpenVPN(){
 listOpenVPN(){
 	echo ""
 	echo "OpenVPN existing client names:"
-	tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sort -u
+	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
 }
 
 addWireGuard_AmneziaWG(){
@@ -299,7 +299,7 @@ listWireGuard_AmneziaWG(){
 recreate(){
 	# OpenVPN
 	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
-		tail -n +2 /etc/openvpn/easyrsa3/pki/index.txt | grep "^V" | cut -d '=' -f 2 | sort -u | while read -r CLIENT_NAME; do
+		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
 				echo "OpenVPN profile files for the client '$CLIENT_NAME' has been recreated"
