@@ -87,8 +87,14 @@ systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
 
+# Очищаем правила iptables
 iptables -F &>/dev/null
 iptables -X &>/dev/null
+iptables -t nat -F &>/dev/null
+iptables -t nat -X &>/dev/null
+
+# Удаляем старый кеш knot-resolver
+rm -f /var/cache/knot-resolver/*
 #
 # Завершим выполнение скрипта при ошибке
 set -e
