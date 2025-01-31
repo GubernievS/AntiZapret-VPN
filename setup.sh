@@ -95,6 +95,7 @@ iptables -t nat -X &>/dev/null
 
 # Удаляем старый кеш knot-resolver
 rm -f /var/cache/knot-resolver/*
+
 #
 # Завершим выполнение скрипта при ошибке
 set -e
