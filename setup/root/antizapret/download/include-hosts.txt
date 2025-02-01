@@ -414,7 +414,6 @@ anythingllm.com
 wikidot.com
 logo.com
 pcmag.com
-foxitsoftware.com
 mixupload.com
 codeium.com
 gateway.pinata.cloud
@@ -496,3 +495,4 @@ anicult.org
 12putinu.net
 padlet.com
 tlsext.com
+foxitsoftware.com
