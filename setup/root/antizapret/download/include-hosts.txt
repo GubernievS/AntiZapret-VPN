@@ -173,7 +173,6 @@ mbed.com
 megogo.net
 microchip.com
 mouser.com
-netflix.com
 nxp.com
 oasis.app
 oclc.org
@@ -467,9 +466,9 @@ app.engagor.com
 openai.qualtrics.com
 magecomp.us
 pm.me
-fast.com
 6pm.com
 em.gazoni1.com
+fast.com
 netflixdnstest1.com
 netflixdnstest2.com
 netflixdnstest3.com
@@ -480,6 +479,13 @@ netflixdnstest7.com
 netflixdnstest8.com
 netflixdnstest9.com
 netflixdnstest10.com
+netflix.com
+nflxext.com
+nflximg.net
+nflximg.com
+nflxsearch.net
+nflxso.net
+nflxvideo.net
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
