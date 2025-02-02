@@ -480,6 +480,7 @@ netflixdnstest8.com
 netflixdnstest9.com
 netflixdnstest10.com
 netflix.com
+netflix.net
 nflxext.com
 nflximg.net
 nflximg.com
