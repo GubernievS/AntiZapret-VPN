@@ -468,6 +468,7 @@ openai.qualtrics.com
 magecomp.us
 pm.me
 fast.com
+6pm.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
