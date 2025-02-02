@@ -487,6 +487,7 @@ nflximg.com
 nflxsearch.net
 nflxso.net
 nflxvideo.net
+amazonaws.com
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
