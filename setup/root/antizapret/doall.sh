@@ -9,6 +9,7 @@ cd "$HERE"
 cat update.sh | bash
 ./parse.sh
 [[ -f "custom.sh" ]] && chmod +x custom.sh && ./custom.sh
-find /etc/openvpn/server/logs -type f ! -name "*status*" -delete
+find /etc/openvpn/server/logs -type f ! -name "*status*" -size +10M -delete
+
 
 echo "Execution time: $SECONDS seconds"
