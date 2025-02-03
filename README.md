@@ -71,7 +71,8 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 /root/antizapret/patch-openvpn.sh [0-2]
 ```
 
-2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload) - это заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
+2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)\
+Включение заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
 ```sh
 /root/antizapret/openvpn-dco.sh [y/n]
 ```
@@ -97,7 +98,20 @@ com\
 /root/antizapret/doall.sh
 ```
 
-5. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
+5. Исключить свои сайты из списка антизапрета (файл /root/antizapret/config/exclude-hosts.txt)
+```sh
+nano /root/antizapret/config/exclude-hosts.txt
+```
+>Добавлять нужно только домены, например:
+subdomain.example.com\
+example.com\
+com\
+После этого нужно обновить список антизапрета
+```sh
+/root/antizapret/doall.sh
+```
+
+6. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
