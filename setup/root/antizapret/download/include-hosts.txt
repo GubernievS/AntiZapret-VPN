@@ -492,6 +492,7 @@ aws.amazon.com
 nba.com
 delltechnologies.com
 download.lenovo.com
+darkproject.eu
 
 # Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
