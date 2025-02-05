@@ -1,10 +1,4 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
-#
-# Список включает:
-# Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
-# Список из оригинального антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
-# Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (скопирован не весь)
-#
 youtube.com
 youtube-nocookie.com
 youtubeeducation.com
