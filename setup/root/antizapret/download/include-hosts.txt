@@ -1,6 +1,10 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
-# Список от GubernievS и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
+#
+# Список включает:
+# Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
+# Список из оригинального антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
 # Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (скопирован не весь)
+#
 youtube.com
 youtube-nocookie.com
 youtubeeducation.com
@@ -495,8 +499,6 @@ download.lenovo.com
 darkproject.eu
 plugins.jetbrains.com
 framer.com
-
-# Внереестровые блокировки в России - https://bitbucket.org/anticensority/russian-unlisted-blocks/src/master/readme.txt (скопирован весь)
 tor.eff.org
 news.google.com
 play.google.com
