@@ -1,5 +1,6 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 # Список от GubernievS и адреса из антизапрета - https://bitbucket.org/anticensority/antizapret-pac-generator-light/src/master/config/include-hosts-dist.txt (скопирован весь)
+# Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (скопирован не весь)
 youtube.com
 youtube-nocookie.com
 youtubeeducation.com
@@ -59,8 +60,7 @@ viber.ru
 viber.me
 vb.me
 whoer.net
-
-# Ограничивают доступ из России - https://github.com/dartraiden/no-russia-hosts/blob/master/hosts.txt (список взят за основу)
+foxitsoftware.com
 platform.activestate.com
 gaming.amazon.com
 login.amd.com
@@ -523,4 +523,3 @@ anicult.org
 12putinu.net
 padlet.com
 tlsext.com
-foxitsoftware.com
