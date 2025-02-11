@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-
 import socket,struct,subprocess,os
 from collections import deque
 from ipaddress import IPv4Network
@@ -29,14 +28,12 @@ class ProxyResolver(BaseResolver):
         'real' transparent proxy option the DNSHandler logic needs to be
         modified (see PassthroughDNSHandler)
     """
-
     def __init__(self,address,port,timeout,iprange):
         self.address = address
         self.port = port
         self.timeout = timeout
         self.unassigned_addresses = deque([str(x) for x in IPv4Network(iprange).hosts()])
         self.ipmap = {}
-
         # Load existing mapping
         get_mapping = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
         output = subprocess.check_output(get_mapping, shell=True, encoding='utf-8')
@@ -53,7 +50,6 @@ class ProxyResolver(BaseResolver):
             # Real addr is already mapped
             print("Real addr {} is already mapped".format(real_addr))
             return False
-
         if fake_addr:
             try:
                 self.unassigned_addresses.remove(fake_addr)
@@ -82,29 +78,23 @@ class ProxyResolver(BaseResolver):
             else:
                 proxy_r = request.send(self.address,self.port, tcp=True, timeout=self.timeout)
             reply = DNSRecord.parse(proxy_r)
-
             if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
-                print('GOT AAAA or HTTPS')
+                #print('GOT AAAA or HTTPS')
                 reply = request.reply()
                 return reply
-
             if request.q.qtype == QTYPE.A:
-                print('GOT A')
-
+                #print('GOT A')
                 newrr = []
                 for record in reply.rr:
                     if record.rtype == QTYPE.CNAME:
                         continue
                     newrr.append(record)
                 reply.rr = newrr
-
                 for record in reply.rr:
                     if record.rtype != QTYPE.A:
                         continue
-
                     #print(dir(record))
                     #print(type(record.rdata))
-
                     real_addr = str(record.rdata)
                     fake_addr = self.get_mapping(real_addr)
                     if not fake_addr:
@@ -114,13 +104,11 @@ class ProxyResolver(BaseResolver):
                         reply = request.reply()
                         reply.header.rcode = getattr(RCODE,'SERVFAIL')
                         return reply
-
                     record.rdata = A(fake_addr)
                     record.rname = request.q.qname
                     record.ttl = 300
                     #print(a.rdata)
                 return reply
-
             #print(reply)
         except socket.timeout:
             reply = request.reply()
@@ -136,17 +124,14 @@ class PassthroughDNSHandler(DNSHandler):
     """
     def get_reply(self,data):
         host,port = self.server.resolver.address,self.server.resolver.port
-
         request = DNSRecord.parse(data)
         self.log_request(request)
-
         if self.protocol == 'tcp':
             data = struct.pack("!H",len(data)) + data
             response = send_tcp(data,host,port)
             response = response[2:]
         else:
             response = send_udp(data,host,port)
-
         reply = DNSRecord.parse(response)
         self.log_reply(reply)
         return response
@@ -177,9 +162,7 @@ def send_udp(data,host,port):
     return response
 
 if __name__ == '__main__':
-
     import argparse,sys,time
-
     p = argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--port","-p",type=int,default=53,
                     metavar="<port>",
@@ -205,26 +188,21 @@ if __name__ == '__main__':
                     metavar="<ip/mask>",
                     help="Fake IP range (default:10.30.0.0/15)")
     args = p.parse_args()
-
     args.dns,_,args.dns_port = args.upstream.partition(':')
     args.dns_port = int(args.dns_port or 53)
-
     print("Starting Proxy Resolver (%s:%d -> %s:%d) [%s]" % (
                         args.address or "*",args.port,
                         args.dns,args.dns_port,
                         "UDP/TCP" if args.tcp else "UDP"))
-
     resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.iprange)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
     logger = DNSLogger(args.log,args.log_prefix)
-
     udp_server = DNSServer(resolver,
                            port=args.port,
                            address=args.address,
                            logger=logger,
                            handler=handler)
     udp_server.start_thread()
-
     if args.tcp:
         tcp_server = DNSServer(resolver,
                                port=args.port,
@@ -233,6 +211,5 @@ if __name__ == '__main__':
                                logger=logger,
                                handler=handler)
         tcp_server.start_thread()
-
     while udp_server.isAlive():
         time.sleep(1)
