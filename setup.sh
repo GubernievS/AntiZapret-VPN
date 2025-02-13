@@ -197,6 +197,10 @@ until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
 	read -rp "Allow multiple clients connecting to OpenVPN using the same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
+until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
+	read -rp "Enable detailed logs in OpenVPN? [y/n]: " -e -i n OPENVPN_LOG
+done
+echo ""
 until [[ "$INSTALL_SSHGUARD" =~ (y|n) ]]; do
 	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
 done
@@ -341,6 +345,12 @@ if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
 fi
 
 #
+# Включим подробные логи в OpenVPN
+if [[ "$OPENVPN_LOG" == "y" ]]; then
+	sed -i 's/^#//' /etc/openvpn/server/*.conf
+fi
+
+#
 # Отключаем защиту от сетевых атак и сканирования
 if [[ "$PROTECT_SERVER" == "n" ]]; then
 	sed -i '/\(antizapret-block\|antizapret-watch\|p icmp\|RST RST\)/s/^/#/' /root/antizapret/iptables-up.sh
@@ -416,6 +426,7 @@ ALTERNATIVE_IP=${ALTERNATIVE_IP}
 OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
 OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
 OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
+OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
 PROXY_DNS=${PROXY_DNS}" > /root/antizapret/setup
