@@ -522,3 +522,5 @@ tlsext.com
 svt.se
 showtime.com
 skyshowtime.com
+msn.com
+teletextart.com
