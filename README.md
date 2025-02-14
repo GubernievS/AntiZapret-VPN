@@ -195,15 +195,28 @@ wg show
     - Более 500 подключений по разным портам и протоколу TCP
 
 При повторном нарушении этих правил блокировка продлевается до 10 минут\
-Отключен ответ на ping
-Отключен ответ о неудачной попытке подключения к закрытому порту сервера
+При добавлении IPv4 или IPv6 в список исключений - правила блокировки не применяются\
+Отключен ответ на ping\
+Отключен ответ о неудачной попытке подключения к закрытому порту сервера\
 > Список заблокированных IPv4 и IPv6-адресов
 ```sh
-ipset list antizapret-block && ipset list antizapret-block6
+ipset list antizapret-block | grep '\.' | sort -u && ipset list antizapret-block6 | grep '\.' | sort -u
 ```
 > Список отслеживаемых подключений по IPv4 и IPv6 за последнюю минуту
 ```sh
-ipset list antizapret-watch && ipset list antizapret-watch6
+ipset list antizapret-watch | grep '\.' | sort -u && ipset list antizapret-watch6 | grep '\.' | sort -u
+```
+> Список исключений IPv4 и IPv6
+```sh
+ipset list antizapret-allow | grep '\.' | sort -u && ipset list antizapret-allow6 | grep '\.' | sort -u
+```
+> Пример добавления IPv4 или IPv6 в список исключений
+```sh
+ipset add antizapret-allow 192.168.1.1
+ipset add antizapret-allow 192.168.1.0/24
+ipset add antizapret-allow6 2001:db8::1
+ipset add antizapret-allow6 2001:db8::/32
+
 ```
 
 ***

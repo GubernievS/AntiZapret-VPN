@@ -15,7 +15,7 @@ iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m set ! 
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-tcp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m hashlimit --hashlimit-above 1500/hour --hashlimit-burst 1500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-udp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashlimit --hashlimit-above 500/hour --hashlimit-burst 500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-tcp --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
-iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
+iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -m set ! --match-set antizapret-allow src -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst
 iptables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 iptables -w -D OUTPUT -o "$INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
@@ -27,7 +27,7 @@ ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m set !
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-name antizapret-port-tcp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p udp -m hashlimit --hashlimit-above 1500/hour --hashlimit-burst 1500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-udp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -p tcp -m hashlimit --hashlimit-above 500/hour --hashlimit-burst 500 --hashlimit-mode srcip --hashlimit-name antizapret-conn-tcp6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
-ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
+ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -m set ! --match-set antizapret-allow6 src -j DROP
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
