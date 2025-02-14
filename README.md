@@ -200,15 +200,15 @@ wg show
 Отключен ответ о неудачной попытке подключения к закрытому порту сервера\
 > Список заблокированных IPv4 и IPv6-адресов
 ```sh
-ipset list antizapret-block | grep '\.' | sort -u && ipset list antizapret-block6 | grep '\.' | sort -u
+ipset list antizapret-block | grep '\.' | sort -u && ipset list antizapret-block6 | grep -E '(:.*:)' | sort -u
 ```
 > Список отслеживаемых подключений по IPv4 и IPv6 за последнюю минуту
 ```sh
-ipset list antizapret-watch | grep '\.' | sort -u && ipset list antizapret-watch6 | grep '\.' | sort -u
+ipset list antizapret-watch | grep '\.' | sort -u && ipset list antizapret-watch6 | grep -E '(:.*:)' | sort -u
 ```
 > Список исключений IPv4 и IPv6
 ```sh
-ipset list antizapret-allow | grep '\.' | sort -u && ipset list antizapret-allow6 | grep '\.' | sort -u
+ipset list antizapret-allow | grep '\.' | sort -u && ipset list antizapret-allow6 | grep -E '(:.*:)' | sort -u
 ```
 > Пример добавления IPv4 или IPv6 в список исключений
 ```sh
