@@ -148,6 +148,7 @@ deleteOpenVPN(){
 }
 
 listOpenVPN(){
+	[[ -n "$CLIENT_NAME" ]] && return
 	echo ""
 	echo "OpenVPN existing client names:"
 	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
@@ -293,6 +294,7 @@ deleteWireGuard_AmneziaWG(){
 }
 
 listWireGuard_AmneziaWG(){
+	[[ -n "$CLIENT_NAME" ]] && return
 	echo ""
 	echo "WireGuard/AmneziaWG existing client names:"
 	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
@@ -353,13 +355,13 @@ CLIENT_CERT_EXPIRE=$3
 
 case "$OPTION" in
 	1)
-		echo "OpenVPN - Add client"
+		echo "OpenVPN - Add client $CLIENT_NAME $CLIENT_CERT_EXPIRE"
 		getServerIP
 		getClientName
 		addOpenVPN
 		;;
 	2)
-		echo "OpenVPN - Delete client"
+		echo "OpenVPN - Delete client $CLIENT_NAME"
 		listOpenVPN
 		getServerIP
 		getClientName
@@ -370,13 +372,13 @@ case "$OPTION" in
 		listOpenVPN
 		;;
 	4)
-		echo "WireGuard/AmneziaWG - Add client"
+		echo "WireGuard/AmneziaWG - Add client $CLIENT_NAME"
 		getServerIP
 		getClientName
 		addWireGuard_AmneziaWG
 		;;
 	5)
-		echo "WireGuard/AmneziaWG - Delete client"
+		echo "WireGuard/AmneziaWG - Delete client $CLIENT_NAME"
 		listWireGuard_AmneziaWG
 		getServerIP
 		getClientName
