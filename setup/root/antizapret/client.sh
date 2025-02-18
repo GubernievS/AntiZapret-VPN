@@ -137,9 +137,10 @@ deleteOpenVPN(){
 
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
 	FILE_NAME="${FILE_NAME#vpn-}"
+	FILE_NAME="${FILE_NAME}-${SERVER_IP}"
 
-	rm -f /root/antizapret/client/openvpn/{antizapret,antizapret-udp,antizapret-tcp}/antizapret-$FILE_NAME-*.ovpn
-	rm -f /root/antizapret/client/openvpn/{vpn,vpn-udp,vpn-tcp}/vpn-$FILE_NAME-*.ovpn
+	rm -f /root/antizapret/client/openvpn/{antizapret,antizapret-udp,antizapret-tcp}/antizapret-$FILE_NAME.ovpn
+	rm -f /root/antizapret/client/openvpn/{vpn,vpn-udp,vpn-tcp}/vpn-$FILE_NAME.ovpn
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
 
@@ -275,9 +276,10 @@ deleteWireGuard_AmneziaWG(){
 
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
 	FILE_NAME="${FILE_NAME#vpn-}"
+	FILE_NAME="${FILE_NAME}-${SERVER_IP}"
 
-	rm -f /root/antizapret/client/{wireguard,amneziawg}/antizapret/antizapret-"${FILE_NAME:0:18}"-*.conf
-	rm -f /root/antizapret/client/{wireguard,amneziawg}/vpn/vpn-"${FILE_NAME:0:25}"-*.conf
+	rm -f /root/antizapret/client/{wireguard,amneziawg}/antizapret/antizapret-${FILE_NAME:0:18}-*.conf
+	rm -f /root/antizapret/client/{wireguard,amneziawg}/vpn/vpn-${FILE_NAME:0:25}-*.conf
 
 	if systemctl is-active --quiet wg-quick@antizapret; then
 		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
@@ -359,6 +361,7 @@ case "$OPTION" in
 	2)
 		echo "OpenVPN - Delete client"
 		listOpenVPN
+		getServerIP
 		getClientName
 		deleteOpenVPN
 		;;
@@ -375,6 +378,7 @@ case "$OPTION" in
 	5)
 		echo "WireGuard/AmneziaWG - Delete client"
 		listWireGuard_AmneziaWG
+		getServerIP
 		getClientName
 		deleteWireGuard_AmneziaWG
 		;;
