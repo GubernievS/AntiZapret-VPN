@@ -71,10 +71,12 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/adblock-hosts3.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-hosts.txt download/adblock-hosts.txt > temp/adblock-hosts4.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' download/adblock-hosts.txt > temp/adblock-hosts4.txt
+#config/adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-pass-hosts.txt download/adblock-pass-hosts.txt > temp/adblock-pass-hosts3.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' download/adblock-pass-hosts.txt > temp/adblock-pass-hosts3.txt
+#config/adblock-pass-hosts.txt
 
 	# Объединяем списки
 	(cat temp/adblock-hosts2.txt && cat temp/adblock-hosts3.txt && cat temp/adblock-hosts4.txt) | sort -u > result/adblock-hosts.txt
