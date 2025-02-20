@@ -392,7 +392,7 @@ shiksha.com
 moneypuck.com
 lightning.ai
 alphacoders.com
-www3.corsair.com
+#www3.corsair.com
 #kemono.su
 element14.com
 octopart.com
@@ -531,3 +531,4 @@ we.tl
 #wetransfer.net
 stereophile.com
 grok.com
+corsair.com
