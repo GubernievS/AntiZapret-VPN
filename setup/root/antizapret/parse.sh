@@ -54,7 +54,6 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 			iptables -w -A ANTIZAPRET-ACCEPT -d "$line" -j ACCEPT
 		done < result/ips.txt
 	fi
-
 fi
 
 if [[ -z "$1" || "$1" == "ad" ]]; then
@@ -66,14 +65,21 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 
 	# Обрабатываем список с исключениями из блокировки от AdGuard
 	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/adblock-pass-hosts.txt
-	sed '/^[0-9.]*$/d' temp/adblock-pass-hosts.txt | sort -u > result/adblock-pass-hosts.txt
+	sed '/^[0-9.]*$/d' temp/adblock-pass-hosts.txt | sort -u > temp/adblock-pass-hosts2.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdAway
 	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/adblock-hosts3.txt
 
-	# Объединяем AdGuard и AdAway
-	(cat temp/adblock-hosts2.txt && cat temp/adblock-hosts3.txt) | sort -u > result/adblock-hosts.txt
-	
+	# Обрабатываем список с рекламными доменами для блокировки
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-hosts.txt download/adblock-hosts.txt > temp/adblock-hosts4.txt
+
+	# Обрабатываем список с исключениями из блокировки
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-pass-hosts.txt download/adblock-pass-hosts.txt > temp/adblock-pass-hosts3.txt
+
+	# Объединяем списки
+	(cat temp/adblock-hosts2.txt && cat temp/adblock-hosts3.txt && cat temp/adblock-hosts4.txt) | sort -u > result/adblock-hosts.txt
+	(cat temp/adblock-pass-hosts2.txt && cat temp/adblock-pass-hosts3.txt) | sort -u > result/adblock-pass-hosts.txt
+
 	# Выводим результат
 	echo "Adblock-hosts: $(wc -l result/adblock-hosts.txt)"
 	echo "Adblock-pass-hosts: $(wc -l result/adblock-pass-hosts.txt)"
@@ -87,7 +93,6 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 		cp -f result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
 		mv -f /etc/knot-resolver/adblock-hosts.temp /etc/knot-resolver/adblock-hosts.rpz
 	fi
-
 fi
 
 if [[ -z "$1" || "$1" == "host" ]]; then
@@ -148,7 +153,6 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 		mv -f /etc/knot-resolver/hosts.temp /etc/knot-resolver/hosts.rpz
 		echo "cache.clear()" | socat - /run/knot-resolver/control/1 &>/dev/null
 	fi
-
 fi
 
 exit 0

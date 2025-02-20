@@ -29,6 +29,12 @@ INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-ips.txt"
 INCLUDE_IPS_PATH="download/include-ips.txt"
 
+ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/adblock-hosts.txt"
+ADBLOCK_HOSTS_PATH="download/adblock-hosts.txt"
+
+ADBLOCK_PASS_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/adblock-pass-hosts.txt"
+ADBLOCK_PASS_HOSTS_PATH="download/adblock-pass-hosts.txt"
+
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
 
@@ -63,10 +69,12 @@ function download {
 download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
-download $DUMP_PATH $DUMP_LINK 16
-download $NXDOMAIN_PATH $NXDOMAIN_LINK 2
+download $DUMP_PATH $DUMP_LINK 10
+download $NXDOMAIN_PATH $NXDOMAIN_LINK 1
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
+download $ADBLOCK_HOSTS_PATH $ADBLOCK_HOSTS_LINK
+download $ADBLOCK_PASS_HOSTS_PATH $ADBLOCK_PASS_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
