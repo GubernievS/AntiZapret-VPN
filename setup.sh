@@ -176,9 +176,9 @@ until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
-echo "    1) Cloudflare+Google - The fastest and most reliable - Recommended by default"
-echo "    2) Yandex Basic      - Use for problems loading sites from Russia"
-echo "    3) AdGuard+replica   - For blocking ads, trackers and phishing"
+echo "    1) Cloudflare+Quad9 - The fastest and most reliable - Recommended by default"
+echo "    2) Yandex           - Use for problems loading sites from Russia"
+echo "    3) AdGuard          - For blocking ads, trackers and phishing"
 until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
@@ -322,10 +322,10 @@ fi
 # Настраиваем DNS в обычном VPN
 if [[ "$VPN_DNS" == "2" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1, 8.8.8.8, 8.8.4.4/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
@@ -362,11 +362,11 @@ fi
 
 #
 # Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
-DNS_SERVERS="127.0.0.53 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+DNS_SERVERS="1.1.1.1 1.0.0.1 9.9.9.10 149.112.112.10"
 for PROXY_DNS in $DNS_SERVERS; do
-	if dig @$PROXY_DNS fb.com +short +dnssec &>/dev/null; then
-		if [ "$PROXY_DNS" != "127.0.0.53" ]; then
-			sed -i "s/127\.0\.0\.53/$PROXY_DNS/g" /root/antizapret/proxy.py
+	if dig @$PROXY_DNS youtube.com &>/dev/null; then
+		if [ "$PROXY_DNS" != "1.1.1.1" ]; then
+			sed -i "s/1\.1\.1\.1/$PROXY_DNS/g" /root/antizapret/proxy.py
 		fi
 		break
 	fi
