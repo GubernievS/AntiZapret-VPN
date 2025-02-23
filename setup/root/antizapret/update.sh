@@ -80,11 +80,4 @@ download $ADAWAY_PATH $ADAWAY_LINK
 
 gunzip -f "$DUMP_PATH" || { echo "Error unpacking $DUMP_PATH"; exit 3; }
 
-if [[ ! -f "/root/antizapret/config/adblock-hosts.txt" ]]; then
-	download "config/adblock-hosts.txt" "https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/adblock-hosts.txt"
-fi
-if [[ ! -f "/root/antizapret/config/adblock-pass-hosts.txt" ]]; then
-	download "config/adblock-pass-hosts.txt" "https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/config/adblock-pass-hosts.txt"
-fi
-
 exit 0
