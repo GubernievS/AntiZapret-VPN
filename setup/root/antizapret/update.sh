@@ -81,10 +81,13 @@ download $ADAWAY_PATH $ADAWAY_LINK
 gunzip -f "$DUMP_PATH" || { echo "Error unpacking $DUMP_PATH"; exit 3; }
 
 #
+find /etc/openvpn -type f -exec chmod 644 {} +
+find /etc/openvpn -type d -exec chmod 755 {} +
+
 cd /etc/openvpn/easyrsa3
 EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-cd "$HERE"
+
 sed -i 's|^\s*/usr/share/easy-rsa/easyrsa gen-crl|	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl|' "/root/antizapret/client.sh"
 #
 
