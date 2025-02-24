@@ -287,17 +287,16 @@ mv -f /root/wireguard/key /tmp/antizapret/setup/etc/wireguard || true
 rm -rf /root/wireguard
 
 #
-# Копируем нужные файлы и папки, удаляем не нужные
+# Выставляем разрешения
+find /tmp/antizapret -type f -exec chmod 644 {} +
+find /tmp/antizapret -type d -exec chmod 755 {} +
+find /tmp/antizapret -type f \( -name "*.sh" -o -name "*.py" \) -execdir chmod +x {} +
+
+# Копируем нужное, удаляем не нужное
 find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
-chmod g+s /tmp/antizapret/
 cp -r /tmp/antizapret/setup/* /
 rm -rf /tmp/antizapret
-
-#
-# Выставляем разрешения на запуск скриптов
-find /root -name "*.sh" -execdir chmod +x {} +
-chmod +x /root/antizapret/proxy.py
 
 #
 # Используем альтернативные диапазоны ip-адресов
