@@ -72,11 +72,4 @@ download $ADBLOCK_PATH $ADBLOCK_LINK
 
 gunzip -f "$DUMP_PATH"
 
-#
-cd /etc/openvpn/easyrsa3
-EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-cd "$HERE"
-#
-
 exit 0
