@@ -68,7 +68,7 @@ addOpenVPN(){
 	fi
 
 	if [[ ! -f ./pki/crl.pem ]]; then
-		/usr/share/easy-rsa/easyrsa gen-crl
+		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 		echo "Created new CRL"
 	fi
 
@@ -128,7 +128,7 @@ deleteOpenVPN(){
 		exit 12
 	fi
 
-	/usr/share/easy-rsa/easyrsa gen-crl
+	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	if [[ $? -ne 0 ]]; then
 		echo "Failed to update CRL"
