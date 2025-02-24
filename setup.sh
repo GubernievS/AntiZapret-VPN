@@ -290,6 +290,7 @@ rm -rf /root/wireguard
 # Копируем нужные файлы и папки, удаляем не нужные
 find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
+chmod g+s /tmp/antizapret/
 cp -r /tmp/antizapret/setup/* /
 rm -rf /tmp/antizapret
 
