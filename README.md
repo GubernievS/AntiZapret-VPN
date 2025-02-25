@@ -46,7 +46,7 @@ VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amnezia
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core, Память: 1 Gb, Хранилище: 10 Gb, Внешний IPv4
 ***
-### Установка и обновление
+## Установка и обновление
 1. Устанавливать только на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 2. Для установка или обновления в терминале под root выполнить
 ```sh
@@ -67,13 +67,13 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 9. Установить SSHGuard для защиты от перебора паролей по SSH
 10. Включить защиту от сканирования и сетевых атак
 ***
-### Настройка
-##### 1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
+## Настройка
+### 1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 ```sh
 /root/antizapret/patch-openvpn.sh [0-2]
 ```
 
-##### 2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)\
+### 2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)\
 Включение заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
 ```sh
 /root/antizapret/openvpn-dco.sh [y/n]
@@ -81,13 +81,13 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM, AES-256-GCM и CHACHA20-POLY1305\
 Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 
-##### 3. Добавить/удалить клиента (срок действия в днях - только для OpenVPN)
+### 3. Добавить/удалить клиента (срок действия в днях - только для OpenVPN)
 ```sh
 /root/antizapret/client.sh [1-7] [имя_клиента] [срок_действия]
 ```
 После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
-##### 4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
+### 4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
 ```sh
 nano /root/antizapret/config/include-hosts.txt
 ```
@@ -100,7 +100,7 @@ com\
 /root/antizapret/doall.sh
 ```
 
-##### 5. Исключить свои сайты из списка антизапрета (файл /root/antizapret/config/exclude-hosts.txt)
+### 5. Исключить свои сайты из списка антизапрета (файл /root/antizapret/config/exclude-hosts.txt)
 ```sh
 nano /root/antizapret/config/exclude-hosts.txt
 ```
@@ -113,7 +113,7 @@ com\
 /root/antizapret/doall.sh
 ```
 
-##### 6. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
+### 6. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
@@ -128,15 +128,15 @@ nano /root/antizapret/config/include-ips.txt
 После обновления списка антизапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
 А клиентам WireGuard/AmneziaWG нужно добавить новые IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
-### Пообщаться
+## Пообщаться
 Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869) и [ntc.party](https://ntc.party/t/9270) (для просмотра 4pda и ntc нужен VPN)\
 Приватная группа в [telegram](https://t.me/+XJwXHTmMvUk3NTli)
 ***
-### Настройка на роутерах
+## Настройка на роутерах
 OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
 WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN)
 ***
-### Где купить сервер
+## Где купить сервер
 Хорошие и быстрые сервера в Европе принимающие рубли:
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10%
 - [aeza.net](https://aeza.net/?ref=529527) (Франкфурт) - ссылка для регистрации с бонусом 15% если пополнение сделать в течении 24 часов с момента регистрации
@@ -147,15 +147,15 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 
 Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект
 ***
-### FAQ
-##### 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
+## FAQ
+### 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
 Для OpenVPN скачать с сервера папку /etc/openvpn/easyrsa3\
 Для WireGuard/AmneziaWG скачать с сервера папку /etc/wireguard\
 Переустановить сервер\
 Обратно на сервер в папку /root закачать папки easyrsa3 и wireguard\
 Запустить скрипт установки
 
-##### 2. Как посмотреть активные соединения?
+### 2. Как посмотреть активные соединения?
 
 Посмотреть активные соединения и статистику OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs на сервере (файлы обновляются каждые 30 секунд)\
 Посмотреть активные соединения и статистику WireGuard/AmneziaWG можно командой
@@ -164,19 +164,19 @@ wg show
 ```
 Кроме этого, есть [сторонний проект](https://github.com/TheMurmabis/StatusOpenVPN) для просмотра статистики через веб-интерфейс
 
-##### 3. Какие IP используются?
+### 3. Какие IP используются?
 
 DNS антизапрета = 10.29.0.1\
 Клиенты AntiZapret VPN = 10.29.0.0/16\
 Клиенты обычного VPN = 10.28.0.0/16\
 Подменные IP = 10.30.0.0/15
 
-##### 4. Как запретить нескольким клиентам использовать один и тот же файл подключения (\*.ovpn) для одновременного подключения к серверу?
+### 4. Как запретить нескольким клиентам использовать один и тот же файл подключения (\*.ovpn) для одновременного подключения к серверу?
 
 На сервере в папке /etc/openvpn/server во всех файлах .conf убрать строчки duplicate-cn\
 Перезагрузить сервер
 
-##### 5. Как пересоздать все файлы подключений (\*.ovpn и \*.conf) в подпапках /root/antizapret/client?
+### 5. Как пересоздать все файлы подключений (\*.ovpn и \*.conf) в подпапках /root/antizapret/client?
 
 Выполните команду
 ```sh
@@ -184,7 +184,7 @@ DNS антизапрета = 10.29.0.1\
 ```
 В подпапках /root/antizapret/client будут пересозданы все файлы подключений
 
-##### 6. Как работает опциональная защита от сканирования и сетевых атак?
+### 6. Как работает опциональная защита от сканирования и сетевых атак?
 
 IPv4 или IPv6-адрес блокируется на 10 минут если за минуту нарушаются следующие правила:
 - Сканирование портов:
