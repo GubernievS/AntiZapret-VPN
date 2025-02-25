@@ -45,7 +45,9 @@ VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amnezia
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
 
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core, Память: 1 Gb, Хранилище: 10 Gb, Внешний IPv4
+
 ***
+
 ## Установка и обновление
 1. Устанавливать только на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
 2. Для установка или обновления в терминале под root выполнить
@@ -55,7 +57,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 3. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 
-При установке можно:
+**При установке можно:**
 1. Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 2. Включить OpenVPN DCO
 3. Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN на основе правил AdGuard и AdAway
@@ -66,32 +68,36 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 8. Разрешить нескольким клиентам подключаться к OpenVPN используя один и тот же файл подключения (\*.ovpn)
 9. Установить SSHGuard для защиты от перебора паролей по SSH
 10. Включить защиту от сканирования и сетевых атак
+
 ***
+
 ## Настройка
+
 ### 1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 ```sh
 /root/antizapret/patch-openvpn.sh [0-2]
 ```
 
-### 2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)\
-Включение заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN
+### 2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)
 ```sh
 /root/antizapret/openvpn-dco.sh [y/n]
 ```
+Включение заметно снижает нагрузку на CPU сервера и клиента - это экономит аккумулятор мобильных устройств и увеличивает скорость передачи данных через OpenVPN\
 При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM, AES-256-GCM и CHACHA20-POLY1305\
 Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 
-### 3. Добавить/удалить клиента (срок действия в днях - только для OpenVPN)
+### 3. Добавить/удалить клиента
 ```sh
 /root/antizapret/client.sh [1-7] [имя_клиента] [срок_действия]
 ```
+Срок действия в днях - только для OpenVPN\
 После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
-### 4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
+### 4. Добавить свои сайты в список антизапрета
 ```sh
 nano /root/antizapret/config/include-hosts.txt
 ```
-Добавлять нужно только домены, например:
+Добавлять нужно в файл /root/antizapret/config/include-hosts.txt только домены, например:
 subdomain.example.com\
 example.com\
 com\
@@ -100,11 +106,11 @@ com\
 /root/antizapret/doall.sh
 ```
 
-### 5. Исключить свои сайты из списка антизапрета (файл /root/antizapret/config/exclude-hosts.txt)
+### 5. Исключить свои сайты из списка антизапрета
 ```sh
 nano /root/antizapret/config/exclude-hosts.txt
 ```
-Добавлять нужно только домены, например:
+Добавлять нужно в файл /root/antizapret/config/exclude-hosts.txt только домены, например:
 subdomain.example.com\
 example.com\
 com\
@@ -113,11 +119,11 @@ com\
 /root/antizapret/doall.sh
 ```
 
-### 6. Добавить свои IP-адреса в список антизапрета (файл /root/antizapret/config/include-ips.txt)
+### 6. Добавить свои IP-адреса в список антизапрета
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
-Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:\
+Добавлять нужно в файл /root/antizapret/config/include-ips.txt только IP-адреса с маской A.B.C.D/M, например:\
 8.8.8.8/32\
 10.20.0.0/16\
 20.30.40.0/24\
@@ -127,15 +133,21 @@ nano /root/antizapret/config/include-ips.txt
 ```
 После обновления списка антизапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
 А клиентам WireGuard/AmneziaWG нужно добавить новые IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
+
 ***
+
 ## Пообщаться
 Обсуждение скрипта на [4pda.to](https://4pda.to/forum/index.php?showtopic=1095869) и [ntc.party](https://ntc.party/t/9270) (для просмотра 4pda и ntc нужен VPN)\
 Приватная группа в [telegram](https://t.me/+XJwXHTmMvUk3NTli)
+
 ***
+
 ## Настройка на роутерах
 OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
 WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN)
+
 ***
+
 ## Где купить сервер
 Хорошие и быстрые сервера в Европе принимающие рубли:
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10%
@@ -143,11 +155,14 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 
 Недорогие сервера в Европе с ограничением скорости до 100 Mbit/s принимающие рубли:
 - SWE-PROMO (Стокгольм) от [aeza.net](https://aeza.net/?ref=529527) - доступность для заказа SWE-PROMO можно отслеживать через [aezastatus_bot](https://t.me/aezastatus_bot)
-- PROMO-Platinum (Франкфурт) от [h2.nexus](https://h2.nexus)
+- PROMO-Platinum (Франкфурт) от [h2.nexus](https://h2.nexus) (IP-адреса определяются как российские)
 
-Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект
+Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект!
+
 ***
+
 ## FAQ
+
 ### 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
 Для OpenVPN скачать с сервера папку /etc/openvpn/easyrsa3\
 Для WireGuard/AmneziaWG скачать с сервера папку /etc/wireguard\
@@ -217,7 +232,6 @@ ipset add antizapret-allow 192.168.1.1
 ipset add antizapret-allow 192.168.1.0/24
 ipset add antizapret-allow6 2001:db8::1
 ipset add antizapret-allow6 2001:db8::/32
-
 ```
 
 ***
