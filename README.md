@@ -47,8 +47,8 @@ VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amnezia
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core, Память: 1 Gb, Хранилище: 10 Gb, Внешний IPv4
 ***
 ### Установка и обновление
-1. Устанавливать на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
-2. В терминале под root выполнить
+1. Устанавливать только на Ubuntu 22.04/24.04 или Debian 11/12 (рекомендуется Ubuntu 24.04)
+2. Для установка или обновления в терминале под root выполнить
 ```sh
 bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh)
 ```
@@ -78,20 +78,20 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 ```sh
 /root/antizapret/openvpn-dco.sh [y/n]
 ```
->При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM, AES-256-GCM и CHACHA20-POLY1305\
+При включении OpenVPN DCO будут работать только алгоритмы шифрования AES-128-GCM, AES-256-GCM и CHACHA20-POLY1305\
 Алгоритмы шифрования AES-128-CBC, AES-192-CBC и AES-256-CBC не поддерживаются и будут отключены
 
 3. Добавить/удалить клиента (срок действия в днях - только для OpenVPN)
 ```sh
 /root/antizapret/client.sh [1-7] [имя_клиента] [срок_действия]
 ```
->После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
+После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
 4. Добавить свои сайты в список антизапрета (файл /root/antizapret/config/include-hosts.txt)
 ```sh
 nano /root/antizapret/config/include-hosts.txt
 ```
->Добавлять нужно только домены, например:
+Добавлять нужно только домены, например:
 subdomain.example.com\
 example.com\
 com\
@@ -104,7 +104,7 @@ com\
 ```sh
 nano /root/antizapret/config/exclude-hosts.txt
 ```
->Добавлять нужно только домены, например:
+Добавлять нужно только домены, например:
 subdomain.example.com\
 example.com\
 com\
@@ -117,7 +117,7 @@ com\
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
->Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:\
+Добавлять нужно только IP-адреса с маской A.B.C.D/M, например:\
 8.8.8.8/32\
 10.20.0.0/16\
 20.30.40.0/24\
@@ -125,7 +125,7 @@ nano /root/antizapret/config/include-ips.txt
 ```sh
 /root/antizapret/doall.sh
 ```
->После обновления списка антизапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
+После обновления списка антизапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
 А клиентам WireGuard/AmneziaWG нужно добавить новые IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 ***
 ### Пообщаться
@@ -149,7 +149,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 ***
 ### FAQ
 1. Как переустановить сервер и сохранить работоспособность ранее созданных файлов подключений OpenVPN (\*.ovpn) и WireGuard/AmneziaWG (\*.conf)?
-> Для OpenVPN скачать с сервера папку /etc/openvpn/easyrsa3\
+Для OpenVPN скачать с сервера папку /etc/openvpn/easyrsa3\
 Для WireGuard/AmneziaWG скачать с сервера папку /etc/wireguard\
 Переустановить сервер\
 Обратно на сервер в папку /root закачать папки easyrsa3 и wireguard\
@@ -157,36 +157,36 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 
 2. Как посмотреть активные соединения?
 
-> Посмотреть активные соединения и статистику OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs на сервере (Логи обновляются каждые 30 секунд)\
+Посмотреть активные соединения и статистику OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs на сервере (файлы обновляются каждые 30 секунд)\
 Посмотреть активные соединения и статистику WireGuard/AmneziaWG можно командой
 ```sh
 wg show
 ```
-> Кроме этого, есть [сторонний проект](https://github.com/TheMurmabis/StatusOpenVPN) для просмотра статистики через веб-интерфейс
+Кроме этого, есть [сторонний проект](https://github.com/TheMurmabis/StatusOpenVPN) для просмотра статистики через веб-интерфейс
 
 3. Какие IP используются?
 
-> DNS антизапрета = 10.29.0.1\
+DNS антизапрета = 10.29.0.1\
 Клиенты AntiZapret VPN = 10.29.0.0/16\
 Клиенты обычного VPN = 10.28.0.0/16\
 Подменные IP = 10.30.0.0/15
 
 4. Как запретить нескольким клиентам использовать один и тот же файл подключения (\*.ovpn) для одновременного подключения к серверу?
 
-> На сервере в папке /etc/openvpn/server во всех файлах .conf убрать строчки duplicate-cn\
+На сервере в папке /etc/openvpn/server во всех файлах .conf убрать строчки duplicate-cn\
 Перезагрузить сервер
 
 5. Как пересоздать все файлы подключений (\*.ovpn и \*.conf) в подпапках /root/antizapret/client?
 
-> Выполните команду
+Выполните команду
 ```sh
 /root/antizapret/client.sh 7
 ```
->В подпапках /root/antizapret/client будут пересозданы все файлы подключений
+В подпапках /root/antizapret/client будут пересозданы все файлы подключений
 
 6. Как работает опциональная защита от сканирования и сетевых атак?
 
-> IPv4 или IPv6-адрес блокируется на 10 минут если за минуту нарушаются следующие правила:
+IPv4 или IPv6-адрес блокируется на 10 минут если за минуту нарушаются следующие правила:
 - Сканирование портов:
     - Более 5 попыток подключения по разным портам и протоколу UDP
     - Более 5 попыток подключения по разным портам и протоколу TCP
@@ -199,19 +199,19 @@ wg show
 При добавлении IPv4 или IPv6 в список исключений - правила блокировки не применяются\
 Отключен ответ на ping\
 Отключен ответ о неудачной попытке подключения к закрытому порту сервера\
-> Список заблокированных IPv4 и IPv6-адресов
+Список заблокированных IPv4 и IPv6-адресов
 ```sh
 ipset list antizapret-block | grep '\.' | sort -u && ipset list antizapret-block6 | grep -E '(:.*:)' | sort -u
 ```
-> Список отслеживаемых подключений по IPv4 и IPv6 за последнюю минуту
+Список отслеживаемых подключений по IPv4 и IPv6 за последнюю минуту
 ```sh
 ipset list antizapret-watch | grep '\.' | sort -u && ipset list antizapret-watch6 | grep -E '(:.*:)' | sort -u
 ```
-> Список исключений IPv4 и IPv6
+Список исключений IPv4 и IPv6
 ```sh
 ipset list antizapret-allow | grep '\.' | sort -u && ipset list antizapret-allow6 | grep -E '(:.*:)' | sort -u
 ```
-> Пример добавления IPv4 или IPv6 в список исключений
+Пример добавления IPv4 или IPv6 в список исключений
 ```sh
 ipset add antizapret-allow 192.168.1.1
 ipset add antizapret-allow 192.168.1.0/24
