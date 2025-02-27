@@ -74,6 +74,6 @@ download $ADBLOCK_PASS_HOSTS_PATH $ADBLOCK_PASS_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
-gunzip -f "$HOSTS_PATH_1" || > "$HOSTS_PATH_1"
+gunzip -f "$HOSTS_PATH_1" || > dump.csv
 
 exit 0
