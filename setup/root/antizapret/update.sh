@@ -17,11 +17,11 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-DOMAIN_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
-DOMAIN_PATH_1="download/dump.csv.gz"
+HOSTS_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
+HOSTS_PATH_1="download/dump.csv.gz"
 
-DOMAIN_LINK_2="https://antifilter.download/list/domains.lst"
-DOMAIN_PATH_2="download/domains.lst"
+HOSTS_LINK_2="https://antifilter.download/list/domains.lst"
+HOSTS_PATH_2="download/domains.lst"
 
 NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
@@ -64,8 +64,8 @@ function download {
 download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
-download $DOMAIN_PATH_1 $DOMAIN_LINK_1
-download $DOMAIN_PATH_2 $DOMAIN_LINK_2
+download $HOSTS_PATH_1 $HOSTS_LINK_1
+download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
@@ -74,6 +74,6 @@ download $ADBLOCK_PASS_HOSTS_PATH $ADBLOCK_PASS_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
-gunzip -f "$DOMAIN_PATH_1" || > "$DOMAIN_PATH_1"
+gunzip -f "$HOSTS_PATH_1" || > "$HOSTS_PATH_1"
 
 exit 0
