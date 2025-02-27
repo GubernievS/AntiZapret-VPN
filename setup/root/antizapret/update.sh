@@ -17,8 +17,11 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
-DUMP_PATH="download/dump.csv.gz"
+DOMAIN_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
+DOMAIN_PATH_1="download/dump.csv.gz"
+
+DOMAIN_LINK_2="https://antifilter.download/list/domains.lst"
+DOMAIN_PATH_2="download/domains.lst"
 
 NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
@@ -44,7 +47,6 @@ ADAWAY_PATH="download/adaway.txt"
 function download {
 	local path="${HERE}/${1}"
 	local link=$2
-	local min_size_mb=$3
 	echo "$path"
 	curl -fL "$link" -o "download/temp"
 	local_size="$(stat -c '%s' "download/temp")"
@@ -52,13 +54,6 @@ function download {
 	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
 		exit 1
-	fi
-	if [[ -n "$min_size_mb" ]]; then
-		min_size=$((min_size_mb * 1024 * 1024))
-		if [[ "$local_size" -lt "$min_size" ]]; then
-			echo "Failed to download $path! File size is less than ${min_size_mb} MB"
-			exit 2
-		fi
 	fi
 	mv -f "download/temp" "$path"
 	if [[ "$path" == *.sh ]]; then
@@ -69,8 +64,9 @@ function download {
 download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
-download $DUMP_PATH $DUMP_LINK 10
-download $NXDOMAIN_PATH $NXDOMAIN_LINK 1
+download $DOMAIN_PATH_1 $DOMAIN_LINK_1
+download $DOMAIN_PATH_2 $DOMAIN_LINK_2
+download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $ADBLOCK_HOSTS_PATH $ADBLOCK_HOSTS_LINK
@@ -78,6 +74,6 @@ download $ADBLOCK_PASS_HOSTS_PATH $ADBLOCK_PASS_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
-gunzip -f "$DUMP_PATH" || { echo "Error unpacking $DUMP_PATH"; exit 3; }
+gunzip -f "$DOMAIN_PATH_1" || > "$DOMAIN_PATH_1"
 
 exit 0
