@@ -54,7 +54,7 @@ VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amnezia
 ```sh
 bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup.sh)
 ```
-3. Изменить настройки (или нажимать Enter для выбора значения по умолчанию)
+3. Изменить настройки (или нажимать Enter для выбора значения по умолчанию):
 	- Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 	- Включить OpenVPN DCO
 	- Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN на основе правил AdGuard и AdAway
