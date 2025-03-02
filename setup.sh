@@ -6,6 +6,49 @@
 #
 
 #
+# Проверка прав root
+if [[ "$EUID" -ne 0 ]]; then
+	echo "Error: You need to run this as root!"
+	exit 1
+fi
+
+cd /root
+
+#
+# Проверка на OpenVZ и LXC
+if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+	echo "Error: OpenVZ and LXC is not supported!"
+	exit 2
+fi
+
+#
+# Проверка версии системы
+OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+VERSION=$(lsb_release -rs | cut -d '.' -f1)
+
+if [[ $OS == "debian" ]]; then
+	if [[ $VERSION -lt 11 ]]; then
+		echo "Error: Your version of Debian is not supported!"
+		exit 3
+	fi
+elif [[ $OS == "ubuntu" ]]; then
+	if [[ $VERSION -lt 22 ]]; then
+		echo "Error: Your version of Ubuntu is not supported!"
+		exit 4
+	fi
+elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
+	echo "Error: Your version of Linux is not supported!"
+	exit 5
+fi
+
+#
+# Проверка свободного места (минимум 2Гб)
+if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
+    echo "Error: Low disk space!"
+    exit 6
+fi
+
+#
 # Удаление или перемещение файлов и папок при обновлении
 systemctl stop openvpn-generate-keys &>/dev/null
 systemctl disable openvpn-generate-keys &>/dev/null
@@ -87,6 +130,7 @@ systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
 
+#
 # Очищаем правила iptables
 iptables -F &>/dev/null
 iptables -X &>/dev/null
@@ -97,6 +141,7 @@ ip6tables -X &>/dev/null
 ip6tables -t nat -F &>/dev/null
 ip6tables -t nat -X &>/dev/null
 
+#
 # Удаляем старый кеш knot-resolver
 rm -f /var/cache/knot-resolver/*
 
@@ -111,45 +156,9 @@ handle_error() {
 	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	echo ""
 	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
-	exit 1
+	exit 7
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
-#
-# Проверка на OpenVZ и LXC
-if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
-	echo "OpenVZ and LXC is not supported!"
-	exit 2
-fi
-
-#
-# Проверка прав root
-if [[ "$EUID" -ne 0 ]]; then
-	echo "You need to run this as root permission!"
-	exit 3
-fi
-
-cd /root
-
-#
-# Проверка версии системы
-OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
-VERSION=$(lsb_release -rs | cut -d '.' -f1)
-
-if [[ $OS == "debian" ]]; then
-	if [[ $VERSION -lt 11 ]]; then
-		echo "Your version of Debian is not supported!"
-		exit 4
-	fi
-elif [[ $OS == "ubuntu" ]]; then
-	if [[ $VERSION -lt 22 ]]; then
-		echo "Your version of Ubuntu is not supported!"
-		exit 5
-	fi
-elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
-	echo "Your version of Linux is not supported!"
-	exit 6
-fi
 
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
