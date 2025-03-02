@@ -17,7 +17,7 @@ cd /root
 #
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
-	echo "Error: OpenVZ and LXC is not supported!"
+	echo "Error: OpenVZ and LXC are not supported!"
 	exit 2
 fi
 
@@ -44,7 +44,7 @@ fi
 #
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
-    echo "Error: Low disk space!"
+    echo "Error: Low disk space! You need 2GB of free space!"
     exit 6
 fi
 
