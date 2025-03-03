@@ -542,3 +542,4 @@ foxnews.com
 meshcapade.com
 elgato.com
 app.langdock.com
+lucid.co
