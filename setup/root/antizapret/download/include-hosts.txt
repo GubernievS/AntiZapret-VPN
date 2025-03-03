@@ -540,3 +540,5 @@ udemy.com
 #qobuz.com
 foxnews.com
 meshcapade.com
+elgato.com
+app.langdock.com
