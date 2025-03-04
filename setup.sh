@@ -55,6 +55,8 @@ while pgrep -x apt-get >/dev/null; do
     sleep 5; 
 done
 
+echo "Preparing for installation, please wait..."
+
 #
 # Удаление или перемещение файлов и папок при обновлении
 systemctl stop openvpn-generate-keys &>/dev/null
