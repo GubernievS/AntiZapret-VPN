@@ -112,9 +112,14 @@ fi
 mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
 mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
 
-apt-get purge -y python3-dnslib gnupg2 ferm libpam0g-dev &>/dev/null
+apt-get purge -y python3-dnslib &>/dev/null
+apt-get purge -y gnupg2 &>/dev/null
+apt-get purge -y ferm &>/dev/null
+apt-get purge -y libpam0g-dev &>/dev/null
 apt-get purge -y amneziawg &>/dev/null
 
+#
+# Остановим и выключим службы
 systemctl stop kresd@1 &>/dev/null
 systemctl stop antizapret &>/dev/null
 systemctl stop antizapret-update.service &>/dev/null
@@ -136,17 +141,6 @@ systemctl disable openvpn-server@vpn-udp &>/dev/null
 systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
-
-#
-# Очищаем правила iptables
-iptables -F &>/dev/null
-iptables -X &>/dev/null
-iptables -t nat -F &>/dev/null
-iptables -t nat -X &>/dev/null
-ip6tables -F &>/dev/null
-ip6tables -X &>/dev/null
-ip6tables -t nat -F &>/dev/null
-ip6tables -t nat -X &>/dev/null
 
 #
 # Удаляем старый кеш knot-resolver
