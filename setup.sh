@@ -49,6 +49,13 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 fi
 
 #
+# Ожидание пока выполняется apt-get
+while pgrep -x apt-get >/dev/null; do 
+    echo "Waiting for apt-get to finish..."; 
+    sleep 5; 
+done
+
+#
 # Удаление или перемещение файлов и папок при обновлении
 systemctl stop openvpn-generate-keys &>/dev/null
 systemctl disable openvpn-generate-keys &>/dev/null
