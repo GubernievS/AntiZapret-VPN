@@ -446,7 +446,7 @@ OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
 PROXY_DNS=${PROXY_DNS}
-SETUP_DATE=\"$(date +"%d.%m.%Y %H:%M:%S %z")\"" > /root/antizapret/setup
+SETUP_DATE=$(date +"%d.%m.%Y %H:%M:%S %z")" > /root/antizapret/setup
 
 #
 # Создадим файл подкачки размером 512 Мб если его нет
