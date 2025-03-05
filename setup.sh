@@ -204,7 +204,7 @@ rm -rf /usr/local/src/openvpn
 
 #
 # Ожидание пока выполняется apt-get
-while pgrep -x apt-get >/dev/null; do 
+while pidof apt-get &>/dev/null; do 
     echo "Waiting for apt-get to finish..."; 
     sleep 5; 
 done
