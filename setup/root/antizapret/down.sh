@@ -2,7 +2,11 @@
 
 exec 2>/dev/null
 
-INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+if [[ -z "$1" ]]; then
+	INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+else
+	INTERFACE=$1
+fi
 
 # filter
 # INPUT connection tracking
@@ -78,3 +82,5 @@ iptables -w -t nat -X ANTIZAPRET-MAPPING
 # MASQUERADE
 iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -j MASQUERADE
+
+./custom-down.sh

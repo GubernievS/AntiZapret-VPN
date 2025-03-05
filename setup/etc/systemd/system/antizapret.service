@@ -7,10 +7,9 @@ Wants=multi-user.target
 LimitNPROC=infinity
 LimitNOFILE=65535
 WorkingDirectory=/root/antizapret
-ExecStartPre=/root/antizapret/iptables-up.sh
-ExecStartPre=/bin/bash -c 'echo "cache.clear()" | socat - /run/knot-resolver/control/1'
+ExecStartPre=/root/antizapret/up.sh
 ExecStart=/root/antizapret/proxy.py
-ExecStopPost=/root/antizapret/iptables-down.sh
+ExecStopPost=/root/antizapret/down.sh
 Restart=on-failure
 
 [Install]

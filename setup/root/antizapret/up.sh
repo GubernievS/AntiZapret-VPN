@@ -1,17 +1,26 @@
 #!/bin/bash
 
-./iptables-down.sh
+INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+if [[ -z "$INTERFACE" ]]; then
+	echo "Default network interface not found!"
+	exit 1
+fi
+
+./down.sh "$INTERFACE"
 
 set -e
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "$HERE"
 
-INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
-if [[ -z "$INTERFACE" ]]; then
-	echo "Default network interface not found!"
-	exit 1
-fi
+# Clear knot-resolver cache
+echo "cache.clear()" | socat - /run/knot-resolver/control/1
+
+# Network parameters modification
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w kernel.printk="3 4 1 3"
+sysctl -w net.core.default_qdisc=fq
+sysctl -w net.ipv4.tcp_congestion_control=bbr
 
 # filter
 # INPUT connection tracking
@@ -84,3 +93,5 @@ iptables -w -t nat -N ANTIZAPRET-MAPPING
 iptables -w -t nat -A PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
 # MASQUERADE
 iptables -w -t nat -A POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
+
+./custom-up.sh

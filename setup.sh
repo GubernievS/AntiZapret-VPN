@@ -136,6 +136,7 @@ systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
 
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/sysctl.d/20-network.conf
+rm -f /etc/sysctl.d/99-antizapret.conf
 rm -f /etc/systemd/network/eth.network
 rm -f /etc/systemd/network/host.network
 rm -f /etc/systemd/system/openvpn-generate-keys.service
@@ -309,7 +310,7 @@ rm -rf /tmp/antizapret
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$ALTERNATIVE_IP" == "y" ]]; then
 	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
-	sed -i 's/10\./172\./g' /root/antizapret/iptables-up.sh
+	sed -i 's/10\./172\./g' /root/antizapret/up.sh
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
@@ -338,14 +339,14 @@ fi
 # Не используем резервные порты 80 и 443 для OpenVPN TCP
 if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
 	sed -i '/ \(80\|443\) tcp/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/tcp.* \(80\|443\) /s/^/#/' /root/antizapret/iptables-up.sh
+	sed -i '/tcp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN UDP
 if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
 	sed -i '/ \(80\|443\) udp/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/udp.* \(80\|443\) /s/^/#/' /root/antizapret/iptables-up.sh
+	sed -i '/udp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
 #
@@ -363,7 +364,7 @@ fi
 #
 # Отключаем защиту от сетевых атак и сканирования
 if [[ "$PROTECT_SERVER" == "n" ]]; then
-	sed -i '/\(antizapret-block\|antizapret-watch\|p icmp\|RST RST\)/s/^/#/' /root/antizapret/iptables-up.sh
+	sed -i '/\(antizapret-block\|antizapret-watch\|p icmp\|RST RST\)/s/^/#/' /root/antizapret/up.sh
 fi
 
 #
