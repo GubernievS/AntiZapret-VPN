@@ -48,17 +48,6 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
     exit 6
 fi
 
-#
-# Обработка ошибок
-handle_error() {
-	echo ""
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
-	echo ""
-	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
-	exit 7
-}
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
@@ -219,6 +208,17 @@ while pgrep -x apt-get >/dev/null; do
     echo "Waiting for apt-get to finish..."; 
     sleep 5; 
 done
+
+#
+# Обработка ошибок
+handle_error() {
+	echo ""
+	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
+	echo ""
+	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	exit 7
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 #
 # Завершим выполнение скрипта при ошибке
