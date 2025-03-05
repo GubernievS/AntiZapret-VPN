@@ -111,6 +111,7 @@ until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
 done
 echo ""
+echo "Preparing for installation, please wait..."
 
 #
 # Удаление или перемещение файлов и папок при обновлении
