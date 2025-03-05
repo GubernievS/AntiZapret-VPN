@@ -162,7 +162,7 @@ rm -rf /root/dnsmap
 rm -rf /root/openvpn
 rm -rf /etc/ferm
 
-mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh
+mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh &>/dev/null
 
 apt-get purge -y python3-dnslib &>/dev/null
 apt-get purge -y gnupg2 &>/dev/null
@@ -282,15 +282,15 @@ git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 #
 # Сохраняем пользовательские настройки и пользовательские обработчики custom*.sh
-mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config || true
-mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret || true
+mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config &>/dev/null || true
+mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret &>/dev/null || true
 
 #
 # Восстанавливаем из бэкапа пользователей vpn
-mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn || true
-mv -f /root/wireguard/antizapret.conf /tmp/antizapret/setup/etc/wireguard || true
-mv -f /root/wireguard/vpn.conf /tmp/antizapret/setup/etc/wireguard || true
-mv -f /root/wireguard/key /tmp/antizapret/setup/etc/wireguard || true
+mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn &>/dev/null || true
+mv -f /root/wireguard/antizapret.conf /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
+mv -f /root/wireguard/vpn.conf /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
+mv -f /root/wireguard/key /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
 rm -rf /root/wireguard
 
 #
