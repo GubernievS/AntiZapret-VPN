@@ -111,6 +111,14 @@ until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
 done
 echo ""
+
+#
+# Ожидание пока выполняется apt-get
+while pidof apt-get &>/dev/null; do 
+    echo "Waiting for apt-get to finish..."; 
+    sleep 5; 
+done
+
 echo "Preparing for installation, please wait..."
 
 #
@@ -202,13 +210,6 @@ rm -rf /etc/wireguard/templates/*
 # Удалим скомпилированный патченный OpenVPN
 make -C /usr/local/src/openvpn uninstall &>/dev/null
 rm -rf /usr/local/src/openvpn
-
-#
-# Ожидание пока выполняется apt-get
-while pidof apt-get &>/dev/null; do 
-    echo "Waiting for apt-get to finish..."; 
-    sleep 5; 
-done
 
 #
 # Обработка ошибок
