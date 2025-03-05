@@ -49,110 +49,6 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 fi
 
 #
-# Ожидание пока выполняется apt-get
-while pgrep -x apt-get >/dev/null; do 
-    echo "Waiting for apt-get to finish..."; 
-    sleep 5; 
-done
-
-echo "Preparing for installation, please wait..."
-
-#
-# Удаление или перемещение файлов и папок при обновлении
-systemctl stop openvpn-generate-keys &>/dev/null
-systemctl disable openvpn-generate-keys &>/dev/null
-systemctl stop openvpn-server@antizapret &>/dev/null
-systemctl disable openvpn-server@antizapret &>/dev/null
-systemctl stop dnsmap &>/dev/null
-systemctl disable dnsmap &>/dev/null
-systemctl stop ferm &>/dev/null
-systemctl disable ferm &>/dev/null
-systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
-systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
-
-rm -f /etc/knot-resolver/knot-aliases-alt.conf
-rm -f /etc/knot-resolver/hosts.conf
-rm -f /etc/sysctl.d/10-conntrack.conf
-rm -f /etc/sysctl.d/20-network.conf
-rm -f /etc/systemd/network/eth.network
-rm -f /etc/systemd/network/host.network
-rm -f /etc/systemd/system/openvpn-generate-keys.service
-rm -f /etc/systemd/system/dnsmap.service
-rm -f /etc/openvpn/server/antizapret.conf
-rm -f /etc/openvpn/server/logs/*
-rm -f /etc/openvpn/server/keys/dh2048.pem
-rm -f /etc/openvpn/client/templates/*
-rm -f /etc/openvpn/client/templates/antizapret-no-cipher.conf
-rm -f /etc/openvpn/server/antizapret-no-cipher.conf
-rm -f /etc/openvpn/server/logs/antizapret-no-cipher*.log
-rm -f /etc/wireguard/templates/*
-rm -f /etc/apt/sources.list.d/amnezia*
-rm -f /var/lib/knot-resolver/*
-rm -f /usr/share/keyrings/amnezia.gpg
-rm -f /root/upgrade.sh
-rm -f /root/generate.sh
-rm -f /root/Enable-OpenVPN-DCO.sh
-rm -f /root/upgrade-openvpn.sh
-rm -f /root/create-swap.sh
-rm -f /root/disable-openvpn-dco.sh
-rm -f /root/enable-openvpn-dco.sh
-rm -f /root/patch-openvpn.sh
-rm -f /root/add-client.sh
-rm -f /root/delete-client.sh
-rm -f /root/*.ovpn
-rm -f /root/*.conf
-rm -rf /root/vpn
-rm -rf /root/easy-rsa-ipsec
-rm -rf /root/.gnupg
-rm -rf /root/dnsmap
-rm -rf /root/antizapret/dnsmap
-rm -rf /etc/ferm
-if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
-	mkdir -p /root/easyrsa3
-	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
-fi
-mv -f /root/openvpn /usr/local/src/openvpn &>/dev/null
-mv -f /etc/knot-resolver/blocked-hosts.conf /etc/knot-resolver/hosts.conf &>/dev/null
-
-apt-get purge -y python3-dnslib &>/dev/null
-apt-get purge -y gnupg2 &>/dev/null
-apt-get purge -y ferm &>/dev/null
-apt-get purge -y libpam0g-dev &>/dev/null
-apt-get purge -y amneziawg &>/dev/null
-
-#
-# Остановим и выключим службы
-systemctl stop kresd@1 &>/dev/null
-systemctl stop antizapret &>/dev/null
-systemctl stop antizapret-update.service &>/dev/null
-systemctl stop antizapret-update.timer &>/dev/null
-systemctl stop openvpn-server@antizapret-udp &>/dev/null
-systemctl stop openvpn-server@antizapret-tcp &>/dev/null
-systemctl stop openvpn-server@vpn-udp &>/dev/null
-systemctl stop openvpn-server@vpn-tcp &>/dev/null
-systemctl stop wg-quick@antizapret &>/dev/null
-systemctl stop wg-quick@vpn &>/dev/null
-
-systemctl disable kresd@1 &>/dev/null
-systemctl disable antizapret &>/dev/null
-systemctl disable antizapret-update.service &>/dev/null
-systemctl disable antizapret-update.timer &>/dev/null
-systemctl disable openvpn-server@antizapret-udp &>/dev/null
-systemctl disable openvpn-server@antizapret-tcp &>/dev/null
-systemctl disable openvpn-server@vpn-udp &>/dev/null
-systemctl disable openvpn-server@vpn-tcp &>/dev/null
-systemctl disable wg-quick@antizapret &>/dev/null
-systemctl disable wg-quick@vpn &>/dev/null
-
-#
-# Удаляем старый кеш knot-resolver
-rm -f /var/cache/knot-resolver/*
-
-#
-# Завершим выполнение скрипта при ошибке
-set -e
-
-#
 # Обработка ошибок
 handle_error() {
 	echo ""
@@ -228,11 +124,105 @@ done
 echo ""
 
 #
+# Удаление или перемещение файлов и папок при обновлении
+systemctl stop openvpn-generate-keys &>/dev/null
+systemctl disable openvpn-generate-keys &>/dev/null
+systemctl stop openvpn-server@antizapret &>/dev/null
+systemctl disable openvpn-server@antizapret &>/dev/null
+systemctl stop dnsmap &>/dev/null
+systemctl disable dnsmap &>/dev/null
+systemctl stop ferm &>/dev/null
+systemctl disable ferm &>/dev/null
+systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
+systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
+
+rm -f /etc/sysctl.d/10-conntrack.conf
+rm -f /etc/sysctl.d/20-network.conf
+rm -f /etc/systemd/network/eth.network
+rm -f /etc/systemd/network/host.network
+rm -f /etc/systemd/system/openvpn-generate-keys.service
+rm -f /etc/systemd/system/dnsmap.service
+#rm -f /etc/apt/sources.list.d/amnezia*
+#rm -f /usr/share/keyrings/amnezia.gpg
+rm -f /root/upgrade.sh
+rm -f /root/generate.sh
+rm -f /root/Enable-OpenVPN-DCO.sh
+rm -f /root/upgrade-openvpn.sh
+rm -f /root/create-swap.sh
+rm -f /root/disable-openvpn-dco.sh
+rm -f /root/enable-openvpn-dco.sh
+rm -f /root/patch-openvpn.sh
+rm -f /root/add-client.sh
+rm -f /root/delete-client.sh
+rm -f /root/*.ovpn
+rm -f /root/*.conf
+rm -rf /root/vpn
+rm -rf /root/easy-rsa-ipsec
+rm -rf /root/.gnupg
+rm -rf /root/dnsmap
+rm -rf /root/openvpn
+rm -rf /etc/ferm
+
+apt-get purge -y python3-dnslib &>/dev/null
+apt-get purge -y gnupg2 &>/dev/null
+apt-get purge -y ferm &>/dev/null
+apt-get purge -y libpam0g-dev &>/dev/null
+#apt-get purge -y amneziawg &>/dev/null
+
+#
+# Остановим и выключим службы
+systemctl stop kresd@1 &>/dev/null
+systemctl stop antizapret &>/dev/null
+systemctl stop antizapret-update.service &>/dev/null
+systemctl stop antizapret-update.timer &>/dev/null
+systemctl stop openvpn-server@antizapret-udp &>/dev/null
+systemctl stop openvpn-server@antizapret-tcp &>/dev/null
+systemctl stop openvpn-server@vpn-udp &>/dev/null
+systemctl stop openvpn-server@vpn-tcp &>/dev/null
+systemctl stop wg-quick@antizapret &>/dev/null
+systemctl stop wg-quick@vpn &>/dev/null
+
+systemctl disable kresd@1 &>/dev/null
+systemctl disable antizapret &>/dev/null
+systemctl disable antizapret-update.service &>/dev/null
+systemctl disable antizapret-update.timer &>/dev/null
+systemctl disable openvpn-server@antizapret-udp &>/dev/null
+systemctl disable openvpn-server@antizapret-tcp &>/dev/null
+systemctl disable openvpn-server@vpn-udp &>/dev/null
+systemctl disable openvpn-server@vpn-tcp &>/dev/null
+systemctl disable wg-quick@antizapret &>/dev/null
+systemctl disable wg-quick@vpn &>/dev/null
+
+#
+# Удаляем старые файлы и кеш knot-resolver
+rm -rf /var/cache/knot-resolver/*
+rm -rf /etc/knot-resolver/*
+rm -rf /var/lib/knot-resolver/*
+
+#
+# Удаляем старые файлы openvpn
+rm -rf /etc/openvpn/server/*
+rm -rf /etc/openvpn/client/*
+
+#
+# Удаляем старые файлы wireguard
+rm -rf /etc/wireguard/templates/*
+
+#
 # Удалим скомпилированный патченный OpenVPN
-if [[ -d "/usr/local/src/openvpn" ]]; then
-	make -C /usr/local/src/openvpn uninstall || true
-	rm -rf /usr/local/src/openvpn
-fi
+make -C /usr/local/src/openvpn uninstall &>/dev/null
+rm -rf /usr/local/src/openvpn
+
+#
+# Ожидание пока выполняется apt-get
+while pgrep -x apt-get >/dev/null; do 
+    echo "Waiting for apt-get to finish..."; 
+    sleep 5; 
+done
+
+#
+# Завершим выполнение скрипта при ошибке
+set -e
 
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
