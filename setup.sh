@@ -161,6 +161,8 @@ rm -rf /root/dnsmap
 rm -rf /root/openvpn
 rm -rf /etc/ferm
 
+mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh
+
 apt-get purge -y python3-dnslib &>/dev/null
 apt-get purge -y gnupg2 &>/dev/null
 apt-get purge -y ferm &>/dev/null
