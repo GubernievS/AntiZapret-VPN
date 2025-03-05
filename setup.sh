@@ -44,8 +44,8 @@ fi
 #
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
-    echo "Error: Low disk space! You need 2GB of free space!"
-    exit 6
+	echo "Error: Low disk space! You need 2GB of free space!"
+	exit 6
 fi
 
 echo ""
@@ -115,8 +115,8 @@ echo ""
 #
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do 
-    echo "Waiting for apt-get to finish..."; 
-    sleep 5; 
+	echo "Waiting for apt-get to finish..."; 
+	sleep 5; 
 done
 
 echo "Preparing for installation, please wait..."
@@ -231,7 +231,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
 # Отключим IPv6 на время установки
-if [ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]; then
+if [[ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]]; then
 	sysctl -w net.ipv6.conf.all.disable_ipv6=1
 fi
 
@@ -278,9 +278,9 @@ rm -rf /tmp/antizapret
 git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 #
-# Сохраняем пользовательские настройки и пользовательский обработчик custom.sh
+# Сохраняем пользовательские настройки и пользовательские обработчики custom*.sh
 mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config || true
-mv -f /root/antizapret/custom.sh /tmp/antizapret/setup/root/antizapret/custom.sh || true
+mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret || true
 
 #
 # Восстанавливаем из бэкапа пользователей vpn
