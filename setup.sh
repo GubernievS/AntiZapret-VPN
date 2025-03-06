@@ -158,14 +158,19 @@ rm -f /root/add-client.sh
 rm -f /root/delete-client.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
+
+if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
+	mkdir -p /root/easyrsa3
+	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
+fi
+mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh &>/dev/null
+
 rm -rf /root/vpn
 rm -rf /root/easy-rsa-ipsec
 rm -rf /root/.gnupg
 rm -rf /root/dnsmap
 rm -rf /root/openvpn
 rm -rf /etc/ferm
-
-mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh &>/dev/null
 
 apt-get purge -y python3-dnslib &>/dev/null
 apt-get purge -y gnupg2 &>/dev/null
