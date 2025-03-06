@@ -117,9 +117,9 @@ echo ""
 
 #
 # Ожидание пока выполняется apt-get
-while pidof apt-get &>/dev/null; do 
-	echo "Waiting for apt-get to finish..."; 
-	sleep 5; 
+while pidof apt-get &>/dev/null; do
+	echo "Waiting for apt-get to finish...";
+	sleep 5;
 done
 
 echo "Preparing for installation, please wait..."
