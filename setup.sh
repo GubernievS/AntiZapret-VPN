@@ -73,9 +73,12 @@ until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
-echo "    1) Cloudflare+Quad9 - The fastest and most reliable - Recommended by default"
-echo "    2) Yandex           - Use for problems loading sites from Russia"
-echo "    3) AdGuard          - For blocking ads, trackers and phishing"
+echo "    1) Cloudflare + Quad9 - The fastest and most reliable - Recommended by default"
+echo "                            (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
+echo "    2) Yandex + MSK-IX    - Use for problems loading sites from Russia"
+echo "                            (77.88.8.8, 77.88.8.1, 62.76.76.62, 62.76.62.76)"
+echo "    3) AdGuard            - For blocking ads, trackers and phishing"
+echo "                            (94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44)"
 until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
@@ -173,6 +176,7 @@ apt-get purge -y libpam0g-dev &>/dev/null
 #
 # Остановим и выключим службы
 systemctl stop kresd@1 &>/dev/null
+systemctl stop kresd@2 &>/dev/null
 systemctl stop antizapret &>/dev/null
 systemctl stop antizapret-update.service &>/dev/null
 systemctl stop antizapret-update.timer &>/dev/null
@@ -184,6 +188,7 @@ systemctl stop wg-quick@antizapret &>/dev/null
 systemctl stop wg-quick@vpn &>/dev/null
 
 systemctl disable kresd@1 &>/dev/null
+systemctl disable kresd@2 &>/dev/null
 systemctl disable antizapret &>/dev/null
 systemctl disable antizapret-update.service &>/dev/null
 systemctl disable antizapret-update.timer &>/dev/null
@@ -309,14 +314,14 @@ rm -rf /tmp/antizapret
 # Используем альтернативные диапазоны ip-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$ALTERNATIVE_IP" == "y" ]]; then
-	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
-	sed -i 's/10\./172\./g' /root/antizapret/up.sh
-	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
-	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
-	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
+	sed -i 's/10\.29\.0\.1/172\.29\.0\.1/g' /root/antizapret/proxy.py
+	sed -i 's/10\.29\.0\.1/172\.29\.0\.1/g' /root/antizapret/up.sh
+	sed -i 's/10\.29\.0\.1/172\.29\.0\.1/g' /etc/openvpn/server/*.conf
+	sed -i 's/10\.29\.0\.1/172\.29\.0\.1/g' /etc/knot-resolver/kresd.conf
+	sed -i 's/10\.29\.0\.1/172\.29\.0\.1/g' /etc/wireguard/templates/*.conf
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\.29\.0\.1/s = 172\.29\.0\.1/g' {} +
 else
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\.29\.0\.1/s = 10\.29\.0\.1/g' {} +
 fi
 
 #
@@ -328,8 +333,8 @@ fi
 #
 # Настраиваем DNS в обычном VPN
 if [[ "$VPN_DNS" == "2" ]]; then
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1\npush "dhcp-option DNS 62.76.76.62\npush "dhcp-option DNS 62.76.62.76"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/77.88.8.8, 77.88.8.1, 62.76.76.62, 62.76.62.76/" /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
@@ -368,18 +373,6 @@ if [[ "$PROTECT_SERVER" == "n" ]]; then
 fi
 
 #
-# Проверяем доступность DNS серверов для proxy.py и выберем первый рабочий
-DNS_SERVERS="1.1.1.1 1.0.0.1 9.9.9.10 149.112.112.10"
-for PROXY_DNS in $DNS_SERVERS; do
-	if dig @$PROXY_DNS youtube.com &>/dev/null; then
-		if [ "$PROXY_DNS" != "1.1.1.1" ]; then
-			sed -i "s/1\.1\.1\.1/$PROXY_DNS/g" /root/antizapret/proxy.py
-		fi
-		break
-	fi
-done
-
-#
 # Создаем список исключений IP-адресов
 /root/antizapret/parse.sh ip
 
@@ -392,6 +385,7 @@ done
 #
 # Включим нужные службы
 systemctl enable kresd@1
+systemctl enable kresd@2
 systemctl enable antizapret
 systemctl enable antizapret-update.service
 systemctl enable antizapret-update.timer
@@ -440,7 +434,6 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
-PROXY_DNS=${PROXY_DNS}
 SETUP_DATE=$(date +"%d.%m.%Y %H:%M:%S %z")" > /root/antizapret/setup
 
 #
