@@ -60,25 +60,24 @@ addOpenVPN(){
 	if [[ ! -f ./pki/ca.crt ]] || \
 	   [[ ! -f ./pki/issued/antizapret-server.crt ]] || \
 	   [[ ! -f ./pki/private/antizapret-server.key ]]; then
-		rm -rf ./pki/
+		rm -rf ./pki
 		/usr/share/easy-rsa/easyrsa init-pki
 		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
 		echo "Created new PKI and CA"
 	fi
 
-	if [[ ! -f ./pki/crl.pem ]]; then
-		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-		echo "Created new CRL"
-	fi
-
 	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
 	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
-	   [[ ! -f ./pki/crl.pem ]]; then
+	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
 		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
 		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+	fi
+
+	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
+		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+		echo "Created new CRL"
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 
@@ -123,17 +122,9 @@ deleteOpenVPN(){
 	cd /etc/openvpn/easyrsa3
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
-	if [[ $? -ne 0 ]]; then
-		echo "Failed to revoke certificate for client '$CLIENT_NAME', please check if the client exists"
-		exit 12
-	fi
 
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-	if [[ $? -ne 0 ]]; then
-		echo "Failed to update CRL"
-		exit 13
-	fi
 
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
 	FILE_NAME="${FILE_NAME#vpn-}"
