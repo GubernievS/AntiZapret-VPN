@@ -239,7 +239,10 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 # Завершим выполнение скрипта при ошибке
 set -e
 
+#
+# Обновляем систему
 apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
@@ -267,11 +270,6 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn
 if [[ $OS == "debian" ]]; then
 	echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
 fi
-
-#
-# Обновляем систему
-apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 #
 # Ставим необходимые пакеты
