@@ -114,6 +114,7 @@ until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
 done
 echo ""
+echo "Preparing for installation, please wait..."
 
 #
 # Ожидание пока выполняется apt-get
@@ -122,7 +123,11 @@ while pidof apt-get &>/dev/null; do
 	sleep 5;
 done
 
-echo "Preparing for installation, please wait..."
+#
+# Отключим фоновые обновления системы
+systemctl stop unattended-upgrades &>/dev/null
+systemctl stop apt-daily.timer &>/dev/null
+systemctl stop apt-daily-upgrade.timer &>/dev/null
 
 #
 # Удаление или перемещение файлов и папок при обновлении
