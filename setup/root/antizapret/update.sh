@@ -107,7 +107,7 @@ for FILE in /etc/openvpn/server/vpn*.conf; do
 	}
 done
 
-./root/antizapret/client.sh 7
+./client.sh 7
 
 ###
 
