@@ -76,4 +76,39 @@ download $ADAWAY_PATH $ADAWAY_LINK
 
 gunzip -f "$HOSTS_PATH_1" || > dump.csv
 
+###
+
+set +e
+
+if ! systemctl is-active --quiet kresd@2; then
+    exit 0
+fi
+
+# Knot Resolver
+KRESD_CONF="/etc/knot-resolver/kresd.conf"
+[ -f "$KRESD_CONF" ] && {
+	sed -i 's/ + MSK-IX//g' "$KRESD_CONF"
+	sed -i 's/62.76.76.62/77.88.8.8@1253/g' "$KRESD_CONF"
+	sed -i 's/62.76.62.76/77.88.8.1@1253/g' "$KRESD_CONF"
+}
+
+systemctl restart kresd@1
+
+# WireGuard
+for FILE in /etc/wireguard/templates/vpn-client*.conf; do
+	[ -f "$FILE" ] && sed -i 's/, 62.76.76.62, 62.76.62.76//g' "$FILE"
+done
+
+# OpenVPN
+for FILE in /etc/openvpn/server/vpn*.conf; do
+	[ -f "$FILE" ] && {
+		sed -i '/push "dhcp-option DNS 62.76.76.62"/d' "$FILE"
+		sed -i '/push "dhcp-option DNS 62.76.62.76"/d' "$FILE"
+	}
+done
+
+./root/antizapret/client.sh 7
+
+###
+
 exit 0
