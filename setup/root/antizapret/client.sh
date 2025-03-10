@@ -143,6 +143,7 @@ listOpenVPN(){
 	echo ""
 	echo "OpenVPN existing client names:"
 	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
+	echo ""
 }
 
 addWireGuard_AmneziaWG(){
@@ -289,6 +290,7 @@ listWireGuard_AmneziaWG(){
 	echo ""
 	echo "WireGuard/AmneziaWG existing client names:"
 	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
+	echo ""
 }
 
 recreate(){
