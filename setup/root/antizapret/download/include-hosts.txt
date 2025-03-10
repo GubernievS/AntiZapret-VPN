@@ -552,4 +552,4 @@ box.com
 app.augmentcode.com
 g711.org
 lenso.ai
-images.pexels.com
+pexels.com
