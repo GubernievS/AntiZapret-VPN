@@ -19,7 +19,7 @@ getClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 		echo ""
 		echo "Enter the client's name"
-		echo "The client's name must consist of 1 to 32 alphanumeric characters, it may also include an underscore or a dash"
+		echo "The client's name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)"
 		until [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
 			read -rp "Client name: " -e CLIENT_NAME
 		done
