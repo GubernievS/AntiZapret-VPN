@@ -320,6 +320,8 @@ mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret &>/dev/n
 
 #
 # Восстанавливаем из бэкапа пользователей vpn
+tar -xzf /root/backup.tar.gz &>/dev/null || true
+rm -f /root/backup.tar.gz &>/dev/null || true
 mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn &>/dev/null || true
 mv -f /root/wireguard/antizapret.conf /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
 mv -f /root/wireguard/vpn.conf /tmp/antizapret/setup/etc/wireguard &>/dev/null || true

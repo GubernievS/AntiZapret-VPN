@@ -326,6 +326,20 @@ recreate(){
 	fi
 }
 
+backup(){
+	rm -rf /root/antizapret/backup
+	mkdir -p /root/antizapret/backup/wireguard
+	cp -r /etc/openvpn/easyrsa3 /root/antizapret/backup
+	cp -r /etc/wireguard/antizapret.conf /root/antizapret/backup/wireguard
+	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
+	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
+	tar -czf /root/antizapret/backup.tar.gz -C /root/antizapret/backup easyrsa3 wireguard
+	tar -tzf /root/antizapret/backup.tar.gz > /dev/null
+	rm -rf /root/antizapret/backup
+	echo ""
+	echo "Created clients backup: /root/antizapret/backup.tar.gz"
+}
+
 OPTION=$1
 if ! [[ "$OPTION" =~ ^[1-7]$ ]]; then
 	echo ""
@@ -336,9 +350,10 @@ if ! [[ "$OPTION" =~ ^[1-7]$ ]]; then
 	echo "	4) WireGuard/AmneziaWG - Add client"
 	echo "	5) WireGuard/AmneziaWG - Delete client"
 	echo "	6) WireGuard/AmneziaWG - List clients"
-	echo "	7) (Re)create client profile files"
-	until [[ "$OPTION" =~ ^[1-7]$ ]]; do
-		read -rp "Option choice [1-7]: " -e OPTION
+	echo "	7) (Re)create clients profile files"
+	echo "  8) Create clients backup"
+	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
+		read -rp "Option choice [1-8]: " -e OPTION
 	done
 	echo ""
 fi
@@ -382,8 +397,12 @@ case "$OPTION" in
 		listWireGuard_AmneziaWG
 		;;
 	7)
-		echo "(Re)create client profile files"
+		echo "(Re)create clients profile files"
 		getServerIP
 		recreate
+		;;
+	8)
+		echo "Create clients backup"
+		backup
 		;;
 esac
