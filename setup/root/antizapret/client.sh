@@ -351,7 +351,7 @@ if ! [[ "$OPTION" =~ ^[1-7]$ ]]; then
 	echo "	5) WireGuard/AmneziaWG - Delete client"
 	echo "	6) WireGuard/AmneziaWG - List clients"
 	echo "	7) (Re)create clients profile files"
-	echo "  8) Create clients backup"
+	echo "	8) Create clients backup"
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
