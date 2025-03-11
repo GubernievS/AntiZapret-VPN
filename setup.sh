@@ -68,20 +68,38 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
 echo ""
-until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-	read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
+echo "    1) Standard  - Recommended by default"
+echo "                   Blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
+echo "                   Not blocked domains: Yandex (77.88.8.8, 77.88.8.1)"
+echo "    2) Comss.one - Use only for problems accessing blocked internet resources!"
+echo "                   Use only if this server IP is identified as Russia, China, Iran, Syria, etc!"
+echo "                   Enable additional proxying and hide this server IP on blocked internet resources"
+echo "                   Enable blocking ads, trackers, malware and phishing websites (not customizable)"
+echo "                   See more: https://www.comss.ru/page.php?id=7315"
+echo "                   Blocked & not blocked domains: Comss.one (83.220.169.155, 212.109.195.93)"
+until [[ "$ANTIZAPRET_DNS" =~ ^[1-2]$ ]]; do
+	read -rp "DNS choice [1-2]: " -e -i 1 ANTIZAPRET_DNS
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare + Quad9 - The fastest and most reliable - Recommended by default"
 echo "                            (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
-echo "    2) Yandex             - Use for problems loading sites from Russia"
+echo "    2) Yandex             - Use for problems accessing internet resources from Russia"
 echo "                            (77.88.8.8, 77.88.8.1)"
-echo "    3) AdGuard            - For blocking ads, trackers and phishing"
+echo "    3) AdGuard            - Use for blocking ads, trackers, malware and phishing websites"
 echo "                            (94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44)"
 until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
+if [[ "$ANTIZAPRET_DNS" -eq 2 ]]; then
+	ANTIZAPRET_ADBLOCK=n
+else
+	echo ""
+	until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
+		read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+	done
+fi
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
@@ -333,12 +351,6 @@ else
 fi
 
 #
-# Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
-if [[ "$ANTIZAPRET_ADBLOCK" == "n" ]]; then
-	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
-fi
-
-#
 # Настраиваем DNS в обычном VPN
 if [[ "$VPN_DNS" == "2" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
@@ -346,6 +358,18 @@ if [[ "$VPN_DNS" == "2" ]]; then
 elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
+fi
+
+#
+# Настраиваем DNS в AntiZapret VPN
+if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
+	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
+fi
+
+#
+# Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
+if [[ "$ANTIZAPRET_ADBLOCK" == "n" ]]; then
+	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -434,6 +458,7 @@ fi
 echo "OPENVPN_PATCH=${OPENVPN_PATCH}
 OPENVPN_DCO=${OPENVPN_DCO}
 ANTIZAPRET_ADBLOCK=${ANTIZAPRET_ADBLOCK}
+ANTIZAPRET_DNS=${ANTIZAPRET_DNS}
 VPN_DNS=${VPN_DNS}
 ALTERNATIVE_IP=${ALTERNATIVE_IP}
 OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
