@@ -78,8 +78,10 @@ echo "                   Enable additional proxying and hide this server IP on b
 echo "                   Enable blocking ads, trackers, malware and phishing websites (not customizable)"
 echo "                   See more: https://www.comss.ru/page.php?id=7315"
 echo "                   Blocked & not blocked domains: Comss.one (83.220.169.155, 212.109.195.93)"
-until [[ "$ANTIZAPRET_DNS" =~ ^[1-2]$ ]]; do
-	read -rp "DNS choice [1-2]: " -e -i 1 ANTIZAPRET_DNS
+echo "    3) No Yandex - No used Yandex DNS"
+echo "                   Blocked & not blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
+until [[ "$ANTIZAPRET_DNS" =~ ^[1-3]$ ]]; do
+	read -rp "DNS choice [1-3]: " -e -i 1 ANTIZAPRET_DNS
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
@@ -364,6 +366,8 @@ fi
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
 	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
+elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
+	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/g" /etc/knot-resolver/kresd.conf
 fi
 
 #
