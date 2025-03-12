@@ -549,9 +549,9 @@ te.com
 #app.box.com
 facebook.net
 box.com
-app.augmentcode.com
 g711.org
 lenso.ai
 pexels.com
 ibm.com
 8chan.moe
+augmentcode.com
