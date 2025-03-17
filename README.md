@@ -40,6 +40,7 @@ VPN-клиенты: [WireGuard](https://www.wireguard.com/install)
 AmneziaWG работает в [режиме обфускации Wireguard](https://habr.com/ru/companies/amnezia/articles/807539)\
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент 'antizapret-client'
+Если ваш провайдер (встречается на мобильных) блокирует протокол AmneziaWG - попробуйте в профиле подключения поменять настройку Jc на 3\
 VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases), [AmneziaWG (Android)](https://play.google.com/store/apps/details?id=org.amnezia.awg), [AmneziaWG (Apple)](https://apps.apple.com/ru/app/amneziawg/id6478942365)
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
@@ -143,7 +144,7 @@ nano /root/antizapret/config/include-ips.txt
 
 ## Настройка на роутерах
 OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
-WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN) [и еще OpenWRT](https://telegra.ph/AntiZapret-WireguardAmneziaWG-on-OpenWRT-03-09)
+WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN) [и еще OpenWRT](https://telegra.ph/AntiZapret-WireGuardAmneziaWG-on-OpenWRT-03-16)
 
 ***
 
