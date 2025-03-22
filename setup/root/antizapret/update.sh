@@ -76,22 +76,4 @@ download $ADAWAY_PATH $ADAWAY_LINK
 
 gunzip -f "$HOSTS_PATH_1" || > dump.csv
 
-### UPDATE
-
-if [[ -f "up.sh" ]]; then
-	if grep -q "CONNMARK" "up.sh"; then
-		sed -i -E '/iptables -w -A FORWARD -s|iptables -w -A FORWARD -j|ACCEPT|connmark|CONNMARK|REJECT|^while|^do|^done/d' up.sh
-		systemctl restart antizapret
-	fi
-fi
-
-if [[ -f "iptables-up.sh" ]]; then
-	if grep -q "CONNMARK" "iptables-up.sh"; then
-		sed -i -E '/iptables -w -A FORWARD -s|iptables -w -A FORWARD -j|ACCEPT|connmark|CONNMARK|REJECT|^while|^do|^done/d' iptables-up.sh
-		systemctl restart antizapret
-	fi
-fi
-
-###
-
 exit 0
