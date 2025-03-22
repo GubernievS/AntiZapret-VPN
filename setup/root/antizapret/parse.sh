@@ -45,15 +45,6 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
 		cp -f result/ips /etc/wireguard/ips
 	fi
-
-	# Обновляем IP-адреса в ANTIZAPRET-ACCEPT
-	if iptables -L ANTIZAPRET-ACCEPT &>/dev/null; then
-		iptables -w -F ANTIZAPRET-ACCEPT
-		while read -r line
-		do
-			iptables -w -A ANTIZAPRET-ACCEPT -d "$line" -j ACCEPT
-		done < result/ips.txt
-	fi
 fi
 
 if [[ -z "$1" || "$1" == "ad" ]]; then

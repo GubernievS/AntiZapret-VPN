@@ -33,21 +33,7 @@ ipset destroy antizapret-block6
 ipset destroy antizapret-watch6
 # FORWARD connection tracking
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
-iptables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
-# ANTIZAPRET-ACCEPT
-iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACCEPT
-iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable
-iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -j ANTIZAPRET-ACCEPT
-iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -j REJECT --reject-with icmp-port-unreachable
-iptables -w -F ANTIZAPRET-ACCEPT
-iptables -w -X ANTIZAPRET-ACCEPT
-# ACCEPT all packets from VPN
-iptables -w -D FORWARD -s 10.28.0.0/15 -j ACCEPT
-iptables -w -D FORWARD -s 172.28.0.0/15 -j ACCEPT
-# REJECT other packets
-iptables -w -D FORWARD -j REJECT --reject-with icmp-port-unreachable
 # OUTPUT connection tracking
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
@@ -65,9 +51,6 @@ iptables -w -t nat -D PREROUTING -i "$INTERFACE" -p udp --dport 52443 -j REDIREC
 # DNS redirection to Knot Resolver
 iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 ! -d 10.29.0.1/32 -p udp --dport 53 -m u32 --u32 "0x1c&0xffcf=0x100&&0x1e&0xffff=0x1" -j DNAT --to-destination 10.29.0.1
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 ! -d 172.29.0.1/32 -p udp --dport 53 -m u32 --u32 "0x1c&0xffcf=0x100&&0x1e&0xffff=0x1" -j DNAT --to-destination 172.29.0.1
-# ANTIZAPRET-ACCEPT
-iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 ! -d 10.30.0.0/15 -j CONNMARK --set-xmark 0x1/0xffffffff
-iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 ! -d 172.30.0.0/15 -j CONNMARK --set-xmark 0x1/0xffffffff
 # ANTIZAPRET-MAPPING
 iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 -d 172.30.0.0/15 -j ANTIZAPRET-MAPPING
