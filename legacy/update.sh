@@ -6,7 +6,7 @@ cd "$HERE"
 
 echo "Update antizapret files:"
 
-rm -f download/*
+#rm -f download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/legacy/update.sh"
 UPDATE_PATH="update.sh"
@@ -60,12 +60,12 @@ function download {
 	fi
 }
 
-download $UPDATE_PATH $UPDATE_LINK
-download $PARSE_PATH $PARSE_LINK
-download $DOALL_PATH $DOALL_LINK
+#download $UPDATE_PATH $UPDATE_LINK
+#download $PARSE_PATH $PARSE_LINK
+#download $DOALL_PATH $DOALL_LINK
 download $DUMP_PATH $DUMP_LINK 15
 download $NXDOMAIN_PATH $NXDOMAIN_LINK 2
-download $EXCLUDE_HOSTS_AWK_PATH $EXCLUDE_HOSTS_AWK_LINK
+#download $EXCLUDE_HOSTS_AWK_PATH $EXCLUDE_HOSTS_AWK_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $ADBLOCK_PATH $ADBLOCK_LINK
