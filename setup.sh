@@ -261,6 +261,10 @@ ip6tables -t nat -F &>/dev/null
 ip6tables -t nat -X &>/dev/null
 
 #
+# Завершим выполнение скрипта при ошибке
+set -e
+
+#
 # Обработка ошибок
 handle_error() {
 	echo ""
@@ -270,10 +274,6 @@ handle_error() {
 	exit 7
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
-#
-# Завершим выполнение скрипта при ошибке
-set -e
 
 #
 # Обновляем систему
