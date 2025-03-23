@@ -27,12 +27,13 @@ iptables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
 # FORWARD connection tracking
 iptables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
-iptables -w -I FORWARD 2 -d 10.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
-iptables -w -I FORWARD 3 -s 10.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
 ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
+# FORWARD VPN traffic
+iptables -w -I FORWARD 2 -d 10.28.0.0/15 -j ACCEPT
+iptables -w -I FORWARD 3 -s 10.28.0.0/15 -j ACCEPT
 # Attack and scan protection
 ipset create antizapret-block hash:ip timeout 600
 ipset create antizapret-watch hash:ip,port timeout 60
