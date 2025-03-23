@@ -48,6 +48,7 @@ ip6tables -w -A OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 ip6tables -w -A OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
 # FORWARD connection tracking
 iptables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -w -A FORWARD -s 10.28.0.0/15 -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 ip6tables -w -A FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -A OUTPUT -m conntrack --ctstate INVALID -j DROP

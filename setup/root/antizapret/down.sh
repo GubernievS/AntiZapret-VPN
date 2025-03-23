@@ -33,6 +33,7 @@ ipset destroy antizapret-block6
 ipset destroy antizapret-watch6
 # FORWARD connection tracking
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -w -D FORWARD -s 10.28.0.0/15 -m conntrack --ctstate RELATED,ESTABLISHED,DNAT -j ACCEPT
 ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
