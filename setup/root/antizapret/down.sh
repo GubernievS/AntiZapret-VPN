@@ -61,7 +61,7 @@ iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-M
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 -d 172.30.0.0/15 -j ANTIZAPRET-MAPPING
 iptables -w -t nat -F ANTIZAPRET-MAPPING
 iptables -w -t nat -X ANTIZAPRET-MAPPING
-# MASQUERADE
+# MASQUERADE VPN traffic
 iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -j MASQUERADE
 
