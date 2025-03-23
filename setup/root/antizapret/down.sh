@@ -12,6 +12,16 @@ fi
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
+# FORWARD connection tracking
+iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -w -D FORWARD -d 10.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
+iptables -w -D FORWARD -d 172.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
+iptables -w -D FORWARD -s 10.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
+iptables -w -D FORWARD -s 172.28.0.0/15 -m conntrack --ctstate DNAT -j ACCEPT
+ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
+# OUTPUT connection tracking
+iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 # Attack and scan protection
 iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
@@ -31,12 +41,6 @@ ip6tables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
 ipset destroy antizapret-block6
 ipset destroy antizapret-watch6
-# FORWARD connection tracking
-iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
-# OUTPUT connection tracking
-iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 
 # nat
 # OpenVPN TCP port redirection for backup connections
