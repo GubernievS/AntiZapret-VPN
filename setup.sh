@@ -419,7 +419,7 @@ fi
 #
 # Отключаем защиту от сетевых атак и сканирования
 if [[ "$PROTECT_SERVER" == "n" ]]; then
-	sed -i '/\(antizapret-block\|antizapret-watch\|p icmp\|RST RST\)/s/^/#/' /root/antizapret/up.sh
+	sed -i '/\(antizapret-block\|antizapret-watch\|antizapret-allow\|tcp-flags\|p icmp\)/s/^/#/' /root/antizapret/up.sh
 fi
 
 #
