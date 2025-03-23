@@ -57,20 +57,20 @@ ip6tables -w -I OUTPUT 3 -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unr
 
 # nat
 # OpenVPN TCP port redirection for backup connections
-iptables -w -t nat -I PREROUTING 1 -i "$INTERFACE" -p tcp --dport 80 -j REDIRECT --to-ports 50080
-iptables -w -t nat -I PREROUTING 2 -i "$INTERFACE" -p tcp --dport 443 -j REDIRECT --to-ports 50443
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p tcp --dport 80 -j REDIRECT --to-ports 50080
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p tcp --dport 443 -j REDIRECT --to-ports 50443
 # OpenVPN UDP port redirection for backup connections
-iptables -w -t nat -I PREROUTING 3 -i "$INTERFACE" -p udp --dport 80 -j REDIRECT --to-ports 50080
-iptables -w -t nat -I PREROUTING 4 -i "$INTERFACE" -p udp --dport 443 -j REDIRECT --to-ports 50443
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 80 -j REDIRECT --to-ports 50080
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 443 -j REDIRECT --to-ports 50443
 # AmneziaWG redirection ports to WireGuard
-iptables -w -t nat -I PREROUTING 5 -i "$INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
-iptables -w -t nat -I PREROUTING 6 -i "$INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
+iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # DNS redirection to Knot Resolver
-iptables -w -t nat -I PREROUTING 7 -s 10.29.0.0/16 ! -d 10.29.0.1/32 -p udp --dport 53 -m u32 --u32 "0x1c&0xffcf=0x100&&0x1e&0xffff=0x1" -j DNAT --to-destination 10.29.0.1
+iptables -w -t nat -A PREROUTING -s 10.29.0.0/16 ! -d 10.29.0.1/32 -p udp --dport 53 -m u32 --u32 "0x1c&0xffcf=0x100&&0x1e&0xffff=0x1" -j DNAT --to-destination 10.29.0.1
 # ANTIZAPRET-MAPPING
 iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -I PREROUTING 8 -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -A PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
 # MASQUERADE
-iptables -w -t nat -I POSTROUTING 1 -s 10.28.0.0/15 -j MASQUERADE
+iptables -w -t nat -A POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
 
 ./custom-up.sh
