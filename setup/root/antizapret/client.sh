@@ -341,7 +341,7 @@ backup(){
 }
 
 OPTION=$1
-if ! [[ "$OPTION" =~ ^[1-7]$ ]]; then
+if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo ""
 	echo "Please choose an option:"
 	echo "	1) OpenVPN - Add client"
