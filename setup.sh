@@ -97,8 +97,8 @@ echo "                            Enable additional proxying and hide this serve
 echo "                            Enable blocking ads, trackers, malware and phishing websites"
 echo "                            See more: https://www.comss.ru/page.php?id=7315"
 echo "                            (83.220.169.155, 212.109.195.93)"
-until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
-	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
+until [[ "$VPN_DNS" =~ ^[1-4]$ ]]; do
+	read -rp "DNS choice [1-4]: " -e -i 1 VPN_DNS
 done
 if [[ "$ANTIZAPRET_DNS" -eq 2 ]]; then
 	ANTIZAPRET_ADBLOCK=n
