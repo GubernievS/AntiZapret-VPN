@@ -143,7 +143,6 @@ listOpenVPN(){
 	echo ""
 	echo "OpenVPN existing client names:"
 	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
-	echo ""
 }
 
 addWireGuard_AmneziaWG(){
@@ -252,6 +251,7 @@ AllowedIPs = ${CLIENT_IP}/32
 		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
 	fi
 
+	echo ""
 	echo "WireGuard/AmneziaWG profile files for the client '$CLIENT_NAME' has been (re)created at '/root/antizapret/client/wireguard' and '/root/antizapret/client/amneziawg'"
 }
 
@@ -282,6 +282,7 @@ deleteWireGuard_AmneziaWG(){
 		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
 	fi
 
+	echo ""
 	echo "WireGuard/AmneziaWG client '$CLIENT_NAME' successfull deleted"
 }
 
@@ -290,10 +291,11 @@ listWireGuard_AmneziaWG(){
 	echo ""
 	echo "WireGuard/AmneziaWG existing client names:"
 	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
-	echo ""
 }
 
 recreate(){
+	echo ""
+
 	# OpenVPN
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
@@ -355,7 +357,6 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
-	echo ""
 fi
 
 CLIENT_NAME=$2
