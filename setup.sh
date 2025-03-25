@@ -204,7 +204,7 @@ apt-get purge -y libpam0g-dev &>/dev/null
 #apt-get purge -y amneziawg &>/dev/null
 
 #
-# Остановим и выключим службы
+# Остановим и выключим обновляемые службы
 systemctl stop kresd@1 &>/dev/null
 systemctl stop kresd@2 &>/dev/null
 systemctl stop antizapret &>/dev/null
@@ -228,6 +228,13 @@ systemctl disable openvpn-server@vpn-udp &>/dev/null
 systemctl disable openvpn-server@vpn-tcp &>/dev/null
 systemctl disable wg-quick@antizapret &>/dev/null
 systemctl disable wg-quick@vpn &>/dev/null
+
+# Остановим и выключим ненужные службы
+systemctl stop firewalld &>/dev/null
+ufw disable &>/dev/null
+
+systemctl disable firewalld &>/dev/null
+systemctl disable ufw &>/dev/null
 
 #
 # Удаляем старые файлы и кеш knot-resolver
@@ -433,7 +440,7 @@ fi
 /root/antizapret/client.sh 7
 
 #
-# Включим нужные службы
+# Включим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
 systemctl enable antizapret
@@ -445,11 +452,6 @@ systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret
 systemctl enable wg-quick@vpn
-
-#
-# Отключим ненужные службы
-systemctl disable ufw &>/dev/null || true
-systemctl disable firewalld &>/dev/null || true
 
 ERRORS=""
 
