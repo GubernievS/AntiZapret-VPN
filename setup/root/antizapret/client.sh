@@ -295,7 +295,7 @@ listWireGuard_AmneziaWG(){
 
 recreate(){
 	# OpenVPN
-	if [[ -f /etc/openvpn/easyrsa3/pki/index.txt ]]; then
+	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
