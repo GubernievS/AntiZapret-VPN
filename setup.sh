@@ -91,6 +91,12 @@ echo "    2) Yandex             - Use for problems accessing internet resources 
 echo "                            (77.88.8.8, 77.88.8.1)"
 echo "    3) AdGuard            - Use for blocking ads, trackers, malware and phishing websites"
 echo "                            (94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44)"
+echo "    4) Comss.one          - Use only for problems accessing blocked internet resources!"
+echo "                            Use only if this server is geolocated in Russia, China, Iran, Syria, etc!"
+echo "                            Enable additional proxying and hide this server IP on blocked internet resources"
+echo "                            Enable blocking ads, trackers, malware and phishing websites"
+echo "                            See more: https://www.comss.ru/page.php?id=7315"
+echo "                            (83.220.169.155, 212.109.195.93)"
 until [[ "$VPN_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 VPN_DNS
 done
@@ -386,6 +392,9 @@ if [[ "$VPN_DNS" == "2" ]]; then
 elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
+elif [[ "$VPN_DNS" == "4" ]]; then
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 83.220.169.155"\npush "dhcp-option DNS 212.109.195.93"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/83.220.169.155, 212.109.195.93/" /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
