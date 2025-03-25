@@ -611,3 +611,6 @@ cars.com
 ducati.com
 xero.com
 startpage.com
+softwarestore.shure.com
+getharvest.com
+harvestapp.com
