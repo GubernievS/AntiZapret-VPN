@@ -302,7 +302,7 @@ recreate(){
 	echo ""
 
 	# OpenVPN
-	if [[ -d "/etc/openvpn/server/keys" ]]; then
+	if [[ ! -d "/etc/openvpn/server/keys" ]]; then
 		initOpenVPN
 	fi
 	
