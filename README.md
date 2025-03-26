@@ -41,6 +41,7 @@ AmneziaWG работает в [режиме обфускации Wireguard](http
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент 'antizapret-client'\
 Если ваш провайдер (встречается на мобильных) блокирует протокол AmneziaWG - попробуйте в профиле подключения поменять настройку Jc на 3\
+Не используйте VPN-клиент AmneziaVPN - он подменяет DNS АнтиЗапрета на свои, из-за чего AntiZapret VPN не работает\
 VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases), [AmneziaWG (Android)](https://play.google.com/store/apps/details?id=org.amnezia.awg), [AmneziaWG (Apple)](https://apps.apple.com/ru/app/amneziawg/id6478942365)
 
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS\
@@ -93,7 +94,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 Срок действия в днях - только для OpenVPN\
 После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
-### 4. Добавить свои сайты в список антизапрета
+### 4. Добавить свои сайты в список АнтиЗапрета
 ```sh
 nano /root/antizapret/config/include-hosts.txt
 ```
@@ -101,12 +102,12 @@ nano /root/antizapret/config/include-hosts.txt
 subdomain.example.com\
 example.com\
 com\
-После этого нужно обновить список антизапрета
+После этого нужно обновить список АнтиЗапрета
 ```sh
 /root/antizapret/doall.sh
 ```
 
-### 5. Исключить свои сайты из списка антизапрета
+### 5. Исключить свои сайты из списка АнтиЗапрета
 ```sh
 nano /root/antizapret/config/exclude-hosts.txt
 ```
@@ -114,12 +115,12 @@ nano /root/antizapret/config/exclude-hosts.txt
 subdomain.example.com\
 example.com\
 com\
-После этого нужно обновить список антизапрета
+После этого нужно обновить список АнтиЗапрета
 ```sh
 /root/antizapret/doall.sh
 ```
 
-### 6. Добавить свои IP-адреса в список антизапрета
+### 6. Добавить свои IP-адреса в список АнтиЗапрета
 ```sh
 nano /root/antizapret/config/include-ips.txt
 ```
@@ -127,11 +128,11 @@ nano /root/antizapret/config/include-ips.txt
 8.8.8.8/32\
 10.20.0.0/16\
 20.30.40.0/24\
-После этого нужно обновить список антизапрета
+После этого нужно обновить список АнтиЗапрета
 ```sh
 /root/antizapret/doall.sh
 ```
-После обновления списка антизапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
+После обновления списка АнтиЗапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
 А клиентам WireGuard/AmneziaWG нужно добавить новые IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
 
 ***
@@ -187,8 +188,8 @@ wg show
 
 Клиенты обычного VPN = 10.28.0.0/22, 10.28.4.0/22, 10.28.8.0/24 (172.28.0.0/22, 172.28.4.0/22, 172.28.8.0/24)\
 Клиенты AntiZapret VPN = 10.29.0.0/22, 10.29.4.0/22, 10.29.8.0/24 (172.29.0.0/22, 172.29.4.0/22, 172.29.8.0/24)\
-DNS антизапрета = 10.29.0.1, 10.29.4.1, 10.29.8.1 (172.29.0.1, 172.29.4.1, 172.29.8.1)\
-Подменные IP антизапрета = 10.30.0.0/15 (172.30.0.0/15)\
+DNS АнтиЗапрета = 10.29.0.1, 10.29.4.1, 10.29.8.1 (172.29.0.1, 172.29.4.1, 172.29.8.1)\
+Подменные IP АнтиЗапрета = 10.30.0.0/15 (172.30.0.0/15)\
 Через запятую перечислены IP-адреса: OpenVPN UDP, OpenVPN TCP, WireGuard/AmneziaWG
 В скобках указаны альтернативные IP-адреса
 
