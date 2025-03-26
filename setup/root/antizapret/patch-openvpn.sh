@@ -21,9 +21,9 @@ if [[ "$1" =~ ^[0-2]$ ]]; then
 else
 	echo ""
 	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
-	echo "    0) None       - Do not install the anti-censorship patch, or remove if already installed"
-	echo "    1) Strong     - Recommended by default"
-	echo "    2) Error-free - Use if the Strong patch causes a connection error, recommended for Mikrotik routers"
+	echo "    0) None        - Do not install the anti-censorship patch, or remove if already installed"
+	echo "    1) Strong      - Recommended by default"
+	echo "    2) Error-free  - Use if the Strong patch causes a connection error, recommended for Mikrotik routers"
 	until [[ "$ALGORITHM" =~ ^[0-2]$ ]]; do
 		read -rp "Version choice [0-2]: " -e -i 1 ALGORITHM
 	done
