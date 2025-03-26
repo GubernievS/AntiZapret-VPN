@@ -53,7 +53,8 @@ render() {
 	done < $File
 }
 
-addOpenVPN(){
+initOpenVPN(){
+	mkdir -p /etc/openvpn/server/keys
 	mkdir -p /etc/openvpn/easyrsa3
 	cd /etc/openvpn/easyrsa3
 
@@ -80,6 +81,10 @@ addOpenVPN(){
 		echo "Created new CRL"
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
+}
+
+addOpenVPN(){
+	initOpenVPN
 
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
@@ -146,7 +151,6 @@ listOpenVPN(){
 }
 
 addWireGuard_AmneziaWG(){
-	IPS=$(cat /etc/wireguard/ips)
 	if [[ ! -f /etc/wireguard/key ]]; then
 		PRIVATE_KEY=$(wg genkey)
 		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
@@ -158,6 +162,7 @@ PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		source /etc/wireguard/key
 	fi
 
+	IPS=$(cat /etc/wireguard/ips)
 	CLIENT_BLOCK_ANTIZAPRET=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)
 	CLIENT_BLOCK_VPN=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)
 
@@ -297,6 +302,10 @@ recreate(){
 	echo ""
 
 	# OpenVPN
+	if [[ -d "/etc/openvpn/server/keys" ]]; then
+		initOpenVPN
+	fi
+	
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
@@ -313,7 +322,7 @@ recreate(){
 	fi
 
 	# WireGuard/AmneziaWG
-	if [[ -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
+	if [[ -f /etc/wireguard/key && -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
 		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard_AmneziaWG >/dev/null
