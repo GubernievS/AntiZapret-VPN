@@ -346,14 +346,14 @@ OPTION=$1
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo ""
 	echo "Please choose an option:"
-	echo "	1) OpenVPN - Add client"
-	echo "	2) OpenVPN - Delete client"
-	echo "	3) OpenVPN - List clients"
-	echo "	4) WireGuard/AmneziaWG - Add client"
-	echo "	5) WireGuard/AmneziaWG - Delete client"
-	echo "	6) WireGuard/AmneziaWG - List clients"
-	echo "	7) (Re)create clients profile files"
-	echo "	8) Create clients backup"
+	echo "    1) OpenVPN - Add client"
+	echo "    2) OpenVPN - Delete client"
+	echo "    3) OpenVPN - List clients"
+	echo "    4) WireGuard/AmneziaWG - Add client"
+	echo "    5) WireGuard/AmneziaWG - Delete client"
+	echo "    6) WireGuard/AmneziaWG - List clients"
+	echo "    7) (Re)create clients profile files"
+	echo "    8) Create clients backup"
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
