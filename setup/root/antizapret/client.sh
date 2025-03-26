@@ -53,7 +53,7 @@ render() {
 	done < $File
 }
 
-initOpenVPN(){
+initEasyRSA(){
 	mkdir -p /etc/openvpn/server/keys
 	mkdir -p /etc/openvpn/easyrsa3
 	cd /etc/openvpn/easyrsa3
@@ -82,7 +82,7 @@ initOpenVPN(){
 }
 
 addOpenVPN(){
-	initOpenVPN
+	initEasyRSA
 
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
@@ -300,10 +300,6 @@ recreate(){
 	echo ""
 
 	# OpenVPN
-	if [[ ! -d "/etc/openvpn/server/keys" ]]; then
-		initOpenVPN
-	fi
-	
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
@@ -317,6 +313,10 @@ recreate(){
 		CLIENT_NAME="antizapret-client"
 		CLIENT_CERT_EXPIRE=3650
 		addOpenVPN >/dev/null
+	fi
+	
+	if [[ ! -d "/etc/openvpn/server/keys" ]]; then
+		initEasyRSA
 	fi
 
 	# WireGuard/AmneziaWG
