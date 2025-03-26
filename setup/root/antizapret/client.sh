@@ -65,7 +65,6 @@ initOpenVPN(){
 		/usr/share/easy-rsa/easyrsa init-pki
 		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
-		echo "Created new PKI and CA"
 	fi
 
 	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
@@ -78,7 +77,6 @@ initOpenVPN(){
 
 	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-		echo "Created new CRL"
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 }
