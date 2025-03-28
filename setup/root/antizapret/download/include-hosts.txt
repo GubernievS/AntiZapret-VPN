@@ -63,8 +63,8 @@ platform.activestate.com
 gaming.amazon.com
 login.amd.com
 bits.avcdn.net
-login.broadcom.com
-packages-prod.broadcom.com
+#login.broadcom.com
+#packages-prod.broadcom.com
 forums.chaos.com
 try.chaos.com
 cisco.com
@@ -615,3 +615,4 @@ softwarestore.shure.com
 getharvest.com
 harvestapp.com
 cloudmatchbeta.nvidiagrid.net
+broadcom.com
