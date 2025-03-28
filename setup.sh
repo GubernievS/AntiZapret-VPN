@@ -301,9 +301,9 @@ DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
 # Отключим IPv6 на время установки
-if [[ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]]; then
-	sysctl -w net.ipv6.conf.all.disable_ipv6=1
-fi
+#if [[ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]]; then
+#	sysctl -w net.ipv6.conf.all.disable_ipv6=1
+#fi
 
 #
 # Добавляем репозитории
