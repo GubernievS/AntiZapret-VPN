@@ -335,7 +335,7 @@ apt-get autoclean
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
 git clone https://github.com/paulc/dnslib.git /tmp/dnslib
-python3 -m pip install --force-reinstall --break-system-packages /tmp/dnslib
+python3 -m pip install --force-reinstall --break-system-packages --no-egg-info /tmp/dnslib
 
 #
 # Клонируем репозиторий antizapret
