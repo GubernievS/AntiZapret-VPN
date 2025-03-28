@@ -203,8 +203,6 @@ rm -rf /root/dnsmap
 rm -rf /root/openvpn
 rm -rf /etc/ferm
 
-pip3 uninstall -y dnslib &>/dev/null
-apt-get purge -y python3-pip &>/dev/null
 apt-get purge -y python3-dnslib &>/dev/null
 apt-get purge -y gnupg2 &>/dev/null
 apt-get purge -y ferm &>/dev/null
@@ -302,6 +300,12 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
+# Отключим IPv6 на время установки
+#if [[ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]]; then
+#	sysctl -w net.ipv6.conf.all.disable_ipv6=1
+#fi
+
+#
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
 
@@ -324,7 +328,7 @@ fi
 #
 # Ставим необходимые пакеты
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3 wireguard diffutils dnsutils socat lua-cqueues ipset
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues ipset
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
 else
@@ -332,15 +336,10 @@ else
 fi
 apt-get autoremove -y
 apt-get autoclean
+PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
-# Клонируем репозиторий и устанавливаем dnslib
-rm -rf /tmp/dnslib
-git clone https://github.com/paulc/dnslib.git /tmp/dnslib
-python3 /tmp/dnslib/setup.py install --force
-
-#
-# Клонируем репозиторий antizapret
+# Клонируем репозиторий
 rm -rf /tmp/antizapret
 git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
@@ -369,7 +368,6 @@ find /tmp/antizapret -type f \( -name "*.sh" -o -name "*.py" \) -execdir chmod +
 find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r /tmp/antizapret/setup/* /
-rm -rf /tmp/dnslib
 rm -rf /tmp/antizapret
 
 #
