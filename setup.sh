@@ -300,12 +300,6 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
 
 #
-# Отключим IPv6 на время установки
-#if [[ -f /proc/sys/net/ipv6/conf/all/disable_ipv6 ]]; then
-#	sysctl -w net.ipv6.conf.all.disable_ipv6=1
-#fi
-
-#
 # Добавляем репозитории
 mkdir -p /etc/apt/keyrings
 
@@ -336,10 +330,15 @@ else
 fi
 apt-get autoremove -y
 apt-get autoclean
-PIP_BREAK_SYSTEM_PACKAGES=1 pip3 install --force-reinstall dnslib
 
 #
-# Клонируем репозиторий
+# Клонируем репозиторий и устанавливаем dnslib
+rm -rf /tmp/dnslib
+git clone https://github.com/paulc/dnslib.git /tmp/dnslib
+python3 -m pip install --force-reinstall /tmp/dnslib --break-system-packages
+
+#
+# Клонируем репозиторий antizapret
 rm -rf /tmp/antizapret
 git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
@@ -368,6 +367,7 @@ find /tmp/antizapret -type f \( -name "*.sh" -o -name "*.py" \) -execdir chmod +
 find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r /tmp/antizapret/setup/* /
+rm -rf /tmp/dnslib
 rm -rf /tmp/antizapret
 
 #
