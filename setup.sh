@@ -203,8 +203,8 @@ rm -rf /root/dnsmap
 rm -rf /root/openvpn
 rm -rf /etc/ferm
 
-pip3 uninstall -y dnslib &>/dev/null
-apt-get purge -y python3-pip &>/dev/null
+#pip3 uninstall -y dnslib &>/dev/null
+#apt-get purge -y python3-pip &>/dev/null
 apt-get purge -y python3-dnslib &>/dev/null
 apt-get purge -y gnupg2 &>/dev/null
 apt-get purge -y ferm &>/dev/null
@@ -324,7 +324,7 @@ fi
 #
 # Ставим необходимые пакеты
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3 wireguard diffutils dnsutils socat lua-cqueues ipset
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues ipset
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
 else
