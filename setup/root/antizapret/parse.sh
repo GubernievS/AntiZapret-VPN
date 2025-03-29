@@ -99,44 +99,44 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 			gsub(/"/, "", $2);		# Удаление всех двойных кавычек
 			print $2				# Выводим только доменные имена
 		}
-	}' | cat - download/domains.lst | sort -u | CHARSET=UTF-8 idn --no-tld > temp/hosts.txt
+	}' | cat - download/domains.lst | sort -u | CHARSET=UTF-8 idn --no-tld > temp/include-hosts.txt
 
 	# Удаляем не существующие домены
-	grep -vFxf download/nxdomain.txt temp/hosts.txt > temp/hosts2.txt
+	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
 
 	# Обрабатываем конфигурационные файлы
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/pass-hosts.txt
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt | sort -u >> temp/hosts2.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt | sort -u >> temp/include-hosts2.txt
 
 	# Удаляем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){6}[^.]*$' temp/hosts2.txt | sed 's/^/./' > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/hosts2.txt | sort -u > temp/hosts3.txt
+	grep -E '^([^.]*\.){6}[^.]*$' temp/include-hosts2.txt | sed 's/^/./' > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
 
-	grep -E '^([^.]*\.){5}[^.]*$' temp/hosts3.txt | sed 's/^/./' > temp/exclude-patterns2.txt
-	grep -vFf temp/exclude-patterns2.txt temp/hosts3.txt | sort -u > temp/hosts4.txt
+	grep -E '^([^.]*\.){5}[^.]*$' temp/include-hosts3.txt | sed 's/^/./' > temp/exclude-patterns2.txt
+	grep -vFf temp/exclude-patterns2.txt temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
 
-	grep -E '^([^.]*\.){4}[^.]*$' temp/hosts4.txt | sed 's/^/./' > temp/exclude-patterns3.txt
-	grep -vFf temp/exclude-patterns3.txt temp/hosts4.txt | sort -u > temp/hosts5.txt
+	grep -E '^([^.]*\.){4}[^.]*$' temp/include-hosts4.txt | sed 's/^/./' > temp/exclude-patterns3.txt
+	grep -vFf temp/exclude-patterns3.txt temp/include-hosts4.txt | sort -u > temp/include-hosts5.txt
 
-	grep -E '^([^.]*\.){3}[^.]*$' temp/hosts5.txt | sed 's/^/./' > temp/exclude-patterns4.txt
-	grep -vFf temp/exclude-patterns4.txt temp/hosts5.txt | sort -u > temp/hosts6.txt
+	grep -E '^([^.]*\.){3}[^.]*$' temp/include-hosts5.txt | sed 's/^/./' > temp/exclude-patterns4.txt
+	grep -vFf temp/exclude-patterns4.txt temp/include-hosts5.txt | sort -u > temp/include-hosts6.txt
 
-	grep -E '^([^.]*\.){2}[^.]*$' temp/hosts6.txt | sed 's/^/./' > temp/exclude-patterns5.txt
-	grep -vFf temp/exclude-patterns5.txt temp/hosts6.txt | sort -u > temp/hosts7.txt
+	grep -E '^([^.]*\.){2}[^.]*$' temp/include-hosts6.txt | sed 's/^/./' > temp/exclude-patterns5.txt
+	grep -vFf temp/exclude-patterns5.txt temp/include-hosts6.txt | sort -u > temp/include-hosts7.txt
 
-	grep -E '^([^.]*\.){1}[^.]*$' temp/hosts7.txt | sed 's/^/./' > temp/exclude-patterns6.txt
-	grep -vFf temp/exclude-patterns6.txt temp/hosts7.txt | sort -u > temp/hosts8.txt
+	grep -E '^([^.]*\.){1}[^.]*$' temp/include-hosts7.txt | sed 's/^/./' > temp/exclude-patterns6.txt
+	grep -vFf temp/exclude-patterns6.txt temp/include-hosts7.txt | sort -u > temp/include-hosts8.txt
 
-	grep -E '^([^.]*\.){0}[^.]*$' temp/hosts8.txt | sed 's/^/./' > temp/exclude-patterns7.txt
-	grep -vFf temp/exclude-patterns7.txt temp/hosts8.txt | sort -u > result/hosts.txt
+	grep -E '^([^.]*\.){0}[^.]*$' temp/include-hosts8.txt | sed 's/^/./' > temp/exclude-patterns7.txt
+	grep -vFf temp/exclude-patterns7.txt temp/include-hosts8.txt | sort -u > result/include-hosts.txt
 
 	# Выводим результат
-	wc -l result/hosts.txt
-	wc -l result/pass-hosts.txt
+	wc -l result/include-hosts.txt
+	wc -l result/exclude-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	sed 's/$/ CNAME ./; p; s/^/*./' result/hosts.txt > result/hosts.rpz
-	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/pass-hosts.txt >> result/hosts.rpz
+	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt > result/hosts.rpz
+	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
 	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
