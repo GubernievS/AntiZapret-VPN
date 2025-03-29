@@ -48,7 +48,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "ad" ]]; then
-	echo "Adblock-hosts..."
+	echo "AdBlock hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/include-adblock-hosts.txt
