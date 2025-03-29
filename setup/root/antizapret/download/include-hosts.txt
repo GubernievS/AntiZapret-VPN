@@ -619,3 +619,4 @@ broadcom.com
 github.com
 t3.chat
 softpedia.com
+tuta.com
