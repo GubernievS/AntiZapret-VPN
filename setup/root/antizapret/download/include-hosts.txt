@@ -618,3 +618,4 @@ cloudmatchbeta.nvidiagrid.net
 broadcom.com
 github.com
 t3.chat
+softpedia.com
