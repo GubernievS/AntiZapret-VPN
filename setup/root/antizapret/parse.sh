@@ -22,7 +22,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
 
 	# Выводим результат
-	echo "IPs: $(wc -l result/ips.txt)"
+	wc -l result/ips.txt
 
 	# Создаем файл для OpenVPN
 	echo -n > result/DEFAULT
@@ -51,33 +51,33 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 	echo "Adblock-hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/adblock-hosts.txt
-	sed '/^[0-9.]*$/d' temp/adblock-hosts.txt > temp/adblock-hosts2.txt
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/include-adblock-hosts.txt
+	sed '/^[0-9.]*$/d' temp/include-adblock-hosts.txt > temp/include-adblock-hosts2.txt
 
 	# Обрабатываем список с исключениями из блокировки от AdGuard
-	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/adblock-pass-hosts.txt
-	sed '/^[0-9.]*$/d' temp/adblock-pass-hosts.txt | sort -u > temp/adblock-pass-hosts2.txt
+	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/exclude-adblock-hosts.txt
+	sed '/^[0-9.]*$/d' temp/exclude-adblock-hosts.txt | sort -u > temp/exclude-adblock-hosts2.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdAway
-	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/adblock-hosts3.txt
+	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/include-adblock-hosts3.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-hosts.txt download/adblock-hosts.txt > temp/adblock-hosts4.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts4.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/adblock-pass-hosts.txt download/adblock-pass-hosts.txt > temp/adblock-pass-hosts3.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts3.txt
 
 	# Объединяем списки
-	(cat temp/adblock-hosts2.txt && cat temp/adblock-hosts3.txt && cat temp/adblock-hosts4.txt) | sort -u > result/adblock-hosts.txt
-	(cat temp/adblock-pass-hosts2.txt && cat temp/adblock-pass-hosts3.txt) | sort -u > result/adblock-pass-hosts.txt
+	(cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts3.txt && cat temp/include-adblock-hosts4.txt) | sort -u > result/include-adblock-hosts.txt
+	(cat temp/exclude-adblock-hosts2.txt && cat temp/exclude-adblock-hosts3.txt) | sort -u > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
-	echo "Adblock-hosts: $(wc -l result/adblock-hosts.txt)"
-	echo "Adblock-pass-hosts: $(wc -l result/adblock-pass-hosts.txt)"
+	wc -l result/include-adblock-hosts.txt
+	wc -l result/exclude-adblock-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	sed 's/$/ CNAME ./; p; s/^/*./' result/adblock-hosts.txt > result/adblock-hosts.rpz
-	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/adblock-pass-hosts.txt >> result/adblock-hosts.rpz
+	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt > result/adblock-hosts.rpz
+	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/adblock-hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл adblock-hosts.rpz изменился
 	if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
@@ -131,8 +131,8 @@ if [[ -z "$1" || "$1" == "host" ]]; then
 	grep -vFf temp/exclude-patterns7.txt temp/hosts8.txt | sort -u > result/hosts.txt
 
 	# Выводим результат
-	echo "Hosts: $(wc -l result/hosts.txt)"
-	echo "Pass-hosts: $(wc -l result/pass-hosts.txt)"
+	wc -l result/hosts.txt
+	wc -l result/pass-hosts.txt
 
 	# Создаем файл для Knot Resolver
 	sed 's/$/ CNAME ./; p; s/^/*./' result/hosts.txt > result/hosts.rpz

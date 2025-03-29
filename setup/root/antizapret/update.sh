@@ -32,11 +32,11 @@ INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-ips.txt"
 INCLUDE_IPS_PATH="download/include-ips.txt"
 
-ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/adblock-hosts.txt"
-ADBLOCK_HOSTS_PATH="download/adblock-hosts.txt"
+INCLUDE_ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-adblock-hosts.txt"
+INCLUDE_ADBLOCK_HOSTS_PATH="download/include-adblock-hosts.txt"
 
-ADBLOCK_PASS_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/adblock-pass-hosts.txt"
-ADBLOCK_PASS_HOSTS_PATH="download/adblock-pass-hosts.txt"
+EXCLUDE_ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-adblock-hosts.txt"
+EXCLUDE_ADBLOCK_HOSTS_PATH="download/exclude-adblock-hosts.txt"
 
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
@@ -69,11 +69,20 @@ download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
-download $ADBLOCK_HOSTS_PATH $ADBLOCK_HOSTS_LINK
-download $ADBLOCK_PASS_HOSTS_PATH $ADBLOCK_PASS_HOSTS_LINK
+download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
+download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 download $ADAWAY_PATH $ADAWAY_LINK
 
 gunzip -f "$HOSTS_PATH_1" || > dump.csv
+
+#
+
+mv "config/adblock-hosts.txt" "config/include-adblock-hosts.txt" || true
+mv "config/adblock-pass-hosts.txt" "config/exclude-adblock-hosts.txt" || true
+sed -i 's|/adblock-hosts.txt|/include-adblock-hosts.txt|g' config/exclude-adblock-hosts.txt || true
+sed -i 's/добавленые/добавленные/g' config/*.txt || true
+
+#
 
 exit 0
