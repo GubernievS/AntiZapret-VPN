@@ -78,7 +78,7 @@ echo "                             Enable additional proxying and hide this serv
 echo "                             Enable blocking ads, trackers, malware and phishing websites (not customizable)"
 echo "                             See more: https://www.comss.ru/page.php?id=7315"
 echo "                             Blocked & not blocked domains: Comss.one (83.220.169.155, 212.109.195.93)"
-echo "    3) Cloudflare + Quad9  - Use only if you do not want Yandex - Not recommended"
+echo "    3) Cloudflare + Quad9  - Use only if you do not want Yandex"
 echo "                             Blocked & not blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 ANTIZAPRET_DNS
