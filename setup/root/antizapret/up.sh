@@ -18,8 +18,8 @@ echo "cache.clear()" | socat - /run/knot-resolver/control/1
 # Network parameters modification
 sysctl -w net.ipv4.ip_forward=1
 sysctl -w kernel.printk="3 4 1 3"
-sysctl -w net.core.default_qdisc=fq
-sysctl -w net.ipv4.tcp_congestion_control=bbr
+sysctl -w net.core.default_qdisc=fq || true
+sysctl -w net.ipv4.tcp_congestion_control=bbr || true
 
 # filter
 # INPUT connection tracking
