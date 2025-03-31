@@ -84,7 +84,7 @@ groupon.com
 grouponcdn.com
 releases.hashicorp.com
 community.infineon.com
-#download.jetbrains.com
+download.jetbrains.com
 documentation.meraki.com
 #account.mongodb.com
 #cloud.mongodb.com
@@ -491,7 +491,7 @@ nba.com
 delltechnologies.com
 download.lenovo.com
 darkproject.eu
-#plugins.jetbrains.com
+plugins.jetbrains.com
 framer.com
 tor.eff.org
 news.google.com
@@ -622,4 +622,3 @@ softpedia.com
 tuta.com
 tutamail.com
 worldpay.com
-jetbrains.com
