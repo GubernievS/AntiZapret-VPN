@@ -218,7 +218,7 @@ apt-get purge -y libpam0g-dev &>/dev/null
 systemctl stop kresd@1 &>/dev/null
 systemctl stop kresd@2 &>/dev/null
 systemctl stop antizapret &>/dev/null
-systemctl stop antizapret-update.service &>/dev/null
+systemctl stop antizapret-update &>/dev/null
 systemctl stop antizapret-update.timer &>/dev/null
 systemctl stop openvpn-server@antizapret-udp &>/dev/null
 systemctl stop openvpn-server@antizapret-tcp &>/dev/null
@@ -230,7 +230,7 @@ systemctl stop wg-quick@vpn &>/dev/null
 systemctl disable kresd@1 &>/dev/null
 systemctl disable kresd@2 &>/dev/null
 systemctl disable antizapret &>/dev/null
-systemctl disable antizapret-update.service &>/dev/null
+systemctl disable antizapret-update &>/dev/null
 systemctl disable antizapret-update.timer &>/dev/null
 systemctl disable openvpn-server@antizapret-udp &>/dev/null
 systemctl disable openvpn-server@antizapret-tcp &>/dev/null
@@ -470,7 +470,7 @@ fi
 systemctl enable kresd@1
 systemctl enable kresd@2
 systemctl enable antizapret
-systemctl enable antizapret-update.service
+systemctl enable antizapret-update
 systemctl enable antizapret-update.timer
 systemctl enable openvpn-server@antizapret-udp
 systemctl enable openvpn-server@antizapret-tcp
