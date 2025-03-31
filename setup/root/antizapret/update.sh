@@ -46,16 +46,18 @@ ADAWAY_PATH="download/adaway.txt"
 
 function download {
 	local path="${HERE}/${1}"
+	local tmp_path="${path}.tmp"
 	local link=$2
 	echo "$path"
-	curl -fL "$link" -o "download/temp"
-	local_size="$(stat -c '%s' "download/temp")"
+	curl -fL "$link" -o "$tmp_path"
+	local_size="$(stat -c '%s' "$tmp_path")"
 	remote_size="$(curl -fsSLI "$link" | grep -i content-length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
 	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
+		rm -f "$tmp_path"
 		exit 1
 	fi
-	mv -f "download/temp" "$path"
+	mv -f "$tmp_path" "$path"
 	if [[ "$path" == *.sh ]]; then
 		chmod +x "$path"
 	fi
