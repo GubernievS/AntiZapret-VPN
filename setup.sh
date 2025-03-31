@@ -528,7 +528,7 @@ if [[ -z "$(swapon --show)" ]]; then
 fi
 
 echo ""
-echo -e "\e[1;32mAntiZapret VPN + traditional VPN successful installation!\e[0m"
+echo -e "\e[1;32mAntiZapret VPN + traditional VPN installed successfully!\e[0m"
 echo "Rebooting..."
 
 #
