@@ -51,7 +51,7 @@ if [[ "$DCO" == "y" ]]; then
 		systemctl restart openvpn-server@*
 	fi
 	echo ""
-	echo "Successful turn on OpenVPN DCO!"
+	echo "OpenVPN DCO turned ON successfully!"
 else
 	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
 	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
@@ -69,5 +69,5 @@ else
 		systemctl restart openvpn-server@*
 	fi
 	echo ""
-	echo "Successful turn off OpenVPN DCO!"
+	echo "OpenVPN DCO turned OFF successfully!"
 fi
