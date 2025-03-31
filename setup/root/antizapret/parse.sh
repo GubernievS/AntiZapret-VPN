@@ -27,7 +27,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	echo -n > result/DEFAULT
 	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute 10.29.0.0 255.255.248.0\nroute 10.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
-	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 10.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 10.29.8.1" > result/keenetic-wireguard-routes.txt
+	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 10.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 10.29.8.1\nroute ADD 10.30.0.0 MASK 255.254.0.0 10.29.8.1" > result/keenetic-wireguard-routes.txt
 	while read -r line
 	do
 		IP="$(echo $line | awk -F '/' '{print $1}')"
