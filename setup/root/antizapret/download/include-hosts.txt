@@ -622,3 +622,4 @@ softpedia.com
 tuta.com
 tutamail.com
 worldpay.com
+chromewebstore.google.com
