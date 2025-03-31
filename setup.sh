@@ -328,9 +328,11 @@ fi
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues ipset
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
-	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y sshguard
+	apt-get purge -y sshguard
+	DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard
+	echo -e "\n# Size of IPv6 subnet to block. Defaults to a single address, CIDR notation. (optional, default to 128)\nIPV6_SUBNET=64\n\n# Size of IPv4 subnet to block. Defaults to a single address, CIDR notation. (optional, default to 32)\nIPV4_SUBNET=24" >> /etc/sshguard/sshguard.conf
 else
-	apt-get purge sshguard &>/dev/null || true
+	apt-get purge -y sshguard
 fi
 apt-get autoremove -y
 apt-get autoclean
