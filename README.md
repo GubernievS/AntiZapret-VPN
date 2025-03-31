@@ -69,6 +69,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 	- Разрешить нескольким клиентам подключаться к OpenVPN используя один и тот же файл подключения (\*.ovpn)
 	- Установить SSHGuard для защиты от перебора паролей по SSH
 	- Включить защиту от сканирования и сетевых атак
+	- Отключить подключения по IPv6
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 
@@ -81,7 +82,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 /root/antizapret/patch-openvpn.sh [0-2]
 ```
 
-### 2. Включить/выключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)
+### 2. Включить/отключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)
 ```sh
 /root/antizapret/openvpn-dco.sh [y/n]
 ```

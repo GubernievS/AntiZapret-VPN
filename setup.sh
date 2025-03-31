@@ -137,7 +137,11 @@ done
 echo ""
 echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
 until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
-	read -rp "Enable network attack and scan protection for this server? [y/n]: " -e -i y PROTECT_SERVER
+	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y PROTECT_SERVER
+done
+echo ""
+until [[ "$DISABLE_IPV6" =~ (y|n) ]]; do
+	read -rp "Disable all external IPv6 connections? [y/n]: " -e -i y DISABLE_IPV6
 done
 echo ""
 echo "Preparing for installation, please wait..."
@@ -438,9 +442,15 @@ if [[ "$OPENVPN_LOG" == "y" ]]; then
 fi
 
 #
-# Отключаем защиту от сетевых атак и сканирования
+# Отключим защиту от сетевых атак и сканирования
 if [[ "$PROTECT_SERVER" == "n" ]]; then
 	sed -i '/\(antizapret-block\|antizapret-watch\|antizapret-allow\|tcp-flags\|p icmp\)/s/^/#/' /root/antizapret/up.sh
+fi
+
+#
+# Включим подключения по IPv6
+if [[ "$DISABLE_IPV6" == "n" ]]; then
+	sed -i '/disable_ipv6/s/^/#/' /root/antizapret/up.sh
 fi
 
 #
@@ -501,6 +511,7 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
+DISABLE_IPV6=${DISABLE_IPV6}
 SETUP_DATE=$(date +"%d.%m.%Y %H:%M:%S %z")" > /root/antizapret/setup
 
 #
