@@ -623,3 +623,5 @@ tuta.com
 tutamail.com
 worldpay.com
 chromewebstore.google.com
+kmail-lists.com
+klaviyo.com
