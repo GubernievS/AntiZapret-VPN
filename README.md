@@ -1,5 +1,8 @@
 # AntiZapret VPN + обычный VPN
 
+| У автора есть собственный VPN-сервер. Вы можете приобрести готовое подключение к AntiZapret VPN или получить помощь в настройке своего сервера или роутера. Все подробности и стоимость [тут](https://t.me/antizapret_vpn/4) |
+|------------------|
+
 Скрипт для установки на [своём сервере](https://github.com/GubernievS/AntiZapret-VPN#где-купить-сервер) AntiZapret VPN и обычного VPN, работает по протоколам OpenVPN (есть патч для обхода блокировки), WireGuard и AmneziaWG
 
 AntiZapret VPN реализует технологию [раздельного туннелирования](https://encyclopedia.kaspersky.ru/glossary/split-tunneling)
