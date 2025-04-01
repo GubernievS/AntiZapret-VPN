@@ -78,14 +78,4 @@ download $ADAWAY_PATH $ADAWAY_LINK
 
 gunzip -f "$HOSTS_PATH_1" || > dump.csv
 
-#
-
-mv "config/adblock-hosts.txt" "config/include-adblock-hosts.txt" || true
-mv "config/adblock-pass-hosts.txt" "config/exclude-adblock-hosts.txt" || true
-sed -i 's|/adblock-hosts.txt|/include-adblock-hosts.txt|g' config/exclude-adblock-hosts.txt || true
-sed -i 's/добавленые/добавленные/g' config/*.txt || true
-rm -f result/hosts.txt result/pass-hosts.txt result/adblock-pass-hosts.txt result/adblock-hosts.txt
-
-#
-
 exit 0
