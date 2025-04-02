@@ -628,3 +628,4 @@ klaviyo.com
 antpool.com
 viabtc.com
 zabbix.com
+deepseek.com
