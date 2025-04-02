@@ -625,3 +625,5 @@ worldpay.com
 chromewebstore.google.com
 kmail-lists.com
 klaviyo.com
+antpool.com
+viabtc.com
