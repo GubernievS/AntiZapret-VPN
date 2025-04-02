@@ -18,8 +18,8 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 getClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 		echo ""
-		echo "Enter the client's name"
-		echo "The client's name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)"
+		echo "Enter the client name"
+		echo "The client name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)"
 		until [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
 			read -rp "Client name: " -e CLIENT_NAME
 		done
@@ -118,7 +118,7 @@ addOpenVPN(){
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn"
 
-	echo "OpenVPN profile files for the client '$CLIENT_NAME' has been (re)created at '/root/antizapret/client/openvpn'"
+	echo "OpenVPN profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/openvpn"
 }
 
 deleteOpenVPN(){
@@ -138,13 +138,13 @@ deleteOpenVPN(){
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
 
-	echo "OpenVPN client '$CLIENT_NAME' successfull deleted"
+	echo "OpenVPN client '$CLIENT_NAME' successfully deleted"
 }
 
 listOpenVPN(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo ""
-	echo "OpenVPN existing client names:"
+	echo "OpenVPN client names:"
 	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
 }
 
@@ -255,7 +255,7 @@ AllowedIPs = ${CLIENT_IP}/32
 	fi
 
 	echo ""
-	echo "WireGuard/AmneziaWG profile files for the client '$CLIENT_NAME' has been (re)created at '/root/antizapret/client/wireguard' and '/root/antizapret/client/amneziawg'"
+	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
 }
 
 deleteWireGuard_AmneziaWG(){
@@ -286,13 +286,13 @@ deleteWireGuard_AmneziaWG(){
 	fi
 
 	echo ""
-	echo "WireGuard/AmneziaWG client '$CLIENT_NAME' successfull deleted"
+	echo "WireGuard/AmneziaWG client '$CLIENT_NAME' successfully deleted"
 }
 
 listWireGuard_AmneziaWG(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo ""
-	echo "WireGuard/AmneziaWG existing client names:"
+	echo "WireGuard/AmneziaWG client names:"
 	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 }
 
@@ -304,9 +304,9 @@ recreate(){
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
-				echo "OpenVPN profile files for the client '$CLIENT_NAME' has been recreated"
+				echo "OpenVPN profile files recreated for client '$CLIENT_NAME'"
 			else
-				echo "Client name '$CLIENT_NAME' format is invalid"
+				echo "OpenVPN client name '$CLIENT_NAME' is invalid! No profile files recreated"
 			fi
 		done
 	else
@@ -324,9 +324,9 @@ recreate(){
 		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard_AmneziaWG >/dev/null
-				echo "WireGuard/AmneziaWG profile files for the client '$CLIENT_NAME' has been recreated"
+				echo "WireGuard/AmneziaWG profile files recreated for client '$CLIENT_NAME'"
 			else
-				echo "Client name '$CLIENT_NAME' format is invalid"
+				echo "WireGuard/AmneziaWG client name '$CLIENT_NAME' is invalid! No profile files recreated"
 			fi
 		done
 	else
@@ -346,7 +346,7 @@ backup(){
 	tar -tzf /root/antizapret/backup.tar.gz > /dev/null
 	rm -rf /root/antizapret/backup
 	echo ""
-	echo "Created clients backup: /root/antizapret/backup.tar.gz"
+	echo "Clients backup (re)created at /root/antizapret/backup.tar.gz"
 }
 
 OPTION=$1
@@ -360,7 +360,7 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo "    5) WireGuard/AmneziaWG - Delete client"
 	echo "    6) WireGuard/AmneziaWG - List clients"
 	echo "    7) (Re)create clients profile files"
-	echo "    8) Create clients backup"
+	echo "    8) (Re)create clients backup"
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
@@ -410,7 +410,7 @@ case "$OPTION" in
 		recreate
 		;;
 	8)
-		echo "Create clients backup"
+		echo "(Re)create clients backup"
 		backup
 		;;
 esac
