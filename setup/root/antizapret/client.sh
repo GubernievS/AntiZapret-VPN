@@ -77,6 +77,7 @@ initEasyRSA(){
 
 	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+		chmod 644 ./pki/crl.pem
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 }
@@ -127,6 +128,7 @@ deleteOpenVPN(){
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
 
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 644 ./pki/crl.pem
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
