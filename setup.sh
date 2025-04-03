@@ -159,14 +159,10 @@ systemctl stop apt-daily-upgrade.timer &>/dev/null
 # Удаление или перемещение файлов и папок при обновлении
 systemctl stop openvpn-generate-keys &>/dev/null
 systemctl disable openvpn-generate-keys &>/dev/null
-systemctl stop openvpn-server@antizapret &>/dev/null
-systemctl disable openvpn-server@antizapret &>/dev/null
 systemctl stop dnsmap &>/dev/null
 systemctl disable dnsmap &>/dev/null
 systemctl stop ferm &>/dev/null
 systemctl disable ferm &>/dev/null
-systemctl stop openvpn-server@antizapret-no-cipher &>/dev/null
-systemctl disable openvpn-server@antizapret-no-cipher &>/dev/null
 
 rm -f /etc/sysctl.d/10-conntrack.conf
 rm -f /etc/sysctl.d/20-network.conf
@@ -211,29 +207,19 @@ apt-get purge -y libpam0g-dev &>/dev/null
 
 #
 # Остановим и выключим обновляемые службы
-systemctl stop kresd@1 &>/dev/null
-systemctl stop kresd@2 &>/dev/null
-systemctl stop antizapret &>/dev/null
-systemctl stop antizapret-update &>/dev/null
-systemctl stop antizapret-update.timer &>/dev/null
-systemctl stop openvpn-server@antizapret-udp &>/dev/null
-systemctl stop openvpn-server@antizapret-tcp &>/dev/null
-systemctl stop openvpn-server@vpn-udp &>/dev/null
-systemctl stop openvpn-server@vpn-tcp &>/dev/null
-systemctl stop wg-quick@antizapret &>/dev/null
-systemctl stop wg-quick@vpn &>/dev/null
+for service in kresd@ openvpn-server@ wg-quick@; do
+    systemctl list-units --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl stop &>/dev/null
+    systemctl list-unit-files --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl disable &>/dev/null
+done
 
-systemctl disable kresd@1 &>/dev/null
-systemctl disable kresd@2 &>/dev/null
+systemctl stop antizapret &>/dev/null
 systemctl disable antizapret &>/dev/null
+
+systemctl stop antizapret-update &>/dev/null
 systemctl disable antizapret-update &>/dev/null
+
+systemctl stop antizapret-update.timer &>/dev/null
 systemctl disable antizapret-update.timer &>/dev/null
-systemctl disable openvpn-server@antizapret-udp &>/dev/null
-systemctl disable openvpn-server@antizapret-tcp &>/dev/null
-systemctl disable openvpn-server@vpn-udp &>/dev/null
-systemctl disable openvpn-server@vpn-tcp &>/dev/null
-systemctl disable wg-quick@antizapret &>/dev/null
-systemctl disable wg-quick@vpn &>/dev/null
 
 # Остановим и выключим ненужные службы
 systemctl stop firewalld &>/dev/null
