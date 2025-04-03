@@ -618,7 +618,7 @@ cloudmatchbeta.nvidiagrid.net
 broadcom.com
 github.com
 t3.chat
-softpedia.com
+#softpedia.com
 tuta.com
 tutamail.com
 worldpay.com
