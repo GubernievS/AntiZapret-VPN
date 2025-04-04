@@ -160,7 +160,7 @@ nano /root/antizapret/config/include-ips.txt
 2. Скопируйте всё содержимое из https://www.cloudflare.com/ips-v4 в файл /root/antizapret/config/include-ips.txt на сервере
 3. Выполните команду:
    ```sh
-   /root/antizapret/doall.sh ip && /root/antizapret/client.sh 7
+   /root/antizapret/doall.sh && /root/antizapret/client.sh 7
    ```
 5. Скачайте и замените обновлённые профили WireGuard/AmneziaWG и переподключите OpenVPN-клиентов — они автоматически получат новые маршруты с сервера
 6. Пропишите новые IP-адреса из https://www.cloudflare.com/ips-v4 на роутерах, если ранее для работы требовалась настройка маршрутов вручную
