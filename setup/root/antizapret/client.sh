@@ -344,11 +344,12 @@ backup(){
 	cp -r /etc/wireguard/antizapret.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
-	tar -czf /root/antizapret/backup.tar.gz -C /root/antizapret/backup easyrsa3 wireguard
-	tar -tzf /root/antizapret/backup.tar.gz > /dev/null
+	BACKUP_FILE="/root/antizapret/backup-${SERVER_IP}.tar.gz"
+	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard
+	tar -tzf "$BACKUP_FILE" > /dev/null
 	rm -rf /root/antizapret/backup
 	echo ""
-	echo "Clients backup (re)created at /root/antizapret/backup.tar.gz"
+	echo "Clients backup (re)created at $BACKUP_FILE"
 }
 
 OPTION=$1
@@ -413,6 +414,7 @@ case "$OPTION" in
 		;;
 	8)
 		echo "(Re)create clients backup"
+		getServerIP
 		backup
 		;;
 esac
