@@ -631,3 +631,4 @@ zabbix.com
 deepseek.com
 tenable.com
 steamdb.info
+ngrok.com
