@@ -77,6 +77,9 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 	- Включить защиту от сканирования и сетевых атак
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
+5. Установить дополнения:
+	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений VPN-клиентов и Telegram-бот
+	- [AdminAntizapret](https://github.com/Kirito0098/AdminAntizapret) - управление конфигурациями VPN-клиентов
 
 ***
 
