@@ -402,14 +402,14 @@ fi
 #
 # Не используем резервные порты 80 и 443 для OpenVPN TCP
 if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
-	sed -i '/ \(80\|443\) tcp/s/^/#/' /etc/openvpn/client/templates/*.conf
+	sed -i '/ \(80\|443\) tcp4/s/^/#/' /etc/openvpn/client/templates/*.conf
 	sed -i '/tcp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN UDP
 if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
-	sed -i '/ \(80\|443\) udp/s/^/#/' /etc/openvpn/client/templates/*.conf
+	sed -i '/ \(80\|443\) udp4/s/^/#/' /etc/openvpn/client/templates/*.conf
 	sed -i '/udp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
