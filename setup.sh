@@ -72,14 +72,14 @@ echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
 echo "    1) Cloudflare + Quad9  - Recommended by default"
 echo "          + Yandex           Blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
 echo "                             Not blocked domains: Yandex (77.88.8.8, 77.88.8.1)"
-echo "    2) Comss.one           - Use only for problems accessing blocked internet resources!"
+echo "    2) Cloudflare + Quad9  - Use only if you do not want Yandex"
+echo "                             Blocked & not blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
+echo "    3) Comss.one           - Use only for problems accessing blocked internet resources!"
 echo "                             Use only if this server is geolocated in Russia, China, Iran, Syria, etc!"
 echo "                             Enable additional proxying and hide this server IP on blocked internet resources"
 echo "                             Enable blocking ads, trackers, malware and phishing websites (not customizable)"
 echo "                             See more: https://www.comss.ru/page.php?id=7315"
 echo "                             Blocked & not blocked domains: Comss.one (83.220.169.155, 212.109.195.93)"
-echo "    3) Cloudflare + Quad9  - Use only if you do not want Yandex"
-echo "                             Blocked & not blocked domains: Cloudflare + Quad9 (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-3]$ ]]; do
 	read -rp "DNS choice [1-3]: " -e -i 1 ANTIZAPRET_DNS
 done
@@ -100,7 +100,7 @@ echo "                             (83.220.169.155, 212.109.195.93)"
 until [[ "$VPN_DNS" =~ ^[1-4]$ ]]; do
 	read -rp "DNS choice [1-4]: " -e -i 1 VPN_DNS
 done
-if [[ "$ANTIZAPRET_DNS" -eq 2 ]]; then
+if [[ "$ANTIZAPRET_DNS" -eq 3 ]]; then
 	ANTIZAPRET_ADBLOCK=n
 else
 	echo ""
@@ -388,9 +388,9 @@ fi
 #
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
 	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/g" /etc/knot-resolver/kresd.conf
+elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
+	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -489,7 +489,7 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 PROTECT_SERVER=${PROTECT_SERVER}
-SETUP_DATE=$(date +"%d.%m.%Y %H:%M:%S %z")" > /root/antizapret/setup
+SETUP_DATE=$(date --iso-8601=seconds)" > /root/antizapret/setup
 
 #
 # Создадим файл подкачки размером 512 Мб если его нет
