@@ -258,7 +258,7 @@ AllowedIPs = ${CLIENT_IP}/32
 	echo ""
 	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
 	echo ""
-	echo "Attention! If importing a profile file fails, shorten the filename to 32 characters (Windows) or 15 (Linux/Android)"
+	echo "Attention! If importing a profile file fails, shorten the filename to 32 characters (Windows) or 15 (Linux/Android/iOS)"
 }
 
 deleteWireGuard_AmneziaWG(){
