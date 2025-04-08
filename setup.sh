@@ -105,7 +105,7 @@ if [[ "$ANTIZAPRET_DNS" -eq 3 ]]; then
 else
 	echo ""
 	until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-		read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+		read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 	done
 fi
 echo ""
