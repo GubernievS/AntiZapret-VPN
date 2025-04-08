@@ -13,8 +13,8 @@ if [[ "$SUM1" != "$SUM2" ]]; then
 	echo "update.sh has been updated, restarting update.sh"
 	cat update.sh | bash
 fi
-./parse.sh $1
+./parse.sh
 find /etc/openvpn/server/logs -type f -size +10M -delete
-./custom-doall.sh $1
+./custom-doall.sh
 
 echo "Execution time: $SECONDS seconds"

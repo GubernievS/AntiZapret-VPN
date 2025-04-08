@@ -41,12 +41,6 @@ EXCLUDE_ADBLOCK_HOSTS_PATH="download/exclude-adblock-hosts.txt"
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
 
-#ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
-#ADAWAY_PATH="download/adaway.txt"
-
-#OISD_LINK="https://raw.githubusercontent.com/sjhgvr/oisd/refs/heads/main/domainswild2_big.txt"
-#OISD_PATH="download/oisd.txt"
-
 function download {
 	local path="${HERE}/${1}"
 	local tmp_path="${path}.tmp"
@@ -77,8 +71,6 @@ download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
-#download $ADAWAY_PATH $ADAWAY_LINK
-#download $OISD_PATH $OISD_LINK
 
 gunzip -f "$HOSTS_PATH_1" || > dump.csv
 

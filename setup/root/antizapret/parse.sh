@@ -62,21 +62,14 @@ if [[ -z "$1" || "$1" == "ad" ]]; then
 	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/exclude-adblock-hosts.txt
 	sed '/^[0-9.]*$/d' temp/exclude-adblock-hosts.txt | sort -u > temp/exclude-adblock-hosts2.txt
 
-	# Обрабатываем список с рекламными доменами для блокировки от AdAway
-#	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/include-adblock-hosts3.txt
-
-	# Обрабатываем список с рекламными доменами для блокировки от OISD
-#	sed -E '/^\s*#/d; /^\s*$/d' download/oisd.txt > temp/include-adblock-hosts4.txt
-
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts5.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts3.txt
 
 	# Обрабатываем список с исключениями из блокировки
 	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts3.txt
 
 	# Объединяем списки
-#	(cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts3.txt && cat temp/include-adblock-hosts4.txt && cat temp/include-adblock-hosts5.txt) | sort -u > result/include-adblock-hosts.txt
-	(cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts5.txt) | sort -u > result/include-adblock-hosts.txt
+	(cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts3.txt) | sort -u > result/include-adblock-hosts.txt
 	(cat temp/exclude-adblock-hosts2.txt && cat temp/exclude-adblock-hosts3.txt) | sort -u > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
