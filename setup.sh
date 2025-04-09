@@ -28,16 +28,16 @@ VERSION=$(lsb_release -rs | cut -d '.' -f1)
 
 if [[ $OS == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
-		echo "Error: Your version of Debian is not supported!"
+		echo "Error: Your Debian version is not supported!"
 		exit 3
 	fi
 elif [[ $OS == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
-		echo "Error: Your version of Ubuntu is not supported!"
+		echo "Error: Your Ubuntu version is not supported!"
 		exit 4
 	fi
 elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
-	echo "Error: Your version of Linux is not supported!"
+	echo "Error: Your Linux version is not supported!"
 	exit 5
 fi
 
@@ -105,7 +105,7 @@ if [[ "$ANTIZAPRET_DNS" -eq 3 ]]; then
 else
 	echo ""
 	until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-		read -rp $'Enable blocking of ads, trackers and phishing in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+		read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 	done
 fi
 echo ""
