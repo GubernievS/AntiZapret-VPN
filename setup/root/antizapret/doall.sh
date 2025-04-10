@@ -3,8 +3,7 @@ set -e
 
 SECONDS=0
 
-HERE="$(dirname "$(readlink -f "${0}")")"
-cd "$HERE"
+cd /root/antizapret
 
 SUM1=$(sha256sum update.sh)
 cat update.sh | bash

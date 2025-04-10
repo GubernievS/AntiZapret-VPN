@@ -8,9 +8,6 @@
 #
 set -e
 
-OPENVPN_HOST=
-WIREGUARD_HOST=
-
 handle_error() {
 	echo ""
 	echo "Error occurred at line $1 while executing: $2"
@@ -41,20 +38,15 @@ askClientCertExpire(){
 	fi
 }
 
-getServerIP() {
-	echo $(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
-}
-
 setServerHost(){
 	if [[ -z "$1" ]]; then
-		SERVER_HOST=$(getServerIP)
+		SERVER_HOST="$SERVER_IP"
 	else
 		SERVER_HOST="$1"
 	fi
 }
 
-setFileName()
-{
+setFileName(){
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
 	FILE_NAME="${FILE_NAME#vpn-}"
 	FILE_NAME="${FILE_NAME}-(${SERVER_HOST})"
@@ -360,7 +352,7 @@ backup(){
 	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
 
-	BACKUP_FILE="/root/antizapret/backup-$(getServerIP).tar.gz"
+	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
 	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard
 	tar -tzf "$BACKUP_FILE" > /dev/null
 
@@ -370,7 +362,18 @@ backup(){
 	echo "Clients backup (re)created at $BACKUP_FILE"
 }
 
+SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
+if [[ -z "$SERVER_IP" ]]; then
+	echo "Default IP address not found!"
+	exit 2
+fi
+
+source /root/antizapret/setup
+
 OPTION=$1
+CLIENT_NAME=$2
+CLIENT_CERT_EXPIRE=$3
+
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo ""
 	echo "Please choose an option:"
@@ -386,9 +389,6 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
 fi
-
-CLIENT_NAME=$2
-CLIENT_CERT_EXPIRE=$3
 
 case "$OPTION" in
 	1)

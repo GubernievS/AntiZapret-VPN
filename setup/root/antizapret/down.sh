@@ -69,4 +69,4 @@ iptables -w -t nat -X ANTIZAPRET-MAPPING
 iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -j MASQUERADE
 
-./custom-down.sh
+/root/antizapret/custom-down.sh

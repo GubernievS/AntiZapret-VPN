@@ -136,8 +136,8 @@ until [[ "$INSTALL_SSHGUARD" =~ (y|n) ]]; do
 done
 echo ""
 echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
-until [[ "$PROTECT_SERVER" =~ (y|n) ]]; do
-	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y PROTECT_SERVER
+until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
+	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
 done
 echo ""
 echo "Preparing for installation, please wait..."
@@ -403,14 +403,12 @@ fi
 # Не используем резервные порты 80 и 443 для OpenVPN TCP
 if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
 	sed -i '/ \(80\|443\) tcp4/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/tcp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
 #
 # Не используем резервные порты 80 и 443 для OpenVPN UDP
 if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
 	sed -i '/ \(80\|443\) udp4/s/^/#/' /etc/openvpn/client/templates/*.conf
-	sed -i '/udp.* \(80\|443\) /s/^/#/' /root/antizapret/up.sh
 fi
 
 #
@@ -423,12 +421,6 @@ fi
 # Включим подробные логи в OpenVPN
 if [[ "$OPENVPN_LOG" == "y" ]]; then
 	sed -i '/^#\(verb\|log\)/s/^#//' /etc/openvpn/server/*.conf
-fi
-
-#
-# Отключим защиту от сетевых атак и сканирования
-if [[ "$PROTECT_SERVER" == "n" ]]; then
-	sed -i '/\(antizapret-block\|antizapret-watch\|antizapret-allow\|tcp-flags\|icmp.*-type\)/s/^/#/' /root/antizapret/up.sh
 fi
 
 #
@@ -488,7 +480,9 @@ OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
 OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
-PROTECT_SERVER=${PROTECT_SERVER}
+ATTACK_PROTECTION=${ATTACK_PROTECTION}
+OPENVPN_HOST=
+WIREGUARD_HOST=
 SETUP_DATE=$(date --iso-8601=seconds)" > /root/antizapret/setup
 
 #

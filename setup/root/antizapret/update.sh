@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-HERE="$(dirname "$(readlink -f "${0}")")"
-cd "$HERE"
-
 echo "Update AntiZapret VPN files:"
+
+cd /root/antizapret
 
 rm -f download/*
 
