@@ -3,9 +3,7 @@ set -e
 
 echo "Update AntiZapret VPN files:"
 
-cd /root/antizapret
-
-rm -f download/*
+rm -f /root/antizapret/download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
@@ -41,7 +39,7 @@ ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
 ADGUARD_PATH="download/adguard.txt"
 
 function download {
-	local path="${HERE}/${1}"
+	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
 	local link=$2
 	echo "$path"
@@ -71,6 +69,6 @@ download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 download $ADGUARD_PATH $ADGUARD_LINK
 
-gunzip -f "$HOSTS_PATH_1" || > dump.csv
+gunzip -f "$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
 
 exit 0
