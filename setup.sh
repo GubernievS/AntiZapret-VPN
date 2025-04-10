@@ -361,7 +361,7 @@ INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
 OPENVPN_HOST=
 WIREGUARD_HOST=
-SETUP_DATE=$(date --iso-8601=seconds)" > /tmp/antizapret/setup/root/antizapret
+SETUP_DATE=$(date --iso-8601=seconds)" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
