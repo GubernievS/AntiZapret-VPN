@@ -346,6 +346,24 @@ mv -f /root/wireguard/key /tmp/antizapret/setup/etc/wireguard &>/dev/null || tru
 rm -rf /root/wireguard
 
 #
+# Сохраняем настройки
+echo "OPENVPN_PATCH=${OPENVPN_PATCH}
+OPENVPN_DCO=${OPENVPN_DCO}
+ANTIZAPRET_DNS=${ANTIZAPRET_DNS}
+VPN_DNS=${VPN_DNS}
+ANTIZAPRET_ADBLOCK=${ANTIZAPRET_ADBLOCK}
+ALTERNATIVE_IP=${ALTERNATIVE_IP}
+OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
+OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
+OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
+OPENVPN_LOG=${OPENVPN_LOG}
+INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
+ATTACK_PROTECTION=${ATTACK_PROTECTION}
+OPENVPN_HOST=
+WIREGUARD_HOST=
+SETUP_DATE=$(date --iso-8601=seconds)" > /tmp/antizapret/setup/root/antizapret
+
+#
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
@@ -466,24 +484,6 @@ fi
 if [[ -n "$ERRORS" ]]; then
 	echo -e "$ERRORS"
 fi
-
-#
-# Сохраняем настройки
-echo "OPENVPN_PATCH=${OPENVPN_PATCH}
-OPENVPN_DCO=${OPENVPN_DCO}
-ANTIZAPRET_DNS=${ANTIZAPRET_DNS}
-VPN_DNS=${VPN_DNS}
-ANTIZAPRET_ADBLOCK=${ANTIZAPRET_ADBLOCK}
-ALTERNATIVE_IP=${ALTERNATIVE_IP}
-OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
-OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
-OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
-OPENVPN_LOG=${OPENVPN_LOG}
-INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
-ATTACK_PROTECTION=${ATTACK_PROTECTION}
-OPENVPN_HOST=
-WIREGUARD_HOST=
-SETUP_DATE=$(date --iso-8601=seconds)" > /root/antizapret/setup
 
 #
 # Создадим файл подкачки размером 512 Мб если его нет
