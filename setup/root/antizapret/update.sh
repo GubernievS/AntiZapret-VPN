@@ -75,6 +75,8 @@ if [[ ! -f /root/antizapret/setup ]]; then
 	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/setup
 fi
 
+sed -i '/^SETUP_DATE/d' /root/antizapret/setup
+
 ###
 
 source /root/antizapret/setup
@@ -92,6 +94,6 @@ else
 fi
 
 
-gunzip -f "$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
+gunzip -f "/root/antizapret/$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
 
 exit 0
