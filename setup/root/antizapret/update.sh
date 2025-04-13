@@ -5,6 +5,16 @@ echo "Update AntiZapret VPN files:"
 
 rm -f /root/antizapret/download/*
 
+###
+
+if [[ ! -f /root/antizapret/config ]]; then
+	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/config
+fi
+
+###
+
+source /root/antizapret/config
+
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
 
@@ -38,6 +48,9 @@ EXCLUDE_ADBLOCK_HOSTS_PATH="download/exclude-adblock-hosts.txt"
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
 
+ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
+ADAWAY_PATH="download/adaway.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -65,9 +78,19 @@ download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
-download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
-download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
-download $ADGUARD_PATH $ADGUARD_LINK
+
+if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then
+	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
+	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
+	download $ADGUARD_PATH $ADGUARD_LINK
+	download $ADAWAY_PATH $ADAWAY_LINK
+else
+	> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
+	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
+	> /root/antizapret/$ADGUARD_PATH
+	> /root/antizapret/$ADAWAY_PATH
+fi
+
 
 gunzip -f "$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
 

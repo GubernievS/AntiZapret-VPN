@@ -50,26 +50,27 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "ad" ]]; then
+if [[ -z "$1" || "$1" == "adblock" ]]; then
 	echo "AdBlock hosts..."
 
-	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/include-adblock-hosts.txt
-	sed '/^[0-9.]*$/d' temp/include-adblock-hosts.txt > temp/include-adblock-hosts2.txt
-
-	# Обрабатываем список с исключениями из блокировки от AdGuard
-	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt > temp/exclude-adblock-hosts.txt
-	sed '/^[0-9.]*$/d' temp/exclude-adblock-hosts.txt | sort -u > temp/exclude-adblock-hosts2.txt
-
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts3.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts3.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+
+	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' > temp/include-adblock-hosts2.txt
+
+	# Обрабатываем список с исключениями из блокировки от AdGuard
+	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' > temp/exclude-adblock-hosts2.txt
+
+	# Обрабатываем список с рекламными доменами для блокировки от AdAway
+	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/include-adblock-hosts3.txt
 
 	# Объединяем списки
-	(cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts3.txt) | sort -u > result/include-adblock-hosts.txt
-	(cat temp/exclude-adblock-hosts2.txt && cat temp/exclude-adblock-hosts3.txt) | sort -u > result/exclude-adblock-hosts.txt
+	(cat temp/include-adblock-hosts.txt && cat temp/include-adblock-hosts2.txt && cat temp/include-adblock-hosts3.txt) | sort -u > result/include-adblock-hosts.txt
+	(cat temp/exclude-adblock-hosts.txt && cat temp/exclude-adblock-hosts2.txt) | sort -u > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-adblock-hosts.txt
