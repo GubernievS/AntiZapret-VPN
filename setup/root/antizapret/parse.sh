@@ -69,8 +69,8 @@ if [[ -z "$1" || "$1" == "adblock" ]]; then
 	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt > temp/include-adblock-hosts3.txt
 
 	# Объединяем списки
-	(cat temp/include-adblock-hosts.txt; echo; temp/include-adblock-hosts2.txt; echo; temp/include-adblock-hosts3.txt) | sort -u > result/include-adblock-hosts.txt
-	(cat temp/exclude-adblock-hosts.txt; echo; temp/exclude-adblock-hosts2.txt) | sort -u > result/exclude-adblock-hosts.txt
+	(cat temp/include-adblock-hosts.txt && echo && cat temp/include-adblock-hosts2.txt && echo && cat temp/include-adblock-hosts3.txt) | sort -u > result/include-adblock-hosts.txt
+	(cat temp/exclude-adblock-hosts.txt && echo && cat temp/exclude-adblock-hosts2.txt) | sort -u > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-adblock-hosts.txt
