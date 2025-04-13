@@ -7,8 +7,8 @@ rm -f /root/antizapret/download/*
 
 ###
 
-if [[ ! -f /root/antizapret/config ]]; then
-	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/config
+if [[ ! -f /root/antizapret/setup ]]; then
+	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/setup
 fi
 
 ###
