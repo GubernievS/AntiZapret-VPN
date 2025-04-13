@@ -5,16 +5,6 @@ echo "Update AntiZapret VPN files:"
 
 rm -f /root/antizapret/download/*
 
-###
-
-if [[ ! -f /root/antizapret/setup ]]; then
-	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/setup
-fi
-
-###
-
-source /root/antizapret/setup
-
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
 
@@ -78,6 +68,16 @@ download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
+
+###
+
+if [[ ! -f /root/antizapret/setup ]]; then
+	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/setup
+fi
+
+###
+
+source /root/antizapret/setup
 
 if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
