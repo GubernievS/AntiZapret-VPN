@@ -13,7 +13,7 @@ fi
 
 ###
 
-source /root/antizapret/config
+source /root/antizapret/setup
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
