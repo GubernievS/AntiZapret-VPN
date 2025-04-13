@@ -11,8 +11,8 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "IPs..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
+	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
 	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
@@ -69,8 +69,8 @@ if [[ -z "$1" || "$1" == "adblock" ]]; then
 	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt >> temp/include-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
-	sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
-	sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
+	LC_ALL=C sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
+	LC_ALL=C sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-adblock-hosts.txt
@@ -90,46 +90,47 @@ fi
 if [[ -z "$1" || "$1" == "host" ]]; then
 	echo "Hosts..."
 
-	# Обрабатываем список заблокированных ресурсов
+	# Обрабатываем конфигурационные файлы
+	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
+
+	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	iconv -f cp1251 -t utf8 download/dump.csv | \
-	awk -F ';' '{
-		if ($2 ~ /\.[а-яА-Яa-zA-Z]/) {
-			sub(/^\*\./, "", $2);	# Удаление *. в начале
-			sub(/\.$/, "", $2);		# Удаление . в конце
-			gsub(/"/, "", $2);		# Удаление всех двойных кавычек
-			print $2				# Выводим только доменные имена
-		}
-	}' | cat - download/domains.lst | sort -u | CHARSET=UTF-8 idn --no-tld > temp/include-hosts.txt
+	cut -d ';' -f 2 download/dump.csv | iconv -f cp1251 -t utf8 | \
+	grep -P '\.[а-яА-Яa-zA-Z]' | \
+	sed -e 's/^\*\.\?//' -e 's/\.$//' -e 's/"//g' | \
+	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
+
+	# Обрабатываем список заблокированных ресурсов из antifilter.download
+	CHARSET=UTF-8 idn --no-tld < download/domains.lst >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
 
-	# Обрабатываем конфигурационные файлы
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt | sort -u >> temp/include-hosts2.txt
+	# Удаляем дубли и сортируем
+	LC_ALL=C sort -u temp/include-hosts2.txt > temp/include-hosts3.txt
 
 	# Удаляем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){6}[^.]*$' temp/include-hosts2.txt | sed 's/^/./' > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
+	grep -E '^([^.]*\.){6}[^.]*$' temp/include-hosts3.txt | sed 's/^/./' > temp/exclude-patterns.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns.txt temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
 
-	grep -E '^([^.]*\.){5}[^.]*$' temp/include-hosts3.txt | sed 's/^/./' > temp/exclude-patterns2.txt
-	grep -vFf temp/exclude-patterns2.txt temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
+	grep -E '^([^.]*\.){5}[^.]*$' temp/include-hosts4.txt | sed 's/^/./' > temp/exclude-patterns2.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns2.txt temp/include-hosts4.txt | sort -u > temp/include-hosts5.txt
 
-	grep -E '^([^.]*\.){4}[^.]*$' temp/include-hosts4.txt | sed 's/^/./' > temp/exclude-patterns3.txt
-	grep -vFf temp/exclude-patterns3.txt temp/include-hosts4.txt | sort -u > temp/include-hosts5.txt
+	grep -E '^([^.]*\.){4}[^.]*$' temp/include-hosts5.txt | sed 's/^/./' > temp/exclude-patterns3.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns3.txt temp/include-hosts5.txt | sort -u > temp/include-hosts6.txt
 
-	grep -E '^([^.]*\.){3}[^.]*$' temp/include-hosts5.txt | sed 's/^/./' > temp/exclude-patterns4.txt
-	grep -vFf temp/exclude-patterns4.txt temp/include-hosts5.txt | sort -u > temp/include-hosts6.txt
+	grep -E '^([^.]*\.){3}[^.]*$' temp/include-hosts6.txt | sed 's/^/./' > temp/exclude-patterns4.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns4.txt temp/include-hosts6.txt | sort -u > temp/include-hosts7.txt
 
-	grep -E '^([^.]*\.){2}[^.]*$' temp/include-hosts6.txt | sed 's/^/./' > temp/exclude-patterns5.txt
-	grep -vFf temp/exclude-patterns5.txt temp/include-hosts6.txt | sort -u > temp/include-hosts7.txt
+	grep -E '^([^.]*\.){2}[^.]*$' temp/include-hosts7.txt | sed 's/^/./' > temp/exclude-patterns5.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns5.txt temp/include-hosts7.txt | sort -u > temp/include-hosts8.txt
 
-	grep -E '^([^.]*\.){1}[^.]*$' temp/include-hosts7.txt | sed 's/^/./' > temp/exclude-patterns6.txt
-	grep -vFf temp/exclude-patterns6.txt temp/include-hosts7.txt | sort -u > temp/include-hosts8.txt
+	grep -E '^([^.]*\.){1}[^.]*$' temp/include-hosts8.txt | sed 's/^/./' > temp/exclude-patterns6.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns6.txt temp/include-hosts8.txt | sort -u > temp/include-hosts9.txt
 
-	grep -E '^([^.]*\.){0}[^.]*$' temp/include-hosts8.txt | sed 's/^/./' > temp/exclude-patterns7.txt
-	grep -vFf temp/exclude-patterns7.txt temp/include-hosts8.txt | sort -u > result/include-hosts.txt
+	grep -E '^([^.]*\.){0}[^.]*$' temp/include-hosts9.txt | sed 's/^/./' > temp/exclude-patterns7.txt
+	LC_ALL=C grep -vFf temp/exclude-patterns7.txt temp/include-hosts9.txt | sort -u > result/include-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-hosts.txt
