@@ -143,14 +143,14 @@ echo ""
 while :; do
 	read -p "Enter domain name for this OpenVPN server or press Enter to skip: " OPENVPN_HOST
 	[[ -z "$OPENVPN_HOST" ]] && break
-	getent hosts "$OPENVPN_HOST" > /dev/null && break
+	dig +short "$OPENVPN_HOST" > /dev/null && break
 	echo "Domain not found, please try again or press Enter to skip"
 done
 echo ""
 while :; do
 	read -p "Enter domain name for this WireGuard/AmneziaWG server or press Enter to skip: " WIREGUARD_HOST
 	[[ -z "$WIREGUARD_HOST" ]] && break
-	getent hosts "$WIREGUARD_HOST" > /dev/null && break
+	dig +short "$WIREGUARD_HOST" > /dev/null && break
 	echo "Domain not found, please try again or press Enter to skip"
 done
 echo ""
