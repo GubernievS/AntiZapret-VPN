@@ -112,7 +112,6 @@ addOpenVPN(){
 	cd /etc/openvpn/easyrsa3
 	mkdir -p /etc/openvpn/client/keys
 
-
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
 		askClientCertExpire
