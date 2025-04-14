@@ -8,9 +8,9 @@ set -e
 
 handle_error() {
 	echo ""
-	echo "Error occurred at line $1 while executing: $2"
+	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
 	echo ""
-	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
