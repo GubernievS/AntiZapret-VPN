@@ -7,6 +7,15 @@ cd /root/antizapret
 
 rm -f temp/*
 
+for file in /root/antizapret/config/*; do
+  if [[ -f "$file" ]]; then
+    # Проверяем, есть ли символ новой строки в конце файла
+    if [[ "$(tail -c 1 "$file" | wc -l)" -eq 0 ]]; then
+      echo "" >> "$file"  # Добавляем новую строку, если её нет
+    fi
+  fi
+done
+
 if [[ -z "$1" || "$1" == "ip" ]]; then
 	echo "IPs..."
 
