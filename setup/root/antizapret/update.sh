@@ -69,16 +69,6 @@ download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 
-###
-
-if [[ ! -f /root/antizapret/setup ]]; then
-	echo "ANTIZAPRET_ADBLOCK=y" > /root/antizapret/setup
-fi
-
-sed -i '/^SETUP_DATE/d' /root/antizapret/setup
-
-###
-
 source /root/antizapret/setup
 
 if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then

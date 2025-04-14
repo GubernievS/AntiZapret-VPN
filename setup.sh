@@ -105,7 +105,7 @@ if [[ "$ANTIZAPRET_DNS" -eq 3 ]]; then
 else
 	echo ""
 	until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-		read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+		read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 	done
 fi
 echo ""
@@ -138,6 +138,20 @@ echo ""
 echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
+done
+echo ""
+while :; do
+	read -p "Enter domain name for this OpenVPN server or press Enter to skip: " OPENVPN_HOST
+	[[ -z "$OPENVPN_HOST" ]] && break
+	getent hosts "$OPENVPN_HOST" > /dev/null && break
+	echo "Domain not found, please try again or press Enter to skip"
+done
+echo ""
+while :; do
+	read -p "Enter domain name for this WireGuard/AmneziaWG server or press Enter to skip: " WIREGUARD_HOST
+	[[ -z "$WIREGUARD_HOST" ]] && break
+	getent hosts "$WIREGUARD_HOST" > /dev/null && break
+	echo "Domain not found, please try again or press Enter to skip"
 done
 echo ""
 echo "Preparing for installation, please wait..."
@@ -173,6 +187,7 @@ rm -f /etc/systemd/system/openvpn-generate-keys.service
 rm -f /etc/systemd/system/dnsmap.service
 #rm -f /etc/apt/sources.list.d/amnezia*
 #rm -f /usr/share/keyrings/amnezia.gpg
+rm -f /usr/share/keyrings/cznic-labs-pkg.gpg
 rm -f /root/upgrade.sh
 rm -f /root/generate.sh
 rm -f /root/Enable-OpenVPN-DCO.sh
@@ -208,8 +223,8 @@ apt-get purge -y libpam0g-dev &>/dev/null
 #
 # Остановим и выключим обновляемые службы
 for service in kresd@ openvpn-server@ wg-quick@; do
-    systemctl list-units --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl stop &>/dev/null
-    systemctl list-unit-files --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl disable &>/dev/null
+	systemctl list-units --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl stop &>/dev/null
+	systemctl list-unit-files --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl disable &>/dev/null
 done
 
 systemctl stop antizapret &>/dev/null
@@ -272,30 +287,31 @@ set -e
 # Обработка ошибок
 handle_error() {
 	echo ""
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
+	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
 	echo ""
-	echo "$(lsb_release -d | awk -F'\t' '{print $2}') $(uname -r) $(date)"
+	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 7
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 #
 # Обновляем систему
+apt-get clean
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg procps
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg
 
 #
-# Добавляем репозитории
+# Папка для ключей
 mkdir -p /etc/apt/keyrings
 
 #
-# Knot Resolver
-curl -fsSL https://pkg.labs.nic.cz/gpg -o /usr/share/keyrings/cznic-labs-pkg.gpg
-echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
+# Добавим репозиторий Knot Resolver
+curl -fsSL https://pkg.labs.nic.cz/gpg -o /etc/apt/keyrings/cznic-labs-pkg.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 
 #
-# OpenVPN
+# Добавим репозиторий OpenVPN
 curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
@@ -359,8 +375,9 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
-OPENVPN_HOST=
-WIREGUARD_HOST=" > /tmp/antizapret/setup/root/antizapret/setup
+OPENVPN_HOST=${OPENVPN_HOST}
+WIREGUARD_HOST=${WIREGUARD_HOST}
+SETUP_DATE=$(date --iso-8601=seconds)" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
@@ -408,24 +425,6 @@ if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
 	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/g" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
 	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
-fi
-
-#
-# Не блокируем рекламу, трекеры и фишинг в AntiZapret VPN
-if [[ "$ANTIZAPRET_ADBLOCK" == "n" ]]; then
-	sed -i '/adblock-hosts\.rpz/s/^/--/' /etc/knot-resolver/kresd.conf
-fi
-
-#
-# Не используем резервные порты 80 и 443 для OpenVPN TCP
-if [[ "$OPENVPN_80_443_TCP" == "n" ]]; then
-	sed -i '/ \(80\|443\) tcp4/s/^/#/' /etc/openvpn/client/templates/*.conf
-fi
-
-#
-# Не используем резервные порты 80 и 443 для OpenVPN UDP
-if [[ "$OPENVPN_80_443_UDP" == "n" ]]; then
-	sed -i '/ \(80\|443\) udp4/s/^/#/' /etc/openvpn/client/templates/*.conf
 fi
 
 #
