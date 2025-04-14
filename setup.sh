@@ -140,9 +140,9 @@ until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
 done
 echo ""
-read -rp "Enter domain name for this OpenVPN server or press Enter to skip: " OPENVPN_HOST
+read -rp "Enter domain name for this OpenVPN server or press Enter to skip: " -e OPENVPN_HOST
 echo ""
-read -rp "Enter domain name for this WireGuard/AmneziaWG server or press Enter to skip: " WIREGUARD_HOST
+read -rp "Enter domain name for this WireGuard/AmneziaWG server or press Enter to skip: " -e WIREGUARD_HOST
 echo ""
 echo "Preparing for installation, please wait..."
 
