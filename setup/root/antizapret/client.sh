@@ -77,8 +77,6 @@ initOpenVPN(){
 	if [[ ! -f ./pki/ca.crt ]] || \
 	   [[ ! -f ./pki/issued/antizapret-server.crt ]] || \
 	   [[ ! -f ./pki/private/antizapret-server.key ]]; then
-		echo ""
-		echo "Creating new PKI and CA"
 		rm -rf ./pki
 		rm -rf /etc/openvpn/server/keys
 		rm -rf /etc/openvpn/client/keys
@@ -88,8 +86,6 @@ initOpenVPN(){
 	fi
 
 	if [[ ! -f ./pki/crl.pem ]]; then
-		echo ""
-		echo "Creating new CRL"
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	fi
 
@@ -119,6 +115,7 @@ addOpenVPN(){
 	else
 		echo ""
 		echo "Client with that name already exists! Please enter a different name"
+		echo ""
 	fi
 
 	mkdir -p /etc/openvpn/server/keys
@@ -155,7 +152,6 @@ addOpenVPN(){
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn"
 
-	echo ""
 	echo "OpenVPN profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/openvpn"
 }
 
@@ -166,11 +162,14 @@ deleteOpenVPN(){
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-	chmod 644 ./pki/crl.pem
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 
-	rm -f /root/antizapret/client/openvpn/{antizapret,antizapret-udp,antizapret-tcp}/antizapret-$FILE_NAME.ovpn
-	rm -f /root/antizapret/client/openvpn/{vpn,vpn-udp,vpn-tcp}/vpn-$FILE_NAME.ovpn
+	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-$FILE_NAME.ovpn
+	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn
+	rm -f /root/antizapret/client/openvpn/antizapret-tcp/antizapret-$FILE_NAME-tcp.ovpn
+	rm -f /root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn
+	rm -f /root/antizapret/client/openvpn/vpn-udp/vpn-$FILE_NAME-udp.ovpn
+	rm -f /root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
 
