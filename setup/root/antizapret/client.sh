@@ -71,55 +71,67 @@ render() {
 }
 
 initOpenVPN(){
-	if [[ ! -d "/etc/openvpn/easyrsa3" ]]; then
-		echo ""
-		echo "Generating OpenVPN server keys"
-		mkdir -p /etc/openvpn/easyrsa3
-	fi
-
+	mkdir -p /etc/openvpn/easyrsa3
 	cd /etc/openvpn/easyrsa3
 
 	if [[ ! -f ./pki/ca.crt ]] || \
 	   [[ ! -f ./pki/issued/antizapret-server.crt ]] || \
 	   [[ ! -f ./pki/private/antizapret-server.key ]]; then
+		echo ""
+		echo "Creating new PKI and CA"
 		rm -rf ./pki
 		rm -rf /etc/openvpn/server/keys
 		rm -rf /etc/openvpn/client/keys
-		mkdir -p /etc/openvpn/server/keys
-		mkdir -p /etc/openvpn/client/keys
 		/usr/share/easy-rsa/easyrsa init-pki
 		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
 	fi
 
+	if [[ ! -f ./pki/crl.pem ]]; then
+		echo ""
+		echo "Creating new CRL"
+		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	fi
+
+	mkdir -p /etc/openvpn/server/keys
+	mkdir -p /etc/openvpn/client/keys
+
 	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
 	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
+	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
+	   [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
 		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-	fi
-
-	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
-		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 }
 
 addOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
-	echo ""
 	cd /etc/openvpn/easyrsa3
-	mkdir -p /etc/openvpn/client/keys
 
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
 		askClientCertExpire
+		echo ""
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
-		cp ./pki/issued/$CLIENT_NAME.crt /etc/openvpn/client/keys/$CLIENT_NAME.crt
-		cp ./pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
 	else
+		echo ""
 		echo "Client with that name already exists! Please enter a different name"
+	fi
+
+	mkdir -p /etc/openvpn/server/keys
+	mkdir -p /etc/openvpn/client/keys
+
+	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
+	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
+	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
+	   [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
+		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
+		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
+		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 
 	if [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.crt ]] || \
@@ -143,6 +155,7 @@ addOpenVPN(){
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn"
 
+	echo ""
 	echo "OpenVPN profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/openvpn"
 }
 
