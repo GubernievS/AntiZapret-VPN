@@ -11,6 +11,8 @@ fi
 
 source /root/antizapret/setup
 
+[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
+
 # Clear knot-resolver cache
 echo "cache.clear()" | socat - /run/knot-resolver/control/1
 
@@ -31,8 +33,8 @@ ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 # FORWARD VPN traffic
-iptables -w -I FORWARD 2 -d 10.28.0.0/15 -j ACCEPT
-iptables -w -I FORWARD 3 -s 10.28.0.0/15 -j ACCEPT
+iptables -w -I FORWARD 2 -d ${IP}.28.0.0/15 -j ACCEPT
+iptables -w -I FORWARD 3 -s ${IP}.28.0.0/15 -j ACCEPT
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	ipset create antizapret-block hash:ip timeout 600
@@ -72,16 +74,16 @@ fi
 iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # DNS redirection to Knot Resolver
-iptables -w -t nat -A PREROUTING -s 10.29.0.0/22 ! -d 10.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.0.1
-iptables -w -t nat -A PREROUTING -s 10.29.4.0/22 ! -d 10.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.4.1
-iptables -w -t nat -A PREROUTING -s 10.29.8.0/24 ! -d 10.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.8.1
-iptables -w -t nat -A PREROUTING -s 10.29.0.0/22 ! -d 10.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.0.1
-iptables -w -t nat -A PREROUTING -s 10.29.4.0/22 ! -d 10.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.4.1
-iptables -w -t nat -A PREROUTING -s 10.29.8.0/24 ! -d 10.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.8.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
+iptables -w -t nat -A PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
 # ANTIZAPRET-MAPPING
 iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -A PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${IP}.30.0.0/15 -j ANTIZAPRET-MAPPING
 # MASQUERADE VPN traffic
-iptables -w -t nat -A POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
+iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -j MASQUERADE
 
 /root/antizapret/custom-up.sh
