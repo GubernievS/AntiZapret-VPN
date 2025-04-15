@@ -388,7 +388,6 @@ rm -rf /tmp/antizapret
 if [[ "$ALTERNATIVE_IP" == "y" ]]; then
 	sed -i 's/10\.30\./172\.30\./g' /root/antizapret/proxy.py
 	sed -i 's/10\.29\./172\.29\./g' /etc/knot-resolver/kresd.conf
-	sed -i 's/10\./172\./g' /root/antizapret/up.sh
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
 	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
