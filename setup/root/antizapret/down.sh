@@ -57,9 +57,15 @@ iptables -w -t nat -D PREROUTING -i "$INTERFACE" -p udp --dport 52443 -j REDIREC
 iptables -w -t nat -D PREROUTING -s 10.29.0.0/22 ! -d 10.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.0.1
 iptables -w -t nat -D PREROUTING -s 10.29.4.0/22 ! -d 10.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.4.1
 iptables -w -t nat -D PREROUTING -s 10.29.8.0/24 ! -d 10.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination 10.29.8.1
+iptables -w -t nat -D PREROUTING -s 10.29.0.0/22 ! -d 10.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.0.1
+iptables -w -t nat -D PREROUTING -s 10.29.4.0/22 ! -d 10.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.4.1
+iptables -w -t nat -D PREROUTING -s 10.29.8.0/24 ! -d 10.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination 10.29.8.1
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/22 ! -d 172.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination 172.29.0.1
 iptables -w -t nat -D PREROUTING -s 172.29.4.0/22 ! -d 172.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination 172.29.4.1
 iptables -w -t nat -D PREROUTING -s 172.29.8.0/24 ! -d 172.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination 172.29.8.1
+iptables -w -t nat -D PREROUTING -s 172.29.0.0/22 ! -d 172.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.0.1
+iptables -w -t nat -D PREROUTING -s 172.29.4.0/22 ! -d 172.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.4.1
+iptables -w -t nat -D PREROUTING -s 172.29.8.0/24 ! -d 172.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.8.1
 # ANTIZAPRET-MAPPING
 iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 -d 172.30.0.0/15 -j ANTIZAPRET-MAPPING
