@@ -194,8 +194,6 @@ initWireGuard(){
 PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
 		render "/etc/wireguard/templates/vpn.conf" > "/etc/wireguard/vpn.conf"
-	else
-		source /etc/wireguard/key
 	fi
 }
 
@@ -203,6 +201,7 @@ addWireGuard(){
 	setServerHost_FileName "$WIREGUARD_HOST"
 	echo ""
 
+	source /etc/wireguard/key
 	IPS=$(cat /etc/wireguard/ips)
 	CLIENT_BLOCK_ANTIZAPRET=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)
 	CLIENT_BLOCK_VPN=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)
