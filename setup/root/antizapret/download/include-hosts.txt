@@ -645,5 +645,4 @@ intellipaat.com
 p.clickup-attachments.com
 musicbrainz.org
 signon.oracle.com
-global.cityscreen.cloud
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
