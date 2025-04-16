@@ -85,20 +85,19 @@ initOpenVPN(){
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
 	fi
 
-	if [[ ! -f ./pki/crl.pem ]]; then
-		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-	fi
-
 	mkdir -p /etc/openvpn/server/keys
 	mkdir -p /etc/openvpn/client/keys
 
 	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
 	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
+	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
 		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
 		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
 		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+	fi
+
+	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
+		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 }
@@ -116,19 +115,6 @@ addOpenVPN(){
 		echo ""
 		echo "Client with that name already exists! Please enter a different name"
 		echo ""
-	fi
-
-	mkdir -p /etc/openvpn/server/keys
-	mkdir -p /etc/openvpn/client/keys
-
-	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
-		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
-		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 
 	if [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.crt ]] || \
@@ -335,6 +321,7 @@ recreate(){
 
 	# OpenVPN
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
+		initOpenVPN
 		LC_ALL=C ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
@@ -349,11 +336,6 @@ recreate(){
 		echo "Creating OpenVPN server keys and first OpenVPN client: '$CLIENT_NAME'"
 		initOpenVPN
 		addOpenVPN >/dev/null
-	fi
-
-	if [[ ! -d "/etc/openvpn/server/keys" ]]; then
-		echo "No OpenVPN clients found! Only recreating OpenVPN server keys"
-		initOpenVPN
 	fi
 
 	# WireGuard/AmneziaWG
