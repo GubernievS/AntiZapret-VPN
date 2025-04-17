@@ -645,4 +645,5 @@ intellipaat.com
 p.clickup-attachments.com
 musicbrainz.org
 signon.oracle.com
+api.cdnlibs.org
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
