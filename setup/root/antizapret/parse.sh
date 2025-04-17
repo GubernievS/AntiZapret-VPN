@@ -16,7 +16,7 @@ for file in /root/antizapret/config/*; do
   fi
 done
 
-if [[ -z "$1" || "$1" == "ip" ]]; then
+if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
 
 	# Обрабатываем конфигурационные файлы
@@ -59,7 +59,7 @@ if [[ -z "$1" || "$1" == "ip" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "adblock" ]]; then
+if [[ -z "$1" || "$1" == "ad" || "$1" == "adblock" ]]; then
 	echo "AdBlock hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
@@ -96,7 +96,7 @@ if [[ -z "$1" || "$1" == "adblock" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "host" ]]; then
+if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
