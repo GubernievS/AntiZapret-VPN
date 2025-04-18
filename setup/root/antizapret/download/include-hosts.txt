@@ -646,4 +646,5 @@ p.clickup-attachments.com
 musicbrainz.org
 signon.oracle.com
 api.cdnlibs.org
+iperf3serverlist.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
