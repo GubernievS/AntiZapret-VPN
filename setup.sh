@@ -143,13 +143,13 @@ echo ""
 while read -rp "Enter valid domain name for this OpenVPN server or press Enter to skip: " -e OPENVPN_HOST
 do
 	[[ -z "$OPENVPN_HOST" ]] && break
-	[[ -n $(dig +short "$OPENVPN_HOST") ]] && break
+	[[ -n $(getent ahostsv4 "$OPENVPN_HOST") ]] && break
 done
 echo ""
 while read -rp "Enter valid domain name for this WireGuard/AmneziaWG server or press Enter to skip: " -e WIREGUARD_HOST
 do
 	[[ -z "$WIREGUARD_HOST" ]] && break
-	[[ -n $(dig +short "$WIREGUARD_HOST") ]] && break
+	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
 done
 echo ""
 echo "Preparing for installation, please wait..."
@@ -322,7 +322,7 @@ fi
 #
 # Ставим необходимые пакеты
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils dnsutils socat lua-cqueues ipset
+DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset
 if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
 	apt-get purge -y sshguard
 	DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard
