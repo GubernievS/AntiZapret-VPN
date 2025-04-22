@@ -98,14 +98,10 @@ echo "                             (83.220.169.155, 212.109.195.93)"
 until [[ "$VPN_DNS" =~ ^[1-4]$ ]]; do
 	read -rp "DNS choice [1-4]: " -e -i 1 VPN_DNS
 done
-if [[ "$ANTIZAPRET_DNS" -eq 3 ]]; then
-	ANTIZAPRET_ADBLOCK=n
-else
-	echo ""
-	until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-		read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
-	done
-fi
+echo ""
+until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
+	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
