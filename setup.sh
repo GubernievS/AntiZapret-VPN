@@ -77,7 +77,6 @@ echo "                             Blocked & not blocked domains: Cloudflare + Q
 echo "    3) Comss.one           - Use only for problems accessing blocked internet resources!"
 echo "                             Use only if this server is geolocated in Russia, China, Iran, Syria, etc!"
 echo "                             Enable additional proxying and hide this server IP on blocked internet resources"
-echo "                             Enable blocking ads, trackers, malware and phishing websites (not customizable)"
 echo "                             See more: https://www.comss.ru/page.php?id=7315"
 echo "                             Blocked & not blocked domains: Comss.one (83.220.169.155, 212.109.195.93)"
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-3]$ ]]; do
@@ -94,7 +93,6 @@ echo "                             (94.140.14.14, 94.140.15.15, 76.76.2.44, 76.7
 echo "    4) Comss.one           - Use only for problems accessing blocked internet resources!"
 echo "                             Use only if this server is geolocated in Russia, China, Iran, Syria, etc!"
 echo "                             Enable additional proxying and hide this server IP on blocked internet resources"
-echo "                             Enable blocking ads, trackers, malware and phishing websites"
 echo "                             See more: https://www.comss.ru/page.php?id=7315"
 echo "                             (83.220.169.155, 212.109.195.93)"
 until [[ "$VPN_DNS" =~ ^[1-4]$ ]]; do
