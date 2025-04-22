@@ -640,7 +640,7 @@ easyjet.com
 syncfusion.com
 bumble.com
 adobe.com
-voice.findmykids.org
+#voice.findmykids.org
 intellipaat.com
 p.clickup-attachments.com
 musicbrainz.org
@@ -648,4 +648,5 @@ signon.oracle.com
 api.cdnlibs.org
 iperf3serverlist.net
 bestchange.com
+findmykids.org
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
