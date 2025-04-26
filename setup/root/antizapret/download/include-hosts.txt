@@ -649,4 +649,5 @@ api.cdnlibs.org
 iperf3serverlist.net
 bestchange.com
 findmykids.org
+manus.im
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
