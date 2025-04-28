@@ -650,4 +650,5 @@ iperf3serverlist.net
 bestchange.com
 findmykids.org
 manus.im
+red.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
