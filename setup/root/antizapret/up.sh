@@ -37,8 +37,8 @@ iptables -w -I FORWARD 2 -d ${IP}.28.0.0/15 -j ACCEPT
 iptables -w -I FORWARD 3 -s ${IP}.28.0.0/15 -j ACCEPT
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then
-	ipset create antizapret-block hash:ip timeout 600
-	ipset create antizapret-watch hash:ip,port timeout 60
+	ipset list antizapret-block &>/dev/null || ipset create antizapret-block hash:ip timeout 600
+	ipset list antizapret-watch &>/dev/null || ipset create antizapret-watch hash:ip,port timeout 60
 	ipset list antizapret-allow &>/dev/null || ipset create antizapret-allow hash:net
 	iptables -w -I INPUT 2 -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 	iptables -w -I INPUT 3 -i "$INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
@@ -48,8 +48,8 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	iptables -w -I INPUT 7 -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst
 	iptables -w -I OUTPUT 2 -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 	iptables -w -I OUTPUT 3 -o "$INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
-	ipset create antizapret-block6 hash:ip timeout 600 family inet6
-	ipset create antizapret-watch6 hash:ip,port timeout 60 family inet6
+	ipset list antizapret-block6 &>/dev/null || ipset create antizapret-block6 hash:ip timeout 600 family inet6
+	ipset list antizapret-watch6 &>/dev/null || ipset create antizapret-watch6 hash:ip,port timeout 60 family inet6
 	ipset list antizapret-allow6 &>/dev/null || ipset create antizapret-allow6 hash:net family inet6
 	ip6tables -w -I INPUT 2 -i "$INTERFACE" -p icmpv6 --icmpv6-type echo-request -j DROP
 	ip6tables -w -I INPUT 3 -i "$INTERFACE" -m set --match-set antizapret-allow6 src -j ACCEPT
