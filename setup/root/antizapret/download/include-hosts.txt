@@ -652,4 +652,5 @@ findmykids.org
 manus.im
 red.com
 flysas.com
+docs.chaos.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
