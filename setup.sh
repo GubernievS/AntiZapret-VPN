@@ -341,7 +341,7 @@ mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config &>/
 mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret &>/dev/null || true
 
 #
-# Восстанавливаем из бэкапа пользователей
+# Восстанавливаем из бэкапа пользователей OpenVPN и WireGuard
 tar -xzf /root/backup*.tar.gz &>/dev/null || true
 rm -f /root/backup*.tar.gz &>/dev/null || true
 mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn &>/dev/null || true
