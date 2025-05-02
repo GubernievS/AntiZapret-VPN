@@ -236,22 +236,19 @@ systemctl disable firewalld &>/dev/null
 systemctl disable ufw &>/dev/null
 
 #
-# Удаляем старые файлы и кеш knot-resolver
+# Удаляем старые файлы и кеш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
 rm -rf /etc/knot-resolver/*
 rm -rf /var/lib/knot-resolver/*
 
 #
-# Удаляем старые файлы openvpn
+# Удаляем старые файлы OpenVPN и WireGuard
 rm -rf /etc/openvpn/server/*
 rm -rf /etc/openvpn/client/*
-
-#
-# Удаляем старые файлы wireguard
 rm -rf /etc/wireguard/templates/*
 
 #
-# Удалим скомпилированный патченный OpenVPN
+# Удаляем скомпилированный патченный OpenVPN
 make -C /usr/local/src/openvpn uninstall &>/dev/null
 rm -rf /usr/local/src/openvpn
 
@@ -344,7 +341,7 @@ mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config &>/
 mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret &>/dev/null || true
 
 #
-# Восстанавливаем из бэкапа пользователей vpn
+# Восстанавливаем из бэкапа пользователей
 tar -xzf /root/backup*.tar.gz &>/dev/null || true
 rm -f /root/backup*.tar.gz &>/dev/null || true
 mv -f /root/easyrsa3 /tmp/antizapret/setup/etc/openvpn &>/dev/null || true
