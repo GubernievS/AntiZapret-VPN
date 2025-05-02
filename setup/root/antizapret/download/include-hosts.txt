@@ -653,4 +653,5 @@ manus.im
 red.com
 flysas.com
 docs.chaos.com
+stream.voidboost.cc
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
