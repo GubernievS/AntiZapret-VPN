@@ -337,17 +337,20 @@ git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 #
 # Сохраняем пользовательские настройки и пользовательские обработчики custom*.sh
-mv -f /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config &>/dev/null || true
-mv -f /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret &>/dev/null || true
+cp /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
+cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ &>/dev/null || true
+
 
 #
-# Восстанавливаем из бэкапа пользователей OpenVPN и WireGuard
+# Восстанавливаем из бэкапа пользовательские настройки и пользователей OpenVPN и WireGuard
 tar -xzf /root/backup*.tar.gz &>/dev/null || true
 rm -f /root/backup*.tar.gz &>/dev/null || true
 cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3 &>/dev/null || true
-cp -r /root/wireguard/* /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
+cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
+cp /root/config/* /tmp/antizapret/setup/root/antizapret/config &>/dev/null || true
 rm -rf /root/easyrsa3
 rm -rf /root/wireguard
+rm -rf /root/config
 
 #
 # Сохраняем настройки

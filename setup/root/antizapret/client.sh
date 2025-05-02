@@ -366,14 +366,15 @@ backup(){
 	cp -r /etc/wireguard/antizapret.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
+	cp -r /root/antizapret/config /root/antizapret/backup
 
 	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
-	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard
+	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config
 	tar -tzf "$BACKUP_FILE" > /dev/null
 
 	rm -rf /root/antizapret/backup
 
-	echo "Clients backup (re)created at $BACKUP_FILE"
+	echo "Clients and config backup (re)created at $BACKUP_FILE"
 }
 
 source /root/antizapret/setup
@@ -394,7 +395,7 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo "    5) WireGuard/AmneziaWG - Delete client"
 	echo "    6) WireGuard/AmneziaWG - List clients"
 	echo "    7) (Re)create clients profile files"
-	echo "    8) (Re)create clients backup"
+	echo "    8) (Re)create clients and config backup"
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp "Option choice [1-8]: " -e OPTION
 	done
@@ -438,7 +439,7 @@ case "$OPTION" in
 		recreate
 		;;
 	8)
-		echo "(Re)create clients backup"
+		echo "(Re)create clients and config backup"
 		backup
 		;;
 esac
