@@ -14,13 +14,16 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-HOSTS_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
-HOSTS_PATH_1="download/dump.csv.gz"
+#HOSTS_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
+#HOSTS_PATH_1="download/dump.csv.gz"
+HOSTS_LINK_1="https://svn.code.sf.net/p/zapret-info/code/dump.csv"
+HOSTS_PATH_1="download/dump.csv"
 
 HOSTS_LINK_2="https://antifilter.download/list/domains.lst"
 HOSTS_PATH_2="download/domains.lst"
 
-NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
+#NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
+NXDOMAIN_LINK="https://svn.code.sf.net/p/zapret-info/code/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
 
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
@@ -84,6 +87,6 @@ else
 fi
 
 
-gunzip -f "/root/antizapret/$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
+#gunzip -f "/root/antizapret/$HOSTS_PATH_1" || > /root/antizapret/download/dump.csv
 
 exit 0
