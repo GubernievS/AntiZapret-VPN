@@ -656,4 +656,5 @@ docs.chaos.com
 stream.voidboost.cc
 faz.net
 spiegel.de
+lucid.app
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
