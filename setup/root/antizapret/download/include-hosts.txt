@@ -654,4 +654,6 @@ red.com
 flysas.com
 docs.chaos.com
 stream.voidboost.cc
+faz.net
+spiegel.de
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
