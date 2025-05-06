@@ -126,7 +126,7 @@ until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
 done
 echo ""
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
-	read -rp "Enable SSH protection? [y/n]: " -e -i y SSH_PROTECTION
+	read -rp "Enable SSH brute-force protection? [y/n]: " -e -i y SSH_PROTECTION
 done
 echo ""
 echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
