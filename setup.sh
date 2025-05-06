@@ -211,7 +211,7 @@ apt-get purge -y gnupg2 &>/dev/null
 apt-get purge -y ferm &>/dev/null
 apt-get purge -y libpam0g-dev &>/dev/null
 #apt-get purge -y amneziawg &>/dev/null
-apt-get purge -y sshguard
+apt-get purge -y sshguard &>/dev/null
 
 #
 # Остановим и выключим обновляемые службы
