@@ -23,8 +23,8 @@ fi
 
 #
 # Проверка версии системы
-OS=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
-VERSION=$(lsb_release -rs | cut -d '.' -f1)
+OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
+VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
 if [[ $OS == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
@@ -125,8 +125,8 @@ until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
 	read -rp "Enable detailed logs in OpenVPN? [y/n]: " -e -i n OPENVPN_LOG
 done
 echo ""
-until [[ "$INSTALL_SSHGUARD" =~ (y|n) ]]; do
-	read -rp "Install SSHGuard to protect this server from brute-force attacks on SSH? [y/n]: " -e -i y INSTALL_SSHGUARD
+until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
+	read -rp "Enable SSH protection? [y/n]: " -e -i y SSH_PROTECTION
 done
 echo ""
 echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
@@ -211,6 +211,7 @@ apt-get purge -y gnupg2 &>/dev/null
 apt-get purge -y ferm &>/dev/null
 apt-get purge -y libpam0g-dev &>/dev/null
 #apt-get purge -y amneziawg &>/dev/null
+apt-get purge -y sshguard
 
 #
 # Остановим и выключим обновляемые службы
@@ -314,13 +315,6 @@ fi
 # Ставим необходимые пакеты
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset
-if [[ "$INSTALL_SSHGUARD" == "y" ]]; then
-	apt-get purge -y sshguard
-	DEBIAN_FRONTEND=noninteractive apt-get install -y sshguard
-	echo -e "\n# Size of IPv6 subnet to block. Defaults to a single address, CIDR notation. (optional, default to 128)\nIPV6_SUBNET=64\n\n# Size of IPv4 subnet to block. Defaults to a single address, CIDR notation. (optional, default to 32)\nIPV4_SUBNET=24" >> /etc/sshguard/sshguard.conf
-else
-	apt-get purge -y sshguard
-fi
 apt-get autoremove -y
 apt-get autoclean
 
@@ -364,7 +358,7 @@ OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
 OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
 OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
-INSTALL_SSHGUARD=${INSTALL_SSHGUARD}
+SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}

@@ -3,7 +3,7 @@
 exec 2>/dev/null
 
 if [[ -z "$1" ]]; then
-	INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+	INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 else
 	INTERFACE=$1
 fi
@@ -40,6 +40,9 @@ ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-
 ip6tables -w -D INPUT -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 ip6tables -w -D OUTPUT -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
+# SSH protection
+iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 2/hour --hashlimit-burst 2 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 120000 -j DROP
+ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 2/hour --hashlimit-burst 2 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 120000 -j DROP
 
 # nat
 # OpenVPN TCP port redirection for backup connections

@@ -5,9 +5,9 @@ SECONDS=0
 
 cd /root/antizapret
 
-SUM1=$(sha256sum update.sh)
+SUM1="$(sha256sum update.sh)"
 cat update.sh | bash
-SUM2=$(sha256sum update.sh)
+SUM2="$(sha256sum update.sh)"
 if [[ "$SUM1" != "$SUM2" ]]; then
 	echo "update.sh has been updated, restarting update.sh"
 	cat update.sh | bash

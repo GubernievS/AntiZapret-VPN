@@ -50,7 +50,7 @@ setServerHost_FileName(){
 }
 
 setServerIP(){
-	SERVER_IP=$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)
+	SERVER_IP="$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)"
 	if [[ -z "$SERVER_IP" ]]; then
 		echo "Default IP address not found!"
 		exit 2
@@ -59,15 +59,14 @@ setServerIP(){
 
 render() {
 	local IFS=''
-	local File="$1"
 	while read -r line; do
 		while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]]; do
-			local LHS=${BASH_REMATCH[1]}
+			local LHS="${BASH_REMATCH[1]}"
 			local RHS="$(eval echo "\"$LHS\"")"
-			line=${line//$LHS/$RHS}
+			line="${line//$LHS/$RHS}"
 		done
 		echo "$line"
-	done < $File
+	done < "$1"
 }
 
 initOpenVPN(){
@@ -123,9 +122,9 @@ addOpenVPN(){
 		cp ./pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
 	fi
 
-	CA_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")
-	CLIENT_CERT=$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")
-	CLIENT_KEY=$(cat -- "/etc/openvpn/client/keys/$CLIENT_NAME.key")
+	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
+	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")"
+	CLIENT_KEY="$(cat -- "/etc/openvpn/client/keys/$CLIENT_NAME.key")"
 	if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]; then
 		echo "Can't load client keys!"
 		exit 11
@@ -173,8 +172,8 @@ initWireGuard(){
 	if [[ ! -f /etc/wireguard/key ]]; then
 		echo ""
 		echo "Generating WireGuard/AmneziaWG server keys"
-		PRIVATE_KEY=$(wg genkey)
-		PUBLIC_KEY=$(echo "${PRIVATE_KEY}" | wg pubkey)
+		PRIVATE_KEY="$(wg genkey)"
+		PUBLIC_KEY="$(echo "${PRIVATE_KEY}" | wg pubkey)"
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
 PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 		render "/etc/wireguard/templates/antizapret.conf" > "/etc/wireguard/antizapret.conf"
@@ -187,24 +186,24 @@ addWireGuard(){
 	echo ""
 
 	source /etc/wireguard/key
-	IPS=$(cat /etc/wireguard/ips)
-	CLIENT_BLOCK_ANTIZAPRET=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)
-	CLIENT_BLOCK_VPN=$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)
+	IPS="$(cat /etc/wireguard/ips)"
+	CLIENT_BLOCK_ANTIZAPRET="$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)"
+	CLIENT_BLOCK_VPN="$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)"
 
 	if [[ -n "$CLIENT_BLOCK_ANTIZAPRET" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')
-		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')
-		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		echo "Client with that name already exists! Please enter a different name"
 	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
-		CLIENT_PRIVATE_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')
-		CLIENT_PUBLIC_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')
-		CLIENT_PRESHARED_KEY=$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')
+		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		echo "Client with that name already exists! Please enter a different name"
 	else
-		CLIENT_PRIVATE_KEY=$(wg genkey)
-		CLIENT_PUBLIC_KEY=$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)
-		CLIENT_PRESHARED_KEY=$(wg genpsk)
+		CLIENT_PRIVATE_KEY="$(wg genkey)"
+		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
+		CLIENT_PRESHARED_KEY="$(wg genpsk)"
 	fi
 
 	sed -i "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
@@ -215,7 +214,7 @@ addWireGuard(){
 
 	# AntiZapret
 
-	BASE_CLIENT_IP=$(grep "^Address" /etc/wireguard/antizapret.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)
+	BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/antizapret.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
 
 	for i in {2..255}; do
 		CLIENT_IP="${BASE_CLIENT_IP}.$i"
@@ -245,7 +244,7 @@ AllowedIPs = ${CLIENT_IP}/32
 
 	# VPN
 
-	BASE_CLIENT_IP=$(grep "^Address" /etc/wireguard/vpn.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)
+	BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/vpn.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
 
 	for i in {2..255}; do
 		CLIENT_IP="${BASE_CLIENT_IP}.$i"

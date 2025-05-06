@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-INTERFACE=$(ip route | grep '^default' | awk '{print $5}')
+INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo "Default network interface not found!"
 	exit 1
@@ -59,6 +59,11 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	ip6tables -w -I INPUT 7 -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst
 	ip6tables -w -I OUTPUT 2 -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 	ip6tables -w -I OUTPUT 3 -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
+fi
+# SSH protection
+if [[ "$SSH_PROTECTION" == "y" ]]; then
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 2/hour --hashlimit-burst 2 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 120000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 2/hour --hashlimit-burst 2 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 120000 -j DROP
 fi
 
 # nat

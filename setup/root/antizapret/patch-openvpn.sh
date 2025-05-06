@@ -54,7 +54,7 @@ DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--for
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev automake libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove -y
 apt-get autoclean
-VERSION=$(openvpn --version | head -n 1 | awk '{print $2}')
+VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
 curl -fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
