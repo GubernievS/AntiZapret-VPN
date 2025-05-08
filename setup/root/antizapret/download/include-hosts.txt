@@ -661,4 +661,5 @@ windsurf.com
 autodesk.com
 autodesk.net
 autodesk.eu
+cdnbunny.org
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
