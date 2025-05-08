@@ -659,4 +659,6 @@ spiegel.de
 lucid.app
 windsurf.com
 autodesk.com
+autodesk.net
+autodesk.eu
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
