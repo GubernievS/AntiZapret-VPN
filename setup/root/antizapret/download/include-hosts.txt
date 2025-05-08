@@ -339,10 +339,10 @@ connect.ubisoft.com
 public-ubiservices.ubi.com
 upc.ubisoft.com
 ubistatic-a.ubisoft.com
-accounts.autodesk.com
-appstreaming.autodesk.com
-help.autodesk.com
-efulfillment.autodesk.com
+#accounts.autodesk.com
+#appstreaming.autodesk.com
+#help.autodesk.com
+#efulfillment.autodesk.com
 databricks.com
 plugin-alliance.com
 devexpress.com
@@ -658,4 +658,5 @@ faz.net
 spiegel.de
 lucid.app
 windsurf.com
+autodesk.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
