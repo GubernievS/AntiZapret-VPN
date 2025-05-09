@@ -664,4 +664,5 @@ autodesk.eu
 cdnbunny.org
 vmware.com
 ahcdn.com
+disneyplus.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
