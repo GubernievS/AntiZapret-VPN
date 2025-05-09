@@ -404,8 +404,8 @@ schenker-tech.de
 yeggi.com
 omv-extras.org
 notebooklm.google.com
-softwareupdate.vmware.com
-docs.vmware.com
+#softwareupdate.vmware.com
+#docs.vmware.com
 members.summerana.com
 anythingllm.com
 wikidot.com
@@ -662,4 +662,5 @@ autodesk.com
 autodesk.net
 autodesk.eu
 cdnbunny.org
+vmware.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
