@@ -665,4 +665,5 @@ cdnbunny.org
 vmware.com
 ahcdn.com
 disneyplus.com
+onfastspring.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
