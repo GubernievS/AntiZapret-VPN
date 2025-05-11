@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import socket,struct,subprocess,os
+import socket,struct,subprocess,sys,time,argparse,threading
 from collections import deque
 from ipaddress import IPv4Network
 from dnslib import DNSRecord,RCODE,QTYPE,A
@@ -28,62 +28,91 @@ class ProxyResolver(BaseResolver):
         'real' transparent proxy option the DNSHandler logic needs to be
         modified (see PassthroughDNSHandler)
     """
-    def __init__(self,address,port,timeout,iprange):
+    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry):
         self.address = address
         self.port = port
         self.timeout = timeout
-        self.unassigned_addresses = deque([str(x) for x in IPv4Network(iprange).hosts()])
-        self.ipmap = {}
+        self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
+        self.ip_map = {}
+        self.cleanup_interval = cleanup_interval
+        self.cleanup_expiry = cleanup_expiry
+        self.lock = threading.Lock()
         # Load existing mapping
-        get_mapping = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
-        output = subprocess.check_output(get_mapping, shell=True, encoding='utf-8')
-        for mapped in output.split("\n"):
-            if mapped:
-                fake_addr, real_addr = mapped.split(' ')
-                self.add_mapping(real_addr, fake_addr) or sys.exit(1)
+        rule = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
+        output = subprocess.check_output(rule,shell=True,encoding="utf-8")
+        rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
+        for mapping in output.split("\n"):
+            if mapping:
+                fake_ip,real_ip = mapping.split(" ")
+                if not self.assign_fake_ip(real_ip,fake_ip):
+                    subprocess.call(rule,shell=True)
+                    sys.exit(1)
+        threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
 
-    def get_mapping(self,real_addr):
-        return self.ipmap.get(real_addr)
+    def get_fake_ip(self,real_ip):
+        with self.lock:
+            entry = self.ip_map.get(real_ip)
+            if entry:
+                entry["last_access"] = time.time()
+                return entry["fake_ip"]
+            return None
 
-    def add_mapping(self,real_addr,fake_addr=None):
-        if self.get_mapping(real_addr):
-            # Real addr is already mapped
-            print("Real addr {} is already mapped".format(real_addr))
+    def assign_fake_ip(self,real_ip,fake_ip=None):
+        if self.get_fake_ip(real_ip):
+            # Real IP is already mapped
+            print(f"Real IP {real_ip} is already mapped")
             return False
-        if fake_addr:
-            try:
-                self.unassigned_addresses.remove(fake_addr)
-                self.ipmap[real_addr]=fake_addr
-                print('Mapping {} to {}'.format(fake_addr, real_addr))
-            except ValueError:
-                print("Fake addr {} not in unassigned addresses list".format(fake_addr))
-                return False
-        else:
-            try:
-                fake_addr = self.unassigned_addresses.popleft()
-            except IndexError:
-                print("ERROR: No IP addresses left!!!")
-                os._exit(1)
-            print('Mapping {} to {}'.format(fake_addr, real_addr))
-            self.ipmap[real_addr]=fake_addr
-            set_mapping = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d '{fake_addr}' -j DNAT --to '{real_addr}'"
-            subprocess.call(set_mapping, shell=True, encoding='utf-8')
-            return fake_addr
-        return True
+        with self.lock:
+            if fake_ip:
+                try:
+                    self.ip_pool.remove(fake_ip)
+                    self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": time.time()}
+                    print(f"Mapping {fake_ip} to {real_ip}")
+                except ValueError:
+                    print(f"Fake IP {fake_ip} not in fake IP pool")
+                    return False
+            else:
+                try:
+                    fake_ip = self.ip_pool.popleft()
+                except IndexError:
+                    print("ERROR: No fake IP left!")
+                    return False
+                print(f"Mapping {fake_ip} to {real_ip}")
+                self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": time.time()}
+                rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
+                subprocess.call(rule,shell=True)
+                return fake_ip
+            return True
+
+    def cleanup_fake_ips_worker(self):
+        while True:
+            time.sleep(self.cleanup_interval)
+            self.cleanup_fake_ips()
+
+    def cleanup_fake_ips(self):
+        current_time = time.time()
+        with self.lock:
+            cleanup_ips = [(key,entry["fake_ip"]) for key,entry in self.ip_map.items() if current_time - entry["last_access"] > self.cleanup_expiry]
+            for real_ip,fake_ip in cleanup_ips:
+                del self.ip_map[real_ip]
+                rule = f"iptables -w -t nat -D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
+                subprocess.call(rule,shell=True)
+                print(f"Unmapped {fake_ip} to {real_ip}")
+                self.ip_pool.appendleft(fake_ip)
 
     def resolve(self,request,handler):
         try:
-            if handler.protocol == 'udp':
-                proxy_r = request.send(self.address,self.port, timeout=self.timeout)
+            if handler.protocol == "udp":
+                proxy_r = request.send(self.address,self.port,timeout=self.timeout)
             else:
-                proxy_r = request.send(self.address,self.port, tcp=True, timeout=self.timeout)
+                proxy_r = request.send(self.address,self.port,tcp=True,timeout=self.timeout)
             reply = DNSRecord.parse(proxy_r)
             if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
-                #print('GOT AAAA or HTTPS')
+                #print("GOT AAAA or HTTPS")
                 reply = request.reply()
                 return reply
             if request.q.qtype == QTYPE.A:
-                #print('GOT A')
+                #print("GOT A")
                 newrr = []
                 for record in reply.rr:
                     if record.rtype == QTYPE.CNAME:
@@ -95,16 +124,16 @@ class ProxyResolver(BaseResolver):
                         continue
                     #print(dir(record))
                     #print(type(record.rdata))
-                    real_addr = str(record.rdata)
-                    fake_addr = self.get_mapping(real_addr)
-                    if not fake_addr:
-                        fake_addr = self.add_mapping(real_addr)
-                    if not fake_addr:
-                        print("No fake_addr, something went wrong!")
+                    real_ip = str(record.rdata)
+                    fake_ip = self.get_fake_ip(real_ip)
+                    if not fake_ip:
+                        fake_ip = self.assign_fake_ip(real_ip)
+                    if not fake_ip:
+                        print("No fake_ip, something went wrong!")
                         reply = request.reply()
-                        reply.header.rcode = getattr(RCODE,'SERVFAIL')
+                        reply.header.rcode = getattr(RCODE,"SERVFAIL")
                         return reply
-                    record.rdata = A(fake_addr)
+                    record.rdata = A(fake_ip)
                     record.rname = request.q.qname
                     record.ttl = 300
                     #print(a.rdata)
@@ -112,7 +141,7 @@ class ProxyResolver(BaseResolver):
             #print(reply)
         except socket.timeout:
             reply = request.reply()
-            reply.header.rcode = getattr(RCODE,'NXDOMAIN')
+            reply.header.rcode = getattr(RCODE,"NXDOMAIN")
         return reply
 
 class PassthroughDNSHandler(DNSHandler):
@@ -126,7 +155,7 @@ class PassthroughDNSHandler(DNSHandler):
         host,port = self.server.resolver.address,self.server.resolver.port
         request = DNSRecord.parse(data)
         self.log_request(request)
-        if self.protocol == 'tcp':
+        if self.protocol == "tcp":
             data = struct.pack("!H",len(data)) + data
             response = send_tcp(data,host,port)
             response = response[2:]
@@ -161,8 +190,7 @@ def send_udp(data,host,port):
     sock.close()
     return response
 
-if __name__ == '__main__':
-    import argparse,sys,time
+if __name__ == "__main__":
     p = argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--port","-p",type=int,default=53,
                     metavar="<port>",
@@ -173,28 +201,34 @@ if __name__ == '__main__':
     p.add_argument("--upstream","-u",default="127.0.0.1:53",
                     metavar="<dns server:port>",
                     help="Upstream DNS server:port (default:127.0.0.1:53)")
-    p.add_argument("--tcp",action='store_true',default=False,
+    p.add_argument("--tcp",action="store_true",default=False,
                     help="TCP proxy (default: UDP only)")
     p.add_argument("--timeout","-o",type=float,default=5,
                     metavar="<timeout>",
                     help="Upstream timeout (default: 5s)")
-    p.add_argument("--passthrough",action='store_true',default=False,
+    p.add_argument("--passthrough",action="store_true",default=False,
                     help="Dont decode/re-encode request/response (default: off)")
     p.add_argument("--log",default="request,reply,truncated,error",
                     help="Log hooks to enable (default: +request,+reply,+truncated,+error,-recv,-send,-data)")
-    p.add_argument("--log-prefix",action='store_true',default=False,
+    p.add_argument("--log-prefix",action="store_true",default=False,
                     help="Log prefix (timestamp/handler/resolver) (default: False)")
-    p.add_argument("--iprange",default="10.30.0.0/15",
+    p.add_argument("--ip-range",default="10.30.0.0/15",
                     metavar="<ip/mask>",
                     help="Fake IP range (default:10.30.0.0/15)")
+    p.add_argument("--cleanup-interval","-c",type=int,default=3600,
+                    metavar="<seconds>",
+                    help="Seconds between fake IP cleanup runs (default: 3600)")
+    p.add_argument("--cleanup-expiry","-e",type=int,default=7200,
+                    metavar="<seconds>",
+                    help="Seconds of inactivity before fake IP is removed (default: 7200)")
     args = p.parse_args()
-    args.dns,_,args.dns_port = args.upstream.partition(':')
+    args.dns,_,args.dns_port = args.upstream.partition(":")
     args.dns_port = int(args.dns_port or 53)
     print("Starting Proxy Resolver (%s:%d -> %s:%d) [%s]" % (
                         args.address or "*",args.port,
                         args.dns,args.dns_port,
                         "UDP/TCP" if args.tcp else "UDP"))
-    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.iprange)
+    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
     logger = DNSLogger(args.log,args.log_prefix)
     udp_server = DNSServer(resolver,
