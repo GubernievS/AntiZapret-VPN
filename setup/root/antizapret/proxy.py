@@ -65,7 +65,7 @@ class ProxyResolver(BaseResolver):
                 self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": time.time()}
                 rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
                 subprocess.call(rule,shell=True)
-                print(f"Mapping {fake_ip} to {real_ip}")
+                print(f"Mapping: {fake_ip} to {real_ip}")
                 return fake_ip
 
     def mapping_ip(self,real_ip,fake_ip,last_access):
@@ -75,7 +75,7 @@ class ProxyResolver(BaseResolver):
         try:
             self.ip_pool.remove(fake_ip)
             self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": last_access}
-            print(f"Mapping {fake_ip} to {real_ip}")
+            print(f"Mapping: {fake_ip} to {real_ip}")
         except ValueError:
             print(f"ERROR: Fake IP {fake_ip} not in fake IP pool")
             return False
@@ -98,8 +98,8 @@ class ProxyResolver(BaseResolver):
                 del self.ip_map[real_ip]
                 rule = f"iptables -w -t nat -D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
                 subprocess.call(rule,shell=True)
-                #print(f"Unmapped {fake_ip} to {real_ip}")
-            print(f"Cleanup {len(cleanup_ips)} expired fake IPs")
+                #print(f"Unmapped: {fake_ip} to {real_ip}")
+            print(f"Cleanup: {len(cleanup_ips)} expired fake IPs")
 
     def resolve(self,request,handler):
         try:
