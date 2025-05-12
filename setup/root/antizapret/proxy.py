@@ -99,7 +99,7 @@ class ProxyResolver(BaseResolver):
                 rule = f"iptables -w -t nat -D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
                 subprocess.call(rule,shell=True)
                 #print(f"Unmapped {fake_ip} to {real_ip}")
-            print(f"Cleanup: {len(cleanup_ips)} expired fake IPs")
+            print(f"Cleanup {len(cleanup_ips)} expired fake IPs")
 
     def resolve(self,request,handler):
         try:
