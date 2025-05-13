@@ -671,4 +671,5 @@ costco.com
 nordstromrack.com
 tjmaxx.tjx.com
 abercrombie.com
+adobe.io
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
