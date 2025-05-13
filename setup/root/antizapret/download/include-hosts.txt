@@ -666,4 +666,9 @@ vmware.com
 ahcdn.com
 disneyplus.com
 onfastspring.com
+gap.com
+costco.com
+nordstromrack.com
+tjmaxx.tjx.com
+abercrombie.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
