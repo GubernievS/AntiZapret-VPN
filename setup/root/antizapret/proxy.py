@@ -29,25 +29,26 @@ class ProxyResolver(BaseResolver):
         modified (see PassthroughDNSHandler)
     """
     def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry):
-        self.address = address
-        self.port = port
-        self.timeout = timeout
         self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
         self.ip_map = {}
-        self.cleanup_interval = cleanup_interval
-        self.cleanup_expiry = cleanup_expiry
-        self.lock = threading.Lock()
         # Load existing mapping
-        rule = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; sub(/to:/, \"\", $6); print $5, $6}'"
-        output = subprocess.check_output(rule,shell=True,encoding="utf-8")
+        rule = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; print $5, substr($6, 4)}'"
+        mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout
         current_time = time.time()
-        for mapping in output.split("\n"):
+        for mapping in mappings.split("\n"):
             if mapping:
                 fake_ip,real_ip = mapping.split(" ")
                 if not self.mapping_ip(real_ip,fake_ip,current_time):
                     rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
-                    subprocess.call(rule,shell=True)
+                    subprocess.run(rule,shell=True,check=True)
                     sys.exit(1)
+        self.address = address
+        self.port = port
+        self.timeout = timeout
+        self.cleanup_interval = cleanup_interval
+        self.cleanup_expiry = cleanup_expiry
+        self.lock = threading.Lock()
+        # Start thread for cleanup fake IPs
         threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
 
     def get_fake_ip(self,real_ip):
@@ -64,7 +65,7 @@ class ProxyResolver(BaseResolver):
                     return None
                 self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": time.time()}
                 rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
-                subprocess.call(rule,shell=True)
+                subprocess.run(rule,shell=True,check=True)
                 print(f"Mapping: {fake_ip} to {real_ip}")
                 return fake_ip
 
@@ -97,7 +98,7 @@ class ProxyResolver(BaseResolver):
                 self.ip_pool.appendleft(fake_ip)
                 del self.ip_map[real_ip]
                 rule = f"iptables -w -t nat -D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
-                subprocess.call(rule,shell=True)
+                subprocess.run(rule,shell=True,check=True)
                 #print(f"Unmapped: {fake_ip} to {real_ip}")
             print(f"Cleanup: {len(cleanup_ips)} expired fake IPs")
 
