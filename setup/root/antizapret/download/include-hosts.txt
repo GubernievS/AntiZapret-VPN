@@ -674,6 +674,8 @@ abercrombie.com
 adobe.io
 err.ee
 yandexwebcache.org
+mirror.cachyos.org
+mirror.fast0ne.com
 lifehacker.com
 myheritage.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
