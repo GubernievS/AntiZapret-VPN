@@ -678,4 +678,5 @@ mirror.cachyos.org
 mirror.fast0ne.com
 lifehacker.com
 myheritage.com
+cdn77.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
