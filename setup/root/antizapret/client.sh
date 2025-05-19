@@ -98,6 +98,7 @@ initOpenVPN(){
 	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+		chmod 644 /etc/openvpn/server/keys/crl.pem
 	fi
 }
 
