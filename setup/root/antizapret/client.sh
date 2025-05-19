@@ -148,6 +148,7 @@ deleteOpenVPN(){
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+	chmod 644 /etc/openvpn/server/keys/crl.pem
 
 	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-$FILE_NAME.ovpn
 	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn
