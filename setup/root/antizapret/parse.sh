@@ -100,7 +100,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
-	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
