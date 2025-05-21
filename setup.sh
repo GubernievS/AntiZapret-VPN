@@ -247,26 +247,6 @@ make -C /usr/local/src/openvpn uninstall &>/dev/null
 rm -rf /usr/local/src/openvpn
 
 #
-# Очищаем правила iptables
-iptables -F &>/dev/null
-iptables -X &>/dev/null
-iptables -t nat -F &>/dev/null
-iptables -t nat -X &>/dev/null
-iptables -t raw -F &>/dev/null
-iptables -t raw -X &>/dev/null
-iptables -t mangle -F &>/dev/null
-iptables -t mangle -X &>/dev/null
-
-ip6tables -F &>/dev/null
-ip6tables -X &>/dev/null
-ip6tables -t nat -F &>/dev/null
-ip6tables -t nat -X &>/dev/null
-ip6tables -t raw -F &>/dev/null
-ip6tables -t raw -X &>/dev/null
-ip6tables -t mangle -F &>/dev/null
-ip6tables -t mangle -X &>/dev/null
-
-#
 # Завершим выполнение скрипта при ошибке
 set -e
 
