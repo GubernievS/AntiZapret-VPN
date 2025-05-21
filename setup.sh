@@ -70,14 +70,9 @@ done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
 echo "    1) Cloudflare + Quad9  - Recommended by default"
-echo "          + Yandex           (Blocked internet resources: 1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
-echo "                             (Not blocked internet resources: 77.88.8.8, 77.88.8.1)"
-echo "    2) Cloudflare + Quad9  - Use for problems accessing internet resources with Yandex DNS"
-echo "                             (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
-echo "    3) Comss.one *         - See more: https://www.comss.ru/disqus/page.php?id=7315"
-echo "                             (83.220.169.155, 212.109.195.93)"
-echo "    4) Xbox-dns.ru *       - See more: https://xbox-dns.ru"
-echo "                             (176.99.11.77, 80.78.247.254)"
+echo "    2) Comss.one *         - Details: https://comss.ru/disqus/page.php?id=7315"
+echo "    3) Xbox-dns.ru *       - Details: https://xbox-dns.ru"
+echo ""
 echo "  * - Enable additional proxying and hide this server IP on blocked internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing blocked internet resources"
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-4]$ ]]; do
@@ -86,15 +81,11 @@ done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare + Quad9  - Recommended by default"
-echo "                             (1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10)"
-echo "    2) Yandex              - Use for problems accessing internet resources from Russia"
-echo "                             (77.88.8.8, 77.88.8.1)"
+echo "    2) Google + Yandex     - Use if problems accessing internet resources (supports EDNS Client Subnet)"
 echo "    3) AdGuard             - Use for blocking ads, trackers, malware and phishing websites"
-echo "                             (94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44)"
-echo "    4) Comss.one *         - See more: https://www.comss.ru/disqus/page.php?id=7315"
-echo "                             (83.220.169.155, 212.109.195.93)"
-echo "    5) Xbox-dns.ru *       - See more: https://xbox-dns.ru"
-echo "                             (176.99.11.77, 80.78.247.254)"
+echo "    4) Comss.one *         - Details: https://comss.ru/disqus/page.php?id=7315"
+echo "    5) Xbox-dns.ru *       - Details: https://xbox-dns.ru"
+echo ""
 echo "  * - Enable additional proxying and hide this server IP on blocked internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing blocked internet resources"
 until [[ "$VPN_DNS" =~ ^[1-5]$ ]]; do
@@ -399,8 +390,8 @@ fi
 #
 # Настраиваем DNS в обычном VPN
 if [[ "$VPN_DNS" == "2" ]]; then
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
-	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 8.8.8.8"\npush "dhcp-option DNS 8.8.4.4"\npush "dhcp-option DNS 77.88.8.8"\npush "dhcp-option DNS 77.88.8.1"' /etc/openvpn/server/vpn*.conf
+	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/8.8.8.8, 8.8.4.4, 77.88.8.8, 77.88.8.1/" /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "3" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+3c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"\npush "dhcp-option DNS 76.76.2.44"\npush "dhcp-option DNS 76.76.10.44"' /etc/openvpn/server/vpn*.conf
 	sed -i "s/1.1.1.1, 1.0.0.1, 9.9.9.10, 149.112.112.10/94.140.14.14, 94.140.15.15, 76.76.2.44, 76.76.10.44/" /etc/wireguard/templates/vpn-client*.conf
@@ -415,11 +406,9 @@ fi
 #
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/g" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'83.220.169.155', '212.109.195.93'/g" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
-	sed -i "s/'77.88.8.8', '77.88.8.1', '77.88.8.8@1253', '77.88.8.1@1253'\|'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'176.99.11.77', '80.78.247.254'/g" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/'176.99.11.77', '80.78.247.254'/g" /etc/knot-resolver/kresd.conf
 fi
 
 #
