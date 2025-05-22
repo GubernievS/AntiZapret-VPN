@@ -681,4 +681,5 @@ myheritage.com
 cdn77.com
 absher.sa
 jules.google.com
+stitch.withgoogle.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
