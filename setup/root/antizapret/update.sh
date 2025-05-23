@@ -35,6 +35,9 @@ EXCLUDE_HOSTS_PATH="download/exclude-hosts.txt"
 INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-ips.txt"
 INCLUDE_IPS_PATH="download/include-ips.txt"
 
+RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
+RPZ_PATH="download/rpz.txt"
+
 INCLUDE_ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-adblock-hosts.txt"
 INCLUDE_ADBLOCK_HOSTS_PATH="download/include-adblock-hosts.txt"
 
@@ -77,6 +80,7 @@ download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
+download $RPZ_PATH $RPZ_LINK
 
 source /root/antizapret/setup
 

@@ -150,6 +150,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo -e '$TTL 300\n@ SOA . . (0 0 0 0 0)' > result/hosts.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/hosts.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/hosts.rpz
+	sed '/^;/d' download/rpz.txt >> result/hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
 	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
