@@ -147,7 +147,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	wc -l result/exclude-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	echo -e '$TTL 300\n@ IN SOA . . (0 0 0 0 0)' > result/hosts.rpz
+	echo -e '$TTL 300\n@ SOA . . (0 0 0 0 0)' > result/hosts.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/hosts.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/hosts.rpz
 
