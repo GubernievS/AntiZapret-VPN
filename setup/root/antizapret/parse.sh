@@ -111,7 +111,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из antifilter.download
-	CHARSET=UTF-8 idn --no-tld < download/domains.lst >> temp/include-hosts.txt
+	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
+	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
@@ -146,7 +147,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	wc -l result/exclude-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt > result/hosts.rpz
+	echo -e '$TTL 300\n@ IN SOA . . (0 0 0 0 0)' > result/hosts.rpz
+	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/hosts.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
