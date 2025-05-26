@@ -44,7 +44,7 @@ amazfitwatchfaces.com
 buymeacoffee.com
 #cloudflare.com
 redgifs.com
-one.one.one.one
+#one.one.one.one
 discord.com
 discord.gg
 discordapp.com
