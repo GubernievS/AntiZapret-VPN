@@ -685,4 +685,5 @@ stitch.withgoogle.com
 ebay.com
 #api.imgur.com
 rapidapi.com
+cleanbrowsing.org
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
