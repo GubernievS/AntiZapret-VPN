@@ -13,4 +13,6 @@ doh.opendns.com CNAME rpz-drop.
 *.doh.opendns.com CNAME rpz-drop.
 doh.cleanbrowsing.org CNAME rpz-drop.
 *.doh.cleanbrowsing.org CNAME rpz-drop.
+dot.dns.yandex.net CNAME rpz-drop.
+*.dot.dns.yandex.net CNAME rpz-drop.
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
