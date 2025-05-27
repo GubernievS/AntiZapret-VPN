@@ -684,4 +684,5 @@ jules.google.com
 stitch.withgoogle.com
 ebay.com
 #api.imgur.com
+rapidapi.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
