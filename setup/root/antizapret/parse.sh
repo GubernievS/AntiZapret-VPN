@@ -59,7 +59,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "ad" || "$1" == "adblock" ]]; then
+if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "AdBlock hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
@@ -86,17 +86,18 @@ if [[ -z "$1" || "$1" == "ad" || "$1" == "adblock" ]]; then
 	wc -l result/exclude-adblock-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt > result/adblock-hosts.rpz
+	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/adblock-hosts.rpz
+	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/adblock-hosts.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/adblock-hosts.rpz
+	sed '/^;/d' download/rpz.txt >> result/adblock-hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл adblock-hosts.rpz изменился
 	if [[ -f result/adblock-hosts.rpz ]] && ! diff -q result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.rpz; then
 		cp -f result/adblock-hosts.rpz /etc/knot-resolver/adblock-hosts.temp
 		mv -f /etc/knot-resolver/adblock-hosts.temp /etc/knot-resolver/adblock-hosts.rpz
+		echo "cache.clear()" | socat - /run/knot-resolver/control/1 &>/dev/null
 	fi
-fi
 
-if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
@@ -147,10 +148,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	wc -l result/exclude-hosts.txt
 
 	# Создаем файл для Knot Resolver
-	echo -e '$TTL 300\n@ SOA . . (0 0 0 0 0)' > result/hosts.rpz
+	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/hosts.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/hosts.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/hosts.rpz
-	sed '/^;/d' download/rpz.txt >> result/hosts.rpz
 
 	# Обновляем файл в Knot Resolver только если файл hosts.rpz изменился
 	if [[ -f result/hosts.rpz ]] && ! diff -q result/hosts.rpz /etc/knot-resolver/hosts.rpz; then
