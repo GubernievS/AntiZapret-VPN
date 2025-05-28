@@ -1,18 +1,18 @@
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 sprosivracha.com A 5.35.8.103
 www.sprosivracha.com A 5.35.8.103
-cloudflare-dns.com CNAME rpz-drop.
-*.cloudflare-dns.com CNAME rpz-drop.
-dns.nextdns.io CNAME rpz-drop.
-*.dns.nextdns.io CNAME rpz-drop.
-dns.google.com CNAME rpz-drop.
-*.dns.google.com CNAME rpz-drop.
-dns.google CNAME rpz-drop.
-*.dns.google CNAME rpz-drop.
-doh.opendns.com CNAME rpz-drop.
-*.doh.opendns.com CNAME rpz-drop.
-doh.cleanbrowsing.org CNAME rpz-drop.
-*.doh.cleanbrowsing.org CNAME rpz-drop.
-dot.dns.yandex.net CNAME rpz-drop.
-*.dot.dns.yandex.net CNAME rpz-drop.
+cloudflare-dns.com CNAME .
+*.cloudflare-dns.com CNAME .
+dns.nextdns.io CNAME .
+*.dns.nextdns.io CNAME .
+dns.google.com CNAME .
+*.dns.google.com CNAME .
+dns.google CNAME .
+*.dns.google CNAME .
+doh.opendns.com CNAME .
+*.doh.opendns.com CNAME .
+doh.cleanbrowsing.org CNAME .
+*.doh.cleanbrowsing.org CNAME .
+dot.dns.yandex.net CNAME .
+*.dot.dns.yandex.net CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
