@@ -109,10 +109,6 @@ class ProxyResolver(BaseResolver):
             else:
                 proxy_r = request.send(self.address,self.port,tcp=True,timeout=self.timeout)
             reply = DNSRecord.parse(proxy_r)
-            if request.q.qtype == QTYPE.AAAA or request.q.qtype == QTYPE.HTTPS:
-                #print("GOT AAAA or HTTPS")
-                reply = request.reply()
-                return reply
             if request.q.qtype == QTYPE.A:
                 #print("GOT A")
                 newrr = []
@@ -140,7 +136,7 @@ class ProxyResolver(BaseResolver):
             #print(reply)
         except socket.timeout:
             reply = request.reply()
-            reply.header.rcode = getattr(RCODE,"NXDOMAIN")
+            reply.header.rcode = getattr(RCODE,"SERVFAIL")
         return reply
 
 class PassthroughDNSHandler(DNSHandler):
