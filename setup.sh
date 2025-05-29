@@ -272,7 +272,7 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 # Обновляем систему
 apt-get clean
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg
 
 #
