@@ -51,6 +51,7 @@ fi
 echo ""
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
+echo "https://github.com/GubernievS/AntiZapret-VPN"
 
 #
 # Спрашиваем о настройках
