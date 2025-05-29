@@ -33,7 +33,7 @@ fi
 
 if [[ "$DCO" == "y" ]]; then
 	apt-get update
-	DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
 	apt-get autoremove -y
 	apt-get autoclean
