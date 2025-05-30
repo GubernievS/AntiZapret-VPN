@@ -78,8 +78,8 @@ echo "    5) Xbox *               - More details: https://xbox-dns.ru"
 echo ""
 echo "  * - Enable additional proxying and hide this server IP on some internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
-until [[ "$ANTIZAPRET_DNS" =~ ^[1-6]$ ]]; do
-	read -rp "DNS choice [1-6]: " -e -i 1 ANTIZAPRET_DNS
+until [[ "$ANTIZAPRET_DNS" =~ ^[1-5]$ ]]; do
+	read -rp "DNS choice [1-5]: " -e -i 1 ANTIZAPRET_DNS
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
