@@ -70,12 +70,11 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 done
 echo ""
 echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
-echo "    1) MSK-IX + Cloudflare  - Recommended by default"
-echo "    2) MSK-IX + Quad9       - Use if Cloudflare fail to resolve domains"
-echo "    3) SkyDNS + Cloudflare  - Use if MSK-IX/Quad9 fail to resolve domains"
-echo "    4) SkyDNS + SafeDNS     - Use if MSK-IX/Quad9/Cloudflare fail to resolve domains"
-echo "    5) Comss *              - More details: https://comss.ru/disqus/page.php?id=7315"
-echo "    6) Xbox *               - More details: https://xbox-dns.ru"
+echo "    1) SkyDNS + Cloudflare  - Recommended by default"
+echo "    2) SkyDNS + Quad9       - Use if Cloudflare fail to resolve domains"
+echo "    3) SkyDNS + SafeDNS     - Use if Cloudflare/Quad9 fail to resolve domains"
+echo "    4) Comss *              - More details: https://comss.ru/disqus/page.php?id=7315"
+echo "    5) Xbox *               - More details: https://xbox-dns.ru"
 echo ""
 echo "  * - Enable additional proxying and hide this server IP on some internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
@@ -401,30 +400,21 @@ elif [[ "$VPN_DNS" == "7" ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
-echo "    1) MSK-IX + Cloudflare  - Recommended by default"
-echo "    2) MSK-IX + Quad9       - Use if Cloudflare fail to resolve domains"
-echo "    3) SkyDNS + Cloudflare  - Use if MSK-IX/Quad9 fail to resolve domains"
-echo "    4) SkyDNS + SafeDNS     - Use if MSK-IX/Quad9/Cloudflare fail to resolve domains"
-
 #
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
-	# MSK-IX + Quad9
+	# SkyDNS + Quad9
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1'/'9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
-	# SkyDNS + Cloudflare
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76'/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	# SkyDNS + SafeDNS
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76'/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1'/'195.46.39.39', '195.46.39.40'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	# Comss
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'193\.58\.251\.251'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "6" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 	# Xbox
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'193\.58\.251\.251'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 fi
 
