@@ -686,4 +686,5 @@ ebay.com
 #api.imgur.com
 rapidapi.com
 cleanbrowsing.org
+store.galaxy-of-heroes.starwars.ea.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
