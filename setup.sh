@@ -26,17 +26,17 @@ fi
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
-if [[ $OS == "debian" ]]; then
+if [[ "$OS" == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
 		echo "Error: Your Debian version is not supported!"
 		exit 3
 	fi
-elif [[ $OS == "ubuntu" ]]; then
+elif [[ "$OS" == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
 		echo "Error: Your Ubuntu version is not supported!"
 		exit 4
 	fi
-elif [[ $OS != "debian" ]] && [[ $OS != "ubuntu" ]]; then
+elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	echo "Error: Your Linux version is not supported!"
 	exit 5
 fi
@@ -290,7 +290,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn
 
 #
 # Добавим репозиторий Debian Backports
-if [[ $OS == "debian" ]]; then
+if [[ "$OS" == "debian" ]]; then
 	echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
 fi
 
@@ -463,8 +463,8 @@ if [[ "$OPENVPN_PATCH" != "0" ]]; then
 fi
 
 if [[ "$OPENVPN_DCO" == "y" ]]; then
-	if ! /root/antizapret/openvpn-dco.sh "y"; then
-		ERRORS+="\n\e[1;31mOpenVPN DCO has not turn on!\e[0m Please run '/root/antizapret/openvpn-dco.sh' after rebooting\n"
+	if ! /root/antizapret/openvpn-dco.sh y; then
+		ERRORS+="\n\e[1;31mOpenVPN DCO has not turn on!\e[0m Please run '/root/antizapret/openvpn-dco.sh y' after rebooting\n"
 	fi
 fi
 
