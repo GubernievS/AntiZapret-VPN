@@ -34,10 +34,10 @@ if [[ "$ALGORITHM" == "0" ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
 		apt-get update
-		DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-		DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y openvpn
+		apt-get dist-upgrade -y
+		apt-get install --reinstall -y openvpn
 		apt-get autoremove -y
-		apt-get autoclean
+		apt-get clean
 		systemctl daemon-reload
 		systemctl restart openvpn-server@*
 		echo ""
@@ -50,10 +50,10 @@ if [[ "$ALGORITHM" == "0" ]]; then
 fi
 
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev automake libnl-genl-3-dev libcap-ng-dev
+apt-get dist-upgrade -y
+apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev automake libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove -y
-apt-get autoclean
+apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
