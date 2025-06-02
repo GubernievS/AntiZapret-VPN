@@ -96,16 +96,4 @@ else
 	> /root/antizapret/$ADAWAY_PATH
 fi
 
-###
-
-sed -i 's/adblock-hosts\.rpz/deny.rpz/g' /etc/knot-resolver/kresd.conf
-sed -i 's/hosts\.rpz/proxy.rpz/g' /etc/knot-resolver/kresd.conf
-cp /etc/knot-resolver/adblock-hosts.rpz /etc/knot-resolver/deny.rpz 2>/dev/null || true
-cp /etc/knot-resolver/hosts.rpz /etc/knot-resolver/proxy.rpz 2>/dev/null || true
-systemctl restart kresd@*
-rm -f /etc/knot-resolver/adblock-hosts.rpz
-rm -f /etc/knot-resolver/hosts.rpz
-
-###
-
 exit 0
