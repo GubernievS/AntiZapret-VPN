@@ -33,10 +33,10 @@ fi
 
 if [[ "$DCO" == "y" ]]; then
 	apt-get update
-	DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-	DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
+	apt-get dist-upgrade -y
+	apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
 	apt-get autoremove -y
-	apt-get autoclean
+	apt-get clean
 	modprobe -r ovpn_dco_v2
 	modprobe ovpn_dco_v2
 	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
