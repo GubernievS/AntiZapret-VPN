@@ -271,8 +271,8 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 # Обновляем систему
 apt-get clean
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y curl gpg
+apt-get dist-upgrade -y
+apt-get install --reinstall -y curl gpg
 
 #
 # Папка для ключей
@@ -297,9 +297,9 @@ fi
 #
 # Ставим необходимые пакеты
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset
+apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset
 apt-get autoremove -y
-apt-get autoclean
+apt-get clean
 
 #
 # Клонируем репозиторий и устанавливаем dnslib
