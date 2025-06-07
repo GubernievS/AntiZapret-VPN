@@ -690,4 +690,6 @@ store.galaxy-of-heroes.starwars.ea.com
 glpals.com
 cfainstitute.org
 bgpmon.net
+upwork.com
+porsche.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
