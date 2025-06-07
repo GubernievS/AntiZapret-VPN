@@ -688,4 +688,6 @@ rapidapi.com
 cleanbrowsing.org
 store.galaxy-of-heroes.starwars.ea.com
 glpals.com
+cfainstitute.org
+bgpmon.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
