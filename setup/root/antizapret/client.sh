@@ -398,7 +398,7 @@ CLIENT_CERT_EXPIRE=$3
 
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo ""
-	echo "Please choose an option:"
+	echo "Please choose option:"
 	echo "    1) OpenVPN - Add client/Renew client certificate"
 	echo "    2) OpenVPN - Delete client"
 	echo "    3) OpenVPN - List clients"
