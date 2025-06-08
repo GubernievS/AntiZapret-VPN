@@ -20,7 +20,7 @@ if [[ "$1" =~ ^[0-2]$ ]]; then
 	ALGORITHM="$1"
 else
 	echo ""
-	echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
+	echo "Choose anti-censorship patch for OpenVPN (UDP only):"
 	echo "    0) None        - Do not install the anti-censorship patch, or remove if already installed"
 	echo "    1) Strong      - Recommended by default"
 	echo "    2) Error-free  - Use if the Strong patch causes a connection error, recommended for Mikrotik routers"
