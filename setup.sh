@@ -56,10 +56,10 @@ echo "More details: https://github.com/GubernievS/AntiZapret-VPN"
 #
 # Спрашиваем о настройках
 echo ""
-echo "Choose a version of the anti-censorship patch for OpenVPN (UDP only):"
-echo "    0) None        - Do not install the anti-censorship patch, or remove if already installed"
+echo "Choose anti-censorship patch for OpenVPN (UDP only):"
+echo "    0) None        - Do not install anti-censorship patch, or remove if already installed"
 echo "    1) Strong      - Recommended by default"
-echo "    2) Error-free  - Use if the Strong patch causes a connection error, recommended for Mikrotik routers"
+echo "    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers"
 until [[ "$OPENVPN_PATCH" =~ ^[0-2]$ ]]; do
 	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
@@ -119,7 +119,7 @@ until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
 done
 echo ""
 until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
-	read -rp "Allow multiple clients connecting to OpenVPN using the same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
+	read -rp "Allow multiple clients connecting to OpenVPN using same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
 echo ""
 until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
@@ -130,7 +130,7 @@ until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable SSH brute-force protection? [y/n]: " -e -i y SSH_PROTECTION
 done
 echo ""
-echo "Warning! Network attack and scan protection may block the work of VPN or third-party applications!"
+echo "Warning! Network attack and scan protection may block VPN or third-party applications!"
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
 done
