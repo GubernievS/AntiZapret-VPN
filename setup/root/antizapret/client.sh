@@ -30,7 +30,7 @@ askClientName(){
 askClientCertExpire(){
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
 		echo ""
-		echo "Enter client certificate expiration period: 1-3650 days"
+		echo "Enter client certificate expiration days (1-3650):"
 		until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
 			read -rp "Certificate expiration days: " -e -i 3650 CLIENT_CERT_EXPIRE
 		done
@@ -113,8 +113,17 @@ addOpenVPN(){
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
 	else
 		echo ""
-		echo "Client with that name already exists! Please enter a different name"
+		echo "Client with that name already exists! Please enter a different name for the new client"
 		echo ""
+		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
+			echo "Current client certificate expiration period:"
+			openssl x509 -in ./pki/issued/$CLIENT_NAME.crt -noout -dates
+			askClientCertExpire
+			echo ""
+			rm -f ./pki/issued/$CLIENT_NAME.crt
+			/usr/share/easy-rsa/easyrsa --batch --days=$CLIENT_CERT_EXPIRE sign client $CLIENT_NAME
+			rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
+		fi
 	fi
 
 	if [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.crt ]] || \
@@ -196,12 +205,12 @@ addWireGuard(){
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter a different name"
+		echo "Client with that name already exists! Please enter a different name for the new client"
 	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter a different name"
+		echo "Client with that name already exists! Please enter a different name for the new client"
 	else
 		CLIENT_PRIVATE_KEY="$(wg genkey)"
 		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
@@ -323,6 +332,7 @@ recreate(){
 	# OpenVPN
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		initOpenVPN
+		CLIENT_CERT_EXPIRE=0
 		LC_ALL=C ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
@@ -389,7 +399,7 @@ CLIENT_CERT_EXPIRE=$3
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo ""
 	echo "Please choose an option:"
-	echo "    1) OpenVPN - Add client"
+	echo "    1) OpenVPN - Add client/Renew client certificate"
 	echo "    2) OpenVPN - Delete client"
 	echo "    3) OpenVPN - List clients"
 	echo "    4) WireGuard/AmneziaWG - Add client"
@@ -404,7 +414,7 @@ fi
 
 case "$OPTION" in
 	1)
-		echo "OpenVPN - Add client $CLIENT_NAME $CLIENT_CERT_EXPIRE"
+		echo "OpenVPN - Add client/Renew client certificate $CLIENT_NAME $CLIENT_CERT_EXPIRE"
 		askClientName
 		initOpenVPN
 		addOpenVPN
