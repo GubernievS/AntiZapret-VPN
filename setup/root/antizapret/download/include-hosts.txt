@@ -692,4 +692,5 @@ cfainstitute.org
 bgpmon.net
 upwork.com
 porsche.com
+cvedetails.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
