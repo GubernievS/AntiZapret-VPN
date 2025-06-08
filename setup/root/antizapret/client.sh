@@ -113,7 +113,7 @@ addOpenVPN(){
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
 	else
 		echo ""
-		echo "Client with that name already exists! Please enter a different name for the new client"
+		echo "Client with that name already exists! Please enter different name for new client"
 		echo ""
 		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
 			echo "Current client certificate expiration period:"
@@ -205,12 +205,12 @@ addWireGuard(){
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter a different name for the new client"
+		echo "Client with that name already exists! Please enter different name for new client"
 	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter a different name for the new client"
+		echo "Client with that name already exists! Please enter different name for new client"
 	else
 		CLIENT_PRIVATE_KEY="$(wg genkey)"
 		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
@@ -285,7 +285,7 @@ AllowedIPs = ${CLIENT_IP}/32
 
 	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
 	echo ""
-	echo "Attention! If importing a profile file fails, shorten the filename to 32 characters (Windows) or 15 (Linux/Android/iOS) and remove parentheses"
+	echo "Attention! If import fails, shorten profile filename to 32 chars (Windows) or 15 (Linux/Android/iOS), remove parentheses"
 }
 
 deleteWireGuard(){
@@ -293,7 +293,7 @@ deleteWireGuard(){
 	echo ""
 
 	if ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/antizapret.conf" && ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/vpn.conf"; then
-		echo "Failed to delete client '$CLIENT_NAME'! Please check if the client exists"
+		echo "Failed to delete client '$CLIENT_NAME'! Please check if client exists"
 		exit 23
 	fi
 
