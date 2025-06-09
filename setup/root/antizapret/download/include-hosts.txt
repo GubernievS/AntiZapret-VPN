@@ -693,4 +693,5 @@ bgpmon.net
 upwork.com
 porsche.com
 cvedetails.com
+hamachi.logmein.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
