@@ -146,6 +146,14 @@ do
 	[[ -z "$WIREGUARD_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
 done
+echo -e "Include Discord IPs in \e[1;32mAntiZapret VPN\e[0m?"
+until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
+	read -rp "? [y/n]: " -e -i y DISCORD_INCLUDE
+done
+echo -e "Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m?"
+until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
+	read -rp "? [y/n]: " -e -i n CLOUDFLARE_INCLUDE
+done
 echo ""
 echo "Preparing for installation, please wait..."
 
@@ -332,7 +340,8 @@ rm -rf /root/config
 
 #
 # Сохраняем настройки
-echo "OPENVPN_PATCH=${OPENVPN_PATCH}
+echo "SETUP_DATE=$(date --iso-8601=seconds)
+OPENVPN_PATCH=${OPENVPN_PATCH}
 OPENVPN_DCO=${OPENVPN_DCO}
 ANTIZAPRET_DNS=${ANTIZAPRET_DNS}
 VPN_DNS=${VPN_DNS}
@@ -346,7 +355,8 @@ SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
-SETUP_DATE=$(date --iso-8601=seconds)" > /tmp/antizapret/setup/root/antizapret/setup
+DISCORD_INCLUDE=${DISCORD_INCLUDE}
+CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
