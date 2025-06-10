@@ -64,7 +64,7 @@ until [[ "$OPENVPN_PATCH" =~ ^[0-2]$ ]]; do
 	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
 echo ""
-echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
+echo "OpenVPN DCO lowers CPU load, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
 until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
@@ -148,7 +148,7 @@ do
 done
 echo ""
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
-	read -rp $"Include Discord IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: " -e -i y DISCORD_INCLUDE
+	read -rp $"Include Discord voice IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: " -e -i y DISCORD_INCLUDE
 done
 echo ""
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
