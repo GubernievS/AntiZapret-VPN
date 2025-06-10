@@ -146,13 +146,13 @@ do
 	[[ -z "$WIREGUARD_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
 done
-echo -e "Include Discord IPs in \e[1;32mAntiZapret VPN\e[0m?"
+echo ""
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
-	read -rp "? [y/n]: " -e -i y DISCORD_INCLUDE
+	read -rp "Include Discord IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: " -e -i y DISCORD_INCLUDE
 done
-echo -e "Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m?"
+echo ""
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
-	read -rp "? [y/n]: " -e -i n CLOUDFLARE_INCLUDE
+	read -rp "Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: " -e -i n CLOUDFLARE_INCLUDE
 done
 echo ""
 echo "Preparing for installation, please wait..."
