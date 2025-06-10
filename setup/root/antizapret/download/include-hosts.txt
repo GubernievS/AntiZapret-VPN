@@ -694,4 +694,5 @@ upwork.com
 porsche.com
 cvedetails.com
 hamachi.logmein.com
+coveo.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
