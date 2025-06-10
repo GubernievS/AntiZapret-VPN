@@ -75,6 +75,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 	- Разрешить нескольким клиентам подключаться к OpenVPN используя один и тот же файл подключения (\*.ovpn)
 	- Включить защиту от перебора паролей SSH и защиту от сканирования и сетевых атак
 	- Указать доменное имя для подключения к OpenVPN и WireGuard/AmneziaWG
+	- Добавить IP-адреса Cloudflare и голосовых серверов Discord
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 5. Установить дополнения:
@@ -149,22 +150,9 @@ nano /root/antizapret/config/include-ips.txt
 
 ### 7. Как обойти блокировку сайтов, использующих Cloudflare
 
-Примеры сайтов, использующих Cloudflare, к которым может быть заблокирован доступ:
-
-- https://hyvor.com
-- https://ownedcore.com
-- https://downdetector.com
-
-Если эти сайты не открываются, выполните следующие шаги:
-
-1. Обновите AntiZapret-VPN
-2. Скопируйте всё содержимое из https://www.cloudflare.com/ips-v4 в файл /root/antizapret/config/include-ips.txt на сервере
-3. Выполните команду:
-   ```sh
-   /root/antizapret/doall.sh && /root/antizapret/client.sh 7
-   ```
-5. Скачайте и замените обновлённые профили WireGuard/AmneziaWG и переподключите OpenVPN-клиентов — они автоматически получат новые маршруты с сервера
-6. Пропишите новые IP-адреса из https://www.cloudflare.com/ips-v4 на роутерах, если ранее для работы требовалась настройка маршрутов вручную
+1. Обновите AntiZapret-VPN и на вопрос "Include Cloudflare IPs in AntiZapret VPN?" ответе "y"
+2. Скачайте и замените обновлённые профили WireGuard/AmneziaWG и переподключите OpenVPN-клиентов — они автоматически получат новые маршруты с сервера
+3. Пропишите новые IP-адреса из https://www.cloudflare.com/ips-v4 на роутерах, если ранее для работы требовалась настройка маршрутов вручную
 
 ***
 
