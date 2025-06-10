@@ -50,6 +50,12 @@ ADGUARD_PATH="download/adguard.txt"
 ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
 ADAWAY_PATH="download/adaway.txt"
 
+DISCORD_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/discord-ips.txt"
+DISCORD_IPS_PATH="download/discord-ips.txt"
+
+CLOUDFLARE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/cloudflare-ips.txt"
+CLOUDFLARE_IPS_PATH="download/cloudflare-ips.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -82,6 +88,12 @@ download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $RPZ_PATH $RPZ_LINK
 
+###
+if ! grep -q "^DISCORD_INCLUDE" /root/antizapret/setup; then
+	echo "DISCORD_INCLUDE=y" >> /root/antizapret/setup
+fi
+###
+
 source /root/antizapret/setup
 
 if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then
@@ -94,6 +106,18 @@ else
 	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$ADGUARD_PATH
 	> /root/antizapret/$ADAWAY_PATH
+fi
+
+if [ "$DISCORD_INCLUDE" = "y" ]; then
+	download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
+else
+	> /root/antizapret/$DISCORD_IPS_PATH
+fi
+
+if [ "$CLOUDFLARE_INCLUDE" = "y" ]; then
+	download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
+else
+	> /root/antizapret/$CLOUDFLARE_IPS_PATH
 fi
 
 exit 0
