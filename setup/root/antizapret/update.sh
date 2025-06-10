@@ -91,6 +91,7 @@ download $RPZ_PATH $RPZ_LINK
 ###
 if ! grep -q "^DISCORD_INCLUDE" /root/antizapret/setup; then
 	echo "DISCORD_INCLUDE=y" >> /root/antizapret/setup
+	echo "CLOUDFLARE_INCLUDE=n" >> /root/antizapret/setup
 fi
 ###
 
