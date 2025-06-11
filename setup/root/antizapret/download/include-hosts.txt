@@ -695,4 +695,5 @@ porsche.com
 cvedetails.com
 hamachi.logmein.com
 coveo.com
+gutefrage.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
