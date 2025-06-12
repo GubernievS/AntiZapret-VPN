@@ -93,7 +93,7 @@ download $RPZ_PATH $RPZ_LINK
 
 source /root/antizapret/setup
 
-if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then
+if [[ "$ANTIZAPRET_ADBLOCK" = "y" ]]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 	download $ADGUARD_PATH $ADGUARD_LINK
@@ -107,13 +107,13 @@ else
 	> /root/antizapret/$OISD_PATH
 fi
 
-if [ "$DISCORD_INCLUDE" = "y" ]; then
+if [[ "$DISCORD_INCLUDE" = "y" ]]; then
 	download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
 else
 	> /root/antizapret/$DISCORD_IPS_PATH
 fi
 
-if [ "$CLOUDFLARE_INCLUDE" = "y" ]; then
+if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
 	download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
 else
 	> /root/antizapret/$CLOUDFLARE_IPS_PATH
