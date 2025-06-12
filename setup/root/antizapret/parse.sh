@@ -34,16 +34,19 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	wc -l result/ips.txt
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
+	source /root/antizapret/setup
 	echo -n > result/DEFAULT
-	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute 10.29.0.0 255.255.248.0\nroute 10.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
-	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 10.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 10.29.8.1\nroute ADD 10.30.0.0 MASK 255.254.0.0 10.29.8.1" > result/keenetic-wireguard-routes.txt
+	[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
+	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP}.29.0.0 255.255.248.0\nroute ${IP}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
+	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD ${IP}.30.0.0 MASK 255.254.0.0 ${IP}.29.8.1" > result/keenetic-wireguard-routes.txt
+	GATEWAY="${IP}.29.8.1"
 	while read -r line
 	do
 		IP="$(echo $line | awk -F '/' '{print $1}')"
 		MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
-		echo "route ADD ${IP} MASK ${MASK} 10.29.8.1" >> result/keenetic-wireguard-routes.txt
+		echo "route ADD ${IP} MASK ${MASK} ${GATEWAY}" >> result/keenetic-wireguard-routes.txt
 	done < result/ips.txt
 
 	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
