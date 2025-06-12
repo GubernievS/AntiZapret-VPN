@@ -103,7 +103,8 @@ else
 	> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$ADGUARD_PATH
-	> /root/antizapret/$ADAWAY_PATH
+	#> /root/antizapret/$ADAWAY_PATH
+	> /root/antizapret/$OISD_PATH
 fi
 
 if [ "$DISCORD_INCLUDE" = "y" ]; then
