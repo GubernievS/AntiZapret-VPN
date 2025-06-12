@@ -696,4 +696,7 @@ cvedetails.com
 hamachi.logmein.com
 coveo.com
 gutefrage.net
+landsend.com
+gapfactory.com
+saksoff5th.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
