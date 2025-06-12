@@ -47,8 +47,11 @@ EXCLUDE_ADBLOCK_HOSTS_PATH="download/exclude-adblock-hosts.txt"
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
 
-ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
-ADAWAY_PATH="download/adaway.txt"
+#ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
+#ADAWAY_PATH="download/adaway.txt"
+
+OISD_LINK="https://raw.githubusercontent.com/sjhgvr/oisd/refs/heads/main/domainswild2_big.txt"
+OISD_PATH="download/oisd.txt"
 
 DISCORD_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/discord-ips.txt"
 DISCORD_IPS_PATH="download/discord-ips.txt"
@@ -88,20 +91,14 @@ download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $RPZ_PATH $RPZ_LINK
 
-###
-if ! grep -q "^DISCORD_INCLUDE" /root/antizapret/setup; then
-	echo "DISCORD_INCLUDE=y" >> /root/antizapret/setup
-	echo "CLOUDFLARE_INCLUDE=n" >> /root/antizapret/setup
-fi
-###
-
 source /root/antizapret/setup
 
 if [ "$ANTIZAPRET_ADBLOCK" = "y" ]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 	download $ADGUARD_PATH $ADGUARD_LINK
-	download $ADAWAY_PATH $ADAWAY_LINK
+	#download $ADAWAY_PATH $ADAWAY_LINK
+	download $OISD_PATH $OISD_LINK
 else
 	> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH

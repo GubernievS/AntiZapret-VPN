@@ -68,7 +68,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 	- Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 	- Включить OpenVPN DCO
 	- Выбрать DNS для AntiZapret VPN и обычного VPN
-	- Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN на основе правил AdGuard и AdAway
+	- Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN на основе правил AdGuard и OISD
 	- Использовать альтернативные диапазоны IP-адресов: 172... вместо 10...
 	- Использовать резервные порты 80 и 443 для OpenVPN
 	- Включить подробные логи в OpenVPN

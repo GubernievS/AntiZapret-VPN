@@ -76,7 +76,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdAway
-	sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt >> temp/include-adblock-hosts.txt
+	#sed -E '/^\s*#/d; /^\s*$/d; /localhost/d; s/^127\.0\.0\.1 //g' download/adaway.txt >> temp/include-adblock-hosts.txt
+
+	# Обрабатываем список с рекламными доменами для блокировки от OISD
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' download/oisd.txt >> temp/include-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
 	LC_ALL=C sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt

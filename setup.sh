@@ -101,7 +101,7 @@ until [[ "$VPN_DNS" =~ ^[1-7]$ ]]; do
 done
 echo ""
 until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and AdAway rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
