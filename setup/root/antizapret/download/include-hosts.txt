@@ -701,4 +701,6 @@ gapfactory.com
 saksoff5th.com
 rabbit-labs.com
 4pda.ws
+se.com.sa
+login.microsoftonline.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
