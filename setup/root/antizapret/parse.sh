@@ -10,12 +10,14 @@ rm -f result/*
 
 for file in config/*; do
 	if [[ -f "$file" ]]; then
-	# Проверяем есть ли символ новой строки в конце файла
-		if [[ "$(tail -c 1 "$file" | wc -l)" -eq 0 ]]; then
-			echo "" >> "$file"  # Добавляем новую строку если её нет
+		# Если последний символ не новая строка - добавляем её
+		if [[ "$(tail -c1 "$file")" != $'\n' ]]; then
+			echo >> "$file"
 		fi
 	fi
 done
+
+source /root/antizapret/setup
 
 if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
@@ -34,7 +36,6 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	wc -l result/ips.txt
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
-	source /root/antizapret/setup
 	echo -n > result/DEFAULT
 	[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP}.29.0.0 255.255.248.0\nroute ${IP}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
