@@ -26,17 +26,14 @@ NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain
 #NXDOMAIN_LINK="https://svn.code.sf.net/p/zapret-info/code/nxdomain.txt"
 NXDOMAIN_PATH="download/nxdomain.txt"
 
+RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
+RPZ_PATH="download/rpz.txt"
+
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
 INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 
 EXCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt"
 EXCLUDE_HOSTS_PATH="download/exclude-hosts.txt"
-
-INCLUDE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-ips.txt"
-INCLUDE_IPS_PATH="download/include-ips.txt"
-
-RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
-RPZ_PATH="download/rpz.txt"
 
 INCLUDE_ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-adblock-hosts.txt"
 INCLUDE_ADBLOCK_HOSTS_PATH="download/include-adblock-hosts.txt"
@@ -86,14 +83,25 @@ download $DOALL_PATH $DOALL_LINK
 download $HOSTS_PATH_1 $HOSTS_LINK_1
 download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
-download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
-download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
-download $INCLUDE_IPS_PATH $INCLUDE_IPS_LINK
 download $RPZ_PATH $RPZ_LINK
+
+###
+sed -i 's/include/*/g' /root/antizapret/config/exclude-ips.txt
+sed -i 's/ANTIZAPRET_ADBLOCK/BLOCK_ADS/g' /root/antizapret/setup
+###
 
 source /root/antizapret/setup
 
-if [[ "$ANTIZAPRET_ADBLOCK" = "y" ]]; then
+if [[ "$TEST" = "y" ]]; then
+	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!\n.\n# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$INCLUDE_HOSTS_PATH
+	download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
+else
+	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
+	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+fi
+
+
+if [[ "$BLOCK_ADS" = "y" ]]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 	download $ADGUARD_PATH $ADGUARD_LINK
