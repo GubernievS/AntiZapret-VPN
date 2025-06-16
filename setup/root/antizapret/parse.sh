@@ -155,8 +155,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Создаем файл для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/proxy.rpz
-	sed 's/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/proxy.rpz
-	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/proxy.rpz
+	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/proxy.rpz
+	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/proxy.rpz
 
 	# Обновляем файл в Knot Resolver только если файл proxy.rpz изменился
 	if [[ -f result/proxy.rpz ]] && ! diff -q result/proxy.rpz /etc/knot-resolver/proxy.rpz; then
