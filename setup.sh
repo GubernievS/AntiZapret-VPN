@@ -100,8 +100,8 @@ until [[ "$VPN_DNS" =~ ^[1-7]$ ]]; do
 	read -rp "DNS choice [1-7]: " -e -i 1 VPN_DNS
 done
 echo ""
-until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
-	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y ANTIZAPRET_ADBLOCK
+until [[ "$BLOCK_ADS" =~ (y|n) ]]; do
+	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y BLOCK_ADS
 done
 echo ""
 echo "Default IP address range:      10.28.0.0/14"
@@ -345,7 +345,7 @@ OPENVPN_PATCH=${OPENVPN_PATCH}
 OPENVPN_DCO=${OPENVPN_DCO}
 ANTIZAPRET_DNS=${ANTIZAPRET_DNS}
 VPN_DNS=${VPN_DNS}
-ANTIZAPRET_ADBLOCK=${ANTIZAPRET_ADBLOCK}
+BLOCK_ADS=${BLOCK_ADS}
 ALTERNATIVE_IP=${ALTERNATIVE_IP}
 OPENVPN_80_443_TCP=${OPENVPN_80_443_TCP}
 OPENVPN_80_443_UDP=${OPENVPN_80_443_UDP}
