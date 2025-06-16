@@ -22,7 +22,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 	# Обрабатываем конфигурационные файлы
 	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
-	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/include-ips.txt download/discord-ips.txt download/cloudflare-ips.txt | sort -u > temp/include-ips.txt
+	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
 	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
