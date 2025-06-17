@@ -169,6 +169,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 		cp -f result/proxy.rpz /etc/knot-resolver/proxy.rpz.tmp
 		mv -f /etc/knot-resolver/proxy.rpz.tmp /etc/knot-resolver/proxy.rpz
 	fi
+	
+	# Очищаем кэш knot-resolver
+	echo 'cache.clear()' | socat - /run/knot-resolver/control/1
 fi
 
 exit 0
