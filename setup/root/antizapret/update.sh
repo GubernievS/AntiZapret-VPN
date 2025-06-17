@@ -3,6 +3,8 @@ set -e
 
 echo "Update AntiZapret VPN files:"
 
+export LC_ALL=C
+
 rm -f /root/antizapret/download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
