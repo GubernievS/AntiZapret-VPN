@@ -21,6 +21,7 @@ vkuseraudio.net
 yandex
 yandex.net
 yandex.com
+yandex.cloud
 yastatic.net
 avito.st
 ozonusercontent.com
