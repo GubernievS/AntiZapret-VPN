@@ -22,7 +22,7 @@ askClientName(){
 		echo
 		echo 'Enter client name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)'
 		until [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
-			read -rp "Client name: " -e CLIENT_NAME
+			read -rp 'Client name: ' -e CLIENT_NAME
 		done
 	fi
 }
@@ -32,7 +32,7 @@ askClientCertExpire(){
 		echo
 		echo 'Enter client certificate expiration days (1-3650):'
 		until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
-			read -rp "Certificate expiration days: " -e -i 3650 CLIENT_CERT_EXPIRE
+			read -rp 'Certificate expiration days: ' -e -i 3650 CLIENT_CERT_EXPIRE
 		done
 	fi
 }
