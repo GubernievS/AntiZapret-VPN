@@ -703,4 +703,5 @@ rabbit-labs.com
 4pda.ws
 se.com.sa
 login.microsoftonline.com
+deepl.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
