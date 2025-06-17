@@ -3,7 +3,7 @@ set -e
 
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
-	echo "Default network interface not found!"
+	echo 'Default network interface not found!'
 	exit 1
 fi
 
@@ -14,7 +14,7 @@ source /root/antizapret/setup
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 
 # Clear knot-resolver cache
-echo "cache.clear()" | socat - /run/knot-resolver/control/1
+echo 'cache.clear()' | socat - /run/knot-resolver/control/1
 
 # Network parameters modification
 sysctl -w net.ipv4.ip_forward=1
