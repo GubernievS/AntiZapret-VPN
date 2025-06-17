@@ -3,6 +3,8 @@ set -e
 
 echo "Parse AntiZapret VPN files:"
 
+export LC_ALL=C
+
 cd /root/antizapret
 
 rm -f temp/*
@@ -23,11 +25,11 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
 
 	# Обрабатываем конфигурационные файлы
-	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
-	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
-	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt
+	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt || > temp/ips.txt
 
 	# Заблокированные IP-адреса
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
@@ -86,8 +88,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' download/oisd.txt >> temp/include-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
-	LC_ALL=C sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
-	LC_ALL=C sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
+	sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
+	sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-adblock-hosts.txt
@@ -108,7 +110,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
-	LC_ALL=C sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
@@ -123,7 +125,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
-	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
+	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt || > temp/include-hosts2.txt
 
 	# Пустим все домены через AntiZapret VPN
 	if [[ "$ROUTE_ALL" = "y" ]]; then
@@ -131,29 +133,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 
 	# Удаляем дубли и сортируем
-	LC_ALL=C sort -u temp/include-hosts2.txt > temp/include-hosts3.txt
-
-	# Удаляем домены у которых уже есть домены верхнего уровня
-	grep -E '^([^.]*\.){6}[^.]*$' temp/include-hosts3.txt | sed 's/^/./' > temp/exclude-patterns.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns.txt temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
-
-	grep -E '^([^.]*\.){5}[^.]*$' temp/include-hosts4.txt | sed 's/^/./' > temp/exclude-patterns2.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns2.txt temp/include-hosts4.txt | sort -u > temp/include-hosts5.txt
-
-	grep -E '^([^.]*\.){4}[^.]*$' temp/include-hosts5.txt | sed 's/^/./' > temp/exclude-patterns3.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns3.txt temp/include-hosts5.txt | sort -u > temp/include-hosts6.txt
-
-	grep -E '^([^.]*\.){3}[^.]*$' temp/include-hosts6.txt | sed 's/^/./' > temp/exclude-patterns4.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns4.txt temp/include-hosts6.txt | sort -u > temp/include-hosts7.txt
-
-	grep -E '^([^.]*\.){2}[^.]*$' temp/include-hosts7.txt | sed 's/^/./' > temp/exclude-patterns5.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns5.txt temp/include-hosts7.txt | sort -u > temp/include-hosts8.txt
-
-	grep -E '^([^.]*\.){1}[^.]*$' temp/include-hosts8.txt | sed 's/^/./' > temp/exclude-patterns6.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns6.txt temp/include-hosts8.txt | sort -u > temp/include-hosts9.txt
-
-	grep -E '^([^.]*\.){0}[^.]*$' temp/include-hosts9.txt | sed 's/^/./' > temp/exclude-patterns7.txt
-	LC_ALL=C grep -vFf temp/exclude-patterns7.txt temp/include-hosts9.txt | sort -u > result/include-hosts.txt
+	sort -u temp/include-hosts2.txt > result/include-hosts.txt
 
 	# Выводим результат
 	wc -l result/include-hosts.txt
