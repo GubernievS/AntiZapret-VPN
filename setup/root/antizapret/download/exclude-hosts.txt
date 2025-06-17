@@ -23,4 +23,9 @@ yandex.com
 yastatic.net
 avito.st
 ozonusercontent.com
+ngenix.net
+ixbt.com
+ixbt.games
+ixbt.photo
+ixbt.pro
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
