@@ -18,6 +18,7 @@ vk.cc
 userapi.com
 mycdn.me
 vkuseraudio.net
+yandex
 yandex.net
 yandex.com
 yastatic.net
