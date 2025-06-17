@@ -8,9 +8,9 @@
 set -e
 
 handle_error() {
-	echo ""
+	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo ""
+	echo
 	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 1
 }
@@ -19,13 +19,13 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 if [[ "$1" =~ ^[0-2]$ ]]; then
 	ALGORITHM="$1"
 else
-	echo ""
-	echo "Choose anti-censorship patch for OpenVPN (UDP only):"
-	echo "    0) None        - Do not install anti-censorship patch, or remove if already installed"
-	echo "    1) Strong      - Recommended by default"
-	echo "    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers"
+	echo
+	echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
+	echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
+	echo '    1) Strong      - Recommended by default'
+	echo '    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers'
 	until [[ "$ALGORITHM" =~ ^[0-2]$ ]]; do
-		read -rp "Version choice [0-2]: " -e -i 1 ALGORITHM
+		read -rp 'Version choice [0-2]: ' -e -i 1 ALGORITHM
 	done
 fi
 
@@ -40,12 +40,12 @@ if [[ "$ALGORITHM" == "0" ]]; then
 		apt-get clean
 		systemctl daemon-reload
 		systemctl restart openvpn-server@*
-		echo ""
-		echo "OpenVPN patch remove successfully!"
+		echo
+		echo 'OpenVPN patch remove successfully!'
 		exit 0
 	fi
-	echo ""
-	echo "OpenVPN patch not installed!"
+	echo
+	echo 'OpenVPN patch not installed!'
 	exit 0
 fi
 
@@ -141,5 +141,5 @@ make
 make install
 systemctl daemon-reload
 systemctl restart openvpn-server@*
-echo ""
-echo "OpenVPN patch installed successfully!"
+echo
+echo 'OpenVPN patch installed successfully!'

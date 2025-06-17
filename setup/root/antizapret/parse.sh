@@ -125,6 +125,11 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем не существующие домены
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
 
+	#
+	if [[ "$ROUTE_ALL" = "y" ]]; then
+		echo . >> temp/include-hosts2.txt
+	fi
+
 	# Удаляем дубли и сортируем
 	LC_ALL=C sort -u temp/include-hosts2.txt > temp/include-hosts3.txt
 

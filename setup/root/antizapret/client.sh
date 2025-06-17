@@ -9,9 +9,9 @@
 set -e
 
 handle_error() {
-	echo ""
+	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo ""
+	echo
 	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 1
 }
@@ -19,8 +19,8 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 askClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
-		echo ""
-		echo "Enter client name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)"
+		echo
+		echo 'Enter client name: 1–32 alphanumeric characters (a-z, A-Z, 0-9) with underscore (_) or dash (-)'
 		until [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; do
 			read -rp "Client name: " -e CLIENT_NAME
 		done
@@ -29,8 +29,8 @@ askClientName(){
 
 askClientCertExpire(){
 	if ! [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] || (( CLIENT_CERT_EXPIRE <= 0 )) || (( CLIENT_CERT_EXPIRE > 3650 )); then
-		echo ""
-		echo "Enter client certificate expiration days (1-3650):"
+		echo
+		echo 'Enter client certificate expiration days (1-3650):'
 		until [[ "$CLIENT_CERT_EXPIRE" =~ ^[0-9]+$ ]] && (( CLIENT_CERT_EXPIRE > 0 )) && (( CLIENT_CERT_EXPIRE <= 3650 )); do
 			read -rp "Certificate expiration days: " -e -i 3650 CLIENT_CERT_EXPIRE
 		done
@@ -52,7 +52,7 @@ setServerHost_FileName(){
 setServerIP(){
 	SERVER_IP="$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)"
 	if [[ -z "$SERVER_IP" ]]; then
-		echo "Default IP address not found!"
+		echo 'Default IP address not found!'
 		exit 2
 	fi
 }
@@ -109,17 +109,17 @@ addOpenVPN(){
 	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
 		askClientCertExpire
-		echo ""
+		echo
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
 	else
-		echo ""
-		echo "Client with that name already exists! Please enter different name for new client"
-		echo ""
+		echo
+		echo 'Client with that name already exists! Please enter different name for new client'
+		echo
 		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
-			echo "Current client certificate expiration period:"
+			echo 'Current client certificate expiration period:'
 			openssl x509 -in ./pki/issued/$CLIENT_NAME.crt -noout -dates
 			askClientCertExpire
-			echo ""
+			echo
 			rm -f ./pki/issued/$CLIENT_NAME.crt
 			/usr/share/easy-rsa/easyrsa --batch --days=$CLIENT_CERT_EXPIRE sign client $CLIENT_NAME
 			rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
@@ -136,7 +136,7 @@ addOpenVPN(){
 	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")"
 	CLIENT_KEY="$(cat -- "/etc/openvpn/client/keys/$CLIENT_NAME.key")"
 	if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]; then
-		echo "Can't load client keys!"
+		echo 'Cannot load client keys!'
 		exit 11
 	fi
 
@@ -152,7 +152,7 @@ addOpenVPN(){
 
 deleteOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
-	echo ""
+	echo
 	cd /etc/openvpn/easyrsa3
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
@@ -174,15 +174,15 @@ deleteOpenVPN(){
 
 listOpenVPN(){
 	[[ -n "$CLIENT_NAME" ]] && return
-	echo ""
-	echo "OpenVPN client names:"
+	echo
+	echo 'OpenVPN client names:'
 	LC_ALL=C ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
 }
 
 initWireGuard(){
 	if [[ ! -f /etc/wireguard/key ]]; then
-		echo ""
-		echo "Generating WireGuard/AmneziaWG server keys"
+		echo
+		echo 'Generating WireGuard/AmneziaWG server keys'
 		PRIVATE_KEY="$(wg genkey)"
 		PUBLIC_KEY="$(echo "${PRIVATE_KEY}" | wg pubkey)"
 		echo "PRIVATE_KEY=${PRIVATE_KEY}
@@ -194,7 +194,7 @@ PUBLIC_KEY=${PUBLIC_KEY}" > /etc/wireguard/key
 
 addWireGuard(){
 	setServerHost_FileName "$WIREGUARD_HOST"
-	echo ""
+	echo
 
 	source /etc/wireguard/key
 	IPS="$(cat /etc/wireguard/ips)"
@@ -205,12 +205,12 @@ addWireGuard(){
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter different name for new client"
+		echo 'Client with that name already exists! Please enter different name for new client'
 	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
 		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
 		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo "Client with that name already exists! Please enter different name for new client"
+		echo 'Client with that name already exists! Please enter different name for new client'
 	else
 		CLIENT_PRIVATE_KEY="$(wg genkey)"
 		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
@@ -233,7 +233,7 @@ addWireGuard(){
 			break
 		fi
 		if [[ $i == 255 ]]; then
-			echo "The WireGuard/AmneziaWG subnet can support only 253 clients!"
+			echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
 			exit 21
 		fi
 	done
@@ -263,7 +263,7 @@ AllowedIPs = ${CLIENT_IP}/32
 			break
 		fi
 		if [[ $i == 255 ]]; then
-			echo "The WireGuard/AmneziaWG subnet can support only 253 clients!"
+			echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
 			exit 22
 		fi
 	done
@@ -284,13 +284,13 @@ AllowedIPs = ${CLIENT_IP}/32
 	fi
 
 	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
-	echo ""
-	echo "Attention! If import fails, shorten profile filename to 32 chars (Windows) or 15 (Linux/Android/iOS), remove parentheses"
+	echo
+	echo 'Attention! If import fails, shorten profile filename to 32 chars (Windows) or 15 (Linux/Android/iOS), remove parentheses'
 }
 
 deleteWireGuard(){
 	setServerHost_FileName "$WIREGUARD_HOST"
-	echo ""
+	echo
 
 	if ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/antizapret.conf" && ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/vpn.conf"; then
 		echo "Failed to delete client '$CLIENT_NAME'! Please check if client exists"
@@ -319,13 +319,13 @@ deleteWireGuard(){
 
 listWireGuard(){
 	[[ -n "$CLIENT_NAME" ]] && return
-	echo ""
-	echo "WireGuard/AmneziaWG client names:"
+	echo
+	echo 'WireGuard/AmneziaWG client names:'
 	LC_ALL=C cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 }
 
 recreate(){
-	echo ""
+	echo
 
 	find /root/antizapret/client -type f -delete
 
@@ -368,7 +368,7 @@ recreate(){
 }
 
 backup(){
-	echo ""
+	echo
 
 	rm -rf /root/antizapret/backup
 	mkdir -p /root/antizapret/backup/wireguard
@@ -397,18 +397,18 @@ CLIENT_NAME=$2
 CLIENT_CERT_EXPIRE=$3
 
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
-	echo ""
-	echo "Please choose option:"
-	echo "    1) OpenVPN - Add client/Renew client certificate"
-	echo "    2) OpenVPN - Delete client"
-	echo "    3) OpenVPN - List clients"
-	echo "    4) WireGuard/AmneziaWG - Add client"
-	echo "    5) WireGuard/AmneziaWG - Delete client"
-	echo "    6) WireGuard/AmneziaWG - List clients"
-	echo "    7) (Re)create clients profile files"
-	echo "    8) (Re)create clients and config backup"
+	echo
+	echo 'Please choose option:'
+	echo '    1) OpenVPN - Add client/Renew client certificate'
+	echo '    2) OpenVPN - Delete client'
+	echo '    3) OpenVPN - List clients'
+	echo '    4) WireGuard/AmneziaWG - Add client'
+	echo '    5) WireGuard/AmneziaWG - Delete client'
+	echo '    6) WireGuard/AmneziaWG - List clients'
+	echo '    7) (Re)create clients profile files'
+	echo '    8) (Re)create clients and config backup'
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
-		read -rp "Option choice [1-8]: " -e OPTION
+		read -rp 'Option choice [1-8]: ' -e OPTION
 	done
 fi
 
@@ -426,7 +426,7 @@ case "$OPTION" in
 		deleteOpenVPN
 		;;
 	3)
-		echo "OpenVPN - List clients"
+		echo 'OpenVPN - List clients'
 		listOpenVPN
 		;;
 	4)
@@ -442,15 +442,15 @@ case "$OPTION" in
 		deleteWireGuard
 		;;
 	6)
-		echo "WireGuard/AmneziaWG - List clients"
+		echo 'WireGuard/AmneziaWG - List clients'
 		listWireGuard
 		;;
 	7)
-		echo "(Re)create clients profile files"
+		echo '(Re)create clients profile files'
 		recreate
 		;;
 	8)
-		echo "(Re)create clients and config backup"
+		echo '(Re)create clients and config backup'
 		backup
 		;;
 esac

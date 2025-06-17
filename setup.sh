@@ -48,14 +48,14 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	exit 6
 fi
 
-echo ""
+echo
 echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
 echo "OpenVPN + WireGuard + AmneziaWG"
 echo "More details: https://github.com/GubernievS/AntiZapret-VPN"
 
 #
 # Спрашиваем о настройках
-echo ""
+echo
 echo "Choose anti-censorship patch for OpenVPN (UDP only):"
 echo "    0) None        - Do not install anti-censorship patch, or remove if already installed"
 echo "    1) Strong      - Recommended by default"
@@ -63,25 +63,25 @@ echo "    2) Error-free  - Use if Strong patch causes connection error, recommen
 until [[ "$OPENVPN_PATCH" =~ ^[0-2]$ ]]; do
 	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
 done
-echo ""
+echo
 echo "OpenVPN DCO lowers CPU load, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
 until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
 done
-echo ""
+echo
 echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
 echo "    1) Cloudflare+Quad9  - Recommended by default"
 echo "        +SkyDNS+Yandex"
 echo "    2) Cloudflare+Quad9  - Use if SkyDNS/Yandex fail to resolve non-blocked domains"
 echo "    3) Comss *           - More details: https://comss.ru/disqus/page.php?id=7315"
 echo "    4) Xbox *            - More details: https://xbox-dns.ru"
-echo ""
+echo
 echo "  * - Enable additional proxying and hide this server IP on some internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-4]$ ]]; do
 	read -rp "DNS choice [1-4]: " -e -i 1 ANTIZAPRET_DNS
 done
-echo ""
+echo
 echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
 echo "    1) Cloudflare  - Recommended by default"
 echo "    2) Quad9       - Use if Cloudflare fail to resolve domains"
@@ -89,69 +89,73 @@ echo "    3) Google *    - Use if Cloudflare/Quad9 fail to resolve domains"
 echo "    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites"
 echo "    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315"
 echo "    6) Xbox **     - More details: https://xbox-dns.ru"
-echo ""
+echo
 echo "  * - Resolvers supports EDNS Client Subnet"
 echo " ** - Enable additional proxying and hide this server IP on some internet resources"
 echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
 until [[ "$VPN_DNS" =~ ^[1-6]$ ]]; do
 	read -rp "DNS choice [1-6]: " -e -i 1 VPN_DNS
 done
-echo ""
+echo
 until [[ "$BLOCK_ADS" =~ (y|n) ]]; do
 	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y BLOCK_ADS
 done
-echo ""
+echo
 echo "Default IP address range:      10.28.0.0/14"
 echo "Alternative IP address range: 172.28.0.0/14"
 until [[ "$ALTERNATIVE_IP" =~ (y|n) ]]; do
 	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n ALTERNATIVE_IP
 done
-echo ""
+echo
 until [[ "$OPENVPN_80_443_TCP" =~ (y|n) ]]; do
 	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_TCP
 done
-echo ""
+echo
 until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
 	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_UDP
 done
-echo ""
+echo
 until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
 	read -rp "Allow multiple clients connecting to OpenVPN using same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
 done
-echo ""
+echo
 until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
 	read -rp "Enable detailed logs in OpenVPN? [y/n]: " -e -i n OPENVPN_LOG
 done
-echo ""
+echo
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable SSH brute-force protection? [y/n]: " -e -i y SSH_PROTECTION
 done
-echo ""
+echo
 echo "Warning! Network attack and scan protection may block VPN or third-party applications!"
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
 done
-echo ""
+echo
 while read -rp "Enter valid domain name for this OpenVPN server or press Enter to skip: " -e OPENVPN_HOST
 do
 	[[ -z "$OPENVPN_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$OPENVPN_HOST") ]] && break
 done
-echo ""
+echo
 while read -rp "Enter valid domain name for this WireGuard/AmneziaWG server or press Enter to skip: " -e WIREGUARD_HOST
 do
 	[[ -z "$WIREGUARD_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
 done
-echo ""
+echo
+until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
+	read -rp $'Route all traffic for domains via \e[1;32mAntiZapret VPN\e[0m, excluding Russian domains and domains from exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
+done
+echo
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Discord voice IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i y DISCORD_INCLUDE
 done
-echo ""
+echo
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n CLOUDFLARE_INCLUDE
 done
-echo ""
+echo
 echo "Preparing for installation, please wait..."
 
 #
@@ -266,9 +270,9 @@ set -e
 #
 # Обработка ошибок
 handle_error() {
-	echo ""
+	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo ""
+	echo
 	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 7
 }
@@ -352,6 +356,7 @@ SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
+ROUTE_ALL=${ROUTE_ALL}
 DISCORD_INCLUDE=${DISCORD_INCLUDE}
 CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
@@ -489,7 +494,7 @@ if [[ -z "$(swapon --show)" ]]; then
 	echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
 fi
 
-echo ""
+echo
 echo -e "\e[1;32mAntiZapret VPN + traditional VPN installed successfully!\e[0m"
 echo "Rebooting..."
 

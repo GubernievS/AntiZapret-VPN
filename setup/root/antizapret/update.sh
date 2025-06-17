@@ -44,9 +44,6 @@ EXCLUDE_ADBLOCK_HOSTS_PATH="download/exclude-adblock-hosts.txt"
 ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
 ADGUARD_PATH="download/adguard.txt"
 
-#ADAWAY_LINK="https://raw.githubusercontent.com/AdAway/adaway.github.io/master/hosts.txt"
-#ADAWAY_PATH="download/adaway.txt"
-
 OISD_LINK="https://raw.githubusercontent.com/sjhgvr/oisd/refs/heads/main/domainswild2_big.txt"
 OISD_PATH="download/oisd.txt"
 
@@ -84,6 +81,7 @@ download $HOSTS_PATH_1 $HOSTS_LINK_1
 download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $RPZ_PATH $RPZ_LINK
+download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 
 ###
 sed -i 's/include/*/g' /root/antizapret/config/exclude-ips.txt
@@ -92,12 +90,10 @@ sed -i 's/ANTIZAPRET_ADBLOCK/BLOCK_ADS/g' /root/antizapret/setup
 
 source /root/antizapret/setup
 
-if [[ "$TEST" = "y" ]]; then
-	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!\n.\n# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$INCLUDE_HOSTS_PATH
+if [[ "$ROUTE_ALL" = "y" ]]; then
 	download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 else
 	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
-	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 fi
 
 
@@ -105,13 +101,11 @@ if [[ "$BLOCK_ADS" = "y" ]]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 	download $ADGUARD_PATH $ADGUARD_LINK
-	#download $ADAWAY_PATH $ADAWAY_LINK
 	download $OISD_PATH $OISD_LINK
 else
 	> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
 	> /root/antizapret/$ADGUARD_PATH
-	#> /root/antizapret/$ADAWAY_PATH
 	> /root/antizapret/$OISD_PATH
 fi
 

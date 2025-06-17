@@ -7,9 +7,9 @@
 set -e
 
 handle_error() {
-	echo ""
+	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo ""
+	echo
 	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
 	exit 1
 }
@@ -17,17 +17,17 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 if [[ ! "$VERSION" =~ ^2\.6 ]]; then
-	echo "Cannot turn on/off DCO because OpenVPN version 2.6 is required"
+	echo 'Cannot turn on/off DCO because OpenVPN version 2.6 is required'
 	exit 1
 fi
 
 if [[ "$1" == [yn] ]]; then
 	DCO="$1"
 else
-	echo ""
-	echo "OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
+	echo
+	echo 'OpenVPN DCO lowers CPU load, saves battery on mobile devices, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols'
 	until [[ "$DCO" =~ (y|n) ]]; do
-		read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y DCO
+		read -rp 'Turn on OpenVPN DCO? [y/n]: ' -e -i y DCO
 	done
 fi
 
@@ -50,8 +50,8 @@ if [[ "$DCO" == "y" ]]; then
 	if systemctl is-active --quie openvpn-server@*; then
 		systemctl restart openvpn-server@*
 	fi
-	echo ""
-	echo "OpenVPN DCO turned ON successfully!"
+	echo
+	echo 'OpenVPN DCO turned ON successfully!'
 else
 	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
 	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
@@ -68,6 +68,6 @@ else
 	if systemctl is-active --quie openvpn-server@*; then
 		systemctl restart openvpn-server@*
 	fi
-	echo ""
-	echo "OpenVPN DCO turned OFF successfully!"
+	echo
+	echo 'OpenVPN DCO turned OFF successfully!'
 fi
