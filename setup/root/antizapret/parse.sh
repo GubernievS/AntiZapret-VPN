@@ -127,7 +127,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	#
 	if [[ "$ROUTE_ALL" = "y" ]]; then
-		echo . >> temp/include-hosts2.txt
+		echo '.' >> temp/include-hosts2.txt
 	fi
 
 	# Удаляем дубли и сортируем
