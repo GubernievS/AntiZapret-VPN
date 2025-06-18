@@ -125,11 +125,11 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt || > temp/include-hosts2.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
-		# Пустим все домены через AntiZapret VPN
-		echo '.' >> temp/include-hosts2.txt
 		# Удаляем лишние домены
 		sed -e 's/\./\\./g' -e 's/^/\\./' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns.txt
 		grep -Ef temp/exclude-patterns.txt temp/include-hosts2.txt > temp/include-hosts3.txt
+		# Пустим все домены через AntiZapret VPN
+		echo '.' >> temp/include-hosts3.txt
 		# Удаляем дубли и сортируем
 		sort -u temp/include-hosts3.txt > result/include-hosts.txt
 	else
