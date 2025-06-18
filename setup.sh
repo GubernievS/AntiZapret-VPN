@@ -5,6 +5,8 @@
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 
+export LC_ALL=C
+
 #
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
