@@ -17,6 +17,8 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+export LC_ALL=C
+
 askClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 		echo
@@ -176,7 +178,7 @@ listOpenVPN(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo
 	echo 'OpenVPN client names:'
-	LC_ALL=C ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
+	ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort
 }
 
 initWireGuard(){
@@ -321,7 +323,7 @@ listWireGuard(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo
 	echo 'WireGuard/AmneziaWG client names:'
-	LC_ALL=C cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
+	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 }
 
 recreate(){
@@ -333,7 +335,7 @@ recreate(){
 	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
 		initOpenVPN
 		CLIENT_CERT_EXPIRE=0
-		LC_ALL=C ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
+		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
 				echo "OpenVPN profile files recreated for client '$CLIENT_NAME'"
@@ -351,7 +353,7 @@ recreate(){
 
 	# WireGuard/AmneziaWG
 	if [[ -f /etc/wireguard/key && -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
-		LC_ALL=C cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
+		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard >/dev/null
 				echo "WireGuard/AmneziaWG profile files recreated for client '$CLIENT_NAME'"
