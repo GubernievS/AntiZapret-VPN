@@ -58,6 +58,9 @@ CLOUDFLARE_IPS_PATH="download/cloudflare-ips.txt"
 AMAZON_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/amazon-ips.txt"
 AMAZON_IPS_PATH="download/amazon-ips.txt"
 
+HETZNER_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/hetzner-ips.txt"
+HETZNER_IPS_PATH="download/hetzner-ips.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -119,6 +122,10 @@ fi
 
 if [[ "$AMAZON_INCLUDE" = "y" ]]; then
 	download $AMAZON_IPS_PATH $AMAZON_IPS_LINK
+fi
+
+if [[ "$HETZNER_INCLUDE" = "y" ]]; then
+	download $HETZNER_IPS_PATH $HETZNER_IPS_LINK
 fi
 
 exit 0
