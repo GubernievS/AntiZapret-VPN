@@ -704,4 +704,6 @@ rabbit-labs.com
 se.com.sa
 login.microsoftonline.com
 deepl.com
+ikea.ee
+samsonite.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
