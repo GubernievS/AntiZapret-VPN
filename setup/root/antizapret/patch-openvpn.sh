@@ -16,6 +16,8 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+export LC_ALL=C
+
 if [[ "$1" =~ ^[0-2]$ ]]; then
 	ALGORITHM="$1"
 else
