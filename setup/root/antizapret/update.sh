@@ -55,6 +55,9 @@ DISCORD_IPS_PATH="download/discord-ips.txt"
 CLOUDFLARE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/cloudflare-ips.txt"
 CLOUDFLARE_IPS_PATH="download/cloudflare-ips.txt"
 
+AMAZON_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/amazon-ips.txt"
+AMAZON_IPS_PATH="download/amazon-ips.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -85,11 +88,6 @@ download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $RPZ_PATH $RPZ_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 
-###
-sed -i 's/include/*/g' /root/antizapret/config/exclude-ips.txt
-sed -i 's/ANTIZAPRET_ADBLOCK/BLOCK_ADS/g' /root/antizapret/setup
-###
-
 source /root/antizapret/setup
 
 if [[ "$ROUTE_ALL" = "y" ]]; then
@@ -113,14 +111,14 @@ fi
 
 if [[ "$DISCORD_INCLUDE" = "y" ]]; then
 	download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
-else
-	> /root/antizapret/$DISCORD_IPS_PATH
 fi
 
 if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
 	download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
-else
-	> /root/antizapret/$CLOUDFLARE_IPS_PATH
+fi
+
+if [[ "$AMAZON_INCLUDE" = "y" ]]; then
+	download $AMAZON_IPS_PATH $AMAZON_IPS_LINK
 fi
 
 exit 0
