@@ -30,4 +30,7 @@ ixbt.com
 ixbt.games
 ixbt.photo
 ixbt.pro
+# Белый список
+stackoverflow.com
+steampowered.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
