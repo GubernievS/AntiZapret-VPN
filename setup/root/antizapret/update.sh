@@ -61,6 +61,12 @@ AMAZON_IPS_PATH="download/amazon-ips.txt"
 HETZNER_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/hetzner-ips.txt"
 HETZNER_IPS_PATH="download/hetzner-ips.txt"
 
+DIGITALOCEAN_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/digitalocean-ips.txt"
+DIGITALOCEAN_IPS_PATH="download/digitalocean-ips.txt"
+
+OVH_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/ovh-ips.txt"
+OVH_IPS_PATH="download/ovh-ips.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -126,6 +132,14 @@ fi
 
 if [[ "$HETZNER_INCLUDE" = "y" ]]; then
 	download $HETZNER_IPS_PATH $HETZNER_IPS_LINK
+fi
+
+if [[ "$DIGITALOCEAN_INCLUDE" = "y" ]]; then
+	download $DIGITALOCEAN_IPS_PATH $DIGITALOCEAN_IPS_LINK
+fi
+
+if [[ "$OVH_INCLUDE" = "y" ]]; then
+	download $OVH_IPS_PATH $OVH_IPS_LINK
 fi
 
 exit 0
