@@ -99,8 +99,8 @@ initOpenVPN(){
 
 	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+		chmod 644 ./pki/crl.pem
 		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-		chmod 644 /etc/openvpn/server/keys/crl.pem
 	fi
 }
 
@@ -120,6 +120,8 @@ addOpenVPN(){
 		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
 			echo 'Current client certificate expiration period:'
 			openssl x509 -in ./pki/issued/$CLIENT_NAME.crt -noout -dates
+			echo
+			echo "Attention! Certificate renewal is NOT possible after 'notAfter' date"
 			askClientCertExpire
 			echo
 			rm -f ./pki/issued/$CLIENT_NAME.crt
@@ -159,8 +161,8 @@ deleteOpenVPN(){
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 644 ./pki/crl.pem
 	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
-	chmod 644 /etc/openvpn/server/keys/crl.pem
 
 	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-$FILE_NAME.ovpn
 	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn
