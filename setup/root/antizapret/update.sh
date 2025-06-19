@@ -52,6 +52,9 @@ OISD_PATH="download/oisd.txt"
 DISCORD_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/discord-ips.txt"
 DISCORD_IPS_PATH="download/discord-ips.txt"
 
+TELEGRAM_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/telegram-ips.txt"
+TELEGRAM_IPS_PATH="download/telegram-ips.txt"
+
 CLOUDFLARE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/cloudflare-ips.txt"
 CLOUDFLARE_IPS_PATH="download/cloudflare-ips.txt"
 
@@ -120,6 +123,10 @@ fi
 
 if [[ "$DISCORD_INCLUDE" = "y" ]]; then
 	download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
+fi
+
+if [[ "$TELEGRAM_INCLUDE" = "y" ]]; then
+	download $TELEGRAM_IPS_PATH $TELEGRAM_IPS_LINK
 fi
 
 if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
