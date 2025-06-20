@@ -31,6 +31,9 @@ NXDOMAIN_PATH="download/nxdomain.txt"
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
 
+CLEANUP_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/cleanup-hosts.txt.gz"
+CLEANUP_HOSTS_PATH="cleanup-hosts.txt.gz"
+
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
 INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 
@@ -98,9 +101,8 @@ download $HOSTS_PATH_1 $HOSTS_LINK_1
 download $HOSTS_PATH_2 $HOSTS_LINK_2
 download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $RPZ_PATH $RPZ_LINK
+download $CLEANUP_HOSTS_PATH $CLEANUP_HOSTS_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
-
-> /root/antizapret/download/cleanup-hosts.txt
 
 source /root/antizapret/setup
 
