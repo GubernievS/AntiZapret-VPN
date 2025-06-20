@@ -100,6 +100,8 @@ download $NXDOMAIN_PATH $NXDOMAIN_LINK
 download $RPZ_PATH $RPZ_LINK
 download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 
+> /root/antizapret/download/cleanup-hosts.txt
+
 source /root/antizapret/setup
 
 if [[ "$ROUTE_ALL" = "y" ]]; then
@@ -107,7 +109,6 @@ if [[ "$ROUTE_ALL" = "y" ]]; then
 else
 	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
 fi
-
 
 if [[ "$BLOCK_ADS" = "y" ]]; then
 	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
