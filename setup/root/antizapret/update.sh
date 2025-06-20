@@ -32,7 +32,7 @@ RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup
 RPZ_PATH="download/rpz.txt"
 
 CLEANUP_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/cleanup-hosts.txt.gz"
-CLEANUP_HOSTS_PATH="cleanup-hosts.txt.gz"
+CLEANUP_HOSTS_PATH="download/cleanup-hosts.txt.gz"
 
 INCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt"
 INCLUDE_HOSTS_PATH="download/include-hosts.txt"
