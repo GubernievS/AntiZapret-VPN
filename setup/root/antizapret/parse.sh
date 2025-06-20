@@ -25,9 +25,9 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
 	shopt -s nullglob
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
 	shopt -u nullglob
 
 	# Убираем IP-адреса из исключений
@@ -72,10 +72,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "AdBlock hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/include-adblock-hosts.txt
@@ -84,7 +84,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от OISD
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' download/oisd.txt >> temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/oisd.txt >> temp/include-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
 	sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
@@ -109,22 +109,23 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
-	sed -E '/^#/d; s/\r//; s/[[:space:]]+//g; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/cleanup-hosts.txt download/nxdomain.txt > temp/cleanup-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	cut -d ';' -f 2 download/dump.csv | iconv -f cp1251 -t utf8 | \
 	grep -P '\.[а-яА-Яa-zA-Z]' | \
-	sed -e 's/^\*\.\?//' -e 's/\.$//' -e 's/"//g' | \
+	sed -E 's/^[[:punct:]]+//; s/[[:punct:]]+$//' | \
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из antifilter.download
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Удаляем не существующие домены
-	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt || > temp/include-hosts2.txt
+	# Удаляем не существующие или лишние домены
+	grep -vFxf temp/cleanup-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt || > temp/include-hosts2.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Удаляем лишние домены
