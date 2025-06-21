@@ -23,6 +23,7 @@ yandex.net
 yandex.com
 yandex.cloud
 yastatic.net
+yadi.sk
 avito.st
 ozonusercontent.com
 ngenix.net
@@ -30,7 +31,12 @@ ixbt.com
 ixbt.games
 ixbt.photo
 ixbt.pro
+sberbank.com
+livejournal.com
+championat.com
 # Белый список
+#android.com
+#office.com
 stackoverflow.com
 steampowered.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
