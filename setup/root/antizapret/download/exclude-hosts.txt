@@ -19,11 +19,13 @@ userapi.com
 mycdn.me
 vkuseraudio.net
 yandex
+yadi.sk
+yandex.st
 yandex.net
 yandex.com
 yandex.cloud
 yastatic.net
-yadi.sk
+yandex-bank.net
 avito.st
 ozonusercontent.com
 ngenix.net
