@@ -28,7 +28,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
 
 	# Выводим результат
-	wc -l result/ips.txt
+	echo "ips.txt count: $(wc -l < result/ips.txt)"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	echo -n > result/DEFAULT
@@ -82,8 +82,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
-	wc -l result/include-adblock-hosts.txt
-	wc -l result/exclude-adblock-hosts.txt
+	echo "include-adblock-hosts.txt count: $(wc -l < result/include-adblock-hosts.txt)"
+	echo "exclude-adblock-hosts.txt count: $(wc -l < result/exclude-adblock-hosts.txt)"
 
 	# Создаем файл для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
@@ -132,8 +132,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 
 	# Выводим результат
-	wc -l result/include-hosts.txt
-	wc -l result/exclude-hosts.txt
+	echo "include-hosts.txt count: $(wc -l < result/include-hosts.txt)"
+	echo "exclude-hosts.txt count: $(wc -l < result/exclude-hosts.txt)"
 
 	# Создаем файл для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/proxy.rpz
@@ -147,7 +147,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 
 	# Очищаем кэш knot-resolver
-	echo 'cache.clear()' | socat - /run/knot-resolver/control/1
+	count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+')
+	echo "DNS cache cleared: $count"
+
 fi
 
 exit 0
