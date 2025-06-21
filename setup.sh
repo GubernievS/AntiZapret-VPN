@@ -10,7 +10,7 @@ export LC_ALL=C
 #
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
-	echo "Error: You need to run this as root!"
+	echo 'Error: You need to run this as root!'
 	exit 1
 fi
 
@@ -19,7 +19,7 @@ cd /root
 #
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
-	echo "Error: OpenVZ and LXC are not supported!"
+	echo 'Error: OpenVZ and LXC are not supported!'
 	exit 2
 fi
 
@@ -30,117 +30,117 @@ VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
 if [[ "$OS" == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
-		echo "Error: Your Debian version is not supported!"
+		echo 'Error: Your Debian version is not supported!'
 		exit 3
 	fi
 elif [[ "$OS" == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
-		echo "Error: Your Ubuntu version is not supported!"
+		echo 'Error: Your Ubuntu version is not supported!'
 		exit 4
 	fi
 elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
-	echo "Error: Your Linux version is not supported!"
+	echo 'Error: Your Linux version is not supported!'
 	exit 5
 fi
 
 #
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
-	echo "Error: Low disk space! You need 2GB of free space!"
+	echo 'Error: Low disk space! You need 2GB of free space!'
 	exit 6
 fi
 
 echo
-echo -e "\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m"
-echo "OpenVPN + WireGuard + AmneziaWG"
-echo "More details: https://github.com/GubernievS/AntiZapret-VPN"
+echo -e '\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m'
+echo 'OpenVPN + WireGuard + AmneziaWG'
+echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 
 #
 # Спрашиваем о настройках
 echo
-echo "Choose anti-censorship patch for OpenVPN (UDP only):"
-echo "    0) None        - Do not install anti-censorship patch, or remove if already installed"
-echo "    1) Strong      - Recommended by default"
-echo "    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers"
+echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
+echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
+echo '    1) Strong      - Recommended by default'
+echo '    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers'
 until [[ "$OPENVPN_PATCH" =~ ^[0-2]$ ]]; do
-	read -rp "Version choice [0-2]: " -e -i 1 OPENVPN_PATCH
+	read -rp 'Version choice [0-2]: ' -e -i 1 OPENVPN_PATCH
 done
 echo
-echo "OpenVPN DCO lowers CPU load, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption protocols"
+echo 'OpenVPN DCO lowers CPU load, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption'
 until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
-	read -rp "Turn on OpenVPN DCO? [y/n]: " -e -i y OPENVPN_DCO
+	read -rp 'Turn on OpenVPN DCO? [y/n]: ' -e -i y OPENVPN_DCO
 done
 echo
-echo -e "Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):"
-echo "    1) Cloudflare+Quad9  - Recommended by default"
-echo "        +SkyDNS+Yandex"
-echo "    2) Cloudflare+Quad9  - Use if SkyDNS/Yandex fail to resolve non-blocked domains"
-echo "    3) Comss *           - More details: https://comss.ru/disqus/page.php?id=7315"
-echo "    4) Xbox *            - More details: https://xbox-dns.ru"
+echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
+echo '    1) Cloudflare+Quad9  - Recommended by default'
+echo '        +SkyDNS+Yandex'
+echo '    2) Cloudflare+Quad9  - Use if SkyDNS/Yandex fail to resolve non-blocked domains'
+echo '    3) Comss *           - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    4) Xbox *            - More details: https://xbox-dns.ru'
 echo
-echo "  * - Enable additional proxying and hide this server IP on some internet resources"
-echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
+echo '  * - Enable additional proxying and hide this server IP on some internet resources'
+echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-4]$ ]]; do
-	read -rp "DNS choice [1-4]: " -e -i 1 ANTIZAPRET_DNS
+	read -rp 'DNS choice [1-4]: ' -e -i 1 ANTIZAPRET_DNS
 done
 echo
-echo -e "Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):"
-echo "    1) Cloudflare  - Recommended by default"
-echo "    2) Quad9       - Use if Cloudflare fail to resolve domains"
-echo "    3) Google *    - Use if Cloudflare/Quad9 fail to resolve domains"
-echo "    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites"
-echo "    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315"
-echo "    6) Xbox **     - More details: https://xbox-dns.ru"
+echo -e 'Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):'
+echo '    1) Cloudflare  - Recommended by default'
+echo '    2) Quad9       - Use if Cloudflare fail to resolve domains'
+echo '    3) Google *    - Use if Cloudflare/Quad9 fail to resolve domains'
+echo '    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites'
+echo '    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    6) Xbox **     - More details: https://xbox-dns.ru'
 echo
-echo "  * - Resolvers supports EDNS Client Subnet"
-echo " ** - Enable additional proxying and hide this server IP on some internet resources"
-echo "      Use only if this server is geolocated in Russia or problems accessing some internet resources"
+echo '  * - Resolvers supports EDNS Client Subnet'
+echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
+echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$VPN_DNS" =~ ^[1-6]$ ]]; do
-	read -rp "DNS choice [1-6]: " -e -i 1 VPN_DNS
+	read -rp 'DNS choice [1-6]: ' -e -i 1 VPN_DNS
 done
 echo
 until [[ "$BLOCK_ADS" =~ (y|n) ]]; do
 	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y BLOCK_ADS
 done
 echo
-echo "Default IP address range:      10.28.0.0/14"
-echo "Alternative IP address range: 172.28.0.0/14"
+echo 'Default IP address range:      10.28.0.0/14'
+echo 'Alternative IP address range: 172.28.0.0/14'
 until [[ "$ALTERNATIVE_IP" =~ (y|n) ]]; do
-	read -rp "Use alternative range of IP addresses? [y/n]: " -e -i n ALTERNATIVE_IP
+	read -rp 'Use alternative range of IP addresses? [y/n]: ' -e -i n ALTERNATIVE_IP
 done
 echo
 until [[ "$OPENVPN_80_443_TCP" =~ (y|n) ]]; do
-	read -rp "Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_TCP
+	read -rp 'Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_80_443_TCP
 done
 echo
 until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
-	read -rp "Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: " -e -i y OPENVPN_80_443_UDP
+	read -rp 'Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_80_443_UDP
 done
 echo
 until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
-	read -rp "Allow multiple clients connecting to OpenVPN using same profile file (*.ovpn)? [y/n]: " -e -i y OPENVPN_DUPLICATE
+	read -rp 'Allow multiple clients connecting to OpenVPN using same profile file (*.ovpn)? [y/n]: ' -e -i y OPENVPN_DUPLICATE
 done
 echo
 until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
-	read -rp "Enable detailed logs in OpenVPN? [y/n]: " -e -i n OPENVPN_LOG
+	read -rp 'Enable detailed logs in OpenVPN? [y/n]: ' -e -i n OPENVPN_LOG
 done
 echo
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
-	read -rp "Enable SSH brute-force protection? [y/n]: " -e -i y SSH_PROTECTION
+	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
 echo "Warning! Network attack and scan protection may block VPN or third-party applications!"
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
-	read -rp "Enable network attack and scan protection? [y/n]: " -e -i y ATTACK_PROTECTION
+	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
 done
 echo
-while read -rp "Enter valid domain name for this OpenVPN server or press Enter to skip: " -e OPENVPN_HOST
+while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
 do
 	[[ -z "$OPENVPN_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$OPENVPN_HOST") ]] && break
 done
 echo
-while read -rp "Enter valid domain name for this WireGuard/AmneziaWG server or press Enter to skip: " -e WIREGUARD_HOST
+while read -rp 'Enter valid domain name for this WireGuard/AmneziaWG server or press Enter to skip: ' -e WIREGUARD_HOST
 do
 	[[ -z "$WIREGUARD_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
@@ -158,12 +158,33 @@ until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n CLOUDFLARE_INCLUDE
 done
 echo
-echo "Preparing for installation, please wait..."
+until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Amazon IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n AMAZON_INCLUDE
+done
+echo
+until [[ "$HETZNER_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Hetzner IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n HETZNER_INCLUDE
+done
+echo
+until [[ "$DIGITALOCEAN_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include DigitalOcean IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DIGITALOCEAN_INCLUDE
+done
+echo
+until [[ "$OVH_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include OVH IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n OVH_INCLUDE
+done
+echo
+until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Telegram IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n TELEGRAM_INCLUDE
+done
+echo
+
+echo 'Preparing for installation, please wait...'
 
 #
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do
-	echo "Waiting for apt-get to finish...";
+	echo 'Waiting for apt-get to finish...';
 	sleep 5;
 done
 
@@ -360,13 +381,18 @@ OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
 ROUTE_ALL=${ROUTE_ALL}
 DISCORD_INCLUDE=${DISCORD_INCLUDE}
-CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
+CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}
+AMAZON_INCLUDE=${AMAZON_INCLUDE}
+HETZNER_INCLUDE=${HETZNER_INCLUDE}
+DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
+OVH_INCLUDE=${OVH_INCLUDE}
+TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
-find /tmp/antizapret -type f \( -name "*.sh" -o -name "*.py" \) -execdir chmod +x {} +
+find /tmp/antizapret -type f \( -name '*.sh' -o -name '*.py' \) -execdir chmod +x {} +
 
 # Копируем нужное, удаляем не нужное
 find /tmp/antizapret -name '.gitkeep' -delete
@@ -497,8 +523,8 @@ if [[ -z "$(swapon --show)" ]]; then
 fi
 
 echo
-echo -e "\e[1;32mAntiZapret VPN + traditional VPN installed successfully!\e[0m"
-echo "Rebooting..."
+echo -e '\e[1;32mAntiZapret VPN + traditional VPN installed successfully!\e[0m'
+echo 'Rebooting...'
 
 #
 # Перезагружаем
