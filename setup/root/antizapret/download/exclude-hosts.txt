@@ -36,6 +36,7 @@ ixbt.pro
 sberbank.com
 livejournal.com
 championat.com
+lenta.com
 # Белый список
 #android.com
 #office.com
