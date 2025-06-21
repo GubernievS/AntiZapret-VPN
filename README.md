@@ -3,9 +3,6 @@
 | У автора есть собственный VPN-сервер. Вы можете приобрести готовое подключение к AntiZapret VPN или получить помощь в настройке своего сервера или роутера. Все подробности и стоимость [тут](https://t.me/antizapret_vpn/4) |
 |------------------|
 
-| Внимание! О блокировке сайтов использующих Cloudflare и [как её обойти](https://github.com/GubernievS/AntiZapret-VPN/tree/main?tab=readme-ov-file#7-как-обойти-блокировку-сайтов-использующих-cloudflare) |
-|------------------|
-
 Скрипт для установки на [своём сервере](https://github.com/GubernievS/AntiZapret-VPN#где-купить-сервер) AntiZapret VPN и обычного VPN, работает по протоколам OpenVPN (есть патч для обхода блокировки), WireGuard и AmneziaWG
 
 AntiZapret VPN реализует технологию [раздельного туннелирования](https://encyclopedia.kaspersky.ru/glossary/split-tunneling)
@@ -76,7 +73,7 @@ bash <(wget --no-hsts -qO- https://raw.githubusercontent.com/GubernievS/AntiZapr
 	- Включить защиту от перебора паролей SSH и защиту от сканирования и сетевых атак
 	- Указать доменное имя для подключения к OpenVPN и WireGuard/AmneziaWG
 	- Пустить все домены через AntiZapret VPN кроме российских доменов и доменов из exclude-hosts.txt
-	- Добавить IP-адреса Cloudflare и голосовых серверов Discord
+	- Добавить IP-адреса: голосовых серверов Discord, Telegram, Cloudflare, Amazon, Hetzner, DigitalOcean и OVH
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 После загрузки сервера, заблокированные сайты заработают через несколько минут
 5. Установить дополнения:
@@ -148,12 +145,6 @@ nano /root/antizapret/config/include-ips.txt
 ```
 После обновления списка АнтиЗапрета, клиентам OpenVPN (antizapret-\*.ovpn) достаточно переподключиться к серверу\
 А клиентам WireGuard/AmneziaWG нужно добавить новые IP-адреса через запятую в конфигурационные файлы (antizapret-\*.conf) в строке AllowedIPs
-
-### 7. Как обойти блокировку сайтов, использующих Cloudflare
-
-1. Обновите AntiZapret-VPN и на вопрос "Include Cloudflare IPs in AntiZapret VPN?" ответе "y"
-2. Скачайте и замените обновлённые профили WireGuard/AmneziaWG и переподключите OpenVPN-клиентов — они автоматически получат новые маршруты с сервера
-3. Пропишите новые IP-адреса из https://www.cloudflare.com/ips-v4 на роутерах, если ранее для работы требовалась настройка маршрутов вручную
 
 ***
 
