@@ -10,15 +10,6 @@ cd /root/antizapret
 rm -f temp/*
 rm -f result/*
 
-for file in config/*; do
-	if [[ -f "$file" ]]; then
-		# Если последний символ не новая строка - добавляем её
-		if [[ "$(tail -c1 "$file")" != $'\n' ]]; then
-			echo >> "$file"
-		fi
-	fi
-done
-
 source /root/antizapret/setup
 
 if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
@@ -27,7 +18,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
 	shopt -s nullglob
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-ips.txt download/*-ips.txt | sort -u > temp/include-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*-ips.txt config/include-ips.txt | sort -u > temp/include-ips.txt
 	shopt -u nullglob
 
 	# Убираем IP-адреса из исключений
@@ -72,10 +63,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "AdBlock hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-adblock-hosts.txt download/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-adblock-hosts.txt download/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-adblock-hosts.txt config/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/include-adblock-hosts.txt
@@ -109,8 +100,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-hosts.txt download/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/include-hosts.txt download/include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/include-hosts.txt > temp/include-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/cleanup-hosts.txt download/nxdomain.txt > temp/cleanup-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
