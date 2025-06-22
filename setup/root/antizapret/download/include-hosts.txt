@@ -707,4 +707,11 @@ deepl.com
 ikea.ee
 samsonite.com
 orlandotechpubs.com
+tvn24.pl
+insideevs.com
+sbom.sh
+jetbrains.ai
+wdfiles.com
+ansys.com
+census.gov
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
