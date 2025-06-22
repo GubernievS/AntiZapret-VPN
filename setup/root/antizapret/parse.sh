@@ -148,7 +148,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Очищаем кэш knot-resolver
 	count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+')
-	echo "DNS cache cleared: $count"
+	echo "DNS cache cleared: $count entries"
 
 fi
 
