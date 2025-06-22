@@ -28,9 +28,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
 
 	# Выводим результат
-	echo "ips.txt – $(wc -l < result/ips.txt)"
-
-	wc -l result/ips.txt
+	echo "$(wc -l < result/ips.txt) - ips.txt"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	echo -n > result/DEFAULT
@@ -84,8 +82,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sort -u temp/exclude-adblock-hosts.txt > result/exclude-adblock-hosts.txt
 
 	# Выводим результат
-	echo "include-adblock-hosts.txt – $(wc -l < result/include-adblock-hosts.txt)"
-	echo "exclude-adblock-hosts.txt – $(wc -l < result/exclude-adblock-hosts.txt)"
+	echo "$(wc -l < result/include-adblock-hosts.txt) - include-adblock-hosts.txt"
+	echo "$(wc -l < result/exclude-adblock-hosts.txt) - exclude-adblock-hosts.txt"
 
 	# Создаем файл для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
@@ -134,8 +132,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 
 	# Выводим результат
-	echo "include-hosts.txt – $(wc -l < result/include-hosts.txt)"
-	echo "exclude-hosts.txt – $(wc -l < result/exclude-hosts.txt)"
+	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
+	echo "$(wc -l < result/exclude-hosts.txt) - exclude-hosts.txt"
 
 	# Создаем файл для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/proxy.rpz
