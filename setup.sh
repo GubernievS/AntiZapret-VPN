@@ -471,8 +471,8 @@ if [[ "$OPENVPN_LOG" == "y" ]]; then
 fi
 
 #
-# Загружаем списки исключений
-/root/antizapret/doall.sh
+# Загружаем и создаем списки исключений IP-адресов
+/root/antizapret/doall.sh ip
 
 #
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
