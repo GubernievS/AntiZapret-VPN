@@ -100,63 +100,68 @@ function download {
 download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
-download $HOSTS_PATH_1 $HOSTS_LINK_1
-download $HOSTS_PATH_2 $HOSTS_LINK_2
-download $NXDOMAIN_PATH $NXDOMAIN_LINK
-download $RPZ_PATH $RPZ_LINK
-download $CLEANUP_HOSTS_PATH $CLEANUP_HOSTS_LINK
-download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 
 source /root/antizapret/setup
 
-if [[ "$ROUTE_ALL" = "y" ]]; then
-	download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
-else
-	printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
+if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
+	download $HOSTS_PATH_1 $HOSTS_LINK_1
+	download $HOSTS_PATH_2 $HOSTS_LINK_2
+	download $NXDOMAIN_PATH $NXDOMAIN_LINK
+	download $RPZ_PATH $RPZ_LINK
+	download $CLEANUP_HOSTS_PATH $CLEANUP_HOSTS_LINK
+	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+
+	if [[ "$ROUTE_ALL" = "y" ]]; then
+		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
+	else
+		printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
+	fi
+
+	if [[ "$BLOCK_ADS" = "y" ]]; then
+		download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
+		download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
+		download $ADGUARD_PATH $ADGUARD_LINK
+		download $OISD_PATH $OISD_LINK
+	else
+		> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
+		> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
+		> /root/antizapret/$ADGUARD_PATH
+		> /root/antizapret/$OISD_PATH
+	fi
 fi
 
-if [[ "$BLOCK_ADS" = "y" ]]; then
-	download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
-	download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
-	download $ADGUARD_PATH $ADGUARD_LINK
-	download $OISD_PATH $OISD_LINK
-else
-	> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
-	> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
-	> /root/antizapret/$ADGUARD_PATH
-	> /root/antizapret/$OISD_PATH
-fi
+if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
+	if [[ "$DISCORD_INCLUDE" = "y" ]]; then
+		download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
+	fi
 
-if [[ "$DISCORD_INCLUDE" = "y" ]]; then
-	download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
-fi
+	if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
+		download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
+	fi
 
-if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
-	download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
-fi
+	if [[ "$AMAZON_INCLUDE" = "y" ]]; then
+		download $AMAZON_IPS_PATH $AMAZON_IPS_LINK
+	fi
 
-if [[ "$AMAZON_INCLUDE" = "y" ]]; then
-	download $AMAZON_IPS_PATH $AMAZON_IPS_LINK
-fi
+	if [[ "$HETZNER_INCLUDE" = "y" ]]; then
+		download $HETZNER_IPS_PATH $HETZNER_IPS_LINK
+	fi
 
-if [[ "$HETZNER_INCLUDE" = "y" ]]; then
-	download $HETZNER_IPS_PATH $HETZNER_IPS_LINK
-fi
+	if [[ "$DIGITALOCEAN_INCLUDE" = "y" ]]; then
+		download $DIGITALOCEAN_IPS_PATH $DIGITALOCEAN_IPS_LINK
+	fi
 
-if [[ "$DIGITALOCEAN_INCLUDE" = "y" ]]; then
-	download $DIGITALOCEAN_IPS_PATH $DIGITALOCEAN_IPS_LINK
-fi
+	if [[ "$OVH_INCLUDE" = "y" ]]; then
+		download $OVH_IPS_PATH $OVH_IPS_LINK
+	fi
 
-if [[ "$OVH_INCLUDE" = "y" ]]; then
-	download $OVH_IPS_PATH $OVH_IPS_LINK
-fi
+	if [[ "$TELEGRAM_INCLUDE" = "y" ]]; then
+		download $TELEGRAM_IPS_PATH $TELEGRAM_IPS_LINK
+	fi
 
-if [[ "$TELEGRAM_INCLUDE" = "y" ]]; then
-	download $TELEGRAM_IPS_PATH $TELEGRAM_IPS_LINK
-fi
-
-if [[ "$GOOGLE_INCLUDE" = "y" ]]; then
-	download $GOOGLE_IPS_PATH $GOOGLE_IPS_LINK
+	if [[ "$GOOGLE_INCLUDE" = "y" ]]; then
+		download $GOOGLE_IPS_PATH $GOOGLE_IPS_LINK
+	fi
 fi
 
 exit 0
