@@ -178,6 +178,10 @@ until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Telegram IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n TELEGRAM_INCLUDE
 done
 echo
+until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Google IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n GOOGLE_INCLUDE
+done
+echo
 
 echo 'Preparing for installation, please wait...'
 
@@ -386,7 +390,8 @@ AMAZON_INCLUDE=${AMAZON_INCLUDE}
 HETZNER_INCLUDE=${HETZNER_INCLUDE}
 DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
 OVH_INCLUDE=${OVH_INCLUDE}
-TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
+TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}
+GOOGLE_INCLUDE=${GOOGLE_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
