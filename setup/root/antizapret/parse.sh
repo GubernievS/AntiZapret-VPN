@@ -60,7 +60,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
-	echo "AdBlock..."
+	echo "AdBlock-hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
