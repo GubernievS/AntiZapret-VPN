@@ -49,6 +49,10 @@ if [[ "$ALGORITHM" == "0" ]]; then
 	echo
 	echo 'OpenVPN patch not installed!'
 	exit 0
+elif [[ "$ALGORITHM" == "2" ]]; then
+    ERROR_FREE="#define ERROR_FREE"
+else
+    ERROR_FREE="#undef ERROR_FREE"
 fi
 
 apt-get update
@@ -68,58 +72,57 @@ link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
 					struct link_socket_actual *to)\
 {\
-#define ALGORITHM '"$ALGORITHM"'\
+'"$ERROR_FREE"'\
 	uint16_t buffer_sent = 0;\
 	uint8_t opcode = *BPTR(buf) >> 3;\
 if (opcode == 7 || opcode == 8 || opcode == 10)\
 {\
-	if (ALGORITHM == 2) {\
-#ifdef _WIN32\
-		buffer_sent =+ link_socket_write_win32(sock, buf, to);\
-#else\
-		buffer_sent =+ link_socket_write_udp_posix(sock, buf, to);\
+#ifdef ERROR_FREE\
+	#ifdef _WIN32\
+		buffer_sent = link_socket_write_win32(sock, buf, to);\
+	#else\
+		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
+	#endif\
 #endif\
-	}\
 	uint16_t buffer_len = BLEN(buf);\
 	srand(time(NULL));\
 	for (int i = 0; i < 2; i++) {\
 		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
 		struct buffer data_buffer;\
-		if (ALGORITHM == 1) {\
-			data_buffer = alloc_buf(data_len);\
-			if (i == 0) {\
-				data[0] = 1;\
-				data[1] = 0;\
-				data[2] = 0;\
-				data[3] = 0;\
-				data[4] = 1;\
-				for (int k = 5; k < data_len; k++) {\
-					data[k] = rand() % 256;\
-				}\
-			}\
-			else {\
-				for (int k = 0; k < data_len; k++) {\
-					data[k] = rand() % 256;\
-				}\
-			}\
+#ifdef ERROR_FREE\
+		data_buffer = clone_buf(buf);\
+		buf_read(&data_buffer, data, buffer_len);\
+		buf_clear(&data_buffer);\
+		data[0] = 40;\
+		for (int k = buffer_len; k < data_len; k++) {\
+			data[k] = rand() % 256;\
 		}\
-		else {\
-			data_buffer = clone_buf(buf);\
-			buf_read(&data_buffer, data, buffer_len);\
-			buf_clear(&data_buffer);\
-			data[0] = 40;\
-			for (int k = buffer_len; k < data_len; k++) {\
+#else\
+		data_buffer = alloc_buf(data_len);\
+		if (i == 0) {\
+			data[0] = 1;\
+			data[1] = 0;\
+			data[2] = 0;\
+			data[3] = 0;\
+			data[4] = 1;\
+			for (int k = 5; k < data_len; k++) {\
 				data[k] = rand() % 256;\
 			}\
 		}\
+		else {\
+			for (int k = 0; k < data_len; k++) {\
+				data[k] = rand() % 256;\
+			}\
+		}\
+#endif\
 		buf_write(&data_buffer, data, data_len);\
 		int data_repeat = rand() % 101 + 100;\
 		for (int j = 0; j < data_repeat; j++) {\
 #ifdef _WIN32\
-			buffer_sent =+ link_socket_write_win32(sock, &data_buffer, to);\
+			buffer_sent += link_socket_write_win32(sock, &data_buffer, to);\
 #else\
-			buffer_sent =+ link_socket_write_udp_posix(sock, &data_buffer, to);\
+			buffer_sent += link_socket_write_udp_posix(sock, &data_buffer, to);\
 #endif\
 		}\
 		free_buf(&data_buffer);\
@@ -127,9 +130,9 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	}\
 }\
 #ifdef _WIN32\
-	buffer_sent =+ link_socket_write_win32(sock, buf, to);\
+	buffer_sent += link_socket_write_win32(sock, buf, to);\
 #else\
-	buffer_sent =+ link_socket_write_udp_posix(sock, buf, to);\
+	buffer_sent += link_socket_write_udp_posix(sock, buf, to);\
 #endif\
 	return buffer_sent;\
 }\
@@ -150,14 +153,14 @@ chmod +x ./configure
 	--disable-plugins \
 	--disable-management \
 	--disable-fragment \
-	--disable-port-share \
 	--disable-wolfssl-options-h \
 	--disable-pam-dlopen \
 	--disable-plugin-auth-pam \
 	--disable-x509-alt-username \
 	--disable-pkcs11 \
 	--disable-selinux \
-	--disable-win32-dll
+	--disable-win32-dll\
+	--disable-port-share
 make
 make install
 systemctl daemon-reload
