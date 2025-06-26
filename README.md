@@ -181,7 +181,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 /root/antizapret/client.sh 8
 ```
 И скачайте созданный файл /root/antizapret/backup\*.tar.gz\
-Если команда выполнилась ошибкой то скачайте с сервера папки /etc/openvpn/easyrsa3 и /etc/wireguard\
+Если команда выполнилась с ошибкой то скачайте с сервера папки /etc/openvpn/easyrsa3 и /etc/wireguard\
 Переустановите сервер\
 Обратно на сервер в папку /root закачайте папки easyrsa3 и wireguard или backup\*.tar.gz\
 Запустите скрипт установки
