@@ -217,7 +217,7 @@ download.microsoft.com
 update.microsoft.com
 prss.microsoft.com
 copilot.microsoft.com
-bing.com
+#bing.com
 4pda.to
 habr.com
 fluke.com
@@ -720,4 +720,7 @@ usher.ttvnw.net
 thetrainline.com
 xsts.auth.xboxlive.com
 datalore.jetbrains.com
+sydney.bing.com
+edgeservices.bing.com
+rewards.bing.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
