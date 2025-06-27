@@ -719,4 +719,5 @@ travel-assets.com
 usher.ttvnw.net
 thetrainline.com
 xsts.auth.xboxlive.com
+datalore.jetbrains.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
