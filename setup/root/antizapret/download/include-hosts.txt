@@ -718,4 +718,5 @@ expedia.de
 travel-assets.com
 usher.ttvnw.net
 thetrainline.com
+xsts.auth.xboxlive.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
