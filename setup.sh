@@ -155,7 +155,7 @@ until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
 done
 echo
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n CLOUDFLARE_INCLUDE
+	read -rp $'Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i y CLOUDFLARE_INCLUDE
 done
 echo
 until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
