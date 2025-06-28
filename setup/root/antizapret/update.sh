@@ -86,6 +86,9 @@ TELEGRAM_IPS_PATH="download/telegram-ips.txt"
 GOOGLE_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/google-ips.txt"
 GOOGLE_IPS_PATH="download/google-ips.txt"
 
+AKAMAI_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/akamai-ips.txt"
+AKAMAI_IPS_PATH="download/akamai-ips.txt"
+
 function download {
 	local path="/root/antizapret/${1}"
 	local tmp_path="${path}.tmp"
@@ -171,6 +174,10 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 	if [[ "$GOOGLE_INCLUDE" = "y" ]]; then
 		download $GOOGLE_IPS_PATH $GOOGLE_IPS_LINK
+	fi
+
+	if [[ "$AKAMAI_INCLUDE" = "y" ]]; then
+		download $AKAMAI_IPS_PATH $AKAMAI_IPS_LINK
 	fi
 fi
 
