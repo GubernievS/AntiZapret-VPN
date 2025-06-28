@@ -182,7 +182,10 @@ until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Google IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n GOOGLE_INCLUDE
 done
 echo
-
+until [[ "$AKAMAI_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Akamai IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n AKAMAI_INCLUDE
+done
+echo
 echo 'Preparing for installation, please wait...'
 
 #
@@ -391,7 +394,8 @@ HETZNER_INCLUDE=${HETZNER_INCLUDE}
 DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
 OVH_INCLUDE=${OVH_INCLUDE}
 TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}
-GOOGLE_INCLUDE=${GOOGLE_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
+GOOGLE_INCLUDE=${GOOGLE_INCLUDE}
+AKAMAI_INCLUDE=${AKAMAI_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
