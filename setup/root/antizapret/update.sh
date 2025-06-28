@@ -181,4 +181,33 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
+###
+FILE="/root/antizapret/setup"
+
+required_vars=(
+"BLOCK_ADS="
+"ALTERNATIVE_IP="
+"OPENVPN_80_443_TCP="
+"OPENVPN_80_443_UDP="
+"SSH_PROTECTION="
+"ATTACK_PROTECTION="
+"ROUTE_ALL="
+"DISCORD_INCLUDE="
+"CLOUDFLARE_INCLUDE="
+"AMAZON_INCLUDE="
+"HETZNER_INCLUDE="
+"DIGITALOCEAN_INCLUDE="
+"OVH_INCLUDE="
+"TELEGRAM_INCLUDE="
+"GOOGLE_INCLUDE="
+"AKAMAI_INCLUDE="
+)
+
+for var in "${required_vars[@]}"; do
+  if ! grep -qE "^\s*${var//=/}=*" "$FILE"; then
+    echo "$var" >> "$FILE"
+  fi
+done
+###
+
 exit 0
