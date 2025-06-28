@@ -73,8 +73,8 @@ done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
-echo '        +SkyDNS+Yandex'
-echo '    2) Cloudflare+Quad9  - Use if SkyDNS/Yandex fail to resolve non-blocked domains'
+echo '       +SkyDNS+Beeline'
+echo '    2) Cloudflare+Quad9  - Use if SkyDNS/Beeline fail to resolve non-blocked domains'
 echo '    3) Comss *           - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    4) Xbox *            - More details: https://xbox-dns.ru'
 echo
@@ -451,14 +451,14 @@ fi
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
 	# Cloudflare+Quad9
-	sed -i "s/'193\.58\.251\.251', '77\.88\.8\.8', '77\.88\.8\.1'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
 	# Comss
-	sed -i "s/'193\.58\.251\.251', '77\.88\.8\.8', '77\.88\.8\.1'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	# Xbox
-	sed -i "s/'193\.58\.251\.251', '77\.88\.8\.8', '77\.88\.8\.1'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 fi
 
