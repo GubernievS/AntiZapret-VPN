@@ -11,7 +11,7 @@ export LC_ALL=C
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
-	exit 1
+	exit 2
 fi
 
 cd /root
@@ -20,7 +20,7 @@ cd /root
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
-	exit 2
+	exit 3
 fi
 
 #
@@ -31,23 +31,23 @@ VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 if [[ "$OS" == "debian" ]]; then
 	if [[ $VERSION -lt 11 ]]; then
 		echo 'Error: Your Debian version is not supported!'
-		exit 3
+		exit 4
 	fi
 elif [[ "$OS" == "ubuntu" ]]; then
 	if [[ $VERSION -lt 22 ]]; then
 		echo 'Error: Your Ubuntu version is not supported!'
-		exit 4
+		exit 5
 	fi
 elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	echo 'Error: Your Linux version is not supported!'
-	exit 5
+	exit 6
 fi
 
 #
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	echo 'Error: Low disk space! You need 2GB of free space!'
-	exit 6
+	exit 7
 fi
 
 echo
@@ -300,11 +300,9 @@ set -e
 #
 # Обработка ошибок
 handle_error() {
-	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
-	exit 7
+	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
