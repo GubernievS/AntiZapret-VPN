@@ -51,7 +51,7 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 fi
 
 echo
-echo -e '\e[1;32mInstalling AntiZapret VPN + traditional VPN...\e[0m'
+echo -e '\e[1;32mInstalling AntiZapret VPN + full VPN...\e[0m'
 echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 
@@ -84,7 +84,7 @@ until [[ "$ANTIZAPRET_DNS" =~ ^[1-4]$ ]]; do
 	read -rp 'DNS choice [1-4]: ' -e -i 1 ANTIZAPRET_DNS
 done
 echo
-echo -e 'Choose DNS resolvers for \e[1;32mtraditional VPN\e[0m (vpn-*):'
+echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'
 echo '    1) Cloudflare  - Recommended by default'
 echo '    2) Quad9       - Use if Cloudflare fail to resolve domains'
 echo '    3) Google *    - Use if Cloudflare/Quad9 fail to resolve domains'
@@ -532,7 +532,7 @@ if [[ -z "$(swapon --show)" ]]; then
 fi
 
 echo
-echo -e '\e[1;32mAntiZapret VPN + traditional VPN installed successfully!\e[0m'
+echo -e '\e[1;32mAntiZapret VPN + full VPN installed successfully!\e[0m'
 echo 'Rebooting...'
 
 #
