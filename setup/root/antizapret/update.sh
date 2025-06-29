@@ -3,11 +3,9 @@ set -e
 
 # Обработка ошибок
 handle_error() {
-	echo
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo
-	echo -e "\e[1;31mError occurred at line $1 while executing: $2\e[0m"
-	exit 7
+	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
@@ -100,7 +98,7 @@ function download {
 	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
 		rm -f "$tmp_path"
-		exit 1
+		exit 2
 	fi
 	mv -f "$tmp_path" "$path"
 	if [[ "$path" == *.sh ]]; then
