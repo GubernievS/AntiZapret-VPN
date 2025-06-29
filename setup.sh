@@ -100,7 +100,7 @@ until [[ "$VPN_DNS" =~ ^[1-6]$ ]]; do
 done
 echo
 until [[ "$BLOCK_ADS" =~ (y|n) ]]; do
-	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \e[1;32mAntiZapret VPN\e[0m (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y BLOCK_ADS
+	read -rp $'Enable blocking ads, trackers, malware and phishing websites in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 (antizapret-*) based on AdGuard and OISD rules? [y/n]: ' -e -i y BLOCK_ADS
 done
 echo
 echo 'Default IP address range:      10.28.0.0/14'
@@ -147,43 +147,43 @@ do
 done
 echo
 until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
-	read -rp $'Route all traffic for domains via \e[1;32mAntiZapret VPN\e[0m, excluding Russian domains and domains from exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
+	read -rp $'Route all traffic for domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and domains from exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
 done
 echo
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Discord voice IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i y DISCORD_INCLUDE
+	read -rp $'Include Discord voice IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y DISCORD_INCLUDE
 done
 echo
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Cloudflare IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i y CLOUDFLARE_INCLUDE
+	read -rp $'Include Cloudflare IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y CLOUDFLARE_INCLUDE
 done
 echo
 until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Amazon IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n AMAZON_INCLUDE
+	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
 done
 echo
 until [[ "$HETZNER_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Hetzner IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n HETZNER_INCLUDE
+	read -rp $'Include Hetzner IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n HETZNER_INCLUDE
 done
 echo
 until [[ "$DIGITALOCEAN_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include DigitalOcean IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n DIGITALOCEAN_INCLUDE
+	read -rp $'Include DigitalOcean IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DIGITALOCEAN_INCLUDE
 done
 echo
 until [[ "$OVH_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include OVH IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n OVH_INCLUDE
+	read -rp $'Include OVH IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n OVH_INCLUDE
 done
 echo
 until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Telegram IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n TELEGRAM_INCLUDE
+	read -rp $'Include Telegram IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n TELEGRAM_INCLUDE
 done
 echo
 until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Google IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n GOOGLE_INCLUDE
+	read -rp $'Include Google IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n GOOGLE_INCLUDE
 done
 echo
 until [[ "$AKAMAI_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Akamai IPs in \e[1;32mAntiZapret VPN\e[0m? [y/n]: ' -e -i n AKAMAI_INCLUDE
+	read -rp $'Include Akamai IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AKAMAI_INCLUDE
 done
 echo
 echo 'Preparing for installation, please wait...'
