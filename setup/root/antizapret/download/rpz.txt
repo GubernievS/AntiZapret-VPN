@@ -5,6 +5,8 @@ www.sprosivracha.com A 5.35.8.103
 dip8.ru A 213.171.17.69
 www.dip8.ru A 213.171.17.69
 ; NXDOMAIN
+local IN CNAME .
+*.local IN CNAME .
 cloudflare-dns.com CNAME .
 *.cloudflare-dns.com CNAME .
 dns.nextdns.io CNAME .
