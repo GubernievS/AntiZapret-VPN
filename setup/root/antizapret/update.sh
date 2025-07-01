@@ -202,6 +202,10 @@ for var in "${required_vars[@]}"; do
     echo "$var" >> "$FILE"
   fi
 done
+
+sed -i 's/policy\.STUB({/policy.FORWARD({/g' /etc/knot-resolver/kresd.conf
+systemctl restart kresd@*
+
 ###
 
 exit 0
