@@ -723,4 +723,5 @@ datalore.jetbrains.com
 sydney.bing.com
 edgeservices.bing.com
 rewards.bing.com
+msa.fr
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
