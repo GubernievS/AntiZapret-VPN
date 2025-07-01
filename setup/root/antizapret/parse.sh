@@ -114,7 +114,6 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/include-hosts.txt > temp/include-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/cleanup-hosts.txt download/nxdomain.txt > temp/cleanup-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -127,20 +126,23 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Удаляем не существующие или лишние домены
-	grep -vFxf temp/cleanup-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt || > temp/include-hosts2.txt
+	# Удаляем не существующие домены
+	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
+	
+	# Удаляем лишние домены
+	sed -e 's/$/$/' temp/include-hosts2.txt > temp/include-hosts3.txt
+	sed -e 's/^/./' temp/include-hosts3.txt > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/include-hosts3.txt > temp/include-hosts4.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
-		# Удаляем лишние домены
-		sed -e 's/\./\\./g' -e 's/^/\\./' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns.txt
-		grep -Ef temp/exclude-patterns.txt temp/include-hosts2.txt > temp/include-hosts3.txt
 		# Пустим все домены через AntiZapret VPN
-		echo '.' >> temp/include-hosts3.txt
-		# Удаляем дубли и сортируем
-		sort -u temp/include-hosts3.txt > result/include-hosts.txt
+		echo '.' > result/include-hosts.txt
+		# Удаляем лишние домены
+		sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
+		grep -Ff temp/exclude-patterns2.txt temp/include-hosts4.txt > temp/include-hosts5.txt
+		sed 's/\$$//' temp/include-hosts5.txt >> result/include-hosts.txt
 	else
-		# Удаляем дубли и сортируем
-		sort -u temp/include-hosts2.txt > result/include-hosts.txt
+		sed 's/\$$//' temp/include-hosts4.txt > result/include-hosts.txt
 	fi
 
 	# Выводим результат
