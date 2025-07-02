@@ -113,13 +113,11 @@ class ProxyResolver(BaseResolver):
                 #print("GOT A")
                 newrr = []
                 for record in reply.rr:
-                    if record.rtype == QTYPE.CNAME:
+                    if record.rtype != QTYPE.A:
                         continue
                     newrr.append(record)
                 reply.rr = newrr
                 for record in reply.rr:
-                    if record.rtype != QTYPE.A:
-                        continue
                     #print(dir(record))
                     #print(type(record.rdata))
                     real_ip = str(record.rdata)
