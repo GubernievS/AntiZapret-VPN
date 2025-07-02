@@ -203,8 +203,8 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-sed -i 's/policy\.STUB({/policy.FORWARD({/g' /etc/knot-resolver/kresd.conf
-systemctl restart kresd@*
+#sed -i 's/policy\.STUB({/policy.FORWARD({/g' /etc/knot-resolver/kresd.conf
+#systemctl restart kresd@*
 
 ###
 
