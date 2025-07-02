@@ -84,7 +84,7 @@ groupon.com
 grouponcdn.com
 releases.hashicorp.com
 community.infineon.com
-download.jetbrains.com
+#download.jetbrains.com
 documentation.meraki.com
 #account.mongodb.com
 #cloud.mongodb.com
@@ -491,7 +491,7 @@ nba.com
 delltechnologies.com
 download.lenovo.com
 darkproject.eu
-plugins.jetbrains.com
+#plugins.jetbrains.com
 framer.com
 tor.eff.org
 news.google.com
@@ -719,9 +719,10 @@ travel-assets.com
 usher.ttvnw.net
 thetrainline.com
 xsts.auth.xboxlive.com
-datalore.jetbrains.com
+#datalore.jetbrains.com
 sydney.bing.com
 edgeservices.bing.com
 rewards.bing.com
 msa.fr
+jetbrains.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
