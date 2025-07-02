@@ -725,4 +725,5 @@ edgeservices.bing.com
 rewards.bing.com
 msa.fr
 jetbrains.com
+xe.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
