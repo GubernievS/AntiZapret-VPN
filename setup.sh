@@ -73,12 +73,13 @@ done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
-echo '       +SkyDNS+Beeline'
-echo '    2) Cloudflare+Quad9  - Use if SkyDNS/Beeline fail to resolve non-blocked domains'
-echo '    3) Comss *           - More details: https://comss.ru/disqus/page.php?id=7315'
-echo '    4) Xbox *            - More details: https://xbox-dns.ru'
+echo '         +Russian *'
+echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
+echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    4) Xbox **           - More details: https://xbox-dns.ru'
 echo
-echo '  * - Enable additional proxying and hide this server IP on some internet resources'
+echo '  * - Resolvers optimized for users in Russia'
+echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-4]$ ]]; do
 	read -rp 'DNS choice [1-4]: ' -e -i 1 ANTIZAPRET_DNS
@@ -86,8 +87,8 @@ done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'
 echo '    1) Cloudflare  - Recommended by default'
-echo '    2) Quad9       - Use if Cloudflare fail to resolve domains'
-echo '    3) Google *    - Use if Cloudflare/Quad9 fail to resolve domains'
+echo '    2) Quad9       - Use if Cloudflare fails to resolve domains'
+echo '    3) Google *    - Use if Cloudflare/Quad9 fails to resolve domains'
 echo '    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites'
 echo '    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    6) Xbox **     - More details: https://xbox-dns.ru'
