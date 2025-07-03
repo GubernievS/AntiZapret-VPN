@@ -726,4 +726,5 @@ rewards.bing.com
 msa.fr
 jetbrains.com
 xe.com
+gql.twitch.tv
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
