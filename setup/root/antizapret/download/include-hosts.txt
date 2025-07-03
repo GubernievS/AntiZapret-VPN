@@ -728,4 +728,6 @@ jetbrains.com
 xe.com
 gql.twitch.tv
 live.chat.eveonline.com
+dyson.fr
+labs.google
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
