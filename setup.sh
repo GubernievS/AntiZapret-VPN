@@ -77,6 +77,7 @@ echo '         +Russian *'
 echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    4) Xbox **           - More details: https://xbox-dns.ru'
+echo '    5) Malw **           - More details: https://info.dns.malw.link'
 echo
 echo '  * - Resolvers optimized for users in Russia'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -92,6 +93,7 @@ echo '    3) Google *    - Use if Cloudflare/Quad9 fails to resolve domains'
 echo '    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites'
 echo '    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    6) Xbox **     - More details: https://xbox-dns.ru'
+echo '    7) Malw **     - More details: https://info.dns.malw.link'
 echo
 echo '  * - Resolvers supports EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -410,16 +412,22 @@ rm -rf /tmp/dnslib
 rm -rf /tmp/antizapret
 
 #
-# Используем альтернативные диапазоны ip-адресов
-# 10.28.0.0/14 => 172.28.0.0/14
-if [[ "$ALTERNATIVE_IP" == "y" ]]; then
-	sed -i 's/10\.30\./172\.30\./g' /root/antizapret/proxy.py
-	sed -i 's/10\.29\./172\.29\./g' /etc/knot-resolver/kresd.conf
-	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
-	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
-else
-	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
+# Настраиваем DNS в AntiZapret VPN
+if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
+	# Cloudflare+Quad9
+	sed -i "s/'193\.58\.251\.251', '195\.112\.112\.1', '212\.92\.149\.149', '212\.92\.149\.150'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
+elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
+	# Comss
+	sed -i "s/'193\.58\.251\.251', '195\.112\.112\.1', '212\.92\.149\.149', '212\.92\.149\.150'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
+elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
+	# Xbox
+	sed -i "s/'193\.58\.251\.251', '195\.112\.112\.1', '212\.92\.149\.149', '212\.92\.149\.150'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
+elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
+	# Malw
+	sed -i "s/'193\.58\.251\.251', '195\.112\.112\.1', '212\.92\.149\.149', '212\.92\.149\.150'/'46.226.165.53', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'46.226.165.53', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -444,21 +452,23 @@ elif [[ "$VPN_DNS" == "6" ]]; then
 	# Xbox
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 176.99.11.77"\npush "dhcp-option DNS 80.78.247.254"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254/' /etc/wireguard/templates/vpn-client*.conf
+elif [[ "$VPN_DNS" == "7" ]]; then
+	# Malw
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 46.226.165.53"\npush "dhcp-option DNS 64.188.98.242"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/46.226.165.53, 64.188.98.242/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
-# Настраиваем DNS в AntiZapret VPN
-if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
-	# Cloudflare+Quad9
-	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
-	# Comss
-	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
-	# Xbox
-	sed -i "s/'193\.58\.251\.251', '212\.92\.149\.149', '212\.92\.149\.150'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
+# Используем альтернативные диапазоны ip-адресов
+# 10.28.0.0/14 => 172.28.0.0/14
+if [[ "$ALTERNATIVE_IP" == "y" ]]; then
+	sed -i 's/10\.30\./172\.30\./g' /root/antizapret/proxy.py
+	sed -i 's/10\.29\./172\.29\./g' /etc/knot-resolver/kresd.conf
+	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
+	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
+else
+	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
 fi
 
 #
