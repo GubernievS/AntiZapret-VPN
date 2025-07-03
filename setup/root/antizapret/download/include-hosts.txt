@@ -727,4 +727,5 @@ msa.fr
 jetbrains.com
 xe.com
 gql.twitch.tv
+live.chat.eveonline.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
