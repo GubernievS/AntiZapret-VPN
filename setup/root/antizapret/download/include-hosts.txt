@@ -730,4 +730,5 @@ gql.twitch.tv
 live.chat.eveonline.com
 dyson.fr
 labs.google
+squarecdn.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
