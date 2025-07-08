@@ -157,8 +157,7 @@ chmod +x ./configure
 	--disable-x509-alt-username \
 	--disable-pkcs11 \
 	--disable-selinux \
-	--disable-win32-dll\
-	--disable-port-share
+	--disable-win32-dll
 make
 make install
 systemctl daemon-reload
