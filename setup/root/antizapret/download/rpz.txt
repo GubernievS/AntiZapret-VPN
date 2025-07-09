@@ -4,10 +4,8 @@ sprosivracha.com A 5.35.8.103
 www.sprosivracha.com A 5.35.8.103
 dip8.ru A 213.171.17.69
 www.dip8.ru A 213.171.17.69
-
-aeza.net A 5.252.32.128
-*.aeza.net IN A 5.252.32.128
-
+aeza.net A 193.233.63.97
+*.aeza.net IN A 193.233.63.97
 ; NXDOMAIN
 local IN CNAME .
 *.local IN CNAME .
