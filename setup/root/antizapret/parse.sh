@@ -101,7 +101,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
-	sed '/^;/d' download/rpz.txt >> result/deny.rpz
+	sed '/^;/d; /^$/d' download/rpz.txt >> result/deny.rpz
 
 	# Обновляем файл в Knot Resolver только если файл deny.rpz изменился
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
