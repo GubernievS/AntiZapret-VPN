@@ -200,90 +200,85 @@ addWireGuard(){
 
 	source /etc/wireguard/key
 	IPS="$(cat /etc/wireguard/ips)"
-	CLIENT_BLOCK_ANTIZAPRET="$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)"
-	CLIENT_BLOCK_VPN="$(sed -n "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)"
 
-	if [[ -n "$CLIENT_BLOCK_ANTIZAPRET" ]]; then
-		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_ANTIZAPRET" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo 'Client with that name already exists! Please enter different name for new client'
-	elif [[ -n "$CLIENT_BLOCK_VPN" ]]; then
-		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK_VPN" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
-		echo 'Client with that name already exists! Please enter different name for new client'
+	# AntiZapret
+
+	CLIENT_BLOCK="$(sed -n "/^# Client = ${CLIENT_NAME}$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/antizapret.conf)"
+
+	if [[ -n "$CLIENT_BLOCK" ]]; then
+		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_IP="$(echo "$CLIENT_BLOCK" | grep 'AllowedIPs =' | cut -d '=' -f 2- | sed 's/ //g' | cut -d '/' -f 1)"
+		echo 'Client (AntiZapret) with that name already exists! Please enter different name for new client'
 	else
 		CLIENT_PRIVATE_KEY="$(wg genkey)"
 		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
 		CLIENT_PRESHARED_KEY="$(wg genpsk)"
-	fi
-
-	sed -i "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
-	sed -i "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
-
-	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
-	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
-
-	# AntiZapret
-
-	BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/antizapret.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
-
-	for i in {2..255}; do
-		CLIENT_IP="${BASE_CLIENT_IP}.$i"
-		if ! grep -q "$CLIENT_IP" /etc/wireguard/antizapret.conf; then
-			break
-		fi
-		if [[ $i == 255 ]]; then
-			echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
-			exit 4
-		fi
-	done
-
-	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret/client/wireguard/antizapret/antizapret-$FILE_NAME-wg.conf"
-	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret/client/amneziawg/antizapret/antizapret-$FILE_NAME-am.conf"
-
-	echo "# Client = ${CLIENT_NAME}
+		BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/antizapret.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
+		for i in {2..255}; do
+			CLIENT_IP="${BASE_CLIENT_IP}.$i"
+			if ! grep -q "$CLIENT_IP" /etc/wireguard/antizapret.conf; then
+				break
+			fi
+			if [[ $i == 255 ]]; then
+				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
+				exit 4
+			fi
+		done
+		echo "# Client = ${CLIENT_NAME}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/antizapret.conf"
-
-	if systemctl is-active --quiet wg-quick@antizapret; then
-		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
+		if systemctl is-active --quiet wg-quick@antizapret; then
+			wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
+		fi
 	fi
+
+	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret/client/wireguard/antizapret/antizapret-$FILE_NAME-wg.conf"
+	render "/etc/wireguard/templates/antizapret-client-am.conf" > "/root/antizapret/client/amneziawg/antizapret/antizapret-$FILE_NAME-am.conf"
 
 	# VPN
 
-	BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/vpn.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
-
-	for i in {2..255}; do
-		CLIENT_IP="${BASE_CLIENT_IP}.$i"
-		if ! grep -q "$CLIENT_IP" /etc/wireguard/vpn.conf; then
-			break
-		fi
-		if [[ $i == 255 ]]; then
-			echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
-			exit 5
-		fi
-	done
-
-	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/antizapret/client/wireguard/vpn/vpn-$FILE_NAME-wg.conf"
-	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/antizapret/client/amneziawg/vpn/vpn-$FILE_NAME-am.conf"
-
-	echo "# Client = ${CLIENT_NAME}
+	CLIENT_BLOCK="$(sed -n "/^# Client = ${CLIENT_NAME}$/,/^AllowedIPs/ {p; /^AllowedIPs/q}" /etc/wireguard/vpn.conf)"
+	if [[ -n "$CLIENT_BLOCK" ]]; then
+		CLIENT_PRIVATE_KEY="$(echo "$CLIENT_BLOCK" | grep '# PrivateKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PUBLIC_KEY="$(echo "$CLIENT_BLOCK" | grep 'PublicKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_PRESHARED_KEY="$(echo "$CLIENT_BLOCK" | grep 'PresharedKey =' | cut -d '=' -f 2- | sed 's/ //g')"
+		CLIENT_IP="$(echo "$CLIENT_BLOCK" | grep 'AllowedIPs =' | cut -d '=' -f 2- | sed 's/ //g' | cut -d '/' -f 1)"
+		echo 'Client (VPN) with that name already exists! Please enter different name for new client'
+	else
+		CLIENT_PRIVATE_KEY="$(wg genkey)"
+		CLIENT_PUBLIC_KEY="$(echo "${CLIENT_PRIVATE_KEY}" | wg pubkey)"
+		CLIENT_PRESHARED_KEY="$(wg genpsk)"
+		BASE_CLIENT_IP="$(grep "^Address" /etc/wireguard/vpn.conf | sed 's/.*= *//' | cut -d'.' -f1-3 | head -n 1)"
+		for i in {2..255}; do
+			CLIENT_IP="${BASE_CLIENT_IP}.$i"
+			if ! grep -q "$CLIENT_IP" /etc/wireguard/vpn.conf; then
+				break
+			fi
+			if [[ $i == 255 ]]; then
+				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
+				exit 5
+			fi
+		done
+		echo "# Client = ${CLIENT_NAME}
 # PrivateKey = ${CLIENT_PRIVATE_KEY}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/vpn.conf"
-
-	if systemctl is-active --quiet wg-quick@vpn; then
-		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
+		if systemctl is-active --quiet wg-quick@vpn; then
+			wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
+		fi
 	fi
+
+	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/antizapret/client/wireguard/vpn/vpn-$FILE_NAME-wg.conf"
+	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/antizapret/client/amneziawg/vpn/vpn-$FILE_NAME-am.conf"
 
 	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
 	echo
@@ -299,8 +294,8 @@ deleteWireGuard(){
 		exit 6
 	fi
 
-	sed -i "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
-	sed -i "/^# Client = ${CLIENT_NAME}\$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
+	sed -i "/^# Client = ${CLIENT_NAME}$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
+	sed -i "/^# Client = ${CLIENT_NAME}$/,/^AllowedIPs/d" /etc/wireguard/vpn.conf
 
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
