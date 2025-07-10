@@ -718,7 +718,6 @@ expedia.de
 travel-assets.com
 usher.ttvnw.net
 thetrainline.com
-xsts.auth.xboxlive.com
 #datalore.jetbrains.com
 sydney.bing.com
 edgeservices.bing.com
@@ -731,4 +730,9 @@ live.chat.eveonline.com
 dyson.fr
 labs.google
 squarecdn.com
+xgpuweb.gssv-play-prod.xboxlive.com
+xsts.auth.xboxlive.com
+user.auth.xboxlive.com
+device.auth.xboxlive.com
+title.auth.xboxlive.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
