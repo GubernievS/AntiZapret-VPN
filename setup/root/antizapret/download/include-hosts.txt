@@ -731,8 +731,9 @@ dyson.fr
 labs.google
 squarecdn.com
 xgpuweb.gssv-play-prod.xboxlive.com
-xsts.auth.xboxlive.com
-user.auth.xboxlive.com
-device.auth.xboxlive.com
-title.auth.xboxlive.com
+#xsts.auth.xboxlive.com
+#user.auth.xboxlive.com
+#device.auth.xboxlive.com
+#title.auth.xboxlive.com
+auth.xboxlive.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
