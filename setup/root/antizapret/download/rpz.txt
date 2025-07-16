@@ -23,4 +23,10 @@ doh.cleanbrowsing.org CNAME .
 *.doh.cleanbrowsing.org CNAME .
 dot.dns.yandex.net CNAME .
 *.dot.dns.yandex.net CNAME .
+dns.adguard-dns.com CNAME .
+*.dns.adguard-dns.com CNAME .
+unfiltered.adguard-dns.com CNAME .
+*.unfiltered.adguard-dns.com CNAME .
+family.adguard-dns.com CNAME .
+*.family.adguard-dns.com CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
