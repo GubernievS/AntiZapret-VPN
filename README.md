@@ -155,8 +155,8 @@ nano /root/antizapret/config/include-ips.txt
 ***
 
 ## Настройка на роутерах
-OpenVPN на роутерах [Keenetic](./Keenetic.md) и [TP-Link](./TP-Link.md)\
-WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005) и [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN) [и еще OpenWRT](https://telegra.ph/AntiZapret-WireGuardAmneziaWG-on-OpenWRT-03-16)
+OpenVPN на роутерах [Keenetic](./Keenetic.md), [TP-Link](./TP-Link.md) и [MikroTik](https://github.com/Kirito0098/AntiZapret-OpenVPN-Mikrotik)\
+WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133090948), [MikroTik](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133091005), [OpenWRT](https://4pda.to/forum/index.php?showtopic=1095869&view=findpost&p=133105107) (для просмотра 4pda нужен VPN) и еще [OpenWRT](https://telegra.ph/AntiZapret-WireGuardAmneziaWG-on-OpenWRT-03-16)
 
 ***
 
