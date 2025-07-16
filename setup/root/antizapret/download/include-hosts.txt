@@ -737,7 +737,7 @@ xgpuweb.gssv-play-prod.xboxlive.com
 #title.auth.xboxlive.com
 auth.xboxlive.
 swarovski.com
-hm.com
+#hm.com
 weekday.com
 cos.com
 stories.com
