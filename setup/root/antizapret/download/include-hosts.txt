@@ -742,4 +742,5 @@ weekday.com
 cos.com
 stories.com
 arket.com
+primevideo.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
