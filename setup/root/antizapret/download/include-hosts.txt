@@ -735,5 +735,11 @@ xgpuweb.gssv-play-prod.xboxlive.com
 #user.auth.xboxlive.com
 #device.auth.xboxlive.com
 #title.auth.xboxlive.com
-auth.xboxlive.com
+auth.xboxlive.
+swarovski.com
+hm.com
+weekday.com
+cos.com
+stories.com
+arket.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
