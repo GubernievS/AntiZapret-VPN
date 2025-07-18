@@ -744,4 +744,5 @@ stories.com
 arket.com
 primevideo.com
 app.n8n.cloud
+lowrance.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
