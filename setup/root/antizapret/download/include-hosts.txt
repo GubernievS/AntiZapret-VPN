@@ -745,4 +745,5 @@ arket.com
 primevideo.com
 app.n8n.cloud
 lowrance.com
+threads.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
