@@ -746,4 +746,5 @@ primevideo.com
 app.n8n.cloud
 lowrance.com
 threads.com
+analog.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
