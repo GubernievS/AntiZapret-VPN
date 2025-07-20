@@ -113,7 +113,7 @@ source /root/antizapret/setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	download $HOSTS_PATH_1 $HOSTS_LINK_1
-	download $HOSTS_PATH_2 $HOSTS_LINK_2
+	download $HOSTS_PATH_2 $HOSTS_LINK_2 || > "$HOSTS_PATH_2"
 	download $NXDOMAIN_PATH $NXDOMAIN_LINK
 	download $RPZ_PATH $RPZ_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
