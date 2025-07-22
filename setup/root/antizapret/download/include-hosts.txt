@@ -750,4 +750,5 @@ analog.com
 imglib.info
 cosupport.ai
 westernunion.com
+coinpayments.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
