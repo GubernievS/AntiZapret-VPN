@@ -117,18 +117,21 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	cut -d ';' -f 2 download/dump.csv | iconv -f cp1251 -t utf8 | \
+	cut -d ';' -f 2 download/dump.csv | \
+	iconv -f cp1251 -t utf8 | \
 	grep -P '\.[а-яА-Яa-zA-Z]' | \
 	sed -E 's/^[[:punct:]]+//; s/[[:punct:]]+$//' | \
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из antifilter.download
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
+	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | \
+	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
-	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
-	
+	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | \
+	grep -v '^www\.' | sort -u > temp/include-hosts2.txt
+
 	# Удаляем лишние домены
 	sed -e 's/$/$/' temp/include-hosts2.txt > temp/include-hosts3.txt
 	sed -e 's/^/./' temp/include-hosts3.txt > temp/exclude-patterns.txt
