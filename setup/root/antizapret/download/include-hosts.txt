@@ -755,4 +755,12 @@ cloudfront.net
 a.run.app
 appspot.com
 sl.pt
+#bitbucket.io
+apteka-ru.shop
+#azurefd.net
+kinoportal.lol
+1080-hd.ru
+kinozo.cam
+kinoza.link
+lordfilm4.movie
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
