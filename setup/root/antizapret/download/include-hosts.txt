@@ -752,4 +752,6 @@ cosupport.ai
 westernunion.com
 coinpayments.net
 cloudfront.net
+a.run.app
+appspot.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
