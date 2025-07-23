@@ -754,5 +754,4 @@ coinpayments.net
 cloudfront.net
 a.run.app
 appspot.com
-sl.pt
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
