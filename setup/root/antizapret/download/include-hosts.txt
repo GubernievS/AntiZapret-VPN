@@ -751,4 +751,5 @@ imglib.info
 cosupport.ai
 westernunion.com
 coinpayments.net
+cloudfront.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
