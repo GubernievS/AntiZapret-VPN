@@ -752,12 +752,7 @@ cosupport.ai
 westernunion.com
 coinpayments.net
 
-
-
-
-
-
-
+# Повторяющиеся > 50 раз
 cloudfront.net
 qqq-ttss.su
 123tt.ru
@@ -1074,5 +1069,4 @@ mrutor.site
 #gb.net
 filmhd1080.me
 1films.biz
-
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
