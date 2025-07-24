@@ -751,6 +751,7 @@ imglib.info
 cosupport.ai
 westernunion.com
 coinpayments.net
+netacad.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
