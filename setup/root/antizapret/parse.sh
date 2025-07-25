@@ -69,7 +69,7 @@ fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Очищаем кэш knot-resolver
-	count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+')
+	count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
 	echo "DNS cache cleared: $count entries"
 
 	echo "AdBlock-hosts..."
@@ -119,8 +119,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	cut -d ';' -f 2 download/dump.csv | \
 	iconv -f cp1251 -t utf8 | \
-	grep -P '\.[а-яА-Яa-zA-Z]' | \
-	sed -E 's/^[[:punct:]]+//; s/[[:punct:]]+$//' | \
+	sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' | \
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из antifilter.download
@@ -128,24 +127,26 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | \
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Удаляем не существующие домены и поддомены www. и m.
-	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | \
-	sed -E '/\..*\./ s/^(www|m)\.//' | sort -u > temp/include-hosts2.txt
+	# Удаляем не существующие домены
+	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
+
+	# Удаляем поддомены www. и m.
+	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
 
 	# Удаляем лишние домены
-	sed -e 's/$/$/' temp/include-hosts2.txt > temp/include-hosts3.txt
-	sed -e 's/^/./' temp/include-hosts3.txt > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts3.txt > temp/include-hosts4.txt
+	sed -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
+	sed -e 's/^/./' temp/include-hosts4.txt > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt || true
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
 		echo '.' > result/include-hosts.txt
 		# Удаляем лишние домены
 		sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
-		grep -Ff temp/exclude-patterns2.txt temp/include-hosts4.txt > temp/include-hosts5.txt
-		sed 's/\$$//' temp/include-hosts5.txt >> result/include-hosts.txt
+		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
+		sed 's/\$$//' temp/include-hosts6.txt >> result/include-hosts.txt
 	else
-		sed 's/\$$//' temp/include-hosts4.txt > result/include-hosts.txt
+		sed 's/\$$//' temp/include-hosts5.txt > result/include-hosts.txt
 	fi
 
 	# Выводим результат
