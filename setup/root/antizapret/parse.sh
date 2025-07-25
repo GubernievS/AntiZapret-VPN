@@ -128,9 +128,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | \
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Удаляем не существующие домены и лишние поддомены
+	# Удаляем не существующие домены и поддомены www. и m.
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | \
-	sed -E '/\..*\./ s/^(www|m)[0-9-]*\.//' | sort -u > temp/include-hosts2.txt
+	sed -E '/\..*\./ s/^(www|m)\.//' | sort -u > temp/include-hosts2.txt
 
 	# Удаляем лишние домены
 	sed -e 's/$/$/' temp/include-hosts2.txt > temp/include-hosts3.txt
