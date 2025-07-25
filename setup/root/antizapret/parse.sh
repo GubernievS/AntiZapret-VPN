@@ -130,7 +130,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Удаляем не существующие домены и лишние поддомены
 	grep -vFxf download/nxdomain.txt temp/include-hosts.txt | \
-	sed -E '/\..*\./ s/^([-0-9a-zA-Z]{1,2}|www|msk|spb)[0-9]*\.//' | sort -u > temp/include-hosts2.txt
+	sed -E '/\..*\./ s/^[-0-9a-zA-Z]{1,3}[-0-9]*\.//' | sort -u > temp/include-hosts2.txt
 
 	# Удаляем лишние домены
 	sed -e 's/$/$/' temp/include-hosts2.txt > temp/include-hosts3.txt
