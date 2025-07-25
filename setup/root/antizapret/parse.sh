@@ -115,6 +115,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/include-hosts.txt > temp/include-hosts.txt
 
+#	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/skip-hosts.txt > skip-hosts.txt
+
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	cut -d ';' -f 2 download/dump.csv | \
@@ -144,14 +146,13 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		echo '.' > result/include-hosts.txt
 		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
+		echo '.' >> temp/include-hosts6.txt
 	else
-		echo > result/include-hosts.txt
 		grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
 	fi
 
-	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts6.txt >> result/include-hosts.txt
+	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts6.txt > result/include-hosts.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
