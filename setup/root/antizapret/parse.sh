@@ -133,21 +133,25 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем поддомены www. и m.
 	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
 
-	# Удаляем лишние домены
-	sed -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
-	sed -e 's/^/./' temp/include-hosts4.txt > temp/exclude-patterns.txt
+	# Удаляем избыточные домены
+	sed -e 's/^/^/' -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
+	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns.txt
 	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt || true
+
+	# Удаляем исключённые домены
+	sed -e 's/^/^/' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
+	sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt >> temp/exclude-patterns2.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
 		echo '.' > result/include-hosts.txt
-		# Удаляем лишние домены
-		sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
 		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
-		sed 's/\$$//' temp/include-hosts6.txt >> result/include-hosts.txt
 	else
-		sed 's/\$$//' temp/include-hosts5.txt > result/include-hosts.txt
+		echo > result/include-hosts.txt
+		grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
 	fi
+
+	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts6.txt >> result/include-hosts.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
