@@ -26,7 +26,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
 	shopt -s nullglob
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*-ips.txt config/include-ips.txt | sort -u > temp/include-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/include-ips.txt | sort -u > temp/include-ips.txt
 	shopt -u nullglob
 
 	# Убираем IP-адреса из исключений
@@ -114,8 +114,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/include-hosts.txt > temp/include-hosts.txt
-
-#	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/skip-hosts.txt > skip-hosts.txt
+	shopt -s nullglob
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/*nxdomain.txt > temp/nxdomain.txt
+	shopt -u nullglob
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -130,7 +131,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
-	grep -vFxf download/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
+	grep -vFxf temp/nxdomain.txt temp/include-hosts.txt > temp/include-hosts2.txt
 
 	# Удаляем поддомены www. и m.
 	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
