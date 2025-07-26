@@ -382,7 +382,7 @@ backup(){
 
 	rm -rf /root/antizapret/backup
 
-	echo "Clients and config backup (re)created at $BACKUP_FILE"
+	echo "Backup of configuration and client data (re)created at $BACKUP_FILE"
 }
 
 source /root/antizapret/setup
@@ -402,8 +402,8 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo '    4) WireGuard/AmneziaWG - Add client'
 	echo '    5) WireGuard/AmneziaWG - Delete client'
 	echo '    6) WireGuard/AmneziaWG - List clients'
-	echo '    7) (Re)create clients profile files'
-	echo '    8) (Re)create clients and config backup'
+	echo '    7) Recreate client profile files'
+	echo '    8) Backup configuration and client data'
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp 'Option choice [1-8]: ' -e OPTION
 	done
@@ -443,11 +443,11 @@ case "$OPTION" in
 		listWireGuard
 		;;
 	7)
-		echo '(Re)create clients profile files'
+		echo 'Recreate client profile files'
 		recreate
 		;;
 	8)
-		echo '(Re)create clients and config backup'
+		echo 'Backup configuration and client data'
 		backup
 		;;
 esac
