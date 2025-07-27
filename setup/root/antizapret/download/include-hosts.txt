@@ -753,6 +753,11 @@ westernunion.com
 coinpayments.net
 netacad.com
 amazon.com
+signal.art
+signal.group
+signal.link
+signal.me
+signal.tube
 
 # Повторяющиеся > 50 раз
 cloudfront.net
