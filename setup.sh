@@ -256,6 +256,9 @@ apt-get purge -y libpam0g-dev &>/dev/null
 #apt-get purge -y amneziawg &>/dev/null
 apt-get purge -y sshguard &>/dev/null
 
+rm -rf /etc/apt/keyrings/openvpn-repo-public.gpg
+rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
+
 #
 # Остановим и выключим обновляемые службы
 for service in kresd@ openvpn-server@ wg-quick@; do
@@ -330,7 +333,6 @@ echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.
 # Добавим репозиторий OpenVPN
 #curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
 #echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
-echo "deb [arch=$(dpkg --print-architecture)] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
 # Добавим репозиторий Debian Backports
