@@ -752,6 +752,7 @@ cosupport.ai
 westernunion.com
 coinpayments.net
 netacad.com
+amazon.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
@@ -1057,5 +1058,4 @@ mrutor.site
 #gb.net
 filmhd1080.me
 1films.biz
-amazon.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
