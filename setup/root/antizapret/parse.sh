@@ -24,9 +24,9 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/exclude-ips.txt | sort -u > temp/exclude-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*exclude-ips.txt | sort -u > temp/exclude-ips.txt
 	shopt -s nullglob
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*-ips.txt config/include-ips.txt | sort -u > temp/include-ips.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/*include-ips.txt | sort -u > temp/include-ips.txt
 	shopt -u nullglob
 
 	# Убираем IP-адреса из исключений
@@ -75,10 +75,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "AdBlock-hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/include-adblock-hosts.txt > temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-adblock-hosts.txt config/exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/include-adblock-hosts.txt
@@ -112,9 +112,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/exclude-hosts.txt > temp/exclude-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/include-hosts.txt > temp/include-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/remove-hosts.txt > temp/remove-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/*remove-hosts.txt > temp/remove-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
