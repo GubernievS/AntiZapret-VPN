@@ -60,7 +60,7 @@ vb.me
 whoer.net
 foxitsoftware.com
 platform.activestate.com
-gaming.amazon.com
+#gaming.amazon.com
 login.amd.com
 bits.avcdn.net
 #login.broadcom.com
@@ -486,7 +486,7 @@ nflxsearch.net
 nflxso.net
 nflxvideo.net
 amazonaws.com
-aws.amazon.com
+#aws.amazon.com
 nba.com
 delltechnologies.com
 download.lenovo.com
@@ -1057,4 +1057,5 @@ mrutor.site
 #gb.net
 filmhd1080.me
 1films.biz
+amazon.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
