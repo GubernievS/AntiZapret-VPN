@@ -66,6 +66,10 @@ if [[ "$SSH_PROTECTION" == "y" ]]; then
 	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
 fi
 
+# mangle
+# Clamp TCP MSS
+iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
 # nat
 # OpenVPN TCP port redirection for backup connections
 if [[ "$OPENVPN_80_443_TCP" == "y" ]]; then
