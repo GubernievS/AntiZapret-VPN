@@ -235,8 +235,6 @@ rm -f /root/add-client.sh
 rm -f /root/delete-client.sh
 rm -f /root/*.ovpn
 rm -f /root/*.conf
-rm -rf /etc/apt/keyrings/openvpn-repo-public.gpg
-rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir -p /root/easyrsa3
