@@ -1,7 +1,5 @@
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 ; A
-aeza.net A 193.233.63.97
-*.aeza.net IN A 193.233.63.97
 ; NXDOMAIN
 local IN CNAME .
 *.local IN CNAME .
