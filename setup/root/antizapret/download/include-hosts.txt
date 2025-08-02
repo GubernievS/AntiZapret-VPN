@@ -20,7 +20,6 @@ signal.org
 hetzner.com
 lostfilm.tv
 licdn.com
-#t-ru.org
 rutrk.org
 nnm-club.ws
 nnmclub.ch
@@ -42,15 +41,12 @@ conversations.im
 roskomsvoboda.org
 amazfitwatchfaces.com
 buymeacoffee.com
-#cloudflare.com
 redgifs.com
-#one.one.one.one
 discord.com
 discord.gg
 discordapp.com
 discordapp.net
 discord.media
-#store.fastly.steamstatic.com
 cloudflare-ech.com
 urban-vpn.com
 viber.com
@@ -71,11 +67,9 @@ dell.com
 dellcdn.com
 artifacts.elastic.co
 store.epicgames.com
-#epicgames.com
 sites.fastspring.com
 furaffinity.net
 fujitsu.com
-#gllto.glpals.com
 grafana.com
 groupon.com
 grouponcdn.com
@@ -235,12 +229,8 @@ phncdn.com
 tiktok.com
 tiktokv.com
 tiktokcdn.com
-#tiktokcdn-eu.com
-#tiktokcdn-us.com
 ttwstatic.com
-#ttlivecdn.com
 lookerstudio.google.com
-#cloudflareinsights.com
 soapui.org
 spotify.com
 githubcopilot.com
@@ -271,8 +261,6 @@ ipdata.co
 aftermarket.schaeffler.com
 vehiclelifetimesolutions.schaeffler.com
 adam-audio.com
-#ubi.com
-#ubisoft.com
 serverkast.com
 alienwarearena.com
 hyundainews.com
@@ -302,7 +290,6 @@ stalker2.com
 wk.cz
 macpaw.com
 redis.io
-#jabra.com
 fw-download.ubnt.com
 download.screamingfrog.co.uk
 etsy.com
@@ -330,10 +317,6 @@ connect.ubisoft.com
 public-ubiservices.ubi.com
 upc.ubisoft.com
 ubistatic-a.ubisoft.com
-#accounts.autodesk.com
-#appstreaming.autodesk.com
-#help.autodesk.com
-#efulfillment.autodesk.com
 databricks.com
 plugin-alliance.com
 devexpress.com
@@ -383,8 +366,6 @@ shiksha.com
 moneypuck.com
 lightning.ai
 alphacoders.com
-#www3.corsair.com
-#kemono.su
 element14.com
 octopart.com
 community.sap.com
@@ -395,8 +376,6 @@ schenker-tech.de
 yeggi.com
 omv-extras.org
 notebooklm.google.com
-#softwareupdate.vmware.com
-#docs.vmware.com
 members.summerana.com
 anythingllm.com
 wikidot.com
@@ -428,7 +407,6 @@ freemyip.com
 static.monotype.com
 beacon3d.com
 wifimap.io
-#app.element.io
 matrix.org
 vector.im
 atelecom.biz
@@ -438,7 +416,6 @@ github.githubassets.com
 vscode.dev
 humblebundle.com
 geospy.ai
-#captcha-delivery.com
 developer.nvidia.com
 pny.com
 reverb.com
@@ -456,7 +433,6 @@ openai.qualtrics.com
 magecomp.us
 pm.me
 6pm.com
-#em.gazoni1.com
 fast.com
 netflixdnstest1.com
 netflixdnstest2.com
@@ -477,12 +453,10 @@ nflxsearch.net
 nflxso.net
 nflxvideo.net
 amazonaws.com
-#aws.amazon.com
 nba.com
 delltechnologies.com
 download.lenovo.com
 darkproject.eu
-#plugins.jetbrains.com
 framer.com
 tor.eff.org
 news.google.com
@@ -518,7 +492,6 @@ rockwellautomation.com
 download.schneider-electric.com
 login.siemens.com
 we.tl
-#wetransfer.net
 stereophile.com
 grok.com
 corsair.com
@@ -527,7 +500,6 @@ spaceforce.mil
 bbystatic.com
 av-connection.com
 udemy.com
-#qobuz.com
 foxnews.com
 meshcapade.com
 elgato.com
@@ -535,8 +507,6 @@ app.langdock.com
 lucid.co
 auth.hpe.com
 te.com
-#account.box.com
-#app.box.com
 facebook.net
 box.com
 g711.org
@@ -608,7 +578,6 @@ cloudmatchbeta.nvidiagrid.net
 broadcom.com
 github.com
 t3.chat
-#softpedia.com
 tuta.com
 tutamail.com
 worldpay.com
@@ -616,21 +585,16 @@ chromewebstore.google.com
 kmail-lists.com
 klaviyo.com
 antpool.com
-#viabtc.com
-#zabbix.com
-#deepseek.com
 tenable.com
 steamdb.info
 ngrok.com
 m.pushbr.com
 wbagora.com
 wbinsights.com
-#oyunfor.com
 easyjet.com
 syncfusion.com
 bumble.com
 adobe.com
-#voice.findmykids.org
 intellipaat.com
 p.clickup-attachments.com
 musicbrainz.org
@@ -673,7 +637,6 @@ absher.sa
 jules.google.com
 stitch.withgoogle.com
 ebay.com
-#api.imgur.com
 rapidapi.com
 cleanbrowsing.org
 store.galaxy-of-heroes.starwars.ea.com
@@ -708,7 +671,6 @@ expedia.de
 travel-assets.com
 usher.ttvnw.net
 thetrainline.com
-#datalore.jetbrains.com
 sydney.bing.com
 edgeservices.bing.com
 rewards.bing.com
@@ -721,13 +683,8 @@ dyson.fr
 labs.google
 squarecdn.com
 xgpuweb.gssv-play-prod.xboxlive.com
-#xsts.auth.xboxlive.com
-#user.auth.xboxlive.com
-#device.auth.xboxlive.com
-#title.auth.xboxlive.com
 auth.xboxlive.com
 swarovski.com
-#hm.com
 weekday.com
 cos.com
 stories.com
