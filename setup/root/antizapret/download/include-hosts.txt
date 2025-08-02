@@ -60,11 +60,8 @@ vb.me
 whoer.net
 foxitsoftware.com
 platform.activestate.com
-#gaming.amazon.com
 login.amd.com
 bits.avcdn.net
-#login.broadcom.com
-#packages-prod.broadcom.com
 forums.chaos.com
 try.chaos.com
 cisco.com
@@ -84,10 +81,7 @@ groupon.com
 grouponcdn.com
 releases.hashicorp.com
 community.infineon.com
-#download.jetbrains.com
 documentation.meraki.com
-#account.mongodb.com
-#cloud.mongodb.com
 cloud.oracle.com
 builds.parsec.app
 download.qt.io
@@ -217,7 +211,6 @@ download.microsoft.com
 update.microsoft.com
 prss.microsoft.com
 copilot.microsoft.com
-#bing.com
 4pda.to
 habr.com
 fluke.com
@@ -266,7 +259,6 @@ cisecurity.org
 outflank.nl
 tria.ge
 guilded.gg
-#download.nvidia.com
 spiceworks.com
 pornolab.net
 senumy.com
@@ -757,6 +749,7 @@ signal.me
 signal.tube
 archive.org
 alohafind.com
+postfix.org
 
 # Повторяющиеся > 50 раз
 cloudfront.net
