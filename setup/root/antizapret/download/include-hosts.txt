@@ -316,7 +316,6 @@ download.screamingfrog.co.uk
 etsy.com
 wetransfer.com
 app.zerossl.com
-home-connect.com
 bosch-home.com
 aftermarket.zf.com
 mongodb.com
@@ -496,7 +495,6 @@ framer.com
 tor.eff.org
 news.google.com
 play.google.com
-twimg.com
 bbc.co.uk
 bbci.co.uk
 radiojar.com
@@ -746,7 +744,6 @@ primevideo.com
 app.n8n.cloud
 lowrance.com
 threads.com
-analog.com
 imglib.info
 cosupport.ai
 westernunion.com
@@ -759,6 +756,7 @@ signal.link
 signal.me
 signal.tube
 archive.org
+alohafind.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
