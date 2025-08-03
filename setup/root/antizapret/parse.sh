@@ -38,18 +38,19 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "$(wc -l < result/ips.txt) - ips.txt"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
+	[[ "$ALTERNATIVE_IP" == "y" ]] && IP_A="172" || IP_A="10"
 	echo -n > result/DEFAULT
-	[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
-	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP}.29.0.0 255.255.248.0\nroute ${IP}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
-	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD ${IP}.30.0.0 MASK 255.254.0.0 ${IP}.29.8.1" > result/keenetic-wireguard-routes.txt
-	GATEWAY="${IP}.29.8.1"
+	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP_A}.29.0.0 255.255.248.0\nroute ${IP_A}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
+	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD ${IP_A}.30.0.0 MASK 255.254.0.0 ${IP_A}.29.8.1" > result/keenetic-wireguard-routes.txt
+	echo "/ip route add dst-address=${IP_A}.30.0.0/15 gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
 	while read -r line
 	do
 		IP="$(echo $line | awk -F '/' '{print $1}')"
 		MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
-		echo "route ADD ${IP} MASK ${MASK} ${GATEWAY}" >> result/keenetic-wireguard-routes.txt
+		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
+		echo "/ip route add dst-address=${IP}/${MASK} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
 	done < result/ips.txt
 
 	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
