@@ -68,10 +68,6 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
-	# Очищаем кэш knot-resolver
-	#count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
-	#echo "DNS cache cleared: $count entries"
-
 	echo "AdBlock-hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
