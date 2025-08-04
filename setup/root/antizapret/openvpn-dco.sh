@@ -32,6 +32,7 @@ else
 fi
 
 if [[ "$DCO" == "y" ]]; then
+	export DEBIAN_FRONTEND=noninteractive
 	apt-get update
 	apt-get dist-upgrade -y
 	apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
