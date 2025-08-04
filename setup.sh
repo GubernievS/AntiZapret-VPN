@@ -314,6 +314,7 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 rm -rf /etc/apt/sources.list.d/backports.list
+export DEBIAN_FRONTEND=noninteractive
 apt-get clean
 apt-get update
 dpkg --configure -a
