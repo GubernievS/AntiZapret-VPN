@@ -29,6 +29,8 @@ else
 	done
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [[ "$ALGORITHM" == "0" ]]; then
 	if [[ -d "/usr/local/src/openvpn" ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
