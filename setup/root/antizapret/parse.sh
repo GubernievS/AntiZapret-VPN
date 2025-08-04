@@ -50,7 +50,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
 		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
-		echo "/ip route add dst-address=${IP}/${MASK} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
+		echo "/ip route add dst-address=${line} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
 	done < result/ips.txt
 
 	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
