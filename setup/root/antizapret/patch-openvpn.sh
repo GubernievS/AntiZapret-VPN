@@ -98,20 +98,8 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 		}\
 #else\
 		data_buffer = alloc_buf(data_len);\
-		if (i == 0) {\
-			data[0] = 1;\
-			data[1] = 0;\
-			data[2] = 0;\
-			data[3] = 0;\
-			data[4] = 1;\
-			for (int k = 5; k < data_len; k++) {\
-				data[k] = rand() % 256;\
-			}\
-		}\
-		else {\
-			for (int k = 0; k < data_len; k++) {\
-				data[k] = rand() % 256;\
-			}\
+		for (int k = 0; k < data_len; k++) {\
+			data[k] = rand() % 256;\
 		}\
 #endif\
 		buf_write(&data_buffer, data, data_len);\
