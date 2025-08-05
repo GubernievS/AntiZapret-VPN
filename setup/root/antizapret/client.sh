@@ -403,7 +403,7 @@ if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo '    5) WireGuard/AmneziaWG - Delete client'
 	echo '    6) WireGuard/AmneziaWG - List clients'
 	echo '    7) Recreate client profile files'
-	echo '    8) Backup configuration and client data'
+	echo '    8) Backup configuration and clients'
 	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
 		read -rp 'Option choice [1-8]: ' -e OPTION
 	done
@@ -447,7 +447,7 @@ case "$OPTION" in
 		recreate
 		;;
 	8)
-		echo 'Backup configuration and client data'
+		echo 'Backup configuration and clients'
 		backup
 		;;
 esac
