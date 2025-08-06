@@ -89,21 +89,18 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	for (int i = 0; i < 2; i++) {\
 		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
-		struct buffer data_buffer;\
 #ifdef ERROR_FREE\
-		data_buffer = clone_buf(buf);\
-		buf_read(&data_buffer, data, buffer_len);\
-		buf_clear(&data_buffer);\
+		memcpy(data, BPTR(buf), buffer_len);\
 		data[0] = 40;\
 		for (int k = buffer_len; k < data_len; k++) {\
 			data[k] = rand() % 256;\
 		}\
 #else\
-		data_buffer = alloc_buf(data_len);\
 		for (int k = 0; k < data_len; k++) {\
 			data[k] = rand() % 256;\
 		}\
 #endif\
+		struct buffer data_buffer = alloc_buf(data_len);\
 		buf_write(&data_buffer, data, data_len);\
 		int data_repeat = rand() % 101 + 100;\
 		for (int j = 0; j < data_repeat; j++) {\
