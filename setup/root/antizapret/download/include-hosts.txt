@@ -743,7 +743,7 @@ intel.id
 intel.ee
 intel.bg
 #intel.ua
-
+microcenter.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
