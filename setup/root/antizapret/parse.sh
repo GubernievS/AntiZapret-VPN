@@ -46,7 +46,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	while read -r line
 	do
 		IP="$(echo $line | awk -F '/' '{print $1}')"
-		MASK="$(sipcalc -- "$line" | awk '/Network mask/ {print $4; exit;}')"
+		MASK="$(sipcalc -- $line | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
 		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
