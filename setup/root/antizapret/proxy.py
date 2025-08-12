@@ -32,7 +32,7 @@ class ProxyResolver(BaseResolver):
         self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
         self.ip_map = {}
         # Load existing mapping
-        rule = "iptables -w -t nat -nL ANTIZAPRET-MAPPING | awk '{if (NR<3) {next}; print $5, substr($6, 4)}'"
+        rule = "iptables -w -t nat -S ANTIZAPRET-MAPPING | awk '{if (NR<2) {next}; print substr($4, 1, length($4)-3), $8}'"
         mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout
         current_time = time.time()
         for mapping in mappings.split("\n"):
