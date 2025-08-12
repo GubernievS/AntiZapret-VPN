@@ -43,8 +43,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP_A}.29.0.0 255.255.248.0\nroute ${IP_A}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
 	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD ${IP_A}.30.0.0 MASK 255.254.0.0 ${IP_A}.29.8.1" > result/keenetic-wireguard-routes.txt
 	echo "/ip route add dst-address=${IP_A}.30.0.0/15 gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
-	while read -r line
-	do
+	while read -r line; do
 		IP="$(echo $line | awk -F '/' '{print $1}')"
 		MASK="$(sipcalc -- $line | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
