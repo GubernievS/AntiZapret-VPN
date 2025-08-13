@@ -161,6 +161,10 @@ until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Cloudflare IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y CLOUDFLARE_INCLUDE
 done
 echo
+until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Telegram IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y TELEGRAM_INCLUDE
+done
+echo
 until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
 done
@@ -175,10 +179,6 @@ done
 echo
 until [[ "$OVH_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include OVH IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n OVH_INCLUDE
-done
-echo
-until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Telegram IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n TELEGRAM_INCLUDE
 done
 echo
 until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
@@ -400,11 +400,11 @@ WIREGUARD_HOST=${WIREGUARD_HOST}
 ROUTE_ALL=${ROUTE_ALL}
 DISCORD_INCLUDE=${DISCORD_INCLUDE}
 CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}
+TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}
 AMAZON_INCLUDE=${AMAZON_INCLUDE}
 HETZNER_INCLUDE=${HETZNER_INCLUDE}
 DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
 OVH_INCLUDE=${OVH_INCLUDE}
-TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}
 GOOGLE_INCLUDE=${GOOGLE_INCLUDE}
 AKAMAI_INCLUDE=${AKAMAI_INCLUDE}" > /tmp/antizapret/setup/root/antizapret/setup
 
