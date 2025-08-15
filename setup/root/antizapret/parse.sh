@@ -29,13 +29,13 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/*include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
-	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/ips.txt || > temp/ips.txt
+	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
 
 	# Заблокированные IP-адреса
-	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/ips.txt > result/ips.txt
+	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/route-ips.txt > result/route-ips.txt
 
 	# Выводим результат
-	echo "$(wc -l < result/ips.txt) - ips.txt"
+	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	[[ "$ALTERNATIVE_IP" == "y" ]] && IP_A="172" || IP_A="10"
@@ -50,7 +50,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
 		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
 		echo "/ip route add dst-address=${line} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
-	done < result/ips.txt
+	done < result/route-ips.txt
 
 	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
 	if [[ -f result/DEFAULT ]] && ! diff -q result/DEFAULT /etc/openvpn/server/ccd/DEFAULT; then
@@ -58,7 +58,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 
 	# Создаем файл для WireGuard/AmneziaWG
-	awk '{printf ", %s", $0}' result/ips.txt > result/ips
+	awk '{printf ", %s", $0}' result/route-ips.txt > result/ips
 
 	# Обновляем файл в WireGuard/AmneziaWG только если файл ips изменился
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
