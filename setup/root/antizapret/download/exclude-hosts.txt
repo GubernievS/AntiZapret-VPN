@@ -37,9 +37,4 @@ sberbank.com
 livejournal.com
 championat.com
 lenta.com
-# Белый список
-#android.com
-#office.com
-#stackoverflow.com
-#steampowered.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
