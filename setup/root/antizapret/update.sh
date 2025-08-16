@@ -207,6 +207,7 @@ cat > config/allow-ips.txt << 'EOF'
 EOF
 fi
 
+sed -i 's/размер маски подсети (0–32)/размер маски подсети (1–32)/g' config/*.txt
 
 ###
 
