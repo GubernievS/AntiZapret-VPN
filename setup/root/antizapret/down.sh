@@ -8,6 +8,12 @@ else
 	INTERFACE=$1
 fi
 
+if [[ -z "$2" ]]; then
+	EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
+else
+	EXTERNAL_IP=$1
+fi
+
 # filter
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
@@ -18,11 +24,9 @@ ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
-# FORWARD VPN traffic
-iptables -w -D FORWARD -d 10.28.0.0/15 -j ACCEPT
-iptables -w -D FORWARD -d 172.28.0.0/15 -j ACCEPT
-iptables -w -D FORWARD -s 10.28.0.0/15 -j ACCEPT
-iptables -w -D FORWARD -s 172.28.0.0/15 -j ACCEPT
+# Restrict forwarding
+iptables -w -D FORWARD -s 10.29.0.0/16 -o "$INTERFACE" -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
+iptables -w -D FORWARD -s 172.29.0.0/16 -o "$INTERFACE" -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
 # Attack and scan protection
 iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
@@ -71,11 +75,14 @@ iptables -w -t nat -D PREROUTING -s 172.29.8.0/24 ! -d 172.29.8.1/32 -p udp --dp
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/22 ! -d 172.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.0.1
 iptables -w -t nat -D PREROUTING -s 172.29.4.0/22 ! -d 172.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.4.1
 iptables -w -t nat -D PREROUTING -s 172.29.8.0/24 ! -d 172.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination 172.29.8.1
-# ANTIZAPRET-MAPPING
+# Restrict forwarding
+iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 ! -d 10.30.0.0/15 -j CONNMARK --set-mark 0x1
+iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 ! -d 172.30.0.0/15 -j CONNMARK --set-mark 0x1
+# Mapping fake IP to real IP
 iptables -w -t nat -D PREROUTING -s 10.29.0.0/16 -d 10.30.0.0/15 -j ANTIZAPRET-MAPPING
 iptables -w -t nat -D PREROUTING -s 172.29.0.0/16 -d 172.30.0.0/15 -j ANTIZAPRET-MAPPING
-# MASQUERADE VPN traffic
-iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -j MASQUERADE
+# SNAT VPN
+iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -o "$INTERFACE" -j SNAT --to-source "$EXTERNAL_IP"
+iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -o "$INTERFACE" -j SNAT --to-source "$EXTERNAL_IP"
 
 /root/antizapret/custom-down.sh
