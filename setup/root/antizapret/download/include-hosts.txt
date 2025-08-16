@@ -218,7 +218,7 @@ oaiusercontent.com
 chatgpt.com
 bosch.de
 weather.com
-#gemini.google.com
+gemini.google.com
 claude.ai
 anthropic.com
 chatfuel.com
