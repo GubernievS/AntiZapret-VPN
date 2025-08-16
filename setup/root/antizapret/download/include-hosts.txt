@@ -218,7 +218,7 @@ oaiusercontent.com
 chatgpt.com
 bosch.de
 weather.com
-gemini.google.com
+#gemini.google.com
 claude.ai
 anthropic.com
 chatfuel.com
@@ -744,6 +744,9 @@ intel.ee
 intel.bg
 #intel.ua
 microcenter.com
+openh264.org
+trae.ai
+picoxr.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
