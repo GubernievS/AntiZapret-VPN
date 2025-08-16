@@ -137,6 +137,10 @@ until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
 done
 echo
+until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
+	read -rp 'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 only to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i n RESTRICT_FORWARD
+done
+echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
 do
 	[[ -z "$OPENVPN_HOST" ]] && break
@@ -150,7 +154,7 @@ do
 done
 echo
 until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
-	read -rp $'Route all traffic for domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and domains from exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
+	read -rp $'Route all traffic for domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and domains from config/exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
 done
 echo
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
@@ -395,6 +399,7 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
+RESTRICT_FORWARD=${RESTRICT_FORWARD}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
 ROUTE_ALL=${ROUTE_ALL}
