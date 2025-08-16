@@ -31,11 +31,16 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	# Убираем IP-адреса из исключений
 	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
 
-	# Заблокированные IP-адреса
-	awk '/([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}/ {print $0}' temp/route-ips.txt > result/route-ips.txt
+	# Обрабатываем конфигурационные файлы
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u > temp/forward-ips.txt
+
+	# Добавленные и разрешённые для маршрутизации IP-адреса
+	awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' temp/route-ips.txt > result/route-ips.txt
+	awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' temp/forward-ips.txt > result/forward-ips.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
+	echo "$(wc -l < result/forward-ips.txt) - forward-ips.txt"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	[[ "$ALTERNATIVE_IP" == "y" ]] && IP_A="172" || IP_A="10"
@@ -64,6 +69,15 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
 		cp -f result/ips /etc/wireguard/ips
 	fi
+
+	# Обновляем ipset antizapret-forward
+	{
+		echo "create antizapret-forward hash:net -exist"
+		echo "flush antizapret-forward"
+		while read -r line; do
+			echo "add antizapret-forward $line -exist"
+		done < /root/antizapret/result/forward-ips.txt
+	} | ipset restore
 fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
