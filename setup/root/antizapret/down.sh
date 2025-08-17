@@ -25,8 +25,8 @@ ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 # Restrict forwarding
-iptables -w -D FORWARD -s 10.29.0.0/16 -o "$INTERFACE" -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
-iptables -w -D FORWARD -s 172.29.0.0/16 -o "$INTERFACE" -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
+iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
+iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
 # Attack and scan protection
 iptables -w -D INPUT -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i "$INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
