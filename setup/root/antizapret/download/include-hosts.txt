@@ -747,6 +747,9 @@ microcenter.com
 openh264.org
 trae.ai
 picoxr.com
+discordstatus.com
+dis.gd
+discordcdn.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
