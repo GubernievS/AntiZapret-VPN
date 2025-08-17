@@ -54,7 +54,7 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 			echo "add antizapret-forward $line"
 		done < /root/antizapret/result/forward-ips.txt
 	} | ipset restore
-	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -o "$INTERFACE" -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
+	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
 fi
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then
