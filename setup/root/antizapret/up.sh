@@ -45,6 +45,13 @@ ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
+# Torrent guard
+if [[ "$TORRENT_GUARD" == "y" ]]; then
+	ipset create antizapret-torrent hash:ip timeout 60 -exist
+	iptables -I FORWARD 2 -s ${IP}.28.0.0/16 -p tcp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "peer_id" -j SET --add-set antizapret-torrent src --exist
+	iptables -I FORWARD 3 -s ${IP}.28.0.0/16 -p udp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "get_peers" -j SET --add-set antizapret-torrent src --exist
+	iptables -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
+fi
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
@@ -54,7 +61,7 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 			echo "add antizapret-forward $line"
 		done < /root/antizapret/result/forward-ips.txt
 	} | ipset restore
-	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j REJECT --reject-with icmp-host-prohibited
+	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then
