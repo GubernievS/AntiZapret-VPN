@@ -143,7 +143,7 @@ until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
 done
 echo
 until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
-	read -rp $'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i n RESTRICT_FORWARD
+	read -rp $'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i y RESTRICT_FORWARD
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
