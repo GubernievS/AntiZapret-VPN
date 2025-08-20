@@ -137,8 +137,13 @@ until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
 done
 echo
+echo "Warning! Torrent guard block VPN traffic for 1 minute on torrent detection!"
+until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
+	read -rp $'Enable torrent guard for \001\e[1;32m\002full VPN\001\e[0m\002? [y/n]: ' -e -i y TORRENT_GUARD
+done
+echo
 until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
-	read -rp $'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 only to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i n RESTRICT_FORWARD
+	read -rp $'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i n RESTRICT_FORWARD
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
@@ -399,6 +404,7 @@ OPENVPN_DUPLICATE=${OPENVPN_DUPLICATE}
 OPENVPN_LOG=${OPENVPN_LOG}
 SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
+TORRENT_GUARD=${TORRENT_GUARD}
 RESTRICT_FORWARD=${RESTRICT_FORWARD}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
