@@ -750,6 +750,7 @@ picoxr.com
 discordstatus.com
 dis.gd
 discordcdn.com
+kemono.cr
 
 # Повторяющиеся > 50 раз
 cloudfront.net
