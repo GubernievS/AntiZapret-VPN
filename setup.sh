@@ -249,7 +249,6 @@ if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
 	mkdir -p /root/easyrsa3
 	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
 fi
-mv -f /root/antizapret/custom.sh /root/antizapret/custom-doall.sh &>/dev/null
 
 rm -rf /root/vpn
 rm -rf /root/easy-rsa-ipsec
