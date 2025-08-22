@@ -214,57 +214,6 @@ systemctl stop apt-daily.timer &>/dev/null
 systemctl stop apt-daily-upgrade.timer &>/dev/null
 
 #
-# Удаление или перемещение файлов и папок при обновлении
-systemctl stop openvpn-generate-keys &>/dev/null
-systemctl disable openvpn-generate-keys &>/dev/null
-systemctl stop dnsmap &>/dev/null
-systemctl disable dnsmap &>/dev/null
-systemctl stop ferm &>/dev/null
-systemctl disable ferm &>/dev/null
-
-rm -f /etc/sysctl.d/10-conntrack.conf
-rm -f /etc/sysctl.d/20-network.conf
-rm -f /etc/sysctl.d/99-antizapret.conf
-rm -f /etc/systemd/network/eth.network
-rm -f /etc/systemd/network/host.network
-rm -f /etc/systemd/system/openvpn-generate-keys.service
-rm -f /etc/systemd/system/dnsmap.service
-#rm -f /etc/apt/sources.list.d/amnezia*
-#rm -f /usr/share/keyrings/amnezia.gpg
-rm -f /usr/share/keyrings/cznic-labs-pkg.gpg
-rm -f /root/upgrade.sh
-rm -f /root/generate.sh
-rm -f /root/Enable-OpenVPN-DCO.sh
-rm -f /root/upgrade-openvpn.sh
-rm -f /root/create-swap.sh
-rm -f /root/disable-openvpn-dco.sh
-rm -f /root/enable-openvpn-dco.sh
-rm -f /root/patch-openvpn.sh
-rm -f /root/add-client.sh
-rm -f /root/delete-client.sh
-rm -f /root/*.ovpn
-rm -f /root/*.conf
-
-if [[ -d "/root/easy-rsa-ipsec/easyrsa3/pki" ]]; then
-	mkdir -p /root/easyrsa3
-	mv -f /root/easy-rsa-ipsec/easyrsa3/pki /root/easyrsa3/pki &>/dev/null
-fi
-
-rm -rf /root/vpn
-rm -rf /root/easy-rsa-ipsec
-rm -rf /root/.gnupg
-rm -rf /root/dnsmap
-rm -rf /root/openvpn
-rm -rf /etc/ferm
-
-apt-get purge -y python3-dnslib &>/dev/null
-apt-get purge -y gnupg2 &>/dev/null
-apt-get purge -y ferm &>/dev/null
-apt-get purge -y libpam0g-dev &>/dev/null
-#apt-get purge -y amneziawg &>/dev/null
-apt-get purge -y sshguard &>/dev/null
-
-#
 # Остановим и выключим обновляемые службы
 for service in kresd@ openvpn-server@ wg-quick@; do
 	systemctl list-units --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl stop &>/dev/null
