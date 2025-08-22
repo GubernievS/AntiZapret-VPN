@@ -2,6 +2,11 @@
 set -e
 shopt -s nullglob
 
+###
+apt-get update
+apt-get install ripgrep -y
+###
+
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
@@ -29,7 +34,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/*include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IP-адреса из исключений
-	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
+	rg -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
 
 	# Обрабатываем конфигурационные файлы
 	awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' temp/route-ips.txt > result/route-ips.txt
@@ -160,8 +165,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
-	grep -vFxf temp/remove-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt
-	grep -vFxf temp/remove-hosts.txt temp/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	rg -vFxf temp/remove-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt
+	rg -vFxf temp/remove-hosts.txt temp/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 
 	# Удаляем поддомены www. и m.
 	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
@@ -169,7 +174,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем избыточные домены
 	sed -e 's/^/^/' -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
 	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt || true
+	rg -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt
 
 	# Удаляем исключённые домены
 	sed -e 's/^/^/' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
@@ -177,10 +182,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
+		rg -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt
 		echo '.' >> temp/include-hosts6.txt
 	else
-		grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt || true
+		rg -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt
 	fi
 
 	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts6.txt > result/include-hosts.txt
