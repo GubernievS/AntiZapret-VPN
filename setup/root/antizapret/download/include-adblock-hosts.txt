@@ -2,4 +2,8 @@
 rutor.org
 ad.mail.ru
 rs.mail.ru
+crashlyticsreports.googleapis.com
+crashlyticsreports-pa.googleapis.com
+firebasecrashlytics.googleapis.com
+firebasecrashlytics-pa.googleapis.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
