@@ -451,3 +451,4 @@ case "$OPTION" in
 		backup
 		;;
 esac
+exit 0
