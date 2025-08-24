@@ -72,3 +72,4 @@ else
 	echo
 	echo 'OpenVPN DCO turned OFF successfully!'
 fi
+exit 0
