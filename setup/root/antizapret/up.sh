@@ -141,3 +141,4 @@ iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${IP}.30.0.0/15 -j ANTIZA
 iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -o "$INTERFACE" -j SNAT --to-source "$EXTERNAL_IP"
 
 /root/antizapret/custom-up.sh
+exit 0
