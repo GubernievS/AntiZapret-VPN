@@ -93,3 +93,4 @@ iptables -w -t nat -D POSTROUTING -s 10.28.0.0/15 -o "$INTERFACE" -j SNAT --to-s
 iptables -w -t nat -D POSTROUTING -s 172.28.0.0/15 -o "$INTERFACE" -j SNAT --to-source "$EXTERNAL_IP"
 
 /root/antizapret/custom-down.sh
+exit 0
