@@ -151,3 +151,4 @@ systemctl daemon-reload
 systemctl restart openvpn-server@*
 echo
 echo 'OpenVPN patch installed successfully!'
+exit 0
