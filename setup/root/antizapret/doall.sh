@@ -17,3 +17,4 @@ find /etc/openvpn/server/logs -type f -size +10M -delete
 ./custom-doall.sh "$1"
 
 echo "Execution time: $SECONDS seconds"
+exit 0
