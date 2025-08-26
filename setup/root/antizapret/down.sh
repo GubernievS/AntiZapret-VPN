@@ -3,13 +3,13 @@
 exec 2>/dev/null
 
 if [[ -z "$1" ]]; then
-	INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
+	INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
 else
 	INTERFACE=$1
 fi
 
 if [[ -z "$2" ]]; then
-	EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
+	EXTERNAL_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
 else
 	EXTERNAL_IP=$1
 fi
