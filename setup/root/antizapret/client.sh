@@ -50,9 +50,9 @@ setServerHost_FileName(){
 }
 
 setServerIP(){
-	SERVER_IP="$(ip -4 addr | sed -ne 's|^.* inet \([^/]*\)/.* scope global.*$|\1|p' | awk '{print $1}' | head -1)"
+	SERVER_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
 	if [[ -z "$SERVER_IP" ]]; then
-		echo 'Default IP address not found!'
+		echo 'Default IPv4 address unavailable!'
 		exit 2
 	fi
 }
