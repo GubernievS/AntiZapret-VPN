@@ -58,6 +58,7 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Restrict forwarding
+iptables -w -I FORWARD 2 ! -i "$INTERFACE" -d 10.28.0.0/15 -j DROP
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
 		echo "create antizapret-forward hash:net -exist"
