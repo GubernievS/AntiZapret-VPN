@@ -32,6 +32,8 @@ iptables -w -D FORWARD -s 172.28.0.0/16 -p tcp -m string --algo kmp --string "in
 iptables -w -D FORWARD -s 172.28.0.0/16 -p udp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "get_peers" -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s 172.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 # Restrict forwarding
+iptables -w -D FORWARD ! -i "$INTERFACE" -d 10.28.0.0/15 -j DROP
+iptables -w -D FORWARD ! -i "$INTERFACE" -d 172.28.0.0/15 -j DROP
 iptables -w -D FORWARD -s 10.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 iptables -w -D FORWARD -s 172.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 # Attack and scan protection
