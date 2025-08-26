@@ -1,14 +1,15 @@
 #!/bin/bash
 set -e
 
-INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
+INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
 if [[ -z "$INTERFACE" ]]; then
-	echo 'Default network interface not found!'
+	echo 'Default network interface unavailable!'
 	exit 1
 fi
-EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
+
+EXTERNAL_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
 if [[ -z "$EXTERNAL_IP" ]]; then
-	echo 'External IPv4 address not found on default network interface!'
+	echo 'Default IPv4 address unavailable!'
 	exit 1
 fi
 
