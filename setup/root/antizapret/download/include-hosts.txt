@@ -753,6 +753,7 @@ discordcdn.com
 kemono.cr
 qoder.com
 armexfort.uk
+st.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
