@@ -1,5 +1,6 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 rutor.org
+rutoro.info
 ad.mail.ru
 rs.mail.ru
 crashlyticsreports.googleapis.com
