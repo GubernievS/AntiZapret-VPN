@@ -201,6 +201,12 @@ echo
 echo 'Preparing for installation, please wait...'
 
 #
+# Отключим IPv6
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+#
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do
 	echo 'Waiting for apt-get to finish...';
