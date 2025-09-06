@@ -756,6 +756,14 @@ armexfort.uk
 st.com
 oculus.com
 coomer.st
+iltalehti.fi
+expressen.se
+aftonbladet.se
+lemonde.fr
+zeit.de
+irishtimes.com
+elpais.com
+elmundo.es
 
 # Повторяющиеся > 50 раз
 cloudfront.net
