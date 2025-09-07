@@ -382,7 +382,7 @@ backup(){
 
 	rm -rf /root/antizapret/backup
 
-	echo "Backup of configuration and client data (re)created at $BACKUP_FILE"
+	echo "Backup configuration and clients (re)created at $BACKUP_FILE"
 }
 
 source /root/antizapret/setup
