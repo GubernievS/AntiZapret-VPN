@@ -1,5 +1,7 @@
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 ; A
+ntc.party A 130.255.77.28
+*.ntc.party A 130.255.77.28
 ; NXDOMAIN
 local IN CNAME .
 *.local IN CNAME .
