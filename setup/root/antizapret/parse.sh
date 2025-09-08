@@ -103,7 +103,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
-	echo "AdBlock-hosts..."
+	echo "Hosts..."
 
 	# Обрабатываем список с рекламными доменами для блокировки
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
@@ -147,8 +147,6 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 		cp -f result/deny2.rpz /etc/knot-resolver/deny2.rpz.tmp
 		mv -f /etc/knot-resolver/deny2.rpz.tmp /etc/knot-resolver/deny2.rpz
 	fi
-
-	echo "Hosts..."
 
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
