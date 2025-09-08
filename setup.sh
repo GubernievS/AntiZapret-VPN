@@ -201,12 +201,6 @@ echo
 echo 'Preparing for installation, please wait...'
 
 #
-# Отключим IPv6
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
-sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-
-#
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do
 	echo 'Waiting for apt-get to finish...';
@@ -258,6 +252,12 @@ rm -rf /etc/wireguard/templates/*
 # Удаляем скомпилированный патченный OpenVPN
 make -C /usr/local/src/openvpn uninstall &>/dev/null
 rm -rf /usr/local/src/openvpn
+
+#
+# Отключим IPv6
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 #
 # Завершим выполнение скрипта при ошибке
