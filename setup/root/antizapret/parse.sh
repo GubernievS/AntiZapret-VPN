@@ -39,7 +39,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	[[ "$ALTERNATIVE_IP" == "y" ]] && IP_A="172" || IP_A="10"
-	echo -n > result/DEFAULT
+	> result/DEFAULT
 	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP_A}.29.0.0 255.255.248.0\nroute ${IP_A}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
 	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD ${IP_A}.30.0.0 MASK 255.254.0.0 ${IP_A}.29.8.1" > result/keenetic-wireguard-routes.txt
 	echo "/ip route add dst-address=${IP_A}.30.0.0/15 gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
@@ -52,15 +52,15 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 		echo "/ip route add dst-address=${line} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
 	done < result/route-ips.txt
 
-	# Обновляем файл в OpenVPN только если файл DEFAULT изменился
+	# Обновляем файл DEFAULT в OpenVPN только если файл изменился
 	if [[ -f result/DEFAULT ]] && ! diff -q result/DEFAULT /etc/openvpn/server/ccd/DEFAULT; then
 		cp -f result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
 	fi
 
-	# Создаем файл для WireGuard/AmneziaWG
+	# Создаем файл ips для WireGuard/AmneziaWG
 	awk '{printf ", %s", $0}' result/route-ips.txt > result/ips
 
-	# Обновляем файл в WireGuard/AmneziaWG только если файл ips изменился
+	# Обновляем файл ips в WireGuard/AmneziaWG только если файл изменился
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then
 		cp -f result/ips /etc/wireguard/ips
 	fi
@@ -128,16 +128,24 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "$(wc -l < result/include-adblock-hosts.txt) - include-adblock-hosts.txt"
 	echo "$(wc -l < result/exclude-adblock-hosts.txt) - exclude-adblock-hosts.txt"
 
-	# Создаем файл для Knot Resolver
+	# Создаем файлы deny.rpz и deny2.rpz для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
+	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny2.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
 	sed 's/\r//g; /^;/d; /^$/d' download/rpz.txt config/*rpz.txt >> result/deny.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/rpz2.txt config/*rpz2.txt >> result/deny2.rpz
 
-	# Обновляем файл в Knot Resolver только если файл deny.rpz изменился
+	# Обновляем файл deny.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
 		cp -f result/deny.rpz /etc/knot-resolver/deny.rpz.tmp
 		mv -f /etc/knot-resolver/deny.rpz.tmp /etc/knot-resolver/deny.rpz
+	fi
+
+	# Обновляем файл deny2.rpz в Knot Resolver только если файл изменился
+	if [[ -f result/deny2.rpz ]] && ! diff -q result/deny2.rpz /etc/knot-resolver/deny2.rpz; then
+		cp -f result/deny2.rpz /etc/knot-resolver/deny2.rpz.tmp
+		mv -f /etc/knot-resolver/deny2.rpz.tmp /etc/knot-resolver/deny2.rpz
 	fi
 
 	echo "Hosts..."
@@ -190,12 +198,12 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
 	echo "$(wc -l < result/exclude-hosts.txt) - exclude-hosts.txt"
 
-	# Создаем файл для Knot Resolver
+	# Создаем файл proxy.rpz для Knot Resolver
 	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/proxy.rpz
 
-	# Обновляем файл в Knot Resolver только если файл proxy.rpz изменился
+	# Обновляем файл proxy.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/proxy.rpz ]] && ! diff -q result/proxy.rpz /etc/knot-resolver/proxy.rpz; then
 		# Очищаем кэш Knot Resolver
 		count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
