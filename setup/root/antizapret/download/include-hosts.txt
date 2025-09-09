@@ -764,6 +764,7 @@ zeit.de
 irishtimes.com
 elpais.com
 elmundo.es
+andrevi.ch
 
 # Повторяющиеся > 50 раз
 cloudfront.net
