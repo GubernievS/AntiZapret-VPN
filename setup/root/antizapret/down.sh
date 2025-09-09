@@ -11,7 +11,7 @@ fi
 if [[ -z "$2" ]]; then
 	EXTERNAL_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
 else
-	EXTERNAL_IP=$1
+	EXTERNAL_IP=$2
 fi
 
 # filter
