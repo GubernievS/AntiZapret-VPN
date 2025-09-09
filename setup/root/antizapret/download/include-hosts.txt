@@ -652,7 +652,7 @@ landsend.com
 gapfactory.com
 saksoff5th.com
 rabbit-labs.com
-4pda.ws
+#4pda.ws
 se.com.sa
 login.microsoftonline.com
 deepl.com
@@ -765,6 +765,8 @@ irishtimes.com
 elpais.com
 elmundo.es
 andrevi.ch
+help.keenetic.com
+whimsical.com
 
 # Повторяющиеся > 50 раз
 cloudfront.net
