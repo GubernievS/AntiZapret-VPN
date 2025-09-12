@@ -503,11 +503,11 @@ if [[ -n "$ERRORS" ]]; then
 fi
 
 #
-# Создадим файл подкачки размером 512 Мб если его нет
+# Создадим файл подкачки размером 1 Гб если его нет
 if [[ -z "$(swapon --show)" ]]; then
 	set +e
 	SWAPFILE="/swapfile"
-	SWAPSIZE=512
+	SWAPSIZE=1024
 	dd if=/dev/zero of=$SWAPFILE bs=1M count=$SWAPSIZE
 	chmod 600 "$SWAPFILE"
 	mkswap "$SWAPFILE"
