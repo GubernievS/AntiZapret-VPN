@@ -770,6 +770,12 @@ whimsical.com
 info.nsf.org
 snyk.io
 
+reddit.com
+redd.it
+redditmedia.com
+redditstatic.com
+redditspace.com
+
 # Повторяющиеся > 50 раз
 cloudfront.net
 qqq-ttss.su
