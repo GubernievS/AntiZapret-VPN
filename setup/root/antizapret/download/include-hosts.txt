@@ -776,6 +776,9 @@ redditmedia.com
 redditstatic.com
 redditspace.com
 
+azurewebsites.net
+pages.dev
+
 # Повторяющиеся > 50 раз
 cloudfront.net
 qqq-ttss.su
