@@ -188,10 +188,12 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		grep -Ff temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt
+		grep -Ff temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
+		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
 		echo '.' >> temp/include-hosts7.txt
 	else
-		grep -vFf temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt
+		grep -vFf temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
+		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
 	fi
 
 	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts7.txt > result/include-hosts.txt
