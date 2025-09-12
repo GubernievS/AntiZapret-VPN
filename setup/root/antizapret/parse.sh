@@ -67,8 +67,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 	if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 		# Обрабатываем конфигурационные файлы
-		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u | \
-		awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/forward-ips.txt
+		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u \
+		| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/forward-ips.txt
 
 		# Выводим результат
 		echo "$(wc -l < result/forward-ips.txt) - forward-ips.txt"
@@ -85,8 +85,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 	if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 		# Обрабатываем конфигурационные файлы
-		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*allow-ips.txt | sort -u | \
-		awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/allow-ips.txt
+		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*allow-ips.txt | sort -u \
+		| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/allow-ips.txt
 
 		# Выводим результат
 		echo "$(wc -l < result/allow-ips.txt) - allow-ips.txt"
@@ -155,15 +155,15 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	cut -d ';' -f 2 download/dump.csv | \
-	iconv -f cp1251 -t utf8 | \
-	sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' | \
-	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
+	cut -d ';' -f 2 download/dump.csv \
+	| iconv -f cp1251 -t utf8 \
+	| sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' \
+	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов из antifilter.download
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -e 's/\.$//' -e 's/"//g' download/domains.lst | \
-	CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
+	sed -e 's/\.$//' -e 's/"//g' download/domains.lst \
+	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем не существующие домены
 	grep -vFxf temp/remove-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt
@@ -172,25 +172,29 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	# Удаляем поддомены www. и m.
 	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
 
-	# Удаляем избыточные домены
+	# Удаляем избыточные домены и домены повторяющиеся > 10 раз
 	sed -e 's/^/^/' -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
-	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt || \
-	( echo "Low memory!"; cp temp/include-hosts4.txt temp/include-hosts5.txt )
+	awk -F. 'NF>1 {d=$(NF-1)"."$NF; if (length(d)>6) print d}' /root/antizapret/temp/include-hosts3.txt \
+	| sort | uniq -c | awk '$1>10 {print $2}' | sed -e 's/^/./' -e 's/$/$/' > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt \
+	|| ( echo "Low memory!"; cp temp/include-hosts4.txt temp/include-hosts5.txt )
+	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns2.txt
+	grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
+	|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
 
 	# Удаляем исключённые домены
-	sed -e 's/^/^/' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
-	sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt >> temp/exclude-patterns2.txt
+	sed -e 's/^/^/' -e 's/$/$/' result/exclude-hosts.txt > temp/exclude-patterns3.txt
+	sed -e 's/^/./' -e 's/$/$/' result/exclude-hosts.txt >> temp/exclude-patterns3.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt
-		echo '.' >> temp/include-hosts6.txt
+		grep -Ff temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt
+		echo '.' >> temp/include-hosts7.txt
 	else
-		grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt
+		grep -vFf temp/exclude-patterns3.txt temp/include-hosts6.txt > temp/include-hosts7.txt
 	fi
 
-	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts6.txt > result/include-hosts.txt
+	sed -e 's/^\^//' -e 's/\$$//' temp/include-hosts7.txt > result/include-hosts.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
