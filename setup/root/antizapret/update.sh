@@ -179,16 +179,4 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
-###
-
-sed -i "s/'193\.58\.251\.251', '195\.112\.112\.1', '212\.92\.149\.149', '212\.92\.149\.150'/'62.76.76.62', '62.76.62.76', '195.208.4.1', '195.208.5.1'/" /etc/knot-resolver/kresd.conf
-
-systemctl restart kresd@*
-
-sed -i 's/EXTERNAL_IP=\$1/EXTERNAL_IP=\$2/' /root/antizapret/down.sh
-
-systemctl restart antizapret
-
-###
-
 exit 0
