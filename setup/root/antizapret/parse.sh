@@ -21,6 +21,10 @@ rm -f result/*
 
 source /root/antizapret/setup
 
+for file in config/*.txt; do
+	sed -i -e '$a\' "$file"
+done
+
 if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	echo "IPs..."
 
