@@ -768,6 +768,7 @@ andrevi.ch
 help.keenetic.com
 whimsical.com
 info.nsf.org
+snyk.io
 
 # Повторяющиеся > 50 раз
 cloudfront.net
