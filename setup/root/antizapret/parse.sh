@@ -179,7 +179,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt \
 	|| ( echo "Low memory!"; cp temp/include-hosts4.txt temp/include-hosts5.txt )
 	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns2.txt
-	grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
+	grep -vFf temp/exclude-patterns.txt temp/exclude-patterns2.txt > temp/exclude-patterns3.txt
+	grep -vFf temp/exclude-patterns3.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
 	|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
 
 	# Удаляем исключённые домены
