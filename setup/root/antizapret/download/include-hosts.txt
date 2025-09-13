@@ -10,7 +10,6 @@ googleapis.com
 gstatic.com
 youtu.be
 yt.be
-googleusercontent.com
 gvt1.com
 gvt2.com
 gvt3.com
@@ -451,7 +450,6 @@ nflximg.com
 nflxsearch.net
 nflxso.net
 nflxvideo.net
-amazonaws.com
 nba.com
 delltechnologies.com
 download.lenovo.com
@@ -1083,7 +1081,6 @@ fanserial.cam
 fanserials.one
 farma-vik.com
 fastfilm.one
-fastly.net
 feikiss.com
 feiportal.org
 feixxx.com
@@ -2018,7 +2015,6 @@ skladchik.org
 skladchina.biz
 sloip.ru
 sl.pt
-sl-reverse.com
 sltodom.ru
 slustena.net
 smotretfilmy.online
