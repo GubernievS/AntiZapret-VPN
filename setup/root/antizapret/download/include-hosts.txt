@@ -2032,7 +2032,7 @@ soski.org
 sotsg.ru
 soyuz-inv.ru
 spb-citystar.ru
-spb.ru
+#spb.ru
 spcs.bio
 spin777.org
 sport-igrok.com
