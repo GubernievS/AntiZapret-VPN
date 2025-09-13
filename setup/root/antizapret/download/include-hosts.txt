@@ -499,6 +499,7 @@ spaceforce.mil
 bbystatic.com
 av-connection.com
 udemy.com
+udemycdn.com
 foxnews.com
 meshcapade.com
 elgato.com
@@ -771,6 +772,7 @@ redd.it
 redditmedia.com
 redditstatic.com
 redditspace.com
+qwant.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
