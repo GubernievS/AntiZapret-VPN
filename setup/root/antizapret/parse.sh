@@ -19,7 +19,7 @@ cd /root/antizapret
 rm -f temp/*
 rm -f result/*
 
-source /root/antizapret/setup
+source setup
 
 for file in config/*.txt; do
 	sed -i -e '$a\' "$file"
@@ -83,7 +83,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 			echo "flush antizapret-forward"
 			while read -r line; do
 				echo "add antizapret-forward $line -exist"
-			done < /root/antizapret/result/forward-ips.txt
+			done < result/forward-ips.txt
 		} | ipset restore
 	fi
 
@@ -101,7 +101,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 			echo "flush antizapret-allow"
 			while read -r line; do
 				echo "add antizapret-allow $line -exist"
-			done < /root/antizapret/result/allow-ips.txt
+			done < result/allow-ips.txt
 		} | ipset restore
 	fi
 fi
@@ -178,12 +178,20 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	# Удаляем избыточные домены и домены повторяющиеся > 10 раз
 	sed -e 's/^/^/' -e 's/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
-	awk -F. 'NF>1 {d=$(NF-1)"."$NF; if (length(d)>6) print d}' /root/antizapret/temp/include-hosts3.txt \
+	
+	awk -F. 'NF>1 {d=$(NF-1)"."$NF; if (length(d)>6) print d}' temp/include-hosts3.txt \
 	| sort | uniq -c | awk '$1>10 {print $2}' | sed -e 's/^/./' -e 's/$/$/' > temp/exclude-patterns.txt
+
+	awk -F. 'NF>1 {d=$(NF-1)"."$NF; if (length(d)>6) print d}' temp/include-hosts3.txt \
+	| sort | uniq -c | awk '$1>10 {print $2}' | sed -e 's/^/^/' -e 's/$/$/' >> include-hosts4.txt
+	
 	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt \
 	|| ( echo "Low memory!"; cp temp/include-hosts4.txt temp/include-hosts5.txt )
+	
 	sed -e 's/^/./' -e 's/$/$/' temp/include-hosts3.txt > temp/exclude-patterns2.txt
+	
 	grep -vFf temp/exclude-patterns.txt temp/exclude-patterns2.txt > temp/exclude-patterns3.txt
+	
 	grep -vFf temp/exclude-patterns3.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
 	|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
 
