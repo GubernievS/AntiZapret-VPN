@@ -1,21 +1,27 @@
 #!/bin/bash
 set -e
 
-INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
-if [[ -z "$INTERFACE" ]]; then
+cd /root/antizapret
+
+./down.sh
+
+source setup
+
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+	DEFAULT_INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
+fi
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface unavailable!'
 	exit 1
 fi
 
-EXTERNAL_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
-if [[ -z "$EXTERNAL_IP" ]]; then
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+	DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+fi
+if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address unavailable!'
 	exit 1
 fi
-
-/root/antizapret/down.sh "$INTERFACE" "$EXTERNAL_IP"
-
-source /root/antizapret/setup
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 
@@ -59,14 +65,14 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Restrict forwarding
-iptables -w -I FORWARD 2 ! -i "$INTERFACE" -d 10.28.0.0/15 -j DROP
+iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d 10.28.0.0/15 -j DROP
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
 		echo "create antizapret-forward hash:net -exist"
 		echo "flush antizapret-forward"
 		while read -r line; do
 			echo "add antizapret-forward $line"
-		done < /root/antizapret/result/forward-ips.txt
+		done < result/forward-ips.txt
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
@@ -77,29 +83,29 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 		echo "flush antizapret-allow"
 		while read -r line; do
 			echo "add antizapret-allow $line"
-		done < /root/antizapret/result/allow-ips.txt
+		done < result/allow-ips.txt
 	} | ipset restore
 	ipset create antizapret-block hash:ip timeout 600 -exist
 	ipset create antizapret-watch hash:ip,port timeout 60 -exist
-	iptables -w -I INPUT 2 -i "$INTERFACE" -p icmp --icmp-type echo-request -j DROP
-	iptables -w -I INPUT 3 -i "$INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
-	iptables -w -I INPUT 4 -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
-	iptables -w -I INPUT 5 -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ddos --hashlimit-htable-expire 10000 -j SET --add-set antizapret-block src --exist
-	iptables -w -I INPUT 6 -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
-	iptables -w -I INPUT 7 -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
-	iptables -w -I OUTPUT 2 -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-	iptables -w -I OUTPUT 3 -o "$INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
+	iptables -w -I INPUT 2 -i "$DEFAULT_INTERFACE" -p icmp --icmp-type echo-request -j DROP
+	iptables -w -I INPUT 3 -i "$DEFAULT_INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
+	iptables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
+	iptables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ddos --hashlimit-htable-expire 10000 -j SET --add-set antizapret-block src --exist
+	iptables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
+	iptables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
+	iptables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
+	iptables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
 	ipset create antizapret-allow6 hash:net family inet6 -exist
 	ipset create antizapret-block6 hash:ip timeout 600 family inet6 -exist
 	ipset create antizapret-watch6 hash:ip,port timeout 60 family inet6 -exist
-	ip6tables -w -I INPUT 2 -i "$INTERFACE" -p icmpv6 --icmpv6-type echo-request -j DROP
-	ip6tables -w -I INPUT 3 -i "$INTERFACE" -m set --match-set antizapret-allow6 src -j ACCEPT
-	ip6tables -w -I INPUT 4 -i "$INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
-	ip6tables -w -I INPUT 5 -i "$INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 10000 -j SET --add-set antizapret-block6 src --exist
-	ip6tables -w -I INPUT 6 -i "$INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
-	ip6tables -w -I INPUT 7 -i "$INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
-	ip6tables -w -I OUTPUT 2 -o "$INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-	ip6tables -w -I OUTPUT 3 -o "$INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
+	ip6tables -w -I INPUT 2 -i "$DEFAULT_INTERFACE" -p icmpv6 --icmpv6-type echo-request -j DROP
+	ip6tables -w -I INPUT 3 -i "$DEFAULT_INTERFACE" -m set --match-set antizapret-allow6 src -j ACCEPT
+	ip6tables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
+	ip6tables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 10000 -j SET --add-set antizapret-block6 src --exist
+	ip6tables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
+	ip6tables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
+	ip6tables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
+	ip6tables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
 fi
 # SSH protection
 if [[ "$SSH_PROTECTION" == "y" ]]; then
@@ -114,17 +120,17 @@ iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clam
 # nat
 # OpenVPN TCP port redirection for backup connections
 if [[ "$OPENVPN_80_443_TCP" == "y" ]]; then
-	iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p tcp --dport 80 -j REDIRECT --to-ports 50080
-	iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p tcp --dport 443 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p tcp --dport 80 -j REDIRECT --to-ports 50080
+	iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p tcp --dport 443 -j REDIRECT --to-ports 50443
 fi
 # OpenVPN UDP port redirection for backup connections
 if [[ "$OPENVPN_80_443_UDP" == "y" ]]; then
-	iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 80 -j REDIRECT --to-ports 50080
-	iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 443 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 80 -j REDIRECT --to-ports 50080
+	iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 443 -j REDIRECT --to-ports 50443
 fi
 # AmneziaWG redirection ports to WireGuard
-iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
-iptables -w -t nat -A PREROUTING -i "$INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
+iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
+iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # DNS redirection to Knot Resolver
 iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
 iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
@@ -140,7 +146,7 @@ fi
 iptables -w -t nat -S ANTIZAPRET-MAPPING &>/dev/null || iptables -w -t nat -N ANTIZAPRET-MAPPING
 iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${IP}.30.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT VPN
-iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -o "$INTERFACE" -j SNAT --to-source "$EXTERNAL_IP"
+iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
 
-/root/antizapret/custom-up.sh
+./custom-up.sh
 exit 0
