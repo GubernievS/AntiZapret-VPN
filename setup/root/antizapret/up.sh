@@ -15,7 +15,7 @@ if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	exit 1
 fi
 
-if [[ -z "$DEFAULT_INTERFACE" ]]; then
+if [[ -z "$DEFAULT_IP" ]]; then
 	DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
 fi
 if [[ -z "$DEFAULT_IP" ]]; then
