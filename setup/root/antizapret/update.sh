@@ -11,9 +11,11 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 echo "Update AntiZapret VPN files:"
 
+cd /root/antizapret
+
 export LC_ALL=C
 
-rm -f /root/antizapret/download/*
+rm -f download/*
 
 UPDATE_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh"
 UPDATE_PATH="update.sh"
@@ -88,7 +90,7 @@ AKAMAI_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/mai
 AKAMAI_IPS_PATH="download/akamai-ips.txt"
 
 function download {
-	local path="/root/antizapret/${1}"
+	local path="${1}"
 	local tmp_path="${path}.tmp"
 	local link=$2
 	echo "$path"
@@ -112,7 +114,7 @@ download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
 
-source /root/antizapret/setup
+source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	download $HOSTS_PATH_1 $HOSTS_LINK_1
@@ -125,7 +127,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 	else
-		printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > /root/antizapret/$EXCLUDE_HOSTS_PATH
+		printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > $EXCLUDE_HOSTS_PATH
 	fi
 
 	if [[ "$BLOCK_ADS" = "y" ]]; then
@@ -134,10 +136,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 		download $ADGUARD_PATH $ADGUARD_LINK
 		download $OISD_PATH $OISD_LINK
 	else
-		> /root/antizapret/$INCLUDE_ADBLOCK_HOSTS_PATH
-		> /root/antizapret/$EXCLUDE_ADBLOCK_HOSTS_PATH
-		> /root/antizapret/$ADGUARD_PATH
-		> /root/antizapret/$OISD_PATH
+		> $INCLUDE_ADBLOCK_HOSTS_PATH
+		> $EXCLUDE_ADBLOCK_HOSTS_PATH
+		> $ADGUARD_PATH
+		> $OISD_PATH
 	fi
 fi
 
