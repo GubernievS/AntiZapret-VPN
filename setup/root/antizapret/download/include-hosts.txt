@@ -774,6 +774,7 @@ qwant.com
 bitbucket.org
 raycast.com
 cici.com
+homedepot.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
