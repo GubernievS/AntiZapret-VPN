@@ -181,4 +181,10 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
+###
+
+sed -i '/^# Disable IPv6/,+4d' /root/antizapret/up.sh
+
+###
+
 exit 0
