@@ -63,7 +63,7 @@ class ProxyResolver(BaseResolver):
                 except IndexError:
                     print("ERROR: No fake IP left")
                     return None
-                self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": time.time()}
+                self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": time.time()}
                 rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
                 subprocess.run(rule,shell=True,check=True)
                 print(f"Mapping: {fake_ip} to {real_ip}")
@@ -75,7 +75,7 @@ class ProxyResolver(BaseResolver):
             return False
         try:
             self.ip_pool.remove(fake_ip)
-            self.ip_map[real_ip] = {"fake_ip": fake_ip, "last_access": last_access}
+            self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": last_access}
             print(f"Mapping: {fake_ip} to {real_ip}")
         except ValueError:
             print(f"ERROR: Fake IP {fake_ip} not in fake IP pool")
@@ -91,15 +91,17 @@ class ProxyResolver(BaseResolver):
         with self.lock:
             current_time = time.time()
             cleanup_ips = []
-            for key, entry in self.ip_map.items():
+            rules = ["*nat"]
+            for key,entry in self.ip_map.items():
                 if current_time - entry["last_access"] > self.cleanup_expiry:
-                    cleanup_ips.append((key, entry["fake_ip"]))
+                    cleanup_ips.append((key,entry["fake_ip"]))
             for real_ip,fake_ip in cleanup_ips:
                 self.ip_pool.appendleft(fake_ip)
                 del self.ip_map[real_ip]
-                rule = f"iptables -w -t nat -D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
-                subprocess.run(rule,shell=True,check=True)
+                rules.append(f"-D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}")
                 #print(f"Unmapped: {fake_ip} to {real_ip}")
+            rules.append("COMMIT")
+            subprocess.run(["iptables-restore","-w","-n"],input="\n".join(rules).encode(),check=True)
             print(f"Cleanup: {len(cleanup_ips)} expired fake IPs")
 
     def resolve(self,request,handler):
