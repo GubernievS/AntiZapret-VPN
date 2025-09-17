@@ -31,7 +31,7 @@ class ProxyResolver(BaseResolver):
     def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry):
         self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
         self.ip_map = {}
-        # Load existing mapping
+        # Loading existing mappings
         rule = "iptables -w -t nat -S ANTIZAPRET-MAPPING | awk '{if (NR<2) {next}; print substr($4, 1, length($4)-3), $8}'"
         mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout
         current_time = time.time()
@@ -42,6 +42,7 @@ class ProxyResolver(BaseResolver):
                     rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
                     subprocess.run(rule,shell=True,check=True)
                     sys.exit(1)
+        print(f"Loaded: {len(mappings)} fake IPs")
         self.address = address
         self.port = port
         self.timeout = timeout
@@ -66,7 +67,7 @@ class ProxyResolver(BaseResolver):
                 self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": time.time()}
                 rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
                 subprocess.run(rule,shell=True,check=True)
-                print(f"Mapping: {fake_ip} to {real_ip}")
+                #print(f"Mapping: {fake_ip} to {real_ip}")
                 return fake_ip
 
     def mapping_ip(self,real_ip,fake_ip,last_access):
@@ -76,7 +77,7 @@ class ProxyResolver(BaseResolver):
         try:
             self.ip_pool.remove(fake_ip)
             self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": last_access}
-            print(f"Mapping: {fake_ip} to {real_ip}")
+            #print(f"Mapping: {fake_ip} to {real_ip}")
         except ValueError:
             print(f"ERROR: Fake IP {fake_ip} not in fake IP pool")
             return False
@@ -99,10 +100,10 @@ class ProxyResolver(BaseResolver):
                 self.ip_pool.appendleft(fake_ip)
                 del self.ip_map[real_ip]
                 rules.append(f"-D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}")
-                #print(f"Unmapped: {fake_ip} to {real_ip}")
+                #print(f"Unmapping: {fake_ip} to {real_ip}")
             rules.append("COMMIT")
             subprocess.run(["iptables-restore","-w","-n"],input="\n".join(rules).encode(),check=True)
-            print(f"Cleanup: {len(cleanup_ips)} expired fake IPs")
+            print(f"Cleaned: {len(cleanup_ips)} expired fake IPs")
 
     def resolve(self,request,handler):
         try:
@@ -149,7 +150,7 @@ class PassthroughDNSHandler(DNSHandler):
     def get_reply(self,data):
         host,port = self.server.resolver.address,self.server.resolver.port
         request = DNSRecord.parse(data)
-        self.log_request(request)
+        #self.log_request(request)
         if self.protocol == "tcp":
             data = struct.pack("!H",len(data)) + data
             response = send_tcp(data,host,port)
@@ -157,7 +158,7 @@ class PassthroughDNSHandler(DNSHandler):
         else:
             response = send_udp(data,host,port)
         reply = DNSRecord.parse(response)
-        self.log_reply(reply)
+        #self.log_reply(reply)
         return response
 
 def send_tcp(data,host,port):
@@ -203,8 +204,8 @@ if __name__ == "__main__":
                     help="Upstream timeout (default: 5s)")
     p.add_argument("--passthrough",action="store_true",default=False,
                     help="Dont decode/re-encode request/response (default: off)")
-    p.add_argument("--log",default="request,reply,truncated,error",
-                    help="Log hooks to enable (default: +request,+reply,+truncated,+error,-recv,-send,-data)")
+    p.add_argument("--log",default="truncated,error",
+                    help="Log hooks to enable (default: +truncated,+error,-request,-reply,-recv,-send,-data)")
     p.add_argument("--log-prefix",action="store_true",default=False,
                     help="Log prefix (timestamp/handler/resolver) (default: False)")
     p.add_argument("--ip-range",default="10.30.0.0/15",
