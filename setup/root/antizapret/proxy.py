@@ -42,7 +42,7 @@ class ProxyResolver(BaseResolver):
                     rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
                     subprocess.run(rule,shell=True,check=True)
                     sys.exit(1)
-        print(f"Loaded: {len(mappings)} fake IPs")
+        print(f"Loaded: {len(mappings) - 1} fake IPs")
         self.address = address
         self.port = port
         self.timeout = timeout
