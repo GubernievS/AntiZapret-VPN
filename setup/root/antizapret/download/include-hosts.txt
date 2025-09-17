@@ -282,7 +282,6 @@ aistudio.google.com
 clickup.com
 extremetech.com
 downloads.malwarebytes.com
-marketplace.atlassian.com
 vectorworks.net
 stalker2.com
 wk.cz
@@ -775,7 +774,7 @@ bitbucket.org
 raycast.com
 cici.com
 homedepot.com
-id.atlassian.com
+atlassian.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
