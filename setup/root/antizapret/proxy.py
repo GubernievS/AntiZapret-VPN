@@ -33,16 +33,15 @@ class ProxyResolver(BaseResolver):
         self.ip_map = {}
         # Loading existing mappings
         rule = "iptables -w -t nat -S ANTIZAPRET-MAPPING | awk '{if (NR<2) {next}; print substr($4, 1, length($4)-3), $8}'"
-        mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout.split("\n")
+        mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout.splitlines()
         current_time = time.time()
         for mapping in mappings:
-            if mapping:
-                fake_ip,real_ip = mapping.split(" ")
-                if not self.mapping_ip(real_ip,fake_ip,current_time):
-                    rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
-                    subprocess.run(rule,shell=True,check=True)
-                    sys.exit(1)
-        print(f"Loaded: {len(mappings) - 1} fake IPs")
+            fake_ip,real_ip = mapping.split(" ")
+            if not self.mapping_ip(real_ip,fake_ip,current_time):
+                rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
+                subprocess.run(rule,shell=True,check=True)
+                sys.exit(1)
+        print(f"Loaded: {len(mappings)} fake IPs")
         self.address = address
         self.port = port
         self.timeout = timeout
