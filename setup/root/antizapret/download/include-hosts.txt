@@ -409,7 +409,7 @@ vector.im
 atelecom.biz
 coolstuffgames.com
 board-game.co.uk
-github.githubassets.com
+githubassets.com
 vscode.dev
 humblebundle.com
 geospy.ai
@@ -775,6 +775,7 @@ raycast.com
 cici.com
 homedepot.com
 atlassian.com
+githubusercontent.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
