@@ -775,6 +775,7 @@ bitbucket.org
 raycast.com
 cici.com
 homedepot.com
+id.atlassian.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
