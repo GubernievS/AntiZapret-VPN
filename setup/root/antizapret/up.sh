@@ -59,8 +59,9 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -I FORWARD 3 -s ${IP}.28.0.0/16 -p udp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "get_peers" -j SET --add-set antizapret-torrent src --exist
 	iptables -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
-# Restrict forwarding
+# Client isolation
 iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
+# Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
 		echo "create antizapret-forward hash:net -exist"
