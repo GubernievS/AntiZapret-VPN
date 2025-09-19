@@ -1006,7 +1006,7 @@ com.co
 com.kz
 comonlab.fr
 com.pl
-com.ru
+#com.ru
 com.se
 com.tr
 comv.info
@@ -1790,7 +1790,7 @@ naver.jp
 net.im
 net.in
 netlify.app
-net.ru
+#net.ru
 new-rutor.org
 new-tkf.xyz
 nh-lordfilm.ru
@@ -1833,7 +1833,7 @@ opr-lordfilm.ru
 opsforgood.fr
 org.in
 org.kz
-org.ru
+#org.ru
 orgs.biz
 org.uk
 ort-lordfilm.ru
@@ -1945,7 +1945,7 @@ ru.actor
 ruanabol.name
 ruanabol.org
 ruanabol.zone
-ru.com
+#ru.com
 rudub.biz
 rudub.online
 rudub.today
@@ -1953,7 +1953,7 @@ rufei.org
 rugames.org
 rugayporn.com
 run2me.top
-ru.net
+#ru.net
 rusoska.mobi
 rusoska.net
 russerial.fun
