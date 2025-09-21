@@ -169,18 +169,21 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed 's/\.$//;s/"//g' download/domains.lst \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
+	# Очищаем домены с казино
+	grep -Ev 'cazin|casin|kazin|kasin|asino|azino|1xbet|1-xbet|1x-bet|vavada|1win|1-win|pokerdom|vulkan|vulcan|admiralx|admiral-x|mostbet|leonbets|1xslots|riobet|bkleon|melbet|playfortuna' temp/include-hosts.txt > temp/include-hosts2.txt
+
 	# Удаляем не существующие домены
-	grep -vFxf temp/remove-hosts.txt temp/include-hosts.txt > temp/include-hosts2.txt
+	grep -vFxf temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
 	grep -vFxf temp/remove-hosts.txt temp/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 
 	# Удаляем поддомены www. и m.
-	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts2.txt | sort -u > temp/include-hosts3.txt
+	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
 
 	# Удаляем избыточные домены
-	sed 's/^/^/;s/$/$/' temp/include-hosts3.txt > temp/include-hosts4.txt
-	sed 's/^/./;s/$/$/' temp/include-hosts3.txt > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts4.txt > temp/include-hosts5.txt \
-	|| ( echo "Low memory!"; cp temp/include-hosts4.txt temp/include-hosts5.txt )
+	sed 's/^/^/;s/$/$/' temp/include-hosts4.txt > temp/include-hosts5.txt
+	sed 's/^/./;s/$/$/' temp/include-hosts4.txt > temp/exclude-patterns.txt
+	grep -vFf temp/exclude-patterns.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
+	|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
 
 	# Удаляем исключённые домены
 	sed 's/^/^/;s/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
@@ -188,15 +191,15 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		grep -Ff temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
-		|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
-		echo '.' >> temp/include-hosts6.txt
+		grep -Ff temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
+		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
+		echo '.' >> temp/include-hosts7.txt
 	else
-		grep -vFf temp/exclude-patterns2.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
-		|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
+		grep -vFf temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
+		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
 	fi
 
-	sed 's/^\^//;s/\$$//' temp/include-hosts6.txt > result/include-hosts.txt
+	sed 's/^\^//;s/\$$//' temp/include-hosts7.txt > result/include-hosts.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
