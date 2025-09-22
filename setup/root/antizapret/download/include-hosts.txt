@@ -781,6 +781,7 @@ githubusercontent.com
 ip4.static.sl-reverse.com
 global.ssl.fastly.net
 a.run.app
+biz.net.ru
 cdn.ampproject.org
 global.e-cloud.ch
 global.nethub.fi
