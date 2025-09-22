@@ -170,7 +170,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Очищаем домены с казино
-	grep -Ev 'cazin|casin|cacin|kazin|kasin|kacin|asino|azino|acino|1xbet|1-xbet|1x-bet|vavada|1win|1-win|pokerdom|vulkan|vulcan|wulkan|admiral|mostbet|leonbet|1xslot|riobet|bkleon|melbet|playfortuna|ramenbet|ramen-bet|fairspin|sykaaa|slotozal|goldfishka|playfortuna|play-fortuna|dragon-money|dragonmoney|poker-dom|pokerdom|maxslot|eldorado|cryptobos|crypto-bos|gogame|leonbet|legzo' temp/include-hosts.txt > temp/include-hosts2.txt
+	grep -Ev 'cazin|casin|cacin|kazin|kasin|kacin|asino|azino|acino|1xbet|1-xbet|1x-bet|vavada|1win|1-win|vulkan|vulcan|wulkan|admiral|mostbet|leonbet|1xslot|riobet|bkleon|melbet|ramenbet|ramen-bet|fairspin|sykaaa|slotozal|goldfishka|playfortuna|play-fortuna|dragon-money|dragonmoney|poker-dom|pokerdom|maxslot|eldorado|cryptobos|crypto-bos|gogame|legzo' temp/include-hosts.txt > temp/include-hosts2.txt \
+	|| cp temp/include-hosts.txt temp/include-hosts2.txt
 
 	# Удаляем не существующие домены
 	grep -vFxf temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
