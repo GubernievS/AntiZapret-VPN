@@ -234,6 +234,7 @@ tiktokcdn.com
 tiktokcdn-us.com
 tiktokcdn-eu.com
 ttwstatic.com
+ibyteimg.com
 lookerstudio.google.com
 soapui.org
 spotify.com
