@@ -170,7 +170,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
-	grep -Ev 'cazin|casin|cacin|kazin|kasin|kacin|asino|asyno|azyno|asiino|assino|azino|aziino|azzino|acino|1xbet|1-xbet|1x-bet|1-x-bet|vavada|1win|1-win|vulkan|vulcan|wulkan|wulcan|vullkan|vullcan|vylkan|admiral|mostbet|leonbet|1xslot|1-xslot|riobet|bkleon|melbet|ramenbet|ramen-bet|fairspin|sykaaa|slotozal|goldfishka|playfortuna|play-fortuna|dragon-money|dragonmoney|poker-dom|pokerdom|maxslot|eldorado|cryptobos|crypto-bos|gogame|legzo|slottica|vodka|bs2best|marathonbet|maxbet|monro|newretro|nodeposit|pinco|betwinner|bet-winner|platinum|welvura|igrovye|avtomaty' temp/include-hosts.txt > temp/include-hosts2.txt \
+	grep -Evi '[ck]a+[szc3]+[iley1]+n+[o0]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|official|slottica|sykaaa|admiral-*x|x-*admiral' temp/include-hosts.txt > temp/include-hosts2.txt \
 	|| cp temp/include-hosts.txt temp/include-hosts2.txt
 
 	# Удаляем не существующие домены
