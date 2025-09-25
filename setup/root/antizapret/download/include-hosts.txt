@@ -700,7 +700,8 @@ cosupport.ai
 westernunion.com
 coinpayments.net
 netacad.com
-amazon.com
+aws.amazon.com
+awsstatic.com
 signal.art
 signal.group
 signal.link
