@@ -662,6 +662,9 @@ deepl.com
 ikea.ee
 ikea.lt
 ikea.lv
+ikea.bg
+ikea.gr
+ikea.com.tr
 samsonite.com
 orlandotechpubs.com
 tvn24.pl
