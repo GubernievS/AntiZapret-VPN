@@ -705,7 +705,7 @@ cosupport.ai
 westernunion.com
 coinpayments.net
 netacad.com
-aws.amazon.com
+amazon.com
 awsstatic.com
 signal.art
 signal.group
@@ -789,6 +789,7 @@ cici.com
 homedepot.com
 atlassian.com
 githubusercontent.com
+lib-tech.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
