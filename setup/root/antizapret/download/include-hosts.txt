@@ -473,7 +473,6 @@ windscribe.com
 vpngate.net
 rebrand.ly
 adguard.com
-antizapret.prostovpn.org
 avira.com
 mullvad.net
 invent.kde.org
@@ -790,6 +789,7 @@ homedepot.com
 atlassian.com
 githubusercontent.com
 lib-tech.com
+poly.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
