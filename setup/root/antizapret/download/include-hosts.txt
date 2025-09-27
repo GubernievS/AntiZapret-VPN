@@ -790,6 +790,7 @@ atlassian.com
 githubusercontent.com
 lib-tech.com
 poly.com
+repo.huaweicloud.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
