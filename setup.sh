@@ -373,7 +373,8 @@ OVH_INCLUDE=${OVH_INCLUDE}
 GOOGLE_INCLUDE=${GOOGLE_INCLUDE}
 AKAMAI_INCLUDE=${AKAMAI_INCLUDE}
 DEFAULT_INTERFACE=
-DEFAULT_IP=" > /tmp/antizapret/setup/root/antizapret/setup
+DEFAULT_IP=
+CLEAR_HOSTS=y" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Выставляем разрешения
