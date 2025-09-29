@@ -183,7 +183,9 @@ fi
 
 ###
 
-sed -i '/^# Disable IPv6/,+4d' /root/antizapret/up.sh
+if ! grep -q 'CLEAR_HOSTS' /root/antizapret/setup; then
+    echo 'CLEAR_HOSTS=y' >> /root/antizapret/setup
+fi
 
 ###
 
