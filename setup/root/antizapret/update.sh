@@ -183,8 +183,16 @@ fi
 
 ###
 
+if ! grep -q 'DEFAULT_INTERFACE' /root/antizapret/setup; then
+	echo 'DEFAULT_INTERFACE=' >> /root/antizapret/setup
+fi
+
+if ! grep -q 'DEFAULT_IP' /root/antizapret/setup; then
+	echo 'DEFAULT_IP=' >> /root/antizapret/setup
+fi
+
 if ! grep -q 'CLEAR_HOSTS' /root/antizapret/setup; then
-    echo 'CLEAR_HOSTS=y' >> /root/antizapret/setup
+	echo 'CLEAR_HOSTS=y' >> /root/antizapret/setup
 fi
 
 ###
