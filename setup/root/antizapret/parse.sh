@@ -144,12 +144,14 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
 		cp -f result/deny.rpz /etc/knot-resolver/deny.rpz.tmp
 		mv -f /etc/knot-resolver/deny.rpz.tmp /etc/knot-resolver/deny.rpz
+		sleep 3
 	fi
 
 	# Обновляем файл deny2.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/deny2.rpz ]] && ! diff -q result/deny2.rpz /etc/knot-resolver/deny2.rpz; then
 		cp -f result/deny2.rpz /etc/knot-resolver/deny2.rpz.tmp
 		mv -f /etc/knot-resolver/deny2.rpz.tmp /etc/knot-resolver/deny2.rpz
+		sleep 3
 	fi
 
 	# Обрабатываем конфигурационные файлы
