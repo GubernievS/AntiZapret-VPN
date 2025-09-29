@@ -224,6 +224,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 		echo "DNS cache cleared: $count entries"
 		cp -f result/proxy.rpz /etc/knot-resolver/proxy.rpz.tmp
 		mv -f /etc/knot-resolver/proxy.rpz.tmp /etc/knot-resolver/proxy.rpz
+		sleep 3
 	fi
 fi
 
