@@ -792,6 +792,7 @@ lib-tech.com
 poly.com
 repo.huaweicloud.com
 chainreactioncycles.com
+mandrillapp.com
 
 # Повторяющиеся > 10 раз
 ip4.static.sl-reverse.com
