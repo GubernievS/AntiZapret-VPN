@@ -795,15 +795,6 @@ chainreactioncycles.com
 mandrillapp.com
 
 # Повторяющиеся > 10 раз
-ip4.static.sl-reverse.com
-global.ssl.fastly.net
-a.run.app
-biz.net.ru
-cdn.ampproject.org
-global.e-cloud.ch
-global.nethub.fi
-r.appspot.com
-1tvv.live
 003.casino
 0123tt.ru
 1080-hd.ru
@@ -829,6 +820,7 @@ r.appspot.com
 1lordfilm.one
 1orbceria1.icu
 1plus1tv.pro
+1tvv.live
 1xbet.com
 2020-film.org
 20-lordfilm.ru
@@ -856,7 +848,9 @@ r.appspot.com
 4k-hd.cyou
 4lordserials.xyz
 51-slot.net
+53-lordfilm.ru
 55-lordfilm.ru
+58-lordfilm.ru
 5lordfilm-0.xyz
 61-lordfilm.ru
 62-lordfilm.ru
@@ -904,12 +898,18 @@ animerem.org
 animespirit.ru
 anlordfilm.ru
 apad.top
+appspot.com
 apteka73.ru
 apteka777.ru
 apteka8.ru
+apteka-ru.online
 aptoide.com
+a.run.app
+ashoo.bar
 ashoo.black
+ashoo.cfd
 ashoo.me
+ashoo.wtf
 asmlocator.ru
 astar.bz
 athleticforum.biz
@@ -948,6 +948,7 @@ bitbucket.io
 bitva-ekstrasensov-lordfilm.online
 biz7.info
 biz99.xyz
+biz.net.ru
 bk-leon.su
 blacksprut24.com
 blacksprut.site
@@ -1003,6 +1004,7 @@ casmars.ru
 casmr.ru
 casvn.ru
 ccloudbuddy.online
+cdn.ampproject.org
 cheleba.pro
 chillandridewakepark.fr
 cigarettessalecoupons.com
@@ -1168,6 +1170,9 @@ gifbox-communication.fr
 giize.com
 github.io
 glavalko.bar
+global.e-cloud.ch
+global.nethub.fi
+global.ssl.fastly.net
 go2me.top
 go2me.xyz
 gofarma.store
@@ -1288,6 +1293,7 @@ intim-penza.com
 intimstory.com
 intim.tel
 intim-znakomstva.com
+ip4.static.sl-reverse.com
 irazin.ru
 it.com
 jackpotik.com
@@ -1338,10 +1344,10 @@ kinogo.tel
 kinogo.win
 kinogo.wtf
 kinohd.one
+kinokingy.online
 kinoklass.net
 kinoknopka.club
 kinoknopka.plus
-kinokingy.online
 kinokong.org
 kinokong.ws
 kinokrad7.cam
@@ -1487,6 +1493,7 @@ lordfilm1.movie
 lordfilm1.org
 lordfilm2023.net
 lordfilm23.org
+lordfilm-24.com
 lordfilm24.mom
 lordfilm24.one
 lordfilm2.band
@@ -1506,6 +1513,7 @@ lordfilmaqo.ru
 lord-film.art
 lordfilm.art
 lord-filma.space
+lordfilmaun.ru
 lordfilm-ayl.ru
 lordfilmbad.ru
 lordfilm-bbr.ru
@@ -1579,6 +1587,7 @@ lordfilmqhc.ru
 lordfilmqm.ru
 lordfilm-qnn.ru
 lordfilm.quest
+lordfilm-rfm.ru
 lordfilm-rgy.ru
 lordfilm-rq.ru
 lordfilm-ryg.ru
@@ -1664,6 +1673,7 @@ lords.best
 lordserial1.fyi
 lordserial1.me
 lord-serial1.pro
+lord-serial2.pro
 lordserial3.cam
 lordserial5.online
 lordseriala.pro
@@ -1782,6 +1792,7 @@ moi-lordfilm.xyz
 morsmusic.org
 mosgay3.xyz
 mostop.ru
+moviesrussian.net
 movitime.by
 moy.su
 mp3-tut.biz
@@ -1804,6 +1815,7 @@ myserial.online
 myvibox.fun
 mywire.org
 myzuka.me
+nadeko.net
 narod.ru
 naver.jp
 #net.im
@@ -1989,6 +2001,7 @@ seasonvar.biz
 seks-rach.com
 seks-rakom.com
 seks-time.com
+serfilm.com
 seriahd.ru
 serial4ikking.online
 serial4ik.online
@@ -2037,6 +2050,8 @@ skladchik.biz
 skladchikc.co
 skladchik.org
 skladchina.biz
+slivof.com
+slivschool.com
 sloip.ru
 sl.pt
 sltodom.ru
@@ -2206,6 +2221,7 @@ xn--80acbypd3c.com
 xn--80acbypdo.com
 xn--80afdphknde.com
 xn--80aikhbrhr.cam
+xn-----8kcgie5einph.xn--p1ai
 x-narod.ru
 xn--c1aem.co
 xn--d1achhdph1a.net
@@ -2264,6 +2280,7 @@ zfilm-hd.net
 zfilm-hd.org
 zfilm-hd.site
 zlg-lordfilm.ru
+znaniyamarket.com
 zona.mom
 zona.plus
 zorgfilm-10.me
