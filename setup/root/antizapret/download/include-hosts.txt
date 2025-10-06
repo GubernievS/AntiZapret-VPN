@@ -793,6 +793,7 @@ poly.com
 repo.huaweicloud.com
 chainreactioncycles.com
 mandrillapp.com
+itoosoft.com
 
 # Повторяющиеся > 10 раз
 003.casino
