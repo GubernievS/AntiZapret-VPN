@@ -794,6 +794,7 @@ repo.huaweicloud.com
 chainreactioncycles.com
 mandrillapp.com
 itoosoft.com
+europa.eu
 
 # Повторяющиеся > 10 раз
 003.casino
