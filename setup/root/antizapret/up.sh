@@ -34,6 +34,7 @@ sysctl -w net.ipv4.ip_forward=1
 sysctl -w kernel.printk="3 4 1 3"
 sysctl -w net.core.default_qdisc=fq || true
 sysctl -w net.ipv4.tcp_congestion_control=bbr || true
+sysctl -w net.ipv4.tcp_mtu_probing=1
 
 # filter
 # Default policy
