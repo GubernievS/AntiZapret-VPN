@@ -797,7 +797,12 @@ itoosoft.com
 europa.eu
 dam.kyoceradocumentsolutions.com
 intuit.com
+intuit.ca
+intuitcdn.net
 installturbotax.com
+mint.com
+quickbooksconnect.com
+tsheets.com
 
 # Повторяющиеся > 10 раз
 003.casino
