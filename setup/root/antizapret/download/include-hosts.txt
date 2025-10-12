@@ -803,6 +803,7 @@ installturbotax.com
 mint.com
 quickbooksconnect.com
 tsheets.com
+thestar.com
 
 # Повторяющиеся > 10 раз
 003.casino
