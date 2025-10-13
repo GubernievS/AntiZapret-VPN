@@ -34,6 +34,7 @@ ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
+iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p tcp -m string --string "GET " --algo kmp --to 100 -m string --string "info_hash=" --algo bm -m string --string "peer_id=" --algo bm -m string --string "port=" --algo bm -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
