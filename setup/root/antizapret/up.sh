@@ -49,9 +49,9 @@ ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 if [[ "$TORRENT_GUARD" == "y" ]]; then
 	ipset create antizapret-torrent hash:ip timeout 60 -exist
-	iptables -I FORWARD 2 -s ${IP}.28.0.0/16 -p tcp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "peer_id" -j SET --add-set antizapret-torrent src --exist
-	iptables -I FORWARD 3 -s ${IP}.28.0.0/16 -p udp -m string --algo kmp --string "info_hash" -m string --algo kmp --string "get_peers" -j SET --add-set antizapret-torrent src --exist
-	iptables -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
+	iptables -w -I FORWARD 2 -s ${IP}.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 3 -s ${IP}.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 4 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Client isolation
 iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
