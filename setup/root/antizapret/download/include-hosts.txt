@@ -809,6 +809,7 @@ turbotax.com
 cgtrader.com
 reve.com
 unsplash.com
+mega.nz
 
 # Повторяющиеся > 10 раз
 003.casino
