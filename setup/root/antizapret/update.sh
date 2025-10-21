@@ -118,7 +118,7 @@ source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	download "$HOSTS_PATH" "$HOSTS_LINK"
-	( download $DUMP_PATH $DUMP_LINK ) || > "$HOSTS_PATH"
+	( download $DUMP_PATH $DUMP_LINK ) || > "$DUMP_PATH"
 	( download $NXDOMAIN_PATH $NXDOMAIN_LINK ) || > "$NXDOMAIN_PATH"
 	download $RPZ_PATH $RPZ_LINK
 	download $RPZ2_PATH $RPZ2_LINK
