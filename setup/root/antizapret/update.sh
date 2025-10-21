@@ -26,13 +26,13 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-#HOSTS_LINK_1="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
-#HOSTS_PATH_1="download/dump.csv.gz"
-HOSTS_LINK_1="https://svn.code.sf.net/p/zapret-info/code/dump.csv"
-HOSTS_PATH_1="download/dump.csv"
+HOSTS_LINK="https://raw.githubusercontent.com/bol-van/rulist/main/reestr_hostname_resolvable_ip4.txt"
+HOSTS_PATH="download/hosts.txt"
 
-HOSTS_LINK_2="https://antifilter.download/list/domains.lst"
-HOSTS_PATH_2="download/domains.lst"
+#DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
+#DUMP_PATH="download/dump.csv.gz"
+DUMP_LINK="https://svn.code.sf.net/p/zapret-info/code/dump.csv"
+DUMP_PATH="download/dump.csv"
 
 #NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 NXDOMAIN_LINK="https://svn.code.sf.net/p/zapret-info/code/nxdomain.txt"
@@ -117,9 +117,9 @@ download $DOALL_PATH $DOALL_LINK
 source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
-	download $HOSTS_PATH_1 $HOSTS_LINK_1
-	( download "$HOSTS_PATH_2" "$HOSTS_LINK_2" ) || > "$HOSTS_PATH_2"
-	download $NXDOMAIN_PATH $NXDOMAIN_LINK
+	download "$HOSTS_PATH" "$HOSTS_LINK"
+	( download $DUMP_PATH $DUMP_LINK ) || > "$HOSTS_PATH"
+	( download $NXDOMAIN_PATH $NXDOMAIN_LINK ) || > "$NXDOMAIN_PATH"
 	download $RPZ_PATH $RPZ_LINK
 	download $RPZ2_PATH $RPZ2_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
