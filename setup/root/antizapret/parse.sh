@@ -159,16 +159,16 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/nxdomain.txt config/*remove-hosts.txt > temp/remove-hosts.txt
 
-	# Обрабатываем список заблокированных ресурсов из github.com/zapret-info
+	# Обрабатываем дамп заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	cut -d ';' -f 2 download/dump.csv \
 	| iconv -f cp1251 -t utf8 \
 	| sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Обрабатываем список заблокированных ресурсов из antifilter.download
+	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed 's/\.$//;s/"//g' download/domains.lst \
+	sed 's/\.$//;s/"//g' download/hosts.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
