@@ -810,6 +810,7 @@ cgtrader.com
 reve.com
 unsplash.com
 mega.nz
+library.hydra.wiki
 
 # Повторяющиеся > 10 раз
 003.casino
