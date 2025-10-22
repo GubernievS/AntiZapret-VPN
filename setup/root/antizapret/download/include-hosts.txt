@@ -606,6 +606,7 @@ iperf3serverlist.net
 bestchange.com
 findmykids.org
 manus.im
+manuscdn.com
 red.com
 flysas.com
 docs.chaos.com
@@ -761,7 +762,6 @@ kemono.cr
 qoder.com
 armexfort.uk
 st.com
-oculus.com
 coomer.st
 iltalehti.fi
 expressen.se
@@ -772,7 +772,6 @@ irishtimes.com
 elpais.com
 elmundo.es
 andrevi.ch
-help.keenetic.com
 whimsical.com
 info.nsf.org
 snyk.io
@@ -810,7 +809,10 @@ cgtrader.com
 reve.com
 unsplash.com
 mega.nz
+
 library.hydra.wiki
+help.keenetic.com
+oculus.com
 
 # Повторяющиеся > 10 раз
 003.casino
