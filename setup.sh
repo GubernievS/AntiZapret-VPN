@@ -240,7 +240,6 @@ systemctl disable ufw &>/dev/null
 # Удаляем старые файлы и кеш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
 rm -rf /etc/knot-resolver/*
-rm -rf /var/lib/knot-resolver/*
 
 #
 # Удаляем старые файлы OpenVPN и WireGuard
