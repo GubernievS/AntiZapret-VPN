@@ -61,7 +61,7 @@ class ProxyResolver(BaseResolver):
                 try:
                     fake_ip = self.ip_pool.popleft()
                 except IndexError:
-                    print("ERROR: No fake IP left")
+                    print("Error: No fake IP left")
                     return None
                 self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": time.time()}
                 rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
@@ -71,14 +71,14 @@ class ProxyResolver(BaseResolver):
 
     def mapping_ip(self,real_ip,fake_ip,last_access):
         if self.ip_map.get(real_ip):
-            print(f"ERROR: Real IP {real_ip} is already mapped")
+            print(f"Error: Real IP {real_ip} is already mapped")
             return False
         try:
             self.ip_pool.remove(fake_ip)
             self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": last_access}
             #print(f"Mapping: {fake_ip} to {real_ip}")
         except ValueError:
-            print(f"ERROR: Fake IP {fake_ip} not in fake IP pool")
+            print(f"Error: Fake IP {fake_ip} not in fake IP pool")
             return False
         return True
 
@@ -126,7 +126,7 @@ class ProxyResolver(BaseResolver):
                     fake_ip = self.get_fake_ip(real_ip)
                     if not fake_ip:
                         reply = request.reply()
-                        reply.header.rcode = getattr(RCODE,"SERVFAIL")
+                        reply.header.rcode = RCODE.SERVFAIL
                         return reply
                     record.rdata = A(fake_ip)
                     record.rname = request.q.qname
@@ -134,9 +134,10 @@ class ProxyResolver(BaseResolver):
                     #print(a.rdata)
                 return reply
             #print(reply)
-        except socket.timeout:
+        except Exception as e:
+            print(f"Error: {e}")
             reply = request.reply()
-            reply.header.rcode = getattr(RCODE,"SERVFAIL")
+            reply.header.rcode = RCODE.SERVFAIL
         return reply
 
 class PassthroughDNSHandler(DNSHandler):
