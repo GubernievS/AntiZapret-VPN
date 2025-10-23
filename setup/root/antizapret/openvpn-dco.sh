@@ -40,32 +40,20 @@ if [[ "$DCO" == "y" ]]; then
 	apt-get clean
 	modprobe -r ovpn_dco_v2
 	modprobe ovpn_dco_v2
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-udp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-tcp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/antizapret-udp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/antizapret-tcp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/vpn-udp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305\"" >> /etc/openvpn/server/vpn-tcp.conf
+	sed -i '/data-ciphers\|disable-dco/d' /etc/openvpn/server/*.conf
+	for f in /etc/openvpn/server/*.conf; do
+		echo 'data-ciphers "AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305"' >> "$f"
+	done
 	if systemctl is-active --quie openvpn-server@*; then
 		systemctl restart openvpn-server@*
 	fi
 	echo
 	echo 'OpenVPN DCO turned ON successfully!'
 else
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-udp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/antizapret-tcp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-udp.conf
-	sed -i "/data-ciphers\|disable-dco/d" /etc/openvpn/server/vpn-tcp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305:AES-128-CBC:AES-192-CBC:AES-256-CBC\"
-	disable-dco" >> /etc/openvpn/server/antizapret-udp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305:AES-128-CBC:AES-192-CBC:AES-256-CBC\"
-	disable-dco" >> /etc/openvpn/server/antizapret-tcp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305:AES-128-CBC:AES-192-CBC:AES-256-CBC\"
-	disable-dco" >> /etc/openvpn/server/vpn-udp.conf
-	echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305:AES-128-CBC:AES-192-CBC:AES-256-CBC\"
-	disable-dco" >> /etc/openvpn/server/vpn-tcp.conf
+	sed -i '/data-ciphers\|disable-dco/d' /etc/openvpn/server/*.conf
+	for f in /etc/openvpn/server/*.conf; do
+		echo -e "data-ciphers \"AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305:AES-128-CBC:AES-192-CBC:AES-256-CBC\"\ndisable-dco" >> "$f"
+	done
 	if systemctl is-active --quie openvpn-server@*; then
 		systemctl restart openvpn-server@*
 	fi
