@@ -810,6 +810,7 @@ reve.com
 unsplash.com
 mega.nz
 mega.co.nz
+snapchat.com
 
 # Блокирует DNS
 library.hydra.wiki
