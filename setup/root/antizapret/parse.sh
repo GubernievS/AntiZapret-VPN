@@ -10,6 +10,10 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+###
+rm -f /root/antizapret/include-hosts4.txt
+###
+
 echo "Parse AntiZapret VPN files:"
 
 export LC_ALL=C
