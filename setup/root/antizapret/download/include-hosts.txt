@@ -809,7 +809,9 @@ cgtrader.com
 reve.com
 unsplash.com
 mega.nz
+mega.co.nz
 
+# Блокирует DNS
 library.hydra.wiki
 help.keenetic.com
 oculus.com
