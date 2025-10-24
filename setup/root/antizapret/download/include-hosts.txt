@@ -812,6 +812,7 @@ mega.nz
 mega.co.nz
 snapchat.com
 chattti.com
+centrum.cz
 
 # Блокирует DNS
 library.hydra.wiki
