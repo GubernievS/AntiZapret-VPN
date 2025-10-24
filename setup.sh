@@ -236,6 +236,9 @@ ufw disable &>/dev/null
 systemctl disable firewalld &>/dev/null
 systemctl disable ufw &>/dev/null
 
+systemctl stop apparmor &>/dev/null
+systemctl disable apparmor &>/dev/null
+
 #
 # Удаляем старые файлы и кеш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
