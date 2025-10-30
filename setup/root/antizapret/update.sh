@@ -9,7 +9,7 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-echo "Update AntiZapret VPN files:"
+echo 'Update AntiZapret VPN files:'
 
 cd /root/antizapret
 
