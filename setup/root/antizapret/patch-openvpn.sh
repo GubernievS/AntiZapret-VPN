@@ -55,13 +55,14 @@ else
     ERROR_FREE="#undef ERROR_FREE"
 fi
 
+make -C /usr/local/src/openvpn uninstall || true
+rm -rf /usr/local/src/openvpn
 apt-get update
 apt-get dist-upgrade -y
-apt-get install --reinstall -y curl tar build-essential libssl-dev pkg-config libsystemd-dev automake libnl-genl-3-dev libcap-ng-dev
+apt-get install --reinstall -y openvpn curl tar build-essential libssl-dev pkg-config libsystemd-dev automake libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove -y
 apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
-rm -rf /usr/local/src/openvpn
 mkdir -p /usr/local/src/openvpn
 curl -4fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
