@@ -19,7 +19,7 @@ sed -i \
 
 ###
 
-echo "Parse AntiZapret VPN files:"
+echo 'Parse AntiZapret VPN files:'
 
 export LC_ALL=C
 
@@ -35,7 +35,7 @@ for file in config/*.txt; do
 done
 
 if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
-	echo "IPs..."
+	echo 'IPs...'
 
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*exclude-ips.txt | sort -u > temp/exclude-ips.txt
@@ -88,8 +88,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 		# Обновляем ipset antizapret-forward
 		{
-			echo "create antizapret-forward hash:net -exist"
-			echo "flush antizapret-forward"
+			echo 'create antizapret-forward hash:net -exist'
+			echo 'flush antizapret-forward'
 			while read -r line; do
 				echo "add antizapret-forward $line -exist"
 			done < result/forward-ips.txt
@@ -106,8 +106,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 
 		# Обновляем ipset antizapret-allow
 		{
-			echo "create antizapret-allow hash:net -exist"
-			echo "flush antizapret-allow"
+			echo 'create antizapret-allow hash:net -exist'
+			echo 'flush antizapret-allow'
 			while read -r line; do
 				echo "add antizapret-allow $line -exist"
 			done < result/allow-ips.txt
@@ -116,7 +116,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 fi
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
-	echo "Hosts..."
+	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
@@ -199,7 +199,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	sed 's/^/^/;s/$/$/' temp/include-hosts4.txt > temp/include-hosts5.txt
 	sed 's/^/./;s/$/$/' temp/include-hosts4.txt > temp/exclude-patterns.txt
 	grep -vFf temp/exclude-patterns.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
-	|| ( echo "Low memory!"; cp temp/include-hosts5.txt temp/include-hosts6.txt )
+	|| ( echo 'Low memory!'; cp temp/include-hosts5.txt temp/include-hosts6.txt )
 
 	# Удаляем исключённые домены
 	sed 's/^/^/;s/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
@@ -208,11 +208,11 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
 		grep -Ff temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
-		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
+		|| ( echo 'Low memory!'; cp temp/include-hosts6.txt temp/include-hosts7.txt )
 		echo '.' >> temp/include-hosts7.txt
 	else
 		grep -vFf temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
-		|| ( echo "Low memory!"; cp temp/include-hosts6.txt temp/include-hosts7.txt )
+		|| ( echo 'Low memory!'; cp temp/include-hosts6.txt temp/include-hosts7.txt )
 	fi
 
 	sed 's/^\^//;s/\$$//' temp/include-hosts7.txt > result/include-hosts.txt
