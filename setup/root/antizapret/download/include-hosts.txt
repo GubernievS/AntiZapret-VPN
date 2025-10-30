@@ -818,6 +818,7 @@ centrum.cz
 library.hydra.wiki
 help.keenetic.com
 oculus.com
+support.logi.com
 
 # Повторяющиеся > 10 раз
 003.casino
