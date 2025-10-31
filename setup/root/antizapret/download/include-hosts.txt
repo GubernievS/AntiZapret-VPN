@@ -821,6 +821,7 @@ oculus.com
 support.logi.com
 support.native-instruments.com
 support.brave.app
+myfootball.life
 
 # Повторяющиеся > 10 раз
 003.casino
