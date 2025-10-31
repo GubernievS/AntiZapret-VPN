@@ -819,6 +819,8 @@ library.hydra.wiki
 help.keenetic.com
 oculus.com
 support.logi.com
+support.native-instruments.com
+support.brave.app
 
 # Повторяющиеся > 10 раз
 003.casino
