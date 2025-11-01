@@ -813,6 +813,7 @@ mega.co.nz
 snapchat.com
 chattti.com
 centrum.cz
+openevidence.com
 
 # Блокирует DNS
 library.hydra.wiki
