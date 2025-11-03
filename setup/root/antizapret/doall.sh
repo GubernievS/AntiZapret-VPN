@@ -12,9 +12,8 @@ if [[ "$SUM1" != "$SUM2" ]]; then
 	echo 'Restarting update.sh'
 	cat update.sh | bash -s "$1"
 fi
-./custom-update.sh "$1" || true
 ./parse.sh "$1"
-./custom-parse.sh "$1" || true
+
 find /etc/openvpn/server/logs -type f -size +10M -delete
 ./custom-doall.sh "$1" || true
 
