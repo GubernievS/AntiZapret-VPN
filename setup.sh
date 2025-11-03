@@ -333,20 +333,27 @@ rm -rf /tmp/antizapret
 git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 #
-# Сохраняем пользовательские настройки и пользовательские обработчики custom*.sh
-cp /root/antizapret/config/* /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
+# Сохраняем пользовательские настройки и обработчики custom*.sh
+cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
 cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ &>/dev/null || true
+cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ &>/dev/null || true
 
 #
-# Восстанавливаем из бэкапа пользовательские настройки и пользователей OpenVPN и WireGuard
+# Восстанавливаем из бэкапа пользовательские настройки и обработчики custom*.sh, пользователей OpenVPN и WireGuard
 tar -xzf /root/backup*.tar.gz &>/dev/null || true
 rm -f /root/backup*.tar.gz &>/dev/null || true
-cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3 &>/dev/null || true
-cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard &>/dev/null || true
-cp /root/config/* /tmp/antizapret/setup/root/antizapret/config &>/dev/null || true
+
+cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3/ &>/dev/null || true
+cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard/ &>/dev/null || true
+cp /root/config/* /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
+cp /root/knot-resolver/* /tmp/antizapret/setup/etc/knot-resolver/ &>/dev/null || true
+cp /root/custom/* /tmp/antizapret/setup/root/antizapret/ &>/dev/null || true
+
 rm -rf /root/easyrsa3
 rm -rf /root/wireguard
 rm -rf /root/config
+rm -rf /root/knot-resolver
+rm -rf /root/custom
 
 #
 # Сохраняем настройки
@@ -385,7 +392,7 @@ CLEAR_HOSTS=y" > /tmp/antizapret/setup/root/antizapret/setup
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
-find /tmp/antizapret -type f \( -name '*.sh' -o -name '*.py' \) -execdir chmod +x {} +
+find /tmp/antizapret/setup/root/antizapret/ -type f -exec chmod +x {} +
 
 # Копируем нужное, удаляем не нужное
 find /tmp/antizapret -name '.gitkeep' -delete
