@@ -237,4 +237,6 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 fi
 
+./custom-parse.sh "$1" || true
+
 exit 0
