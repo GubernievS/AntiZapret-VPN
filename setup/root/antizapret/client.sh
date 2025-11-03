@@ -369,15 +369,20 @@ backup(){
 
 	rm -rf /root/antizapret/backup
 	mkdir -p /root/antizapret/backup/wireguard
+	mkdir -p /root/antizapret/backup/config
+	mkdir -p /root/antizapret/backup/knot-resolver
+	mkdir -p /root/antizapret/backup/custom
 
 	cp -r /etc/openvpn/easyrsa3 /root/antizapret/backup
 	cp -r /etc/wireguard/antizapret.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
-	cp -r /root/antizapret/config /root/antizapret/backup
+	cp -r /root/antizapret/config/*.txt /root/antizapret/backup/config
+	cp -r /etc/knot-resolver/*.lua /root/antizapret/backup/knot-resolver
+	cp -r /root/antizapret/custom*.sh /root/antizapret/backup/custom
 
 	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
-	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config
+	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
 	tar -tzf "$BACKUP_FILE" > /dev/null
 
 	rm -rf /root/antizapret/backup
