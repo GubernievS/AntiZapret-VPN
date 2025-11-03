@@ -181,4 +181,6 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
+./custom-update.sh "$1" || true
+
 exit 0
