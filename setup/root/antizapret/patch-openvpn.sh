@@ -68,7 +68,7 @@ curl -4fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 
-sed -i '/link_socket_write_udp(struct link_socket \*sock/,/\/\* write a TCP or UDP packet to link \*\//c\
+sed -i '/link_socket_write_udp(struct link_socket \*sock/,/^$/c\
 link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
 					struct link_socket_actual *to)\
@@ -122,8 +122,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 #endif\
 	return buffer_sent;\
 }\
-\
-\/\* write a TCP or UDP packet to link \*\/' "/usr/local/src/openvpn/src/openvpn/socket.h"
+' "/usr/local/src/openvpn/src/openvpn/socket.h"
 
 cd /usr/local/src/openvpn
 chmod +x ./configure
