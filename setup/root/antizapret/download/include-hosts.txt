@@ -814,6 +814,7 @@ snapchat.com
 chattti.com
 centrum.cz
 openevidence.com
+alexelec.run.place
 
 # Блокирует DNS
 library.hydra.wiki
