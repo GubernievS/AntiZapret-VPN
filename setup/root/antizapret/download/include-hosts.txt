@@ -618,6 +618,7 @@ windsurf.com
 autodesk.com
 autodesk.net
 autodesk.eu
+autocad.com
 cdnbunny.org
 vmware.com
 ahcdn.com
