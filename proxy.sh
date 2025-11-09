@@ -35,6 +35,20 @@ if [[ -z "$EXTERNAL_IP" ]]; then
 	echo 'External IPv4 address not found on default network interface!'
 fi
 
+echo
+echo 'Preparing for installation, please wait...'
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get clean
+apt-get update
+dpkg --configure -a
+apt-get install --fix-broken -y
+apt-get dist-upgrade -y
+apt-get install --reinstall -y iptables iptables-persistent
+
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean false | sudo debconf-set-selections
+
 # AntiZapret parameters modification
 sudo tee /etc/sysctl.d/99-antizapret.conf > /dev/null <<'EOF'
 # AntiZapret parameters modification
@@ -116,17 +130,6 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
-
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean false | sudo debconf-set-selections
-
-export DEBIAN_FRONTEND=noninteractive
-apt-get clean
-apt-get update
-dpkg --configure -a
-apt-get install --fix-broken -y
-apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables-persistent
 
 echo
 echo -e '\e[1;32mProxy for AntiZapret VPN installed successfully!\e[0m'
