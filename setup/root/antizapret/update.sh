@@ -94,9 +94,9 @@ function download {
 	local tmp_path="${path}.tmp"
 	local link=$2
 	echo "$path"
-	curl -4fL "$link" -o "$tmp_path"
+	curl -fL "$link" -o "$tmp_path"
 	local_size="$(stat -c '%s' "$tmp_path")"
-	remote_size="$(curl -4fsSLI "$link" | grep -i content-length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
+	remote_size="$(curl -fsSLI "$link" | grep -i content-length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
 	if [[ "$local_size" != "$remote_size" ]]; then
 		echo "Failed to download $path! Size on server is different"
 		rm -f "$tmp_path"
