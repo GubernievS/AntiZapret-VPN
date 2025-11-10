@@ -64,7 +64,7 @@ apt-get autoremove -y
 apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 mkdir -p /usr/local/src/openvpn
-curl -4fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
+curl -fL https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 
