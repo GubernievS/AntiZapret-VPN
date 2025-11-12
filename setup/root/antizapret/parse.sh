@@ -10,15 +10,6 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-###
-
-sed -i \
-    -e 's|# Добавление IP-адресов разрешённых для маршрутизации через AntiZapret VPN|# Добавление IP-адресов неявно разрешённых для маршрутизации через AntiZapret VPN|' \
-    -e '/# Они добавляются к указанным в result\/route-ips.txt/d' \
-    /root/antizapret/config/forward-ips.txt
-
-###
-
 echo 'Parse AntiZapret VPN files:'
 
 export LC_ALL=C
