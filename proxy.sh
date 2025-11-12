@@ -74,8 +74,6 @@ net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
 EOF
 
-sysctl --system
-
 # Clamp TCP MSS
 iptables -F && iptables -t nat -F && iptables -t mangle -F
 
@@ -136,17 +134,17 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
 # Stop and disable unnecessary services
-systemctl stop firewalld || true
-ufw disable || true
+systemctl stop firewalld &>/dev/null || true
+ufw disable &>/dev/null || true
 
-systemctl disable firewalld || true
-systemctl disable ufw || true
+systemctl disable firewalld &>/dev/null || true
+systemctl disable ufw &>/dev/null || true
 
-systemctl stop apparmor || true
-systemctl disable apparmor || true
+systemctl stop apparmor &>/dev/null || true
+systemctl disable apparmor &>/dev/null || true
 
-systemctl stop apport || true
-systemctl disable apport || true
+systemctl stop apport &>/dev/null || true
+systemctl disable apport &>/dev/null || true
 
 # Rebooting
 echo
