@@ -63,6 +63,7 @@ net.ipv4.tcp_rmem=4096 131072 16777216
 net.ipv4.tcp_wmem=4096 16384 16777216
 net.ipv4.tcp_no_metrics_save=1
 net.core.netdev_budget=1000
+net.ipv4.tcp_fastopen=3
 EOF
 
 # Disable IPv6
@@ -75,8 +76,11 @@ EOF
 
 sysctl --system
 
+# Clamp TCP MSS
 iptables -F && iptables -t nat -F && iptables -t mangle -F
 
+# filter
+# Default policy
 iptables -w -P INPUT ACCEPT
 iptables -w -P FORWARD ACCEPT
 iptables -w -P OUTPUT ACCEPT
@@ -131,6 +135,20 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
+# Stop and disable unnecessary services
+systemctl stop firewalld &>/dev/null
+ufw disable &>/dev/null
+
+systemctl disable firewalld &>/dev/null
+systemctl disable ufw &>/dev/null
+
+systemctl stop apparmor &>/dev/null
+systemctl disable apparmor &>/dev/null
+
+systemctl stop apport &>/dev/null
+systemctl disable apport &>/dev/null
+
+# Rebooting
 echo
 echo -e '\e[1;32mProxy for AntiZapret VPN installed successfully!\e[0m'
 echo 'Rebooting...'
