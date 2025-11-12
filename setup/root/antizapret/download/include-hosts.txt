@@ -818,6 +818,7 @@ chattti.com
 centrum.cz
 openevidence.com
 alexelec.run.place
+api.imgur.com
 
 # Блокирует DNS
 library.hydra.wiki
