@@ -136,17 +136,17 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
 # Stop and disable unnecessary services
-systemctl stop firewalld &>/dev/null
-ufw disable &>/dev/null
+systemctl stop firewalld || true
+ufw disable || true
 
-systemctl disable firewalld &>/dev/null
-systemctl disable ufw &>/dev/null
+systemctl disable firewalld || true
+systemctl disable ufw || true
 
-systemctl stop apparmor &>/dev/null
-systemctl disable apparmor &>/dev/null
+systemctl stop apparmor || true
+systemctl disable apparmor || true
 
-systemctl stop apport &>/dev/null
-systemctl disable apport &>/dev/null
+systemctl stop apport || true
+systemctl disable apport || true
 
 # Rebooting
 echo
