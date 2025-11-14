@@ -819,6 +819,7 @@ centrum.cz
 openevidence.com
 alexelec.run.place
 api.imgur.com
+adblockplus.org
 
 # Блокирует DNS
 library.hydra.wiki
