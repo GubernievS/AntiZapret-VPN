@@ -829,6 +829,7 @@ support.logi.com
 support.native-instruments.com
 support.brave.app
 myfootball.life
+support.pokemon.com
 
 # Повторяющиеся > 10 раз
 003.casino
