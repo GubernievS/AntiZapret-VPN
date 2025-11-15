@@ -23,21 +23,42 @@ done
 
 if [[ -z "$DESTINATION_IP" ]]; then
 	echo 'Destination AntiZapret VPN server IPv4 address not set!'
+	exit 2
 fi
 
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo 'Default network interface not found!'
+	exit 3
 fi
 
 EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
 if [[ -z "$EXTERNAL_IP" ]]; then
 	echo 'External IPv4 address not found on default network interface!'
+	exit 4
 fi
 
 echo
 echo 'Preparing for installation, please wait...'
 
+# Stop and disable unnecessary services
+systemctl stop firewalld &>/dev/null || true
+ufw disable &>/dev/null || true
+
+systemctl disable firewalld &>/dev/null || true
+systemctl disable ufw &>/dev/null || true
+
+systemctl stop apparmor &>/dev/null || true
+systemctl disable apparmor &>/dev/null || true
+
+systemctl stop apport &>/dev/null || true
+systemctl disable apport &>/dev/null || true
+
+# Set autosave
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean false | sudo debconf-set-selections
+
+# Install pkg
 export DEBIAN_FRONTEND=noninteractive
 apt-get clean
 apt-get update
@@ -45,9 +66,6 @@ dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
 apt-get install --reinstall -y iptables iptables-persistent
-
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean false | sudo debconf-set-selections
 
 # AntiZapret parameters modification
 sudo tee /etc/sysctl.d/99-antizapret.conf > /dev/null <<'EOF'
@@ -133,18 +151,7 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
-# Stop and disable unnecessary services
-systemctl stop firewalld &>/dev/null || true
-ufw disable &>/dev/null || true
-
-systemctl disable firewalld &>/dev/null || true
-systemctl disable ufw &>/dev/null || true
-
-systemctl stop apparmor &>/dev/null || true
-systemctl disable apparmor &>/dev/null || true
-
-systemctl stop apport &>/dev/null || true
-systemctl disable apport &>/dev/null || true
+netfilter-persistent save
 
 # Rebooting
 echo
