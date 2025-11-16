@@ -844,10 +844,15 @@ symcb.com
 symcd.com
 ws.symantec.com
 globalsign.com
+globalsign.net
 godaddy.com
 sectigo.com
+comodoca.com
+usertrust.com
+identrust.com
 crl.microsoft.com
 mscrl.microsoft.com
+
 
 # Повторяющиеся > 10 раз
 003.casino
