@@ -843,10 +843,11 @@ geotrust.com
 symcb.com
 symcd.com
 ws.symantec.com
-crl.microsoft.com
 globalsign.com
 godaddy.com
 sectigo.com
+crl.microsoft.com
+mscrl.microsoft.com
 
 # Повторяющиеся > 10 раз
 003.casino
