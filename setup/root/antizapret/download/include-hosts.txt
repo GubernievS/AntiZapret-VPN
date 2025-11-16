@@ -820,6 +820,7 @@ openevidence.com
 alexelec.run.place
 api.imgur.com
 adblockplus.org
+russkoetv.shop
 
 # Блокирует DNS
 library.hydra.wiki
