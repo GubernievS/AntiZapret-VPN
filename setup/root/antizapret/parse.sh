@@ -133,8 +133,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	echo "$(wc -l < result/exclude-adblock-hosts.txt) - exclude-adblock-hosts.txt"
 
 	# Создаем файлы deny.rpz и deny2.rpz для Knot Resolver
-	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
-	echo -e '$TTL 3600\n@ SOA . . (0 0 0 0 0)' > result/deny2.rpz
+	echo -e '$TTL 10800\n@ SOA . . (0 0 0 0 0)' > result/deny.rpz
+	echo -e '$TTL 10800\n@ SOA . . (0 0 0 0 0)' > result/deny2.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
 	sed 's/\r//g; /^;/d; /^$/d' download/rpz.txt config/*rpz.txt >> result/deny.rpz
