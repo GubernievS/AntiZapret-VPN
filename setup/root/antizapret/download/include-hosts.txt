@@ -831,6 +831,23 @@ support.brave.app
 myfootball.life
 support.pokemon.com
 
+# Сертификаты
+letsencrypt.org
+lencr.org
+pki.goog
+amazontrust.com
+ss2.us
+digicert.com
+verisign.com
+geotrust.com
+symcb.com
+symcd.com
+ws.symantec.com
+crl.microsoft.com
+globalsign.com
+godaddy.com
+sectigo.com
+
 # Повторяющиеся > 10 раз
 003.casino
 0123tt.ru
