@@ -662,6 +662,8 @@ rabbit-labs.com
 se.com.sa
 login.microsoftonline.com
 login.live.com
+fpt.live.com
+account.live.com
 msauth.net
 deepl.com
 ikea.ee
