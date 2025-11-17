@@ -243,13 +243,6 @@ systemctl stop apport &>/dev/null
 systemctl disable apport &>/dev/null
 
 #
-# Создаем папки для кэша Knot Resolver
-mkdir -p /var/cache/knot-resolver
-mkdir -p /var/cache/knot-resolver2
-chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
-chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
-
-#
 # Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
 rm -rf /var/cache/knot-resolver2/*
@@ -394,6 +387,13 @@ AKAMAI_INCLUDE=${AKAMAI_INCLUDE}
 DEFAULT_INTERFACE=
 DEFAULT_IP=
 CLEAR_HOSTS=y" > /tmp/antizapret/setup/root/antizapret/setup
+
+#
+# Создаем папки для кэша Knot Resolver
+mkdir -p /var/cache/knot-resolver
+mkdir -p /var/cache/knot-resolver2
+chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
+chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 
 #
 # Выставляем разрешения
