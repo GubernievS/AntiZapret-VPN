@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Скрипт для установки на своём сервере AntiZapret VPN и обычного VPN
+# Скрипт для установки на своём сервере AntiZapret VPN и полного VPN
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
@@ -73,13 +73,13 @@ done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
-echo '         +Russian *'
+echo '        +MSK-IX+NSDI *'
 echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    4) Xbox **           - More details: https://xbox-dns.ru'
 echo '    5) Malw **           - More details: https://info.dns.malw.link'
 echo
-echo '  * - Resolvers optimized for users in Russia'
+echo '  * - DNS resolvers optimized for users located in Russia'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$ANTIZAPRET_DNS" =~ ^[1-5]$ ]]; do
@@ -95,7 +95,7 @@ echo '    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=731
 echo '    6) Xbox **     - More details: https://xbox-dns.ru'
 echo '    7) Malw **     - More details: https://info.dns.malw.link'
 echo
-echo '  * - Resolvers supports EDNS Client Subnet'
+echo '  * - DNS resolvers supports EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$VPN_DNS" =~ ^[1-7]$ ]]; do
@@ -243,9 +243,16 @@ systemctl stop apport &>/dev/null
 systemctl disable apport &>/dev/null
 
 #
-# Удаляем старые файлы и кеш Knot Resolver
+# Создаем папки для кэша Knot Resolver
+mkdir -p /var/cache/knot-resolver
+mkdir -p /var/cache/knot-resolver2
+chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
+chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
+
+#
+# Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
-rm -rf /etc/knot-resolver/*
+rm -rf /var/cache/knot-resolver2/*
 
 #
 # Удаляем старые файлы OpenVPN и WireGuard
@@ -296,12 +303,12 @@ mkdir -p /etc/apt/keyrings
 
 #
 # Добавим репозиторий Knot Resolver
-curl -4fsSL https://pkg.labs.nic.cz/gpg -o /etc/apt/keyrings/cznic-labs-pkg.gpg
+curl -fsSL https://pkg.labs.nic.cz/gpg -o /etc/apt/keyrings/cznic-labs-pkg.gpg
 echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 
 #
 # Добавим репозиторий OpenVPN
-curl -4fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
+curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
 echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 #
@@ -421,7 +428,7 @@ elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 fi
 
 #
-# Настраиваем DNS в обычном VPN
+# Настраиваем DNS в полном VPN
 if [[ "$VPN_DNS" == "2" ]]; then
 	# Quad9
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 9.9.9.10"\npush "dhcp-option DNS 149.112.112.10"' /etc/openvpn/server/vpn*.conf
@@ -530,10 +537,10 @@ if [[ -z "$(swapon --show)" ]]; then
 	echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
 fi
 
+#
+# Перезагружаем
 echo
 echo -e '\e[1;32mAntiZapret VPN + full VPN installed successfully!\e[0m'
 echo 'Rebooting...'
 
-#
-# Перезагружаем
 reboot
