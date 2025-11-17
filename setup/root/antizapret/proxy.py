@@ -28,7 +28,7 @@ class ProxyResolver(BaseResolver):
         'real' transparent proxy option the DNSHandler logic needs to be
         modified (see PassthroughDNSHandler)
     """
-    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry):
+    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry,min_ttl):
         self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
         self.ip_map = {}
         # Loading existing mappings
@@ -47,6 +47,7 @@ class ProxyResolver(BaseResolver):
         self.timeout = timeout
         self.cleanup_interval = cleanup_interval
         self.cleanup_expiry = cleanup_expiry
+        self.min_ttl = min_ttl
         self.lock = threading.Lock()
         # Start thread for cleanup fake IPs
         threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
@@ -130,9 +131,9 @@ class ProxyResolver(BaseResolver):
                         return reply
                     record.rdata = A(fake_ip)
                     record.rname = request.q.qname
-                    record.ttl = 300
-                    #print(a.rdata)
-                return reply
+            for record in reply.rr:
+                if record.ttl < self.min_ttl:
+                    record.ttl = self.min_ttl
             #print(reply)
         except Exception as e:
             print(f"Error: {e}")
@@ -188,22 +189,22 @@ def send_udp(data,host,port):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="DNS Proxy")
-    p.add_argument("--port","-p",type=int,default=53,
+    p.add_argument("--port",type=int,default=53,
                     metavar="<port>",
                     help="Local proxy port (default:53)")
-    p.add_argument("--address","-a",default="127.0.0.2",
+    p.add_argument("--address",default="127.0.0.2",
                     metavar="<address>",
                     help="Local proxy listen address (default:all)")
-    p.add_argument("--upstream","-u",default="127.0.0.1:53",
+    p.add_argument("--upstream",default="127.0.0.1:53",
                     metavar="<dns server:port>",
                     help="Upstream DNS server:port (default:127.0.0.1:53)")
-    p.add_argument("--tcp",action="store_true",default=False,
-                    help="TCP proxy (default: UDP only)")
-    p.add_argument("--timeout","-o",type=float,default=5,
+    p.add_argument("--tcp",action="store_true",default=True,
+                    help="TCP proxy (default: True)")
+    p.add_argument("--timeout",type=float,default=5,
                     metavar="<timeout>",
                     help="Upstream timeout (default: 5s)")
     p.add_argument("--passthrough",action="store_true",default=False,
-                    help="Dont decode/re-encode request/response (default: off)")
+                    help="Dont decode/re-encode request/response (default: False)")
     p.add_argument("--log",default="truncated,error",
                     help="Log hooks to enable (default: +truncated,+error,-request,-reply,-recv,-send,-data)")
     p.add_argument("--log-prefix",action="store_true",default=False,
@@ -211,12 +212,15 @@ if __name__ == "__main__":
     p.add_argument("--ip-range",default="10.30.0.0/15",
                     metavar="<ip/mask>",
                     help="Fake IP range (default:10.30.0.0/15)")
-    p.add_argument("--cleanup-interval","-c",type=int,default=3600,
+    p.add_argument("--cleanup-interval",type=int,default=3600,
                     metavar="<seconds>",
                     help="Seconds between fake IP cleanup runs (default: 3600)")
-    p.add_argument("--cleanup-expiry","-e",type=int,default=7200,
+    p.add_argument("--cleanup-expiry",type=int,default=7200,
                     metavar="<seconds>",
                     help="Seconds of inactivity before fake IP is removed (default: 7200)")
+    p.add_argument("--min-ttl",type=int,default=300,
+                    metavar="<seconds>",
+                    help="Minimum TTL in seconds (default: 300)")                    
     args = p.parse_args()
     args.dns,_,args.dns_port = args.upstream.partition(":")
     args.dns_port = int(args.dns_port or 53)
@@ -224,7 +228,7 @@ if __name__ == "__main__":
                         args.address or "*",args.port,
                         args.dns,args.dns_port,
                         "UDP/TCP" if args.tcp else "UDP"))
-    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry)
+    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry,args.min_ttl)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
     logger = DNSLogger(args.log,args.log_prefix)
     udp_server = DNSServer(resolver,
