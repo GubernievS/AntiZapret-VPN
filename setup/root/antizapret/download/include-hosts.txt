@@ -664,6 +664,7 @@ login.microsoftonline.com
 login.live.com
 fpt.live.com
 account.live.com
+msftauth.net
 msauth.net
 deepl.com
 ikea.ee
