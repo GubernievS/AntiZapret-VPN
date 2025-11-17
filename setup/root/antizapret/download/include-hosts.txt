@@ -661,6 +661,8 @@ saksoff5th.com
 rabbit-labs.com
 se.com.sa
 login.microsoftonline.com
+login.live.com
+msauth.net
 deepl.com
 ikea.ee
 ikea.lt
