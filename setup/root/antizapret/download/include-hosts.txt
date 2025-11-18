@@ -830,6 +830,7 @@ adblockplus.org
 russkoetv.shop
 matrikonopc.de
 hdrezka-home.tv
+kia.com
 
 # Блокирует DNS
 library.hydra.wiki
