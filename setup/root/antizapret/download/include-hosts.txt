@@ -525,7 +525,7 @@ ralphlauren.com
 ralphlauren.nl
 calvinklein.us
 calvinklein.nl
-michaelkors.com
+#michaelkors.com
 michaelkors.global
 nike.com
 vonderste.in
@@ -629,6 +629,7 @@ onfastspring.com
 gap.com
 costco.com
 nordstromrack.com
+nordstrommedia.com
 tjmaxx.tjx.com
 abercrombie.com
 adobe.io
@@ -860,7 +861,6 @@ usertrust.com
 identrust.com
 crl.microsoft.com
 mscrl.microsoft.com
-
 
 # Повторяющиеся > 10 раз
 003.casino
