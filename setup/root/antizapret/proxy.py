@@ -28,7 +28,7 @@ class ProxyResolver(BaseResolver):
         'real' transparent proxy option the DNSHandler logic needs to be
         modified (see PassthroughDNSHandler)
     """
-    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry,min_ttl):
+    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry,min_ttl,max_ttl):
         self.ip_pool = deque([str(x) for x in IPv4Network(ip_range).hosts()])
         self.ip_map = {}
         # Loading existing mappings
@@ -48,6 +48,7 @@ class ProxyResolver(BaseResolver):
         self.cleanup_interval = cleanup_interval
         self.cleanup_expiry = cleanup_expiry
         self.min_ttl = min_ttl
+        self.max_ttl = max_ttl
         self.lock = threading.Lock()
         # Start thread for cleanup fake IPs
         threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
@@ -134,6 +135,8 @@ class ProxyResolver(BaseResolver):
             for record in reply.rr:
                 if record.ttl < self.min_ttl:
                     record.ttl = self.min_ttl
+                elif record.ttl > self.max_ttl:
+                    record.ttl = self.max_ttl
             #print(reply)
         except Exception as e:
             print(f"Error: {e}")
@@ -217,10 +220,13 @@ if __name__ == "__main__":
                     help="Seconds between fake IP cleanup runs (default: 3600)")
     p.add_argument("--cleanup-expiry",type=int,default=7200,
                     metavar="<seconds>",
-                    help="Seconds of inactivity before fake IP is removed (default: 7200)")
+                    help="Seconds of inactivity before fake IP is removed (default: max-ttl * 2)")
     p.add_argument("--min-ttl",type=int,default=300,
                     metavar="<seconds>",
-                    help="Minimum TTL in seconds (default: 300)")                    
+                    help="Minimum TTL in seconds (default: 300)")
+    p.add_argument("--max-ttl",type=int,default=3600,
+                    metavar="<seconds>",
+                    help="Maximum TTL in seconds (default: 3600)")
     args = p.parse_args()
     args.dns,_,args.dns_port = args.upstream.partition(":")
     args.dns_port = int(args.dns_port or 53)
@@ -228,7 +234,7 @@ if __name__ == "__main__":
                         args.address or "*",args.port,
                         args.dns,args.dns_port,
                         "UDP/TCP" if args.tcp else "UDP"))
-    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry,args.min_ttl)
+    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry,args.min_ttl,args.max_ttl)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
     logger = DNSLogger(args.log,args.log_prefix)
     udp_server = DNSServer(resolver,
