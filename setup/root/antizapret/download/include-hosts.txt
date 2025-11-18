@@ -829,6 +829,7 @@ api.imgur.com
 adblockplus.org
 russkoetv.shop
 matrikonopc.de
+hdrezka-home.tv
 
 # Блокирует DNS
 library.hydra.wiki
