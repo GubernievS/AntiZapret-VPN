@@ -828,6 +828,7 @@ alexelec.run.place
 api.imgur.com
 adblockplus.org
 russkoetv.shop
+matrikonopc.de
 
 # Блокирует DNS
 library.hydra.wiki
