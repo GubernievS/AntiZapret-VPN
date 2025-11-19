@@ -9,6 +9,11 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+if [[ -n "$1" && "$1" != "host" && "$1" != "hosts" && "$1" != "noclear" && "$1" != "noclean" ]]; then
+	echo "Ignored invalid parameter: $1"
+	set -- ""
+fi
+
 echo 'Update AntiZapret VPN files:'
 
 cd /root/antizapret
@@ -93,7 +98,7 @@ AKAMAI_IPS_PATH="download/akamai-ips.txt"
 function download {
 	local path="${1}"
 	local tmp_path="${path}.tmp"
-	local link=$2
+	local link="$2"
 	echo "$path"
 	curl -fL "$link" -o "$tmp_path"
 	local_size="$(stat -c '%s' "$tmp_path")"
