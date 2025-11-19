@@ -26,7 +26,8 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-HOSTS_LINK="https://raw.githubusercontent.com/bol-van/rulist/main/reestr_hostname_resolvable_ip4.txt"
+HOSTS_LINK="https://antifilter.download/list/domains.lst"
+#HOSTS_LINK="https://raw.githubusercontent.com/bol-van/rulist/main/reestr_hostname_resolvable_ip4.txt"
 HOSTS_PATH="download/hosts.txt"
 
 #DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
