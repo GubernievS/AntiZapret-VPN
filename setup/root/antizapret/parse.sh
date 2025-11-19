@@ -25,7 +25,7 @@ for file in config/*.txt; do
 	sed -i -e '$a\' "$file"
 done
 
-if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
+if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	echo 'IPs...'
 
 	# Обрабатываем конфигурационные файлы
@@ -106,7 +106,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
+if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
@@ -222,9 +222,11 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 		cp -f result/proxy.rpz /etc/knot-resolver/proxy.rpz.tmp
 		mv -f /etc/knot-resolver/proxy.rpz.tmp /etc/knot-resolver/proxy.rpz
 		sleep 5
-		# Очищаем кэш Knot Resolver
-		count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
-		echo "DNS cache cleared: $count entries"
+		if [[ "$1" != "noclear" && "$1" != "noclean" ]]; then
+			# Очищаем кэш Knot Resolver
+			count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
+			echo "DNS cache cleared: $count entries"
+		fi
 	fi
 	
 fi
