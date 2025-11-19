@@ -31,9 +31,11 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-HOSTS_LINK="https://antifilter.download/list/domains.lst"
-#HOSTS_LINK="https://raw.githubusercontent.com/bol-van/rulist/main/reestr_hostname_resolvable_ip4.txt"
-HOSTS_PATH="download/hosts.txt"
+DOMAIN_LINK="https://antifilter.download/list/domains.lst"
+DOMAIN_PATH="download/domain.txt"
+
+DOMAIN2_LINK="https://community.antifilter.download/list/domains.lst"
+DOMAIN2_PATH="download/domain-2.txt"
 
 #DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
 #DUMP_PATH="download/dump.csv.gz"
@@ -123,7 +125,8 @@ download $DOALL_PATH $DOALL_LINK
 source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
-	download "$HOSTS_PATH" "$HOSTS_LINK"
+	download "$DOMAIN_PATH" "$DOMAIN_LINK"
+	download "$DOMAIN2_PATH" "$DOMAIN2_LINK"
 	( download $DUMP_PATH $DUMP_LINK ) || > "$DUMP_PATH"
 	( download $NXDOMAIN_PATH $NXDOMAIN_LINK ) || > "$NXDOMAIN_PATH"
 	download $RPZ_PATH $RPZ_LINK
