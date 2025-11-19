@@ -668,7 +668,6 @@ account.live.com
 signup.live.com
 msftauth.net
 msauth.net
-msidentity.com
 deepl.com
 ikea.ee
 ikea.lt
