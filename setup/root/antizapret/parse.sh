@@ -10,6 +10,11 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+if [[ -n "$1" && "$1" != "host" && "$1" != "hosts" && "$1" != "noclear" && "$1" != "noclean" ]]; then
+	echo "Ignored invalid parameter: $1"
+	set -- ""
+fi
+
 echo 'Parse AntiZapret VPN files:'
 
 export LC_ALL=C
