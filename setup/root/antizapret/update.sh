@@ -143,7 +143,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "noclean"]]; then
+if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	if [[ "$DISCORD_INCLUDE" = "y" ]]; then
 		download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
 	fi
