@@ -116,7 +116,7 @@ download $DOALL_PATH $DOALL_LINK
 
 source setup
 
-if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
+if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	download "$HOSTS_PATH" "$HOSTS_LINK"
 	( download $DUMP_PATH $DUMP_LINK ) || > "$DUMP_PATH"
 	( download $NXDOMAIN_PATH $NXDOMAIN_LINK ) || > "$NXDOMAIN_PATH"
@@ -143,7 +143,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" ]]; then
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" ]]; then
+if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "noclean"]]; then
 	if [[ "$DISCORD_INCLUDE" = "y" ]]; then
 		download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
 	fi
