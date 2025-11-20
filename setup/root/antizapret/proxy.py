@@ -154,7 +154,7 @@ class PassthroughDNSHandler(DNSHandler):
     def get_reply(self,data):
         host,port = self.server.resolver.address,self.server.resolver.port
         request = DNSRecord.parse(data)
-        #self.log_request(request)
+        self.server.logger.log_request(self,request)
         if self.protocol == "tcp":
             data = struct.pack("!H",len(data)) + data
             response = send_tcp(data,host,port)
@@ -162,7 +162,7 @@ class PassthroughDNSHandler(DNSHandler):
         else:
             response = send_udp(data,host,port)
         reply = DNSRecord.parse(response)
-        #self.log_reply(reply)
+        self.server.logger.log_reply(self,reply)
         return response
 
 def send_tcp(data,host,port):
@@ -170,25 +170,33 @@ def send_tcp(data,host,port):
         Helper function to send/receive DNS TCP request
         (in/out packets will have prepended TCP length header)
     """
-    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock.connect((host,port))
-    sock.sendall(data)
-    response = sock.recv(8192)
-    length = struct.unpack("!H",bytes(response[:2]))[0]
-    while len(response) - 2 < length:
-        response += sock.recv(8192)
-    sock.close()
-    return response
+    sock = None
+    try:
+        sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        sock.connect((host,port))
+        sock.sendall(data)
+        response = sock.recv(8192)
+        length = struct.unpack("!H",bytes(response[:2]))[0]
+        while len(response) - 2 < length:
+            response += sock.recv(8192)
+        return response
+    finally:
+        if (sock is not None):
+            sock.close()
 
 def send_udp(data,host,port):
     """
         Helper function to send/receive DNS UDP request
     """
-    sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    sock.sendto(data,(host,port))
-    response,server = sock.recvfrom(8192)
-    sock.close()
-    return response
+    sock = None
+    try:
+        sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        sock.sendto(data,(host,port))
+        response,server = sock.recvfrom(8192)
+        return response
+    finally:
+        if (sock is not None):
+            sock.close()
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="DNS Proxy")
@@ -236,7 +244,7 @@ if __name__ == "__main__":
                         "UDP/TCP" if args.tcp else "UDP"))
     resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry,args.min_ttl,args.max_ttl)
     handler = PassthroughDNSHandler if args.passthrough else DNSHandler
-    logger = DNSLogger(args.log,args.log_prefix)
+    logger = DNSLogger(args.log,prefix=args.log_prefix)
     udp_server = DNSServer(resolver,
                            port=args.port,
                            address=args.address,
