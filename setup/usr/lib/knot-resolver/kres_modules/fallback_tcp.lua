@@ -3,7 +3,7 @@ local M = {layer = {}}
 M.timeout = 2 * sec
 local ffi = require('ffi')
 ffi.cdef("void kr_server_selection_init(struct kr_query *qry);")
-function M.layer.produce(_, req, _)
+function M.layer.produce(_, req)
 	local qry = req.current_query
 	if qry.flags.TCP or qry.flags.STUB then return end
 	local now = ffi.C.kr_now()
