@@ -168,12 +168,12 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	cut -d ';' -f 2 download/dump.csv \
 	| iconv -f cp1251 -t utf8 \
-	| sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' \
+	| sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -n '/\.[а-яА-Яa-zA-Z]/ { s/^[[:punct:]]\+//; s/[[:punct:]]\+$//; p }' download/domain*.txt \
+	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' download/domain*.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
