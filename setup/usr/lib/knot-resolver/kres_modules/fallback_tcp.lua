@@ -5,7 +5,6 @@ local M = {}
 M.layer = {}
 M.timeout = 1 * sec
 M.layer.produce = function(state, req)
-	if state == kres.FAIL then return state end
 	local qry = req:current()
 	if qry.flags.TCP then return state end
 	local now = ffi.C.kr_now()
