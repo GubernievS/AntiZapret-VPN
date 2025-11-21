@@ -87,19 +87,20 @@ until [[ "$ANTIZAPRET_DNS" =~ ^[1-5]$ ]]; do
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'
-echo '    1) Cloudflare  - Recommended by default'
-echo '    2) Quad9       - Use if Cloudflare fails to resolve domains'
-echo '    3) Google *    - Use if Cloudflare/Quad9 fails to resolve domains'
-echo '    4) AdGuard *   - Use for blocking ads, trackers, malware and phishing websites'
-echo '    5) Comss **    - More details: https://comss.ru/disqus/page.php?id=7315'
-echo '    6) Xbox **     - More details: https://xbox-dns.ru'
-echo '    7) Malw **     - More details: https://info.dns.malw.link'
+echo '    1) Self-hosted  - Use previous DNS choice, recommended by default'
+echo '    2) Cloudflare   - Use if Self-hosted fails to resolve domains'
+echo '    3) Quad9        - Use if Self-hosted/Cloudflare fails to resolve domains'
+echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve domains'
+echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
+echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    7) Xbox **      - More details: https://xbox-dns.ru'
+echo '    8) Malw **      - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers supports EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
-until [[ "$VPN_DNS" =~ ^[1-7]$ ]]; do
-	read -rp 'DNS choice [1-7]: ' -e -i 1 VPN_DNS
+until [[ "$VPN_DNS" =~ ^[1-8]$ ]]; do
+	read -rp 'DNS choice [1-8]: ' -e -i 1 VPN_DNS
 done
 echo
 until [[ "$BLOCK_ADS" =~ (y|n) ]]; do
@@ -423,36 +424,36 @@ elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 	# Malw
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'46.226.165.53', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'46.226.165.53', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
 # Настраиваем DNS в полном VPN
-if [[ "$VPN_DNS" == "2" ]]; then
+if [[ "$VPN_DNS" == "3" ]]; then
 	# Quad9
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 9.9.9.10"\npush "dhcp-option DNS 149.112.112.10"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/9.9.9.10, 149.112.112.10/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "3" ]]; then
+elif [[ "$VPN_DNS" == "4" ]]; then
 	# Google
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 8.8.8.8"\npush "dhcp-option DNS 8.8.4.4"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/8.8.8.8, 8.8.4.4/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "4" ]]; then
+elif [[ "$VPN_DNS" == "5" ]]; then
 	# AdGuard
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/94.140.14.14, 94.140.15.15/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "5" ]]; then
+elif [[ "$VPN_DNS" == "6" ]]; then
 	# Comss
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 83.220.169.155"\npush "dhcp-option DNS 212.109.195.93"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/83.220.169.155, 212.109.195.93/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "6" ]]; then
+elif [[ "$VPN_DNS" == "7" ]]; then
 	# Xbox
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 176.99.11.77"\npush "dhcp-option DNS 80.78.247.254"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "7" ]]; then
+elif [[ "$VPN_DNS" == "8" ]]; then
 	# Malw
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 46.226.165.53"\npush "dhcp-option DNS 64.188.98.242"' /etc/openvpn/server/vpn*.conf
-	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/46.226.165.53, 64.188.98.242/' /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 64.188.98.242"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 64.188.98.242/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
