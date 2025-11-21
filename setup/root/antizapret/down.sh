@@ -77,7 +77,14 @@ iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 443 -j R
 # AmneziaWG redirection ports to WireGuard
 iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
-# DNS redirection to Knot Resolver
+# VPN DNS redirection to Knot Resolver
+iptables -w -t nat -D PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
+iptables -w -t nat -D PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
+iptables -w -t nat -D PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
+iptables -w -t nat -D PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
+iptables -w -t nat -D PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
+iptables -w -t nat -D PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
+# AntiZapret DNS redirection to Knot Resolver
 iptables -w -t nat -D PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
 iptables -w -t nat -D PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
 iptables -w -t nat -D PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
