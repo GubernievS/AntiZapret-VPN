@@ -10,6 +10,7 @@ googleapis.com
 gstatic.com
 youtu.be
 yt.be
+googleusercontent.com
 gvt1.com
 gvt2.com
 gvt3.com
@@ -19,6 +20,7 @@ signal.org
 hetzner.com
 lostfilm.tv
 licdn.com
+
 rutrk.org
 nnm-club.ws
 nnmclub.ch
@@ -411,6 +413,7 @@ freemyip.com
 static.monotype.com
 beacon3d.com
 wifimap.io
+#app.element.io
 matrix.org
 vector.im
 atelecom.biz
@@ -420,6 +423,7 @@ githubassets.com
 vscode.dev
 humblebundle.com
 geospy.ai
+#captcha-delivery.com
 developer.nvidia.com
 pny.com
 reverb.com
@@ -456,6 +460,7 @@ nflximg.com
 nflxsearch.net
 nflxso.net
 nflxvideo.net
+amazonaws.com
 nba.com
 delltechnologies.com
 download.lenovo.com
@@ -473,6 +478,7 @@ windscribe.com
 vpngate.net
 rebrand.ly
 adguard.com
+#antizapret.prostovpn.org
 avira.com
 mullvad.net
 invent.kde.org
@@ -587,6 +593,7 @@ chromewebstore.google.com
 kmail-lists.com
 klaviyo.com
 antpool.com
+#viabtc.com
 tenable.com
 steamdb.info
 ngrok.com
@@ -830,6 +837,12 @@ adblockplus.org
 russkoetv.shop
 matrikonopc.de
 hdrezka-home.tv
+cloudfront.net
+#azurefd.net
+a.run.app
+appspot.com
+biz.net.ru
+sl.pt
 
 # Блокирует DNS
 library.hydra.wiki
