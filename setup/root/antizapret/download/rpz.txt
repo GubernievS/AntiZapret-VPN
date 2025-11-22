@@ -31,4 +31,6 @@ unfiltered.adguard-dns.com A 0.0.0.0
 *.unfiltered.adguard-dns.com A 0.0.0.0
 family.adguard-dns.com A 0.0.0.0
 *.family.adguard-dns.com A 0.0.0.0
+dns.alidns.com A 0.0.0.0
+*.dns.alidns.com A 0.0.0.0
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
