@@ -25,6 +25,12 @@ sandbox.opendns.com A 0.0.0.0
 *.sandbox.opendns.com A 0.0.0.0
 doh.cleanbrowsing.org A 0.0.0.0
 *.doh.cleanbrowsing.org A 0.0.0.0
+family-filter-dns.cleanbrowsing.org A 0.0.0.0
+*.family-filter-dns.cleanbrowsing.org A 0.0.0.0
+adult-filter-dns.cleanbrowsing.org A 0.0.0.0
+*.adult-filter-dns.cleanbrowsing.org A 0.0.0.0
+security-filter-dns.cleanbrowsing.org A 0.0.0.0
+*.security-filter-dns.cleanbrowsing.org A 0.0.0.0
 dot.dns.yandex.net A 0.0.0.0
 *.dot.dns.yandex.net A 0.0.0.0
 dns.adguard-dns.com A 0.0.0.0
