@@ -1,4 +1,32 @@
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
+cloudflare-dns.com A 0.0.0.0
+*.cloudflare-dns.com A 0.0.0.0
+dns.cloudflare.com A 0.0.0.0
+*.dns.cloudflare.com A 0.0.0.0
+dns.quad9.net A 0.0.0.0
+*.dns.quad9.net A 0.0.0.0
+dns10.quad9.net A 0.0.0.0
+*.dns10.quad9.net A 0.0.0.0
+dns11.quad9.net A 0.0.0.0
+*.dns11.quad9.net A 0.0.0.0
+dns.nextdns.io A 0.0.0.0
+*.dns.nextdns.io A 0.0.0.0
+dns.google.com A 0.0.0.0
+*.dns.google.com A 0.0.0.0
+dns.google A 0.0.0.0
+*.dns.google A 0.0.0.0
+doh.opendns.com A 0.0.0.0
+*.doh.opendns.com A 0.0.0.0
+doh.cleanbrowsing.org A 0.0.0.0
+*.doh.cleanbrowsing.org A 0.0.0.0
+dot.dns.yandex.net A 0.0.0.0
+*.dot.dns.yandex.net A 0.0.0.0
+dns.adguard-dns.com A 0.0.0.0
+*.dns.adguard-dns.com A 0.0.0.0
+unfiltered.adguard-dns.com A 0.0.0.0
+*.unfiltered.adguard-dns.com A 0.0.0.0
+family.adguard-dns.com A 0.0.0.0
+*.family.adguard-dns.com A 0.0.0.0
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
