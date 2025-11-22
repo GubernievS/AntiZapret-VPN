@@ -15,8 +15,12 @@ dns.google.com A 0.0.0.0
 *.dns.google.com A 0.0.0.0
 dns.google A 0.0.0.0
 *.dns.google A 0.0.0.0
+dns.opendns.com A 0.0.0.0
+*.dns.opendns.com A 0.0.0.0
 doh.opendns.com A 0.0.0.0
 *.doh.opendns.com A 0.0.0.0
+familyshield.opendns.com A 0.0.0.0
+*.familyshield.opendns.com A 0.0.0.0
 doh.cleanbrowsing.org A 0.0.0.0
 *.doh.cleanbrowsing.org A 0.0.0.0
 dot.dns.yandex.net A 0.0.0.0
