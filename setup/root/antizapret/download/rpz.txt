@@ -1,24 +1,30 @@
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
-local IN CNAME .
-*.local IN CNAME .
-cloudflare-dns.com CNAME .
-*.cloudflare-dns.com CNAME .
-dns.nextdns.io CNAME .
-*.dns.nextdns.io CNAME .
-dns.google.com CNAME .
-*.dns.google.com CNAME .
-dns.google CNAME .
-*.dns.google CNAME .
-doh.opendns.com CNAME .
-*.doh.opendns.com CNAME .
-doh.cleanbrowsing.org CNAME .
-*.doh.cleanbrowsing.org CNAME .
-dot.dns.yandex.net CNAME .
-*.dot.dns.yandex.net CNAME .
-dns.adguard-dns.com CNAME .
-*.dns.adguard-dns.com CNAME .
-unfiltered.adguard-dns.com CNAME .
-*.unfiltered.adguard-dns.com CNAME .
-family.adguard-dns.com CNAME .
-*.family.adguard-dns.com CNAME .
+cloudflare-dns.com A 0.0.0.0
+*.cloudflare-dns.com A 0.0.0.0
+dns.cloudflare.com A 0.0.0.0
+*.dns.cloudflare.com A 0.0.0.0
+dns.quad9.net A 0.0.0.0
+*.dns.quad9.net A 0.0.0.0
+dns10.quad9.net A 0.0.0.0
+*.dns10.quad9.net A 0.0.0.0
+dns11.quad9.net A 0.0.0.0
+*.dns11.quad9.net A 0.0.0.0
+dns.nextdns.io A 0.0.0.0
+*.dns.nextdns.io A 0.0.0.0
+dns.google.com A 0.0.0.0
+*.dns.google.com A 0.0.0.0
+dns.google A 0.0.0.0
+*.dns.google A 0.0.0.0
+doh.opendns.com A 0.0.0.0
+*.doh.opendns.com A 0.0.0.0
+doh.cleanbrowsing.org A 0.0.0.0
+*.doh.cleanbrowsing.org A 0.0.0.0
+dot.dns.yandex.net A 0.0.0.0
+*.dot.dns.yandex.net A 0.0.0.0
+dns.adguard-dns.com A 0.0.0.0
+*.dns.adguard-dns.com A 0.0.0.0
+unfiltered.adguard-dns.com A 0.0.0.0
+*.unfiltered.adguard-dns.com A 0.0.0.0
+family.adguard-dns.com A 0.0.0.0
+*.family.adguard-dns.com A 0.0.0.0
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
