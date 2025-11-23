@@ -843,6 +843,7 @@ a.run.app
 appspot.com
 biz.net.ru
 sl.pt
+anydesk.com
 
 # Блокирует DNS
 library.hydra.wiki
@@ -855,6 +856,7 @@ myfootball.life
 support.pokemon.com
 en.help.roblox.com
 meta.ai
+support.opendns.com
 
 # Сертификаты
 letsencrypt.org
