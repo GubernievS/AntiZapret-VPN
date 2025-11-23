@@ -844,6 +844,7 @@ appspot.com
 biz.net.ru
 sl.pt
 anydesk.com
+thetvdb.com
 
 # Блокирует DNS
 library.hydra.wiki
