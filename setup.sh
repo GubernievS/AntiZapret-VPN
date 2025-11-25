@@ -243,6 +243,9 @@ systemctl disable apparmor &>/dev/null
 systemctl stop apport &>/dev/null
 systemctl disable apport &>/dev/null
 
+systemctl stop ModemManager &>/dev/null
+systemctl disable ModemManager &>/dev/null
+
 #
 # Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
