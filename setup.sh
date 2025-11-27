@@ -492,17 +492,17 @@ fi
 
 #
 # Включим обновляемые службы
-systemctl disable --now kresd@1
-systemctl disable --now kresd@2
-systemctl disable --now antizapret
-systemctl disable --now antizapret-update
-systemctl disable --now antizapret-update.timer
-systemctl disable --now openvpn-server@antizapret-udp
-systemctl disable --now openvpn-server@antizapret-tcp
-systemctl disable --now openvpn-server@vpn-udp
-systemctl disable --now openvpn-server@vpn-tcp
-systemctl disable --now wg-quick@antizapret
-systemctl disable --now wg-quick@vpn
+systemctl enable kresd@1
+systemctl enable kresd@2
+systemctl enable antizapret
+systemctl enable antizapret-update
+systemctl enable antizapret-update.timer
+systemctl enable openvpn-server@antizapret-udp
+systemctl enable openvpn-server@antizapret-tcp
+systemctl enable openvpn-server@vpn-udp
+systemctl enable openvpn-server@vpn-tcp
+systemctl enable wg-quick@antizapret
+systemctl enable wg-quick@vpn
 
 ERRORS=""
 
