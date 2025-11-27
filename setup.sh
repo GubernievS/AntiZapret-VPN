@@ -216,35 +216,31 @@ systemctl stop apt-daily-upgrade.timer &>/dev/null
 
 #
 # Остановим и выключим обновляемые службы
-for service in kresd@ openvpn-server@ wg-quick@; do
-	systemctl list-units --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl stop &>/dev/null
-	systemctl list-unit-files --type=service --no-pager | awk -v s="$service" '$1 ~ s"[^.]+\\.service" {print $1}' | xargs -r systemctl disable &>/dev/null
-done
+systemctl disable --now kresd@1 &>/dev/null
+systemctl disable --now kresd@2 &>/dev/null
+systemctl disable --now antizapret &>/dev/null
+systemctl disable --now antizapret-update &>/dev/null
+systemctl disable --now antizapret-update.timer &>/dev/null
+systemctl disable --now openvpn-server@antizapret-udp &>/dev/null
+systemctl disable --now openvpn-server@antizapret-tcp &>/dev/null
+systemctl disable --now openvpn-server@vpn-udp &>/dev/null
+systemctl disable --now openvpn-server@vpn-tcp &>/dev/null
+systemctl disable --now wg-quick@antizapret &>/dev/null
+systemctl disable --now wg-quick@vpn &>/dev/null
 
-systemctl stop antizapret &>/dev/null
-systemctl disable antizapret &>/dev/null
-
-systemctl stop antizapret-update &>/dev/null
-systemctl disable antizapret-update &>/dev/null
-
-systemctl stop antizapret-update.timer &>/dev/null
-systemctl disable antizapret-update.timer &>/dev/null
-
+#
 # Остановим и выключим ненужные службы
-systemctl stop firewalld &>/dev/null
 ufw disable &>/dev/null
-
-systemctl disable firewalld &>/dev/null
-systemctl disable ufw &>/dev/null
-
-systemctl stop apparmor &>/dev/null
-systemctl disable apparmor &>/dev/null
-
-systemctl stop apport &>/dev/null
-systemctl disable apport &>/dev/null
-
-systemctl stop ModemManager &>/dev/null
-systemctl disable ModemManager &>/dev/null
+systemctl disable --now ufw &>/dev/null
+systemctl disable --now firewalld &>/dev/null
+systemctl disable --now apparmor &>/dev/null
+systemctl disable --now apport &>/dev/null
+systemctl disable --now ModemManager &>/dev/null
+systemctl disable --now snapd.socket &>/dev/null
+systemctl disable --now snapd &>/dev/null
+systemctl disable --now upower &>/dev/null
+systemctl disable --now multipathd.socket &>/dev/null
+systemctl disable --now multipathd &>/dev/null
 
 #
 # Удаляем кэш Knot Resolver
@@ -496,17 +492,17 @@ fi
 
 #
 # Включим обновляемые службы
-systemctl enable kresd@1
-systemctl enable kresd@2
-systemctl enable antizapret
-systemctl enable antizapret-update
-systemctl enable antizapret-update.timer
-systemctl enable openvpn-server@antizapret-udp
-systemctl enable openvpn-server@antizapret-tcp
-systemctl enable openvpn-server@vpn-udp
-systemctl enable openvpn-server@vpn-tcp
-systemctl enable wg-quick@antizapret
-systemctl enable wg-quick@vpn
+systemctl disable --now kresd@1
+systemctl disable --now kresd@2
+systemctl disable --now antizapret
+systemctl disable --now antizapret-update
+systemctl disable --now antizapret-update.timer
+systemctl disable --now openvpn-server@antizapret-udp
+systemctl disable --now openvpn-server@antizapret-tcp
+systemctl disable --now openvpn-server@vpn-udp
+systemctl disable --now openvpn-server@vpn-tcp
+systemctl disable --now wg-quick@antizapret
+systemctl disable --now wg-quick@vpn
 
 ERRORS=""
 
