@@ -845,6 +845,9 @@ biz.net.ru
 sl.pt
 anydesk.com
 thetvdb.com
+wa.me
+whatsapp.com
+whatsapp.net
 
 # Блокирует DNS
 library.hydra.wiki
