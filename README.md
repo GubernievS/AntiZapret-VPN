@@ -166,11 +166,11 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 - [4vps.su](https://4vps.su/r/cPe6t2yHR101) - ссылка для регистрации со скидкой на первую покупку 20%
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10%
 - [aeza.net](https://aeza.net/?ref=529527) - ссылка для регистрации с бонусом 15% если пополнение сделать в течении 24 часов с момента регистрации
+- [waicore](https://waicore.com/?from=11334)
 - [h2.nexus](https://h2.nexus)
 
 Сервера в Европе НЕ принимающие рубли:
 - [senko.digital](https://senko.digital/?ref=1483520)
-- [waicore](https://waicore.com/?from=11334)
 
 Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект!
 
