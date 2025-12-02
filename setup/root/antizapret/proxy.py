@@ -117,9 +117,8 @@ class ProxyResolver(BaseResolver):
                 #print("GOT A")
                 newrr = []
                 for record in reply.rr:
-                    if record.rtype != QTYPE.A:
-                        continue
-                    newrr.append(record)
+                    if record.rtype == QTYPE.A:
+                        newrr.append(record)
                 reply.rr = newrr
                 for record in reply.rr:
                     #print(dir(record))
@@ -132,11 +131,10 @@ class ProxyResolver(BaseResolver):
                         return reply
                     record.rdata = A(fake_ip)
                     record.rname = request.q.qname
-            for record in reply.rr:
-                if record.ttl < self.min_ttl:
-                    record.ttl = self.min_ttl
-                elif record.ttl > self.max_ttl:
-                    record.ttl = self.max_ttl
+                    if record.ttl < self.min_ttl:
+                        record.ttl = self.min_ttl
+                    elif record.ttl > self.max_ttl:
+                        record.ttl = self.max_ttl
             #print(reply)
         except Exception as e:
             print(f"Error: {e}")
