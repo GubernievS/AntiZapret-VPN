@@ -849,6 +849,7 @@ wa.me
 whatsapp.com
 whatsapp.net
 entware.net
+roblox.com
 
 # Блокирует DNS
 library.hydra.wiki
