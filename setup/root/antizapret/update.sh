@@ -97,6 +97,12 @@ GOOGLE_IPS_PATH="download/google-ips.txt"
 AKAMAI_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/akamai-ips.txt"
 AKAMAI_IPS_PATH="download/akamai-ips.txt"
 
+WHATSAPP_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/whatsapp-ips.txt"
+WHATSAPP_IPS_PATH="download/whatsapp-ips.txt"
+
+ROBLOX_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/roblox-ips.txt"
+ROBLOX_IPS_PATH="download/roblox-ips.txt"
+
 function download {
 	local path="${1}"
 	local tmp_path="${path}.tmp"
@@ -188,6 +194,14 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 
 	if [[ "$AKAMAI_INCLUDE" = "y" ]]; then
 		download $AKAMAI_IPS_PATH $AKAMAI_IPS_LINK
+	fi
+
+	if [[ "$WHATSAPP_INCLUDE" = "y" ]]; then
+		download $WHATSAPP_IPS_PATH $WHATSAPP_IPS_LINK
+	fi
+
+	if [[ "$ROBLOX_INCLUDE" = "y" ]]; then
+		download $ROBLOX_IPS_PATH $ROBLOX_IPS_LINK
 	fi
 fi
 
