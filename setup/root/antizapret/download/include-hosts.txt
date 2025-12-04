@@ -853,6 +853,22 @@ roblox.com
 rbxcdn.com
 facetime.apple.com 
 facetime-apple-com.we.apple-dns.net
+pepephone.com
+onlineprinters.com
+onlineprinters.org
+onlineprinters.be
+onlineprinters.dk
+onlineprinters.de
+onlineprinters.es
+onlineprinters.fr
+onlineprinters.ie
+onlineprinters.it
+onlineprinters.lu
+onlineprinters.nl
+onlineprinters.at
+onlineprinters.pl
+onlineprinters.se
+onlineprinters.ch
 
 # Блокирует DNS
 library.hydra.wiki
