@@ -851,6 +851,8 @@ whatsapp.net
 entware.net
 roblox.com
 rbxcdn.com
+facetime.apple.com 
+facetime-apple-com.we.apple-dns.net
 
 # Блокирует DNS
 library.hydra.wiki
