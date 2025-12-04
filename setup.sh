@@ -175,6 +175,14 @@ until [[ "$TELEGRAM_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Telegram IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y TELEGRAM_INCLUDE
 done
 echo
+until [[ "$WHATSAPP_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include WhatsApp IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y WHATSAPP_INCLUDE
+done
+echo
+until [[ "$ROBLOX_INCLUDE" =~ (y|n) ]]; do
+	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y ROBLOX_INCLUDE
+done
+echo
 until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
 done
@@ -378,6 +386,8 @@ ROUTE_ALL=${ROUTE_ALL}
 DISCORD_INCLUDE=${DISCORD_INCLUDE}
 CLOUDFLARE_INCLUDE=${CLOUDFLARE_INCLUDE}
 TELEGRAM_INCLUDE=${TELEGRAM_INCLUDE}
+WHATSAPP_INCLUDE=${WHATSAPP_INCLUDE}
+ROBLOX_INCLUDE=${ROBLOX_INCLUDE}
 AMAZON_INCLUDE=${AMAZON_INCLUDE}
 HETZNER_INCLUDE=${HETZNER_INCLUDE}
 DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
