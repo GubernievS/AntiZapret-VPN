@@ -114,7 +114,7 @@ until [[ "$ALTERNATIVE_IP" =~ (y|n) ]]; do
 done
 echo
 until [[ "$OPENVPN_80_443_TCP" =~ (y|n) ]]; do
-	read -rp 'Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_80_443_TCP
+	read -rp 'Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i n OPENVPN_80_443_TCP
 done
 echo
 until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
