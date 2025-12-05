@@ -394,9 +394,9 @@ DIGITALOCEAN_INCLUDE=${DIGITALOCEAN_INCLUDE}
 OVH_INCLUDE=${OVH_INCLUDE}
 GOOGLE_INCLUDE=${GOOGLE_INCLUDE}
 AKAMAI_INCLUDE=${AKAMAI_INCLUDE}
+CLEAR_HOSTS=y
 DEFAULT_INTERFACE=
-DEFAULT_IP=
-CLEAR_HOSTS=y" > /tmp/antizapret/setup/root/antizapret/setup
+DEFAULT_IP=" > /tmp/antizapret/setup/root/antizapret/setup
 
 #
 # Создаем папки для кэша Knot Resolver
