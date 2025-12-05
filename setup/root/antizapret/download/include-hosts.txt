@@ -870,6 +870,16 @@ onlineprinters.pl
 onlineprinters.se
 onlineprinters.ch
 
+meet.google.com
+stun.l.google.com
+stun1.l.google.com
+stun2.l.google.com
+stun3.l.google.com
+stun4.l.google.com
+
+#stun.cloudflare.com
+#stun.nextcloud.com
+
 # Блокирует DNS
 library.hydra.wiki
 help.keenetic.com
