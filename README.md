@@ -163,9 +163,10 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 
 ## Где купить сервер
 Сервера в Европе принимающие рубли:
-- [4vps.su](https://4vps.su/r/cPe6t2yHR101) - ссылка для регистрации со скидкой на первую покупку 20%
-- [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10%
-- [aeza.net](https://aeza.net/?ref=529527) - ссылка для регистрации с бонусом 15% если пополнение сделать в течении 24 часов с момента регистрации
+- [4vps.su](https://4vps.su/r/cPe6t2yHR101) - ссылка для регистрации со скидкой 20% на первую покупку
+- [4vps.su](https://4vps.su/r/hUR44U5dcD3J) - ссылка для регистрации с бонусом 20% к первому пополнению
+- [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10% к первому пополнению
+- [aeza.net](https://aeza.net/?ref=529527) - ссылка для регистрации с бонусом 15% к первому пополнению который будет действовать 24 часа
 - [waicore](https://waicore.com/?from=11334)
 - [senko.digital](https://senko.digital/?ref=1483520)
 - [h2.nexus](https://h2.nexus)
