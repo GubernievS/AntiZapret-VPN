@@ -40,11 +40,11 @@ DOMAIN2_PATH="download/domain-2.txt"
 #DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
 #DUMP_PATH="download/dump.csv.gz"
 #DUMP_LINK="https://svn.code.sf.net/p/zapret-info/code/dump.csv"
-#DUMP_PATH="download/dump.csv"
+DUMP_PATH="download/dump.csv"
 
 #NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
 #NXDOMAIN_LINK="https://svn.code.sf.net/p/zapret-info/code/nxdomain.txt"
-#NXDOMAIN_PATH="download/nxdomain.txt"
+NXDOMAIN_PATH="download/nxdomain.txt"
 
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
