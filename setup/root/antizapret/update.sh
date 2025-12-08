@@ -37,15 +37,6 @@ DOMAIN_PATH="download/domain.txt"
 DOMAIN2_LINK="https://community.antifilter.download/list/domains.lst"
 DOMAIN2_PATH="download/domain-2.txt"
 
-#DUMP_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv.gz"
-#DUMP_PATH="download/dump.csv.gz"
-#DUMP_LINK="https://svn.code.sf.net/p/zapret-info/code/dump.csv"
-DUMP_PATH="download/dump.csv"
-
-#NXDOMAIN_LINK="https://raw.githubusercontent.com/zapret-info/z-i/master/nxdomain.txt"
-#NXDOMAIN_LINK="https://svn.code.sf.net/p/zapret-info/code/nxdomain.txt"
-NXDOMAIN_PATH="download/nxdomain.txt"
-
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
 
@@ -57,6 +48,9 @@ INCLUDE_HOSTS_PATH="download/include-hosts.txt"
 
 EXCLUDE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt"
 EXCLUDE_HOSTS_PATH="download/exclude-hosts.txt"
+
+REMOVE_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/remove-hosts.txt.gz"
+REMOVE_HOSTS_PATH="download/remove-hosts.txt"
 
 INCLUDE_ADBLOCK_HOSTS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-adblock-hosts.txt"
 INCLUDE_ADBLOCK_HOSTS_PATH="download/include-adblock-hosts.txt"
@@ -134,13 +128,10 @@ source setup
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	download "$DOMAIN_PATH" "$DOMAIN_LINK"
 	download "$DOMAIN2_PATH" "$DOMAIN2_LINK"
-#	( download $DUMP_PATH $DUMP_LINK ) || > "$DUMP_PATH"
-#	( download $NXDOMAIN_PATH $NXDOMAIN_LINK ) || > "$NXDOMAIN_PATH"
-	> "$DUMP_PATH"
-	> "$NXDOMAIN_PATH"
 	download $RPZ_PATH $RPZ_LINK
 	download $RPZ2_PATH $RPZ2_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+	download $REMOVE_HOSTS_PATH $REMOVE_HOSTS_LINK
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
