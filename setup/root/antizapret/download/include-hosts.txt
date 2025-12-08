@@ -869,6 +869,7 @@ onlineprinters.at
 onlineprinters.pl
 onlineprinters.se
 onlineprinters.ch
+ip4.static.sl-reverse.com
 
 meet.google.com
 stun.l.google.com
