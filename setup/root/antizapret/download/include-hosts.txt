@@ -875,6 +875,7 @@ reolink.com
 
 meet.google.com
 stun.l.google.com
+stun-anycast.l.google.com
 stun1.l.google.com
 stun2.l.google.com
 stun3.l.google.com
