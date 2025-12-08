@@ -162,14 +162,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/nxdomain.txt config/*remove-hosts.txt > temp/remove-hosts.txt
-
-	# Обрабатываем дамп заблокированных ресурсов
-	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	cut -d ';' -f 2 download/dump.csv \
-	| iconv -f cp1251 -t utf8 \
-	| sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' \
-	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/remove-hosts.txt config/*remove-hosts.txt > temp/remove-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
