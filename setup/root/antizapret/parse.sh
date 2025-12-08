@@ -2,6 +2,12 @@
 set -e
 shopt -s nullglob
 
+###
+
+sed -i 's/IP-/IPv4-/g' /root/antizapret/config/*-ips.txt
+
+###
+
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
@@ -37,7 +43,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*exclude-ips.txt | sort -u > temp/exclude-ips.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/*include-ips.txt | sort -u > temp/include-ips.txt
 
-	# Убираем IP-адреса из исключений
+	# Убираем IPv4-адреса из исключений
 	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
 
 	# Обрабатываем конфигурационные файлы
