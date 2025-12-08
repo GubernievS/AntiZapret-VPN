@@ -870,6 +870,7 @@ onlineprinters.pl
 onlineprinters.se
 onlineprinters.ch
 ip4.static.sl-reverse.com
+azurefd.net
 
 meet.google.com
 stun.l.google.com
