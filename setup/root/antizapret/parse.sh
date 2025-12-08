@@ -181,8 +181,9 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	grep -vFxf temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
 	grep -vFxf temp/remove-hosts.txt temp/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
 
-	# Удаляем поддомены www. и m.
-	sed -E '/\..*\./ s/^(www|m)\.//' temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
+	# Удаляем избыточные поддомены
+	sed -E '/\..*\./ s/^(www[0-9]*|[A-Za-z0-9])\.//' temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
+
 
 	# Удаляем избыточные домены
 	sed 's/^/^/;s/$/$/' temp/include-hosts4.txt > temp/include-hosts5.txt
