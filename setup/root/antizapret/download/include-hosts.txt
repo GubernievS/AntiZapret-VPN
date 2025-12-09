@@ -872,7 +872,7 @@ onlineprinters.ch
 ip4.static.sl-reverse.com
 azurefd.net
 reolink.com
-
+neuesbad.de
 meet.google.com
 stun.l.google.com
 stun-anycast.l.google.com
