@@ -6,10 +6,10 @@ shopt -s nullglob
 
 sed -i 's/IP-/IPv4-/g' /root/antizapret/config/*-ips.txt
 
-if grep -qE 'HTTPS 1 \.|SVCB 1 \.' /etc/knot-resolver/kresd.conf; then
-	sed -i 's/HTTPS 1 \./HTTPS 0 ./g; s/SVCB 1 \./SVCB 0 ./g' /etc/knot-resolver/kresd.conf
-	systemctl restart kresd@*
-fi
+#if grep -qE 'HTTPS 1 \.|SVCB 1 \.' /etc/knot-resolver/kresd.conf; then
+#	sed -i 's/HTTPS 1 \./HTTPS 0 ./g; s/SVCB 1 \./SVCB 0 ./g' /etc/knot-resolver/kresd.conf
+#	systemctl restart kresd@*
+#fi
 
 ###
 
