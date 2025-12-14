@@ -884,6 +884,7 @@ turns.goog
 fpvcdn.com
 #stun.cloudflare.com
 #stun.nextcloud.com
+download.asrock.com
 
 # Блокирует DNS
 library.hydra.wiki
