@@ -885,6 +885,7 @@ fpvcdn.com
 #stun.cloudflare.com
 #stun.nextcloud.com
 download.asrock.com
+buf.build
 
 # Блокирует DNS
 library.hydra.wiki
