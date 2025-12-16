@@ -828,6 +828,7 @@ unsplash.com
 mega.nz
 mega.co.nz
 snapchat.com
+sc-cdn.net
 chattti.com
 centrum.cz
 openevidence.com
