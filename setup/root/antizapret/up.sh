@@ -108,6 +108,18 @@ fi
 # Clamp TCP MSS
 iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
+# raw
+# NOTRACK loopback
+iptables -w -t raw -A PREROUTING -i lo -j NOTRACK
+iptables -w -t raw -A OUTPUT -o lo -j NOTRACK
+ip6tables -w -t raw -A PREROUTING -i lo -j NOTRACK
+ip6tables -w -t raw -A OUTPUT -o lo -j NOTRACK
+# NOTRACK DNS
+iptables -w -t raw -A PREROUTING ! -s ${IP}.28.0.0/15 -p udp --dport 53 -j NOTRACK
+iptables -w -t raw -A PREROUTING ! -s ${IP}.28.0.0/15 -p tcp --dport 53 -j NOTRACK
+iptables -w -t raw -A OUTPUT ! -d ${IP}.28.0.0/15 -p udp --sport 53 -j NOTRACK
+iptables -w -t raw -A OUTPUT ! -d ${IP}.28.0.0/15 -p tcp --sport 53 -j NOTRACK
+
 # nat
 # OpenVPN TCP port redirection for backup connections
 if [[ "$OPENVPN_80_443_TCP" == "y" ]]; then
