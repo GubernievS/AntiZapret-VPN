@@ -67,6 +67,18 @@ ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit
 # Clamp TCP MSS
 iptables -w -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
+# raw
+# NOTRACK loopback
+iptables -w -t raw -D PREROUTING -i lo -j NOTRACK
+iptables -w -t raw -D OUTPUT -o lo -j NOTRACK
+ip6tables -w -t raw -D PREROUTING -i lo -j NOTRACK
+ip6tables -w -t raw -D OUTPUT -o lo -j NOTRACK
+# NOTRACK DNS
+iptables -w -t raw -D PREROUTING ! -s ${IP}.28.0.0/15 -p udp --dport 53 -j NOTRACK
+iptables -w -t raw -D PREROUTING ! -s ${IP}.28.0.0/15 -p tcp --dport 53 -j NOTRACK
+iptables -w -t raw -D OUTPUT ! -d ${IP}.28.0.0/15 -p udp --sport 53 -j NOTRACK
+iptables -w -t raw -D OUTPUT ! -d ${IP}.28.0.0/15 -p tcp --sport 53 -j NOTRACK
+
 # nat
 # OpenVPN TCP port redirection for backup connections
 iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p tcp --dport 80 -j REDIRECT --to-ports 50080
