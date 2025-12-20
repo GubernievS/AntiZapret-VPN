@@ -34,8 +34,8 @@ DOALL_PATH="doall.sh"
 DOMAIN_LINK="https://antifilter.download/list/domains.lst"
 DOMAIN_PATH="download/domain.txt"
 
-DOMAIN2_LINK="https://community.antifilter.download/list/domains.lst"
-DOMAIN2_PATH="download/domain-2.txt"
+#DOMAIN2_LINK="https://community.antifilter.download/list/domains.lst"
+#DOMAIN2_PATH="download/domain-2.txt"
 
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
@@ -127,7 +127,7 @@ source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	download "$DOMAIN_PATH" "$DOMAIN_LINK"
-	download "$DOMAIN2_PATH" "$DOMAIN2_LINK"
+#	download "$DOMAIN2_PATH" "$DOMAIN2_LINK"
 	download $RPZ_PATH $RPZ_LINK
 	download $RPZ2_PATH $RPZ2_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
