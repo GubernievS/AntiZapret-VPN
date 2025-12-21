@@ -36,7 +36,7 @@ if [[ "$DCO" == "y" ]]; then
 	apt-get update
 	apt-get dist-upgrade -y
 	apt-get install --reinstall -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
-	apt-get autoremove -y
+	apt-get autoremove --purge -y
 	apt-get clean
 	modprobe -r ovpn_dco_v2
 	modprobe ovpn_dco_v2
