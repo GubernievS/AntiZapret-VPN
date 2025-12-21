@@ -38,7 +38,7 @@ if [[ "$ALGORITHM" == "0" ]]; then
 		apt-get update
 		apt-get dist-upgrade -y
 		apt-get install --reinstall -y openvpn
-		apt-get autoremove -y
+		apt-get autoremove --purge -y
 		apt-get clean
 		systemctl daemon-reload
 		systemctl restart openvpn-server@*
