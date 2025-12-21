@@ -218,39 +218,35 @@ done
 
 #
 # Отключим фоновые обновления системы
-systemctl stop unattended-upgrades &>/dev/null
-systemctl stop apt-daily.timer &>/dev/null
-systemctl stop apt-daily-upgrade.timer &>/dev/null
+systemctl stop unattended-upgrades
+systemctl stop apt-daily.timer
+systemctl stop apt-daily-upgrade.timer
 
 #
 # Остановим и выключим обновляемые службы
-systemctl disable --now kresd@1 &>/dev/null
-systemctl disable --now kresd@2 &>/dev/null
-systemctl disable --now antizapret &>/dev/null
-systemctl disable --now antizapret-update &>/dev/null
-systemctl disable --now antizapret-update.timer &>/dev/null
-systemctl disable --now openvpn-server@antizapret-udp &>/dev/null
-systemctl disable --now openvpn-server@antizapret-tcp &>/dev/null
-systemctl disable --now openvpn-server@vpn-udp &>/dev/null
-systemctl disable --now openvpn-server@vpn-tcp &>/dev/null
-systemctl disable --now wg-quick@antizapret &>/dev/null
-systemctl disable --now wg-quick@vpn &>/dev/null
+systemctl disable --now kresd@1
+systemctl disable --now kresd@2
+systemctl disable --now antizapret
+systemctl disable --now antizapret-update
+systemctl disable --now antizapret-update.timer
+systemctl disable --now openvpn-server@antizapret-udp
+systemctl disable --now openvpn-server@antizapret-tcp
+systemctl disable --now openvpn-server@vpn-udp
+systemctl disable --now openvpn-server@vpn-tcp
+systemctl disable --now wg-quick@antizapret
+systemctl disable --now wg-quick@vpn
 
 #
-# Остановим и выключим ненужные службы
-ufw disable &>/dev/null
-systemctl disable --now ufw &>/dev/null
-systemctl disable --now firewalld &>/dev/null
-systemctl disable --now apparmor &>/dev/null
-systemctl disable --now apport &>/dev/null
-systemctl disable --now ModemManager &>/dev/null
-systemctl disable --now snapd.socket &>/dev/null
-systemctl disable --now snapd &>/dev/null
-systemctl disable --now upower &>/dev/null
-systemctl disable --now multipathd.socket &>/dev/null
-systemctl disable --now multipathd &>/dev/null
-#systemctl disable --now qemu-guest-agent &>/dev/null
-#apt-get remove --purge qemu-guest-agent -y &>/dev/null
+# Удалим ненужные службы
+apt-get purge -y ufw
+apt-get purge -y firewalld
+apt-get purge -y apparmor
+apt-get purge -y apport
+apt-get purge -y ModemManager
+apt-get purge -y snapd
+apt-get purge -y upower
+apt-get purge -y multipathd
+apt-get purge -y qemu-guest-agent
 
 #
 # Удаляем кэш Knot Resolver
@@ -265,7 +261,7 @@ rm -rf /etc/wireguard/templates/*
 
 #
 # Удаляем скомпилированный патченный OpenVPN
-make -C /usr/local/src/openvpn uninstall &>/dev/null
+make -C /usr/local/src/openvpn uninstall
 rm -rf /usr/local/src/openvpn
 
 #
@@ -332,7 +328,7 @@ fi
 # Ставим необходимые пакеты
 apt-get update
 apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance
-apt-get autoremove -y
+apt-get autoremove --purge -y
 apt-get clean
 
 #
@@ -348,20 +344,20 @@ git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 #
 # Сохраняем пользовательские настройки и обработчики custom*.sh
-cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
-cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ &>/dev/null || true
-cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ &>/dev/null || true
+cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ || true
+cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ || true
+cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ || true
 
 #
 # Восстанавливаем из бэкапа пользовательские настройки и обработчики custom*.sh, пользователей OpenVPN и WireGuard
-tar -xzf /root/backup*.tar.gz &>/dev/null || true
-rm -f /root/backup*.tar.gz &>/dev/null || true
+tar -xzf /root/backup*.tar.gz || true
+rm -f /root/backup*.tar.gz || true
 
-cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3/ &>/dev/null || true
-cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard/ &>/dev/null || true
-cp /root/config/* /tmp/antizapret/setup/root/antizapret/config/ &>/dev/null || true
-cp /root/knot-resolver/* /tmp/antizapret/setup/etc/knot-resolver/ &>/dev/null || true
-cp /root/custom/* /tmp/antizapret/setup/root/antizapret/ &>/dev/null || true
+cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3/ || true
+cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard/ || true
+cp /root/config/* /tmp/antizapret/setup/root/antizapret/config/ || true
+cp /root/knot-resolver/* /tmp/antizapret/setup/etc/knot-resolver/ || true
+cp /root/custom/* /tmp/antizapret/setup/root/antizapret/ || true
 
 rm -rf /root/easyrsa3
 rm -rf /root/wireguard
