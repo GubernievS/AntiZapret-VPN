@@ -242,10 +242,10 @@ apt-get purge -y ufw
 apt-get purge -y firewalld
 apt-get purge -y apparmor
 apt-get purge -y apport
-apt-get purge -y ModemManager
+apt-get purge -y modemmanager
 apt-get purge -y snapd
 apt-get purge -y upower
-apt-get purge -y multipathd
+apt-get purge -y multipath-tools
 apt-get purge -y qemu-guest-agent
 
 #
