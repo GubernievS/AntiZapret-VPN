@@ -249,6 +249,8 @@ systemctl disable --now snapd &>/dev/null
 systemctl disable --now upower &>/dev/null
 systemctl disable --now multipathd.socket &>/dev/null
 systemctl disable --now multipathd &>/dev/null
+#systemctl disable --now qemu-guest-agent &>/dev/null
+#apt-get remove --purge qemu-guest-agent -y &>/dev/null
 
 #
 # Удаляем кэш Knot Resolver
@@ -271,6 +273,10 @@ rm -rf /usr/local/src/openvpn
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+#
+# Принудительная загрузка модуля nf_conntrack
+echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
 #
 # Завершим выполнение скрипта при ошибке
