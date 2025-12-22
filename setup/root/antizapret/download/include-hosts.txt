@@ -20,7 +20,6 @@ signal.org
 hetzner.com
 lostfilm.tv
 licdn.com
-#t-ru.org
 rutrk.org
 nnm-club.ws
 nnmclub.ch
@@ -478,7 +477,6 @@ windscribe.com
 vpngate.net
 rebrand.ly
 adguard.com
-#antizapret.prostovpn.org
 avira.com
 mullvad.net
 invent.kde.org
