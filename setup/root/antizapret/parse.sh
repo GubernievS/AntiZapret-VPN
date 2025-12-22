@@ -115,10 +115,10 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
 	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/include-adblock-hosts.txt
@@ -142,8 +142,8 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/deny2.rpz
 	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
-	sed 's/\r//g; /^;/d; /^$/d' download/rpz.txt config/*rpz.txt >> result/deny.rpz
-	sed 's/\r//g; /^;/d; /^$/d' download/rpz2.txt config/*rpz2.txt >> result/deny2.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*rpz.txt config/*rpz.txt >> result/deny.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*rpz2.txt config/*rpz2.txt >> result/deny2.rpz
 
 	# Обновляем файл deny.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
@@ -160,13 +160,13 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	fi
 
 	# Обрабатываем конфигурационные файлы
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/remove-hosts.txt config/*remove-hosts.txt > temp/remove-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*remove-hosts.txt config/*remove-hosts.txt > temp/remove-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' download/domain*.txt \
+	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' download/domain.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
