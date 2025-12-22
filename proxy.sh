@@ -41,18 +41,18 @@ fi
 echo
 echo 'Preparing for installation, please wait...'
 
-# Stop and disable unnecessary services
-systemctl stop firewalld &>/dev/null || true
-ufw disable &>/dev/null || true
-
-systemctl disable firewalld &>/dev/null || true
-systemctl disable ufw &>/dev/null || true
-
-systemctl stop apparmor &>/dev/null || true
-systemctl disable apparmor &>/dev/null || true
-
-systemctl stop apport &>/dev/null || true
-systemctl disable apport &>/dev/null || true
+# Remove unnecessary services
+apt-get purge -y ufw
+apt-get purge -y firewalld
+apt-get purge -y apparmor
+apt-get purge -y apport
+apt-get purge -y modemmanager
+apt-get purge -y snapd
+apt-get purge -y upower
+apt-get purge -y multipath-tools
+apt-get purge -y rsyslog
+apt-get purge -y udisks2
+apt-get purge -y qemu-guest-agent
 
 # Set autosave
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
@@ -97,6 +97,9 @@ net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1
 EOF
+
+# Forced loading nf_conntrack module
+echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
 # Clamp TCP MSS
 iptables -F && iptables -t nat -F && iptables -t mangle -F
