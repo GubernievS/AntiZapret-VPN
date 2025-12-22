@@ -246,6 +246,8 @@ apt-get purge -y modemmanager
 apt-get purge -y snapd
 apt-get purge -y upower
 apt-get purge -y multipath-tools
+apt-get purge -y rsyslog
+apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
 
 #
