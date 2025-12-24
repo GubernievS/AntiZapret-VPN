@@ -887,6 +887,7 @@ download.asrock.com
 buf.build
 jabra.com
 bsh-group.com
+payment-website-pci.ol.epicgames.com
 
 # Блокирует DNS
 library.hydra.wiki
