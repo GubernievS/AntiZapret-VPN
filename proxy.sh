@@ -53,10 +53,11 @@ apt-get purge -y multipath-tools
 apt-get purge -y rsyslog
 apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
+apt-get purge -y tuned
 
 # Set autosave
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean false | sudo debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean false | debconf-set-selections
 
 # Install pkg
 export DEBIAN_FRONTEND=noninteractive
@@ -65,10 +66,12 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent
+apt-get install --reinstall -y iptables iptables-persistent irqbalance
+apt-get autoremove --purge -y
+apt-get clean
 
 # AntiZapret parameters modification
-sudo tee /etc/sysctl.d/99-antizapret.conf > /dev/null <<'EOF'
+cat <<'EOF' > /etc/sysctl.d/99-antizapret.conf
 # AntiZapret parameters modification
 net.ipv4.ip_forward=1
 kernel.printk=3 4 1 3
@@ -91,7 +94,7 @@ net.netfilter.nf_conntrack_buckets=65536
 EOF
 
 # Disable IPv6
-sudo tee /etc/sysctl.d/99-disable-ipv6.conf > /dev/null <<'EOF'
+cat <<'EOF' > /etc/sysctl.d/99-disable-ipv6.conf
 # Disable IPv6
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
