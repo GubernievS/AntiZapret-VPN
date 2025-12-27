@@ -888,6 +888,7 @@ buf.build
 jabra.com
 bsh-group.com
 payment-website-pci.ol.epicgames.com
+cloud-ip.cc
 
 # Блокирует DNS
 library.hydra.wiki
