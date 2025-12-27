@@ -137,7 +137,6 @@ chmod +x ./configure
 	--disable-ofb-cfb \
 	--disable-ntlm \
 	--disable-plugins \
-	--disable-management \
 	--disable-fragment \
 	--disable-wolfssl-options-h \
 	--disable-pam-dlopen \
