@@ -108,7 +108,7 @@ EOF
 # Forced loading nf_conntrack module
 echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
-# Clamp TCP MSS
+# Clear iptables
 iptables -F && iptables -t nat -F && iptables -t mangle -F
 
 # filter
