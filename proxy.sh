@@ -70,9 +70,9 @@ apt-get install --reinstall -y iptables iptables-persistent irqbalance
 apt-get autoremove --purge -y
 apt-get clean
 
-# AntiZapret parameters modification
-cat <<'EOF' > /etc/sysctl.d/99-antizapret.conf
-# AntiZapret parameters modification
+# Proxy parameters modification
+cat <<'EOF' > /etc/sysctl.d/99-proxy.conf
+# Proxy parameters modification
 net.ipv4.ip_forward=1
 kernel.printk=3 4 1 3
 net.core.default_qdisc=fq
@@ -91,6 +91,10 @@ net.core.netdev_budget_usecs=10000
 net.core.dev_weight=128
 net.ipv4.tcp_max_syn_backlog=1024
 net.netfilter.nf_conntrack_buckets=65536
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0
+net.netfilter.nf_conntrack_udp_timeout=120
+net.netfilter.nf_conntrack_udp_timeout_stream=180
 EOF
 
 # Disable IPv6
