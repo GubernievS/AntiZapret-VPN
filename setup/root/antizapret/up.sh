@@ -25,6 +25,9 @@ fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 
+# SoftIRQ CPU balance
+echo $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/*/queues/rx-0/rps_cpus >/dev/null
+
 # Clear knot-resolver cache
 count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
 echo "DNS cache cleared: $count entries"
