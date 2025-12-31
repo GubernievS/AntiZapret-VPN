@@ -10,7 +10,7 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 echo
-echo -e '\e[1;32mInstalling proxy for AntiZapret VPN\e[0m'
+echo -e '\e[1;32mInstalling proxy for AntiZapret VPN + full VPN\e[0m'
 echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
@@ -170,7 +170,7 @@ netfilter-persistent save
 
 # Rebooting
 echo
-echo -e '\e[1;32mProxy for AntiZapret VPN installed successfully!\e[0m'
+echo -e '\e[1;32mProxy for AntiZapret VPN + full VPN installed successfully!\e[0m'
 echo 'Rebooting...'
 
 reboot
