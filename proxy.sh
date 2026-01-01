@@ -135,6 +135,7 @@ ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 # mangle
 # Clamp TCP MSS
 iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # nat
 # OpenVPN TCP
