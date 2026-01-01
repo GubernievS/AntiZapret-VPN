@@ -889,6 +889,7 @@ jabra.com
 bsh-group.com
 payment-website-pci.ol.epicgames.com
 #cloud-ip.cc
+nissanusa.com
 
 # Блокирует DNS
 library.hydra.wiki
