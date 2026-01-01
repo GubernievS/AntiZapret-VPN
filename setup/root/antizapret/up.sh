@@ -26,7 +26,7 @@ fi
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 
 # SoftIRQ CPU balance
-echo $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/*/queues/rx-0/rps_cpus >/dev/null
+printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/$DEFAULT_INTERFACE/queues/rx-*/rps_cpus >/dev/null
 
 # Clear knot-resolver cache
 count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
@@ -110,6 +110,7 @@ fi
 # mangle
 # Clamp TCP MSS
 iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # raw
 # NOTRACK loopback
