@@ -171,6 +171,11 @@ deleteOpenVPN(){
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
 
+	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-udp.sock &>/dev/null || true
+	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-tcp.sock &>/dev/null || true
+	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/vpn-udp.sock &>/dev/null || true
+	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/vpn-tcp.sock &>/dev/null || true
+
 	echo "OpenVPN client '$CLIENT_NAME' successfully deleted"
 }
 
@@ -233,9 +238,7 @@ PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/antizapret.conf"
-		if systemctl is-active --quiet wg-quick@antizapret; then
-			wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
-		fi
+		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null) &>/dev/null || true
 	fi
 
 	render "/etc/wireguard/templates/antizapret-client-wg.conf" > "/root/antizapret/client/wireguard/antizapret/antizapret-$FILE_NAME-wg.conf"
@@ -272,9 +275,7 @@ PublicKey = ${CLIENT_PUBLIC_KEY}
 PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_IP}/32
 " >> "/etc/wireguard/vpn.conf"
-		if systemctl is-active --quiet wg-quick@vpn; then
-			wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
-		fi
+		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null) &>/dev/null || true
 	fi
 
 	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/antizapret/client/wireguard/vpn/vpn-$FILE_NAME-wg.conf"
@@ -303,13 +304,8 @@ deleteWireGuard(){
 	rm -f /root/antizapret/client/{wireguard,amneziawg}/antizapret/antizapret-$FILE_NAME-*.conf
 	rm -f /root/antizapret/client/{wireguard,amneziawg}/vpn/vpn-$FILE_NAME-*.conf
 
-	if systemctl is-active --quiet wg-quick@antizapret; then
-		wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null)
-	fi
-
-	if systemctl is-active --quiet wg-quick@vpn; then
-		wg syncconf vpn <(wg-quick strip vpn 2>/dev/null)
-	fi
+	wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null) &>/dev/null || true
+	wg syncconf vpn <(wg-quick strip vpn 2>/dev/null) &>/dev/null || true
 
 	echo "WireGuard/AmneziaWG client '$CLIENT_NAME' successfully deleted"
 }
@@ -383,7 +379,7 @@ backup(){
 
 	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
 	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
-	tar -tzf "$BACKUP_FILE" > /dev/null
+	tar -tzf "$BACKUP_FILE" >/dev/null
 
 	rm -rf /root/antizapret/backup
 
