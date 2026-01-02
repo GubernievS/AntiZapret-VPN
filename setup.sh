@@ -249,6 +249,7 @@ apt-get purge -y multipath-tools
 apt-get purge -y rsyslog
 apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
+apt-get purge -y tuned
 
 #
 # Удаляем кэш Knot Resolver
@@ -413,7 +414,8 @@ chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
-find /tmp/antizapret/setup/root/antizapret/ -type f -exec chmod +x {} +
+find /tmp/antizapret/setup/root/antizapret -type f -exec chmod +x {} +
+#find /tmp/antizapret/setup/etc/openvpn/server/scripts -type f -exec chmod +x {} +
 
 # Копируем нужное, удаляем не нужное
 find /tmp/antizapret -name '.gitkeep' -delete
@@ -485,7 +487,7 @@ fi
 #
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
 if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
-	sed -i '/^duplicate-cn/s/^/#/' /etc/openvpn/server/*.conf
+	sed -i '/duplicate/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
 #
@@ -495,8 +497,8 @@ if [[ "$OPENVPN_LOG" == "y" ]]; then
 fi
 
 #
-# Загружаем и создаем списки исключений IPv4-адресов
-/root/antizapret/doall.sh ip
+# Загружаем и создаем списки исключений
+/root/antizapret/doall.sh noclear
 
 #
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
