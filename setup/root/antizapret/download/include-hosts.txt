@@ -844,9 +844,9 @@ biz.net.ru
 sl.pt
 anydesk.com
 thetvdb.com
-wa.me
-whatsapp.com
-whatsapp.net
+#wa.me
+#whatsapp.com
+#whatsapp.net
 entware.net
 roblox.com
 rbxcdn.com
