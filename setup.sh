@@ -415,7 +415,7 @@ chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
 find /tmp/antizapret/setup/root/antizapret -type f -exec chmod +x {} +
-#find /tmp/antizapret/setup/etc/openvpn/server/scripts -type f -exec chmod +x {} +
+find /tmp/antizapret/setup/etc/openvpn/server/scripts -type f -exec chmod +x {} +
 
 # Копируем нужное, удаляем не нужное
 find /tmp/antizapret -name '.gitkeep' -delete
