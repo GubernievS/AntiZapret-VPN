@@ -98,6 +98,7 @@ net.core.somaxconn=4096
 net.ipv4.tcp_syncookies=1
 net.ipv4.udp_rmem_min=16384
 net.ipv4.udp_wmem_min=16384
+net.core.optmem_max=524288
 EOF
 
 # Disable IPv6
