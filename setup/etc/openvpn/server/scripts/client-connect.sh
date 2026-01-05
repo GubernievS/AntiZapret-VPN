@@ -11,9 +11,9 @@ if [[ ! -v duplicate_cn ]]; then
 fi
 
 if [[ -v IV_PLAT && "$IV_PLAT" != "linux" ]]; then
-	echo 'push "ifconfig-ipv6 dead::bad"' >> "$1"
-	echo 'push "redirect-gateway ipv6 !ipv4"' >> "$1"    
-	echo 'push "block-ipv6"' >> "$1"
+#	echo 'push "ifconfig-ipv6 dead::bad"' >> "$1"
+#	echo 'push "redirect-gateway ipv6 !ipv4"' >> "$1"    
+#	echo 'push "block-ipv6"' >> "$1"
 fi
 
 exit 0
