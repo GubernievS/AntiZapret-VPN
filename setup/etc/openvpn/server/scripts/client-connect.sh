@@ -10,9 +10,10 @@ if [[ ! -v duplicate_cn ]]; then
 	done
 fi
 
-if [[ "$dev" == antizapret* && -v IV_PLAT && "$IV_PLAT" != "linux" ]]; then
+if [[ -v IV_PLAT && "$IV_PLAT" != "linux" ]]; then
+	[[ "$dev" == vpn* ]] && ipv4_flag="" || ipv4_flag=" !ipv4"
 	echo "push \"ifconfig-ipv6 dead::bad\"
-push \"redirect-gateway ipv6 !ipv4\"
+push \"redirect-gateway ipv6$ipv4_flag\"
 push \"block-ipv6\"" >> "$1"
 fi
 
