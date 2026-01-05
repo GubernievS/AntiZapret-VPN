@@ -71,8 +71,7 @@ apt-get autoremove --purge -y
 apt-get clean
 
 # Proxy parameters modification
-cat <<'EOF' > /etc/sysctl.d/99-proxy.conf
-# Proxy parameters modification
+echo "# Proxy parameters modification
 net.ipv4.ip_forward=1
 kernel.printk=3 4 1 3
 net.core.default_qdisc=fq
@@ -98,16 +97,13 @@ net.core.somaxconn=4096
 net.ipv4.tcp_syncookies=1
 net.ipv4.udp_rmem_min=16384
 net.ipv4.udp_wmem_min=16384
-net.core.optmem_max=524288
-EOF
+net.core.optmem_max=524288" > /etc/sysctl.d/99-proxy.conf
 
 # Disable IPv6
-cat <<'EOF' > /etc/sysctl.d/99-disable-ipv6.conf
-# Disable IPv6
+echo "# Disable IPv6
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
-net.ipv6.conf.lo.disable_ipv6=1
-EOF
+net.ipv6.conf.lo.disable_ipv6=1" > /etc/sysctl.d/99-disable-ipv6.conf
 
 # Forced loading nf_conntrack module
 echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
