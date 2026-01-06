@@ -10,7 +10,7 @@ if [[ ! -v duplicate_cn ]]; then
 	done
 fi
 
-if [[ -v IV_PLAT && "$IV_PLAT" != "linux" ]]; then
+if [[ "$IV_PLAT" == "android" ]]; then
 	[[ "$dev" == vpn* ]] && ipv4_flag="" || ipv4_flag=" !ipv4"
 	echo "push \"ifconfig-ipv6 2001::dead\"
 push \"redirect-gateway ipv6$ipv4_flag\"
