@@ -12,7 +12,7 @@ fi
 
 if [[ "$IV_PLAT" == "android" ]]; then
 	[[ "$dev" == vpn* ]] && ipv4_flag="" || ipv4_flag=" !ipv4"
-	echo "push \"ifconfig-ipv6 2001::dead\"
+	echo "push \"ifconfig-ipv6 2001::dead/64 2001::1\"
 push \"redirect-gateway ipv6$ipv4_flag\"
 push \"block-ipv6\"" >> "$1"
 fi
