@@ -26,6 +26,10 @@ if [[ "$IV_PLAT" == "android" ]]; then
 	echo "push \"ifconfig-ipv6 2001::dead/64 2001::1\"
 push \"redirect-gateway ipv6$ipv4_flag\"
 push \"block-ipv6\"" >> "$1"
+elif [[ "$IV_PLAT" == "ios" ]]; then
+	echo "push \"ifconfig-ipv6 fd00::dead/64 fd00::1\"
+push \"route-ipv6 2000::/3 100::1\"
+push \"block-ipv6\"" >> "$1"
 fi
 
 exit 0
