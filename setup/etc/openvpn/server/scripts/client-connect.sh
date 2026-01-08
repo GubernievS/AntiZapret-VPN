@@ -15,6 +15,10 @@ if [[ "$IV_PLAT" == "android" || "$IV_PLAT" == "ios" ]]; then
 push \"route-ipv6 ::/1\"
 push \"route-ipv6 8000::/1\"
 push \"block-ipv6\"" >> "$1"
+elif [[ "$IV_PLAT" == "win" || "$IV_PLAT" == "mac" ]]; then
+	echo "push \"ifconfig-ipv6 fd00::dead/64 fd00::1\"
+push \"route-ipv6 ::/1\"
+push \"route-ipv6 8000::/1\"" >> "$1"
 fi
 
 exit 0
