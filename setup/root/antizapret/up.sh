@@ -57,10 +57,6 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -w -I FORWARD 4 -s ${IP}.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 	iptables -w -I FORWARD 5 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
-# Client isolation
-if [[ "$CLIENT_ISOLATION" == "y" ]]; then
-	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
-fi
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
@@ -71,6 +67,12 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 		done < result/forward-ips.txt
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+# Client isolation
+if [[ "$CLIENT_ISOLATION" == "y" ]]; then
+	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
+else
+	iptables -w -I FORWARD 2 -d ${IP}.28.0.0/15 -j ACCEPT
 fi
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then

@@ -143,12 +143,12 @@ until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
 	read -rp $'Enable torrent guard for \001\e[1;32m\002full VPN\001\e[0m\002? [y/n]: ' -e -i y TORRENT_GUARD
 done
 echo
-until [[ "$CLIENT_ISOLATION" =~ (y|n) ]]; do
-	read -rp $'Enable VPN client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
-done
-echo
 until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
 	read -rp $'Restrict forwarding in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 to IPs from config/forward-ips.txt and result/route-ips.txt? [y/n]: ' -e -i y RESTRICT_FORWARD
+done
+echo
+until [[ "$CLIENT_ISOLATION" =~ (y|n) ]]; do
+	read -rp $'Enable VPN client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
@@ -388,8 +388,8 @@ OPENVPN_LOG=${OPENVPN_LOG}
 SSH_PROTECTION=${SSH_PROTECTION}
 ATTACK_PROTECTION=${ATTACK_PROTECTION}
 TORRENT_GUARD=${TORRENT_GUARD}
-CLIENT_ISOLATION=${CLIENT_ISOLATION}
 RESTRICT_FORWARD=${RESTRICT_FORWARD}
+CLIENT_ISOLATION=${CLIENT_ISOLATION}
 OPENVPN_HOST=${OPENVPN_HOST}
 WIREGUARD_HOST=${WIREGUARD_HOST}
 ROUTE_ALL=${ROUTE_ALL}
