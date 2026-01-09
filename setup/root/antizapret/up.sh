@@ -58,7 +58,9 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -w -I FORWARD 5 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Client isolation
-iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
+if [[ "$CLIENT_ISOLATION" == "y" ]]; then
+	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
+fi
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	{
