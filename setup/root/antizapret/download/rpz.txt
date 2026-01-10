@@ -41,12 +41,12 @@ family.adguard-dns.com CNAME .
 *.family.adguard-dns.com CNAME .
 dns.alidns.com CNAME .
 *.dns.alidns.com CNAME .
-usmall.ru A 3.161.82.8
-*.usmall.ru A 3.161.82.8
-usmall.ru A 3.162.38.7
-*.usmall.ru A 3.162.38.7
-usmall.ru A 18.64.119.98
-*.usmall.ru A 18.64.119.98
-usmall.ru A 18.66.192.97
-*.usmall.ru A 18.66.192.97
+;usmall.ru A 3.161.82.8
+;*.usmall.ru A 3.161.82.8
+;usmall.ru A 3.162.38.7
+;*.usmall.ru A 3.162.38.7
+;usmall.ru A 18.64.119.98
+;*.usmall.ru A 18.64.119.98
+;usmall.ru A 18.66.192.97
+;*.usmall.ru A 18.66.192.97
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
