@@ -110,6 +110,7 @@ echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
 # Clear iptables
 iptables -F && iptables -t nat -F && iptables -t mangle -F
+ip6tables -F && ip6tables -t nat -F && ip6tables -t mangle -F
 
 # filter
 # Default policy
@@ -168,6 +169,7 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
+# Save new rules
 netfilter-persistent save
 systemctl enable netfilter-persistent
 
