@@ -892,6 +892,9 @@ bsh-group.com
 payment-website-pci.ol.epicgames.com
 #cloud-ip.cc
 nissanusa.com
+xhcdn.com
+xnxx-cdn.com
+xvideos-cdn.com
 
 # Блокирует DNS
 library.hydra.wiki
