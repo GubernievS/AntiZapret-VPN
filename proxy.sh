@@ -169,6 +169,7 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
 netfilter-persistent save
+systemctl enable netfilter-persistent
 
 # Rebooting
 echo
