@@ -242,18 +242,18 @@ systemctl disable --now wg-quick@vpn 2>/dev/null
 
 #
 # Удалим ненужные службы
-apt-get purge -y ufw || true
-apt-get purge -y firewalld || true
-apt-get purge -y apparmor || true
-apt-get purge -y apport || true
-apt-get purge -y modemmanager || true
-apt-get purge -y snapd || true
-apt-get purge -y upower || true
-apt-get purge -y multipath-tools || true
-apt-get purge -y rsyslog || true
-apt-get purge -y udisks2 || true
-apt-get purge -y qemu-guest-agent || true
-apt-get purge -y tuned || true
+apt-get purge -y ufw
+apt-get purge -y firewalld
+apt-get purge -y apparmor
+apt-get purge -y apport
+apt-get purge -y modemmanager
+apt-get purge -y snapd
+apt-get purge -y upower
+apt-get purge -y multipath-tools
+apt-get purge -y rsyslog
+apt-get purge -y udisks2
+apt-get purge -y qemu-guest-agent
+apt-get purge -y tuned
 
 #
 # Удаляем кэш Knot Resolver
