@@ -228,17 +228,17 @@ systemctl stop apt-daily-upgrade.timer
 
 #
 # Остановим и выключим обновляемые службы
-systemctl disable --now kresd@1
-systemctl disable --now kresd@2
-systemctl disable --now antizapret
-systemctl disable --now antizapret-update.timer
-systemctl disable --now antizapret-update
-systemctl disable --now openvpn-server@antizapret-udp
-systemctl disable --now openvpn-server@antizapret-tcp
-systemctl disable --now openvpn-server@vpn-udp
-systemctl disable --now openvpn-server@vpn-tcp
-systemctl disable --now wg-quick@antizapret
-systemctl disable --now wg-quick@vpn
+systemctl disable --now kresd@1 2>/dev/null
+systemctl disable --now kresd@2 2>/dev/null
+systemctl disable --now antizapret 2>/dev/null
+systemctl disable --now antizapret-update.timer 2>/dev/null
+systemctl disable --now antizapret-update 2>/dev/null
+systemctl disable --now openvpn-server@antizapret-udp 2>/dev/null
+systemctl disable --now openvpn-server@antizapret-tcp 2>/dev/null
+systemctl disable --now openvpn-server@vpn-udp 2>/dev/null
+systemctl disable --now openvpn-server@vpn-tcp 2>/dev/null
+systemctl disable --now wg-quick@antizapret 2>/dev/null
+systemctl disable --now wg-quick@vpn 2>/dev/null
 
 #
 # Удалим ненужные службы
