@@ -195,8 +195,8 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 ```
 bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/proxy.sh)
 ```
-3. Введите IPv4-адрес зарубежного сервера АнтиЗапрета
-4. Замените в профилях подключения IPv4-адрес/домен АнтиЗапрета на новый IPv4-адрес/домен прокси-сервера
+3. Ввести IPv4-адрес зарубежного сервера АнтиЗапрета
+4. Заменить в профилях подключения IPv4-адрес/домен АнтиЗапрета на новый IPv4-адрес/домен прокси-сервера
 5. На сервере АнтиЗапрета в файл /root/antizapret/config/allow-ips.txt записать IPv4-адрес прокси-сервера и выполнить
 ```
 /root/antizapret/parse.sh ip
