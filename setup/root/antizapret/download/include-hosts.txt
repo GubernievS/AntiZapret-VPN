@@ -895,6 +895,7 @@ nissanusa.com
 xhcdn.com
 xnxx-cdn.com
 xvideos-cdn.com
+pixelbuilds.org
 
 # Блокирует DNS
 library.hydra.wiki
