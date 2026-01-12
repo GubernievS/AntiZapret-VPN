@@ -75,7 +75,7 @@ echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
 echo '        +MSK-IX+NSDI *'
 echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
-echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    3) Comss **          - Not recommended! More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    4) Xbox **           - More details: https://xbox-dns.ru'
 echo '    5) Malw **           - More details: https://info.dns.malw.link'
 echo
@@ -92,7 +92,7 @@ echo '    2) Cloudflare   - Use if Self-hosted fails to resolve domains'
 echo '    3) Quad9        - Use if Self-hosted/Cloudflare fails to resolve domains'
 echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve domains'
 echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
-echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
+echo '    6) Comss **     - Not recommended! More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    7) Xbox **      - More details: https://xbox-dns.ru'
 echo '    8) Malw **      - More details: https://info.dns.malw.link'
 echo
@@ -444,8 +444,8 @@ elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 	# Malw
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -472,8 +472,8 @@ elif [[ "$VPN_DNS" == "7" ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254, 31.192.108.180/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "8" ]]; then
 	# Malw
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 64.188.98.242"' /etc/openvpn/server/vpn*.conf
-	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 64.188.98.242/' /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 193.23.209.189"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 193.23.209.189/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
