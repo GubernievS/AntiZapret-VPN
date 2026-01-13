@@ -1,4 +1,12 @@
 #!/bin/bash
+
+###
+
+sed -i "s/, '195.208.4.1', '195.208.5.1'//g" /etc/knot-resolver/kresd.conf
+systemctl restart kresd@*
+
+###
+
 set -e
 shopt -s nullglob
 
