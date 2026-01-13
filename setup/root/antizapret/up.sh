@@ -84,22 +84,22 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 		done < result/allow-ips.txt
 	} | ipset restore
 	ipset create antizapret-block hash:ip timeout 600 -exist
-	ipset create antizapret-watch hash:ip,port timeout 60 -exist
+	ipset create antizapret-watch hash:ip,port timeout 600 -exist
 	iptables -w -I INPUT 2 -i "$DEFAULT_INTERFACE" -p icmp --icmp-type echo-request -j DROP
 	iptables -w -I INPUT 3 -i "$DEFAULT_INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
-	iptables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
-	iptables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block src --exist
+	iptables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
+	iptables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
 	iptables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 	iptables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
 	iptables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
 	iptables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
 	ipset create antizapret-allow6 hash:net family inet6 -exist
 	ipset create antizapret-block6 hash:ip timeout 600 family inet6 -exist
-	ipset create antizapret-watch6 hash:ip,port timeout 60 family inet6 -exist
+	ipset create antizapret-watch6 hash:ip,port timeout 600 family inet6 -exist
 	ip6tables -w -I INPUT 2 -i "$DEFAULT_INTERFACE" -p icmpv6 --icmpv6-type echo-request -j DROP
 	ip6tables -w -I INPUT 3 -i "$DEFAULT_INTERFACE" -m set --match-set antizapret-allow6 src -j ACCEPT
-	ip6tables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
-	ip6tables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 60000 -j SET --add-set antizapret-block6 src --exist
+	ip6tables -w -I INPUT 4 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
+	ip6tables -w -I INPUT 5 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 	ip6tables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 	ip6tables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
