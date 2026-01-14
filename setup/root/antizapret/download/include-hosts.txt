@@ -898,6 +898,7 @@ xvideos-cdn.com
 pixelbuilds.org
 united24media.com
 hoo.be
+nuxt.dev
 
 # Блокирует DNS
 library.hydra.wiki
