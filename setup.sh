@@ -76,7 +76,7 @@ echo '    1) Cloudflare+Quad9  - Recommended by default'
 echo '       +MSK-IX+SkyDNS *'
 echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
-echo '    4) Xbox **           - More details: https://xbox-dns.ru'
+echo '    4) XBox **           - More details: https://xbox-dns.ru'
 echo '    5) Malw **           - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers optimized for users located in Russia'
@@ -93,7 +93,7 @@ echo '    3) Quad9        - Use if Self-hosted/Cloudflare fails to resolve domai
 echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve domains'
 echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
 echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
-echo '    7) Xbox **      - More details: https://xbox-dns.ru'
+echo '    7) XBox **      - More details: https://xbox-dns.ru'
 echo '    8) Malw **      - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers supports EDNS Client Subnet'
@@ -439,7 +439,7 @@ elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
 	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
-	# Xbox
+	# XBox
 	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
@@ -467,7 +467,7 @@ elif [[ "$VPN_DNS" == "6" ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 83.220.169.155"\npush "dhcp-option DNS 212.109.195.93"\npush "dhcp-option DNS 195.133.25.16"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/83.220.169.155, 212.109.195.93, 195.133.25.16/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "7" ]]; then
-	# Xbox
+	# XBox
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 176.99.11.77"\npush "dhcp-option DNS 80.78.247.254"\npush "dhcp-option DNS 31.192.108.180"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254, 31.192.108.180/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "8" ]]; then
