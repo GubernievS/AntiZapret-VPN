@@ -3,6 +3,7 @@
 ###
 
 sed -i "s/, '195.208.4.1', '195.208.5.1'//g" /etc/knot-resolver/kresd.conf
+sed -i "s/{'62.76.76.62', '62.76.62.76'}/{'62.76.76.62', '62.76.62.76', '193.58.251.251'}/" /etc/knot-resolver/kresd.conf
 systemctl restart kresd@*
 
 ###
