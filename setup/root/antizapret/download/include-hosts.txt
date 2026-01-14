@@ -897,6 +897,7 @@ xnxx-cdn.com
 xvideos-cdn.com
 pixelbuilds.org
 united24media.com
+hoo.be
 
 # Блокирует DNS
 library.hydra.wiki
