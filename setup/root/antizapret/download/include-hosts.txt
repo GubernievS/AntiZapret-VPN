@@ -899,6 +899,7 @@ pixelbuilds.org
 united24media.com
 hoo.be
 nuxt.dev
+nasa.gov
 
 # Блокирует DNS
 library.hydra.wiki
