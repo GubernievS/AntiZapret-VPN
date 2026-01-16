@@ -124,29 +124,30 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 }\
 ' "/usr/local/src/openvpn/src/openvpn/socket.h"
 
-cd /usr/local/src/openvpn
-chmod +x ./configure
-./configure \
-	--enable-systemd \
-	--enable-dco \
-	--enable-dco-arg \
-	--enable-small \
-	--disable-debug \
-	--disable-lzo \
-	--disable-lz4 \
-	--disable-ofb-cfb \
-	--disable-ntlm \
-	--disable-plugins \
-	--disable-fragment \
-	--disable-wolfssl-options-h \
-	--disable-pam-dlopen \
-	--disable-plugin-auth-pam \
-	--disable-x509-alt-username \
-	--disable-pkcs11 \
-	--disable-selinux \
-	--disable-plugin-down-root
-make
-make install
+(
+	cd /usr/local/src/openvpn
+	chmod +x ./configure
+	./configure \
+		--enable-systemd \
+		--enable-dco \
+		--enable-small \
+		--enable-port-share \
+		--disable-debug \
+		--disable-lzo \
+		--disable-lz4 \
+		--disable-ofb-cfb \
+		--disable-plugins \
+		--disable-fragment \
+		--disable-wolfssl-options-h \
+		--disable-pam-dlopen \
+		--disable-plugin-auth-pam \
+		--disable-x509-alt-username \
+		--disable-pkcs11 \
+		--disable-selinux \
+		--disable-plugin-down-root
+	make
+	make install
+)
 systemctl daemon-reload
 systemctl restart openvpn-server@*
 echo
