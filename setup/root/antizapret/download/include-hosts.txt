@@ -900,6 +900,7 @@ united24media.com
 hoo.be
 nuxt.dev
 nasa.gov
+lovable.dev
 
 # Блокирует DNS
 library.hydra.wiki
