@@ -16,6 +16,7 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 export LC_ALL=C
+export EASYRSA_PKI=/etc/openvpn/easyrsa3/pki
 
 askClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
@@ -71,12 +72,11 @@ render() {
 
 initOpenVPN(){
 	mkdir -p /etc/openvpn/easyrsa3
-	cd /etc/openvpn/easyrsa3
 
-	if [[ ! -f ./pki/ca.crt ]] || \
-	   [[ ! -f ./pki/issued/antizapret-server.crt ]] || \
-	   [[ ! -f ./pki/private/antizapret-server.key ]]; then
-		rm -rf ./pki
+	if [[ ! -f /etc/openvpn/easyrsa3/pki/ca.crt ]] || \
+	   [[ ! -f /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt ]] || \
+	   [[ ! -f /etc/openvpn/easyrsa3/pki/private/antizapret-server.key ]]; then
+		rm -rf /etc/openvpn/easyrsa3/pki
 		rm -rf /etc/openvpn/server/keys
 		rm -rf /etc/openvpn/client/keys
 		/usr/share/easy-rsa/easyrsa init-pki
@@ -90,24 +90,23 @@ initOpenVPN(){
 	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
 	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
 	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
-		cp ./pki/ca.crt /etc/openvpn/server/keys/ca.crt
-		cp ./pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-		cp ./pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
+		cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
+		cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
+		cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 	fi
 
 	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
 		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-		chmod 644 ./pki/crl.pem
-		cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+		chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
+		cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 	fi
 }
 
 addOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
-	cd /etc/openvpn/easyrsa3
 
-	if [[ ! -f ./pki/issued/$CLIENT_NAME.crt ]] || \
-	   [[ ! -f ./pki/private/$CLIENT_NAME.key ]]; then
+	if [[ ! -f /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt ]] || \
+	   [[ ! -f /etc/openvpn/easyrsa3/pki/private/$CLIENT_NAME.key ]]; then
 		askClientCertExpire
 		echo
 		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
@@ -117,12 +116,12 @@ addOpenVPN(){
 		echo
 		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
 			echo 'Current client certificate expiration period:'
-			openssl x509 -in ./pki/issued/$CLIENT_NAME.crt -noout -dates
+			openssl x509 -in /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt -noout -dates
 			echo
 			echo "Attention! Certificate renewal is NOT possible after 'notAfter' date"
 			askClientCertExpire
 			echo
-			rm -f ./pki/issued/$CLIENT_NAME.crt
+			rm -f /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt
 			/usr/share/easy-rsa/easyrsa --batch --days=$CLIENT_CERT_EXPIRE sign client $CLIENT_NAME
 			rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
 		fi
@@ -130,8 +129,8 @@ addOpenVPN(){
 
 	if [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.crt ]] || \
 	   [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.key ]]; then
-		cp ./pki/issued/$CLIENT_NAME.crt /etc/openvpn/client/keys/$CLIENT_NAME.crt
-		cp ./pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
+		cp /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt /etc/openvpn/client/keys/$CLIENT_NAME.crt
+		cp /etc/openvpn/easyrsa3/pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
 	fi
 
 	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
@@ -155,12 +154,11 @@ addOpenVPN(){
 deleteOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
 	echo
-	cd /etc/openvpn/easyrsa3
 
 	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-	chmod 644 ./pki/crl.pem
-	cp ./pki/crl.pem /etc/openvpn/server/keys/crl.pem
+	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
+	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 
 	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-$FILE_NAME.ovpn
 	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn
