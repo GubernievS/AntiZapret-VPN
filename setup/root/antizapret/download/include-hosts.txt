@@ -901,6 +901,8 @@ hoo.be
 nuxt.dev
 nasa.gov
 lovable.dev
+lobste.rs
+hard-tm.su
 
 # Блокирует DNS
 library.hydra.wiki
