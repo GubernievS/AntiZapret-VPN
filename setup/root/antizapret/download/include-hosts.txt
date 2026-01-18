@@ -903,6 +903,8 @@ nasa.gov
 lovable.dev
 lobste.rs
 hard-tm.su
+nintendo.net
+#nintendo.com
 
 # Блокирует DNS
 library.hydra.wiki
