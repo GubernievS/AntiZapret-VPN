@@ -73,7 +73,7 @@ apt-get clean
 # Proxy parameters modification
 echo "# Proxy parameters modification
 kernel.printk=3 4 1 3
-kernel.panic=10
+kernel.panic=1
 kernel.panic_on_oops=1
 kernel.softlockup_panic=1
 kernel.hardlockup_panic=1
