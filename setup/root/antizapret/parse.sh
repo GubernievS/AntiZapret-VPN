@@ -19,7 +19,7 @@ net.core.wmem_max=4194304
 net.ipv4.tcp_rmem=4096 16384 4194304
 net.ipv4.tcp_wmem=4096 16384 4194304
 net.ipv4.tcp_no_metrics_save=1
-net.core.netdev_budget=300
+net.core.netdev_budget=600
 net.ipv4.tcp_fastopen=3
 net.ipv4.ip_local_port_range=10000 50000
 net.netfilter.nf_conntrack_max=131072
@@ -40,7 +40,7 @@ net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_slow_start_after_idle=0
 net.netfilter.nf_conntrack_tcp_timeout_established=86400" > /etc/sysctl.d/99-antizapret.conf
 
-sysctl --system
+sysctl --system &>/dev/null
 
 fi
 
@@ -85,7 +85,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' download/*ips.txt config/*include-ips.txt | sort -u > temp/include-ips.txt
 
 	# Убираем IPv4-адреса из исключений
-	grep -vFxf temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt || > temp/route-ips.txt
+	comm -13 temp/exclude-ips.txt temp/include-ips.txt > temp/route-ips.txt
 
 	# Обрабатываем конфигурационные файлы
 	awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' temp/route-ips.txt > result/route-ips.txt
@@ -162,19 +162,16 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/oisd.txt download/*include-adblock-hosts.txt config/*include-adblock-hosts.txt > temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/include-adblock-hosts.txt
+	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки от AdGuard
-	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed '/^[0-9.]*$/d' >> temp/exclude-adblock-hosts.txt
-
-	# Обрабатываем список с рекламными доменами для блокировки от OISD
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/oisd.txt >> temp/include-adblock-hosts.txt
+	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/exclude-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
 	sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
@@ -207,31 +204,43 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	fi
 
 	# Обрабатываем конфигурационные файлы
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*exclude-hosts.txt config/*exclude-hosts.txt > temp/exclude-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//' download/*remove-hosts.txt config/*remove-hosts.txt > temp/remove-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-hosts.txt config/*exclude-hosts.txt | sort -u > temp/exclude-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*remove-hosts.txt config/*remove-hosts.txt | sort -u > temp/remove-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{/^[а-яА-Яa-zA-Z0-9.-]\+$/p}' download/domain.txt \
+	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{s/.*/\L&/; /^[а-яa-z0-9.-]\+$/p}' download/domain.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
 	if [[ "$CLEAR_HOSTS" == "y" ]]; then
-		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|official|slottica|sykaaa|admiral-*x|x-*admiral|pinup-*bet|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|newretro|platinum|igrat|flagman|arkada' temp/include-hosts.txt > temp/include-hosts2.txt \
-		|| cp temp/include-hosts.txt temp/include-hosts2.txt
+		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|official|slottica|sykaaa|admiral-*x|x-*admiral|pinup-*bet|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|newretro|platinum|igrat|flagman|arkada' temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
 	else
-		cp temp/include-hosts.txt temp/include-hosts2.txt
+		sort -u temp/include-hosts.txt > temp/include-hosts2.txt
 	fi
 
 	# Удаляем не существующие домены
-	grep -vFxf temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
-	grep -vFxf temp/remove-hosts.txt temp/exclude-hosts.txt | sort -u > result/exclude-hosts.txt
+	comm -13 temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
+	comm -13 temp/remove-hosts.txt temp/exclude-hosts.txt > result/exclude-hosts.txt
 
 	# Удаляем избыточные поддомены
 	sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
 
 	# Удаляем избыточные домены
+
+#	rev temp/include-hosts4.txt | \
+#	sort -t '.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 -k8,8 -k9,9 -k10,10 \
+#	-k11,11 -k12,12 -k13,13 -k14,14 -k15,15 -k16,16 -k17,17 -k18,18 -k19,19 -k20,20 | \
+#	awk 'BEGIN { last = "" }
+#	{
+#		if (last != "" && index($0, last ".") == 1) {
+#			next
+#		}
+#		last = $0
+#		print $0
+#	}' | rev > temp/include-hosts5.txt
+
 	sed 's/^/^/;s/$/$/' temp/include-hosts4.txt > temp/include-hosts5.txt
 	sed 's/^/./;s/$/$/' temp/include-hosts4.txt > temp/exclude-patterns.txt
 	grep -vFf temp/exclude-patterns.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
