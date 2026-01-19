@@ -7,7 +7,6 @@
 
 export LC_ALL=C
 
-#
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
@@ -16,34 +15,31 @@ fi
 
 cd /root
 
-#
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
 	exit 3
 fi
 
-#
 # Проверка версии системы
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
 if [[ "$OS" == "debian" ]]; then
-	if [[ $VERSION -lt 11 ]]; then
-		echo 'Error: Your Debian version is not supported!'
+	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
+		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
 		exit 4
 	fi
 elif [[ "$OS" == "ubuntu" ]]; then
-	if [[ $VERSION -lt 22 ]]; then
-		echo 'Error: Your Ubuntu version is not supported!'
+	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
+		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
 		exit 5
 	fi
 elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
-	echo 'Error: Your Linux version is not supported!'
+	echo "Error: Your Linux distribution ($OS) is not supported!"
 	exit 6
 fi
 
-#
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	echo 'Error: Low disk space! You need 2GB of free space!'
@@ -55,7 +51,6 @@ echo -e '\e[1;32mInstalling AntiZapret VPN + full VPN...\e[0m'
 echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 
-#
 # Спрашиваем о настройках
 echo
 echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
@@ -213,20 +208,17 @@ done
 echo
 echo 'Preparing for installation, please wait...'
 
-#
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do
 	echo 'Waiting for apt-get to finish...';
 	sleep 5;
 done
 
-#
 # Отключим фоновые обновления системы
 systemctl stop unattended-upgrades
 systemctl stop apt-daily.timer
 systemctl stop apt-daily-upgrade.timer
 
-#
 # Остановим и выключим обновляемые службы
 systemctl disable --now kresd@1 2>/dev/null
 systemctl disable --now kresd@2 2>/dev/null
@@ -240,7 +232,6 @@ systemctl disable --now openvpn-server@vpn-tcp 2>/dev/null
 systemctl disable --now wg-quick@antizapret 2>/dev/null
 systemctl disable --now wg-quick@vpn 2>/dev/null
 
-#
 # Удалим ненужные службы
 apt-get purge -y ufw
 apt-get purge -y firewalld
@@ -255,37 +246,30 @@ apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
 apt-get purge -y tuned
 
-#
 # Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
 rm -rf /var/cache/knot-resolver2/*
 
-#
 # Удаляем старые файлы OpenVPN и WireGuard
 rm -rf /etc/openvpn/server/*
 rm -rf /etc/openvpn/client/*
 rm -rf /etc/wireguard/templates/*
 
-#
 # Удаляем скомпилированный патченный OpenVPN
 make -C /usr/local/src/openvpn uninstall
 rm -rf /usr/local/src/openvpn
 
-#
 # Отключим IPv6
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
-#
 # Принудительная загрузка модуля nf_conntrack
 echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
-#
 # Завершим выполнение скрипта при ошибке
 set -e
 
-#
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
@@ -294,7 +278,6 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-#
 # Обновляем систему
 rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
@@ -307,21 +290,17 @@ apt-get install --fix-broken -y
 apt-get dist-upgrade -y
 apt-get install --reinstall -y curl gpg
 
-#
 # Папка для ключей
 mkdir -p /etc/apt/keyrings
 
-#
 # Добавим репозиторий Knot Resolver
 curl -fsSL https://pkg.labs.nic.cz/gpg -o /etc/apt/keyrings/cznic-labs-pkg.gpg
 echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 
-#
 # Добавим репозиторий OpenVPN
 curl -fsSL https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --dearmor > /etc/apt/keyrings/openvpn-repo-public.gpg
 echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
-#
 # Добавим репозиторий Debian Backports
 if [[ "$OS" == "debian" ]]; then
 	if [[ "$VERSION" -ge 12 ]]; then
@@ -331,31 +310,26 @@ if [[ "$OS" == "debian" ]]; then
 	fi
 fi
 
-#
 # Ставим необходимые пакеты
 apt-get update
 apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance
 apt-get autoremove --purge -y
 apt-get clean
 
-#
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
 git clone https://github.com/paulc/dnslib.git /tmp/dnslib
 PIP_BREAK_SYSTEM_PACKAGES=1 python3 -m pip install --force-reinstall --user /tmp/dnslib
 
-#
 # Клонируем репозиторий antizapret
 rm -rf /tmp/antizapret
 git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
-#
 # Сохраняем пользовательские настройки и обработчики custom*.sh
 cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ || true
 cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ || true
 cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ || true
 
-#
 # Восстанавливаем из бэкапа пользовательские настройки и обработчики custom*.sh, пользователей OpenVPN и WireGuard
 tar -xzf /root/backup*.tar.gz || true
 rm -f /root/backup*.tar.gz || true
@@ -372,7 +346,6 @@ rm -rf /root/config
 rm -rf /root/knot-resolver
 rm -rf /root/custom
 
-#
 # Сохраняем настройки
 echo "SETUP_DATE=$(date --iso-8601=seconds)
 OPENVPN_PATCH=${OPENVPN_PATCH}
@@ -408,14 +381,12 @@ CLEAR_HOSTS=y
 DEFAULT_INTERFACE=
 DEFAULT_IP=" > /tmp/antizapret/setup/root/antizapret/setup
 
-#
 # Создаем папки для кэша Knot Resolver
 mkdir -p /var/cache/knot-resolver
 mkdir -p /var/cache/knot-resolver2
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 
-#
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
@@ -429,7 +400,6 @@ cp -r /tmp/antizapret/setup/* /
 rm -rf /tmp/dnslib
 rm -rf /tmp/antizapret
 
-#
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
 	# Cloudflare+Quad9
@@ -448,7 +418,6 @@ elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
 fi
 
-#
 # Настраиваем DNS в полном VPN
 if [[ "$VPN_DNS" == "3" ]]; then
 	# Quad9
@@ -476,7 +445,6 @@ elif [[ "$VPN_DNS" == "8" ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 193.23.209.189/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
-#
 # Используем альтернативные диапазоны IPv4-адресов
 # 10.28.0.0/14 => 172.28.0.0/14
 if [[ "$ALTERNATIVE_IP" == "y" ]]; then
@@ -489,29 +457,24 @@ else
 	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
 fi
 
-#
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
 if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
 	sed -i '/duplicate/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
-#
 # Включим подробные логи в OpenVPN
 if [[ "$OPENVPN_LOG" == "y" ]]; then
 	sed -i '/^#\(verb\|log\)/s/^#//' /etc/openvpn/server/*.conf
 fi
 
-#
 # Загружаем и создаем списки исключений
 /root/antizapret/doall.sh noclear
 
-#
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
 # Пересоздаем для всех существующих пользователей файлы подключений
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/antizapret/client.sh 7
 
-#
 # Включим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
@@ -539,13 +502,11 @@ if [[ "$OPENVPN_DCO" == "y" ]]; then
 	fi
 fi
 
-#
 # Если есть ошибки, выводим их
 if [[ -n "$ERRORS" ]]; then
 	echo -e "$ERRORS"
 fi
 
-#
 # Создадим файл подкачки размером 1 Гб если его нет
 if [[ -z "$(swapon --show)" ]]; then
 	set +e
@@ -558,7 +519,6 @@ if [[ -z "$(swapon --show)" ]]; then
 	echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
 fi
 
-#
 # Перезагружаем
 echo
 echo -e '\e[1;32mAntiZapret VPN + full VPN installed successfully!\e[0m'
