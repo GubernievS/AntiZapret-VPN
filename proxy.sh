@@ -1,7 +1,42 @@
 #!/bin/bash
 
+# Проверка прав root
+if [[ "$EUID" -ne 0 ]]; then
+	echo 'Error: You need to run this as root!'
+	exit 2
+fi
+
+cd /root
+
+# Проверка на OpenVZ и LXC
+if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+	echo 'Error: OpenVZ and LXC are not supported!'
+	exit 3
+fi
+
+# Проверка версии системы
+OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
+VERSION="$(lsb_release -rs | cut -d '.' -f1)"
+
+if [[ "$OS" == "debian" ]]; then
+	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
+		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
+		exit 4
+	fi
+elif [[ "$OS" == "ubuntu" ]]; then
+	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
+		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
+		exit 5
+	fi
+elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
+	echo "Error: Your Linux distribution ($OS) is not supported!"
+	exit 6
+fi
+
+# Завершим выполнение скрипта при ошибке
 set -e
 
+# Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
 	echo -e "\e[1;31mError at line $1: $2\e[0m"
@@ -15,6 +50,7 @@ echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
+# Спрашиваем о настройках
 while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
 do
 	[[ -n $(getent ahostsv4 "$DESTINATION_IP") ]] || continue
@@ -23,25 +59,25 @@ done
 
 if [[ -z "$DESTINATION_IP" ]]; then
 	echo 'Destination AntiZapret VPN server IPv4 address not set!'
-	exit 2
+	exit 7
 fi
 
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo 'Default network interface not found!'
-	exit 3
+	exit 8
 fi
 
 EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
 if [[ -z "$EXTERNAL_IP" ]]; then
 	echo 'External IPv4 address not found on default network interface!'
-	exit 4
+	exit 9
 fi
 
 echo
 echo 'Preparing for installation, please wait...'
 
-# Remove unnecessary services
+# Удалим ненужные службы
 apt-get purge -y ufw || true
 apt-get purge -y firewalld || true
 apt-get purge -y apparmor || true
@@ -55,11 +91,11 @@ apt-get purge -y udisks2 || true
 apt-get purge -y qemu-guest-agent || true
 apt-get purge -y tuned || true
 
-# Set autosave
+# Автоматически сохраним правила iptables
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean false | debconf-set-selections
 
-# Install pkg
+# Обновляем систему и ставим необходимые пакеты
 export DEBIAN_FRONTEND=noninteractive
 apt-get clean
 apt-get update
@@ -70,7 +106,7 @@ apt-get install --reinstall -y iptables iptables-persistent irqbalance
 apt-get autoremove --purge -y
 apt-get clean
 
-# Proxy parameters modification
+# Измененим параметры для прокси
 echo "# Proxy parameters modification
 kernel.printk=3 4 1 3
 kernel.panic=1
@@ -107,19 +143,20 @@ net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_slow_start_after_idle=0
 net.netfilter.nf_conntrack_tcp_timeout_established=86400" > /etc/sysctl.d/99-proxy.conf
 
-# Disable IPv6
+# Отключим IPv6
 echo "# Disable IPv6
 net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1" > /etc/sysctl.d/99-disable-ipv6.conf
 
-# Forced loading nf_conntrack module
+# Принудительная загрузка модуля nf_conntrack
 echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
 
-# Clear iptables
+# Очистка iptables
 iptables -F && iptables -t nat -F && iptables -t mangle -F
 ip6tables -F && ip6tables -t nat -F && ip6tables -t mangle -F
 
+# Новые правила iptables
 # filter
 # Default policy
 iptables -w -P INPUT ACCEPT
@@ -177,11 +214,11 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
 
-# Save new rules
+# Сохранение новых правил iptables
 netfilter-persistent save
 systemctl enable netfilter-persistent
 
-# Rebooting
+# Перезагружаем
 echo
 echo -e '\e[1;32mProxy for AntiZapret VPN + full VPN installed successfully!\e[0m'
 echo 'Rebooting...'
