@@ -226,42 +226,33 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	comm -13 temp/remove-hosts.txt temp/exclude-hosts.txt > result/exclude-hosts.txt
 
 	# Удаляем избыточные поддомены
-	sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt | sort -u > temp/include-hosts4.txt
+	if [[ "$ROUTE_ALL" = "y" ]]; then
+		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt > temp/include-hosts4.txt
+	else
+		# Добавляем исключённые домены для дальнейшего удаления избыточных доменов
+		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt result/exclude-hosts.txt > temp/include-hosts4.txt
+	fi
 
 	# Удаляем избыточные домены
-
-#	rev temp/include-hosts4.txt | \
-#	sort -t '.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 -k8,8 -k9,9 -k10,10 \
-#	-k11,11 -k12,12 -k13,13 -k14,14 -k15,15 -k16,16 -k17,17 -k18,18 -k19,19 -k20,20 | \
-#	awk 'BEGIN { last = "" }
-#	{
-#		if (last != "" && index($0, last ".") == 1) {
-#			next
-#		}
-#		last = $0
-#		print $0
-#	}' | rev > temp/include-hosts5.txt
-
-	sed 's/^/^/;s/$/$/' temp/include-hosts4.txt > temp/include-hosts5.txt
-	sed 's/^/./;s/$/$/' temp/include-hosts4.txt > temp/exclude-patterns.txt
-	grep -vFf temp/exclude-patterns.txt temp/include-hosts5.txt > temp/include-hosts6.txt \
-	|| ( echo 'Low memory!'; cp temp/include-hosts5.txt temp/include-hosts6.txt )
-
-	# Удаляем исключённые домены
-	sed 's/^/^/;s/$/$/' result/exclude-hosts.txt > temp/exclude-patterns2.txt
-	sed 's/^/./;s/$/$/' result/exclude-hosts.txt >> temp/exclude-patterns2.txt
+	rev temp/include-hosts4.txt | \
+	sort -t '.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 -k8,8 -k9,9 -k10,10 \
+	-k11,11 -k12,12 -k13,13 -k14,14 -k15,15 -k16,16 -k17,17 -k18,18 -k19,19 -k20,20 | \
+	awk 'BEGIN { last = "" }
+	{
+		if (last != "" && index($0, last ".") == 1) {
+			next
+		}
+		last = $0
+		print $0
+	}' | rev | sort -u > temp/include-hosts5.txt
 
 	if [[ "$ROUTE_ALL" = "y" ]]; then
 		# Пустим все домены через AntiZapret VPN
-		grep -Ff temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
-		|| ( echo 'Low memory!'; cp temp/include-hosts6.txt temp/include-hosts7.txt )
-		echo '.' >> temp/include-hosts7.txt
+		sed '1i.' temp/include-hosts5.txt > result/include-hosts.txt
 	else
-		grep -vFf temp/exclude-patterns2.txt temp/include-hosts6.txt > temp/include-hosts7.txt \
-		|| ( echo 'Low memory!'; cp temp/include-hosts6.txt temp/include-hosts7.txt )
+		# Удаляем исключённые домены
+		comm -23 temp/include-hosts5.txt result/exclude-hosts.txt > result/include-hosts.txt
 	fi
-
-	sed 's/^\^//;s/\$$//' temp/include-hosts7.txt > result/include-hosts.txt
 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
@@ -283,7 +274,6 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 			echo "DNS cache cleared: $count entries"
 		fi
 	fi
-	
 fi
 
 ./custom-parse.sh "$1" || true
