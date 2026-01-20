@@ -142,7 +142,9 @@ net.core.optmem_max=131072
 net.ipv4.tcp_timestamps=1
 net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_slow_start_after_idle=0
-net.netfilter.nf_conntrack_tcp_timeout_established=86400" > /etc/sysctl.d/99-proxy.conf
+net.netfilter.nf_conntrack_tcp_timeout_established=86400
+net.core.rmem_default=524288
+net.core.wmem_default=524288" > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
 echo "# Disable IPv6
