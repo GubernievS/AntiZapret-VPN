@@ -907,6 +907,7 @@ nintendo.net
 #nintendo.com
 freecad.org
 audient.com
+vrcdb.com
 
 # Блокирует DNS
 library.hydra.wiki
