@@ -913,6 +913,7 @@ nintendo.net
 reallusion.com
 alphatheta.com
 map-care.com
+b-cdn.net
 
 # Блокирует DNS
 library.hydra.wiki
