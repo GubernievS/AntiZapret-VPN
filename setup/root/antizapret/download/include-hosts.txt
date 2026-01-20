@@ -911,6 +911,7 @@ vrcdb.com
 grundfos.com
 intvl.com.au
 reallusion.com
+alphatheta.com
 
 # Блокирует DNS
 library.hydra.wiki
