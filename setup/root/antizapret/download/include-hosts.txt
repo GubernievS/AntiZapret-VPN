@@ -912,6 +912,7 @@ grundfos.com
 intvl.com.au
 reallusion.com
 alphatheta.com
+map-care.com
 
 # Блокирует DNS
 library.hydra.wiki
