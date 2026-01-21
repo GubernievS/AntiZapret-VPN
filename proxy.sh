@@ -75,7 +75,12 @@ if [[ -z "$EXTERNAL_IP" ]]; then
 fi
 
 echo
-echo 'Preparing for installation, please wait...'
+until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
+done
+
+echo
+echo 'Installation, please wait...'
 
 # Удалим ненужные службы
 apt-get purge -y ufw || true
@@ -90,6 +95,13 @@ apt-get purge -y rsyslog || true
 apt-get purge -y udisks2 || true
 apt-get purge -y qemu-guest-agent || true
 apt-get purge -y tuned || true
+apt-get purge -y sysstat || true
+
+# SSH protection включён
+if [[ "$SSH_PROTECTION" == "y" ]]; then
+	apt-get purge -y fail2ban || true
+	apt-get purge -y sshguard || true
+fi
 
 # Автоматически сохраним правила iptables
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
@@ -216,6 +228,12 @@ iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
 iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
+
+# SSH protection
+if [[ "$SSH_PROTECTION" == "y" ]]; then
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
+fi
 
 # Сохранение новых правил iptables
 netfilter-persistent save
