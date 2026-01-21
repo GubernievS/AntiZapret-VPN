@@ -50,13 +50,6 @@ echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-# Спрашиваем о настройках
-while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
-do
-	[[ -n $(getent ahostsv4 "$DESTINATION_IP") ]] || continue
-	break
-done
-
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo 'Default network interface not found!'
@@ -68,6 +61,17 @@ if [[ -z "$EXTERNAL_IP" ]]; then
 	echo 'External IPv4 address not found on default network interface!'
 	exit 8
 fi
+
+echo
+echo "$INTERFACE: MTU $(cat /sys/class/net/$INTERFACE/mtu)"
+echo "Warning! If MTU < 1500, change MTU in OpenVPN and WireGuard on AntiZapret VPN server"
+
+# Спрашиваем о настройках
+while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
+do
+	[[ -n $(getent ahostsv4 "$DESTINATION_IP") ]] || continue
+	break
+done
 
 echo
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
