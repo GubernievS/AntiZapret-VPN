@@ -917,6 +917,9 @@ b-cdn.net
 list-manage.com
 zappos.com
 xmeye.net
+cardhaus.com
+drivethrurpg.com
+dubizzle.com
 
 # Блокирует DNS
 library.hydra.wiki
