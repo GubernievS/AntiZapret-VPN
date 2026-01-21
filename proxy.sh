@@ -62,9 +62,9 @@ if [[ -z "$EXTERNAL_IP" ]]; then
 	exit 8
 fi
 
-echo
-echo "$INTERFACE: MTU $(cat /sys/class/net/$INTERFACE/mtu)"
+echo "MTU: $(cat /sys/class/net/$INTERFACE/mtu)"
 echo "Warning! If MTU < 1500, change MTU in OpenVPN and WireGuard on AntiZapret VPN server"
+echo
 
 # Спрашиваем о настройках
 while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
