@@ -914,6 +914,7 @@ reallusion.com
 alphatheta.com
 map-care.com
 b-cdn.net
+list-manage.com
 
 # Блокирует DNS
 library.hydra.wiki
