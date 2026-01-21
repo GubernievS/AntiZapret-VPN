@@ -206,7 +206,7 @@ until [[ "$AKAMAI_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Akamai IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AKAMAI_INCLUDE
 done
 echo
-echo 'Preparing for installation, please wait...'
+echo 'Installation, please wait...'
 
 # Ожидание пока выполняется apt-get
 while pidof apt-get &>/dev/null; do
@@ -245,6 +245,13 @@ apt-get purge -y rsyslog
 apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
 apt-get purge -y tuned
+apt-get purge -y sysstat
+
+# SSH protection включён
+if [[ "$SSH_PROTECTION" == "y" ]]; then
+	apt-get purge -y fail2ban || true
+	apt-get purge -y sshguard || true
+fi
 
 # Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
