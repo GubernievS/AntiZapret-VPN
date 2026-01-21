@@ -915,6 +915,8 @@ alphatheta.com
 map-care.com
 b-cdn.net
 list-manage.com
+zappos.com
+xmeye.net
 
 # Блокирует DNS
 library.hydra.wiki
