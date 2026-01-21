@@ -57,21 +57,16 @@ do
 	break
 done
 
-if [[ -z "$DESTINATION_IP" ]]; then
-	echo 'Destination AntiZapret VPN server IPv4 address not set!'
-	exit 7
-fi
-
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo 'Default network interface not found!'
-	exit 8
+	exit 7
 fi
 
 EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
 if [[ -z "$EXTERNAL_IP" ]]; then
 	echo 'External IPv4 address not found on default network interface!'
-	exit 9
+	exit 8
 fi
 
 echo
