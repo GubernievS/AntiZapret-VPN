@@ -33,23 +33,6 @@ elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	exit 6
 fi
 
-# Завершим выполнение скрипта при ошибке
-set -e
-
-# Обработка ошибок
-handle_error() {
-	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo -e "\e[1;31mError at line $1: $2\e[0m"
-	exit 1
-}
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
-echo
-echo -e '\e[1;32mInstalling proxy for AntiZapret VPN + full VPN\e[0m'
-echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
-echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
-echo
-
 INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
 if [[ -z "$INTERFACE" ]]; then
 	echo 'Default network interface not found!'
@@ -62,9 +45,20 @@ if [[ -z "$EXTERNAL_IP" ]]; then
 	exit 8
 fi
 
-echo "MTU: $(cat /sys/class/net/$INTERFACE/mtu)"
-echo "Warning! If MTU < 1500, change MTU in OpenVPN and WireGuard on AntiZapret VPN server"
 echo
+echo -e '\e[1;32mInstalling proxy for AntiZapret VPN + full VPN\e[0m'
+echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
+echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
+echo
+
+MTU=$(< /sys/class/net/$INTERFACE/mtu)
+if (( MTU < 1500 )); then
+	echo "MTU on ${INTERFACE}: ${MTU}"
+	echo "Warning! MTU < 1500"
+	echo "Change MTU in OpenVPN and WireGuard configs (default 1420) on AntiZapret VPN server"
+	echo "New recommended MTU: $((MTU-80))"
+	echo
+fi
 
 # Спрашиваем о настройках
 while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
@@ -72,35 +66,44 @@ do
 	[[ -n $(getent ahostsv4 "$DESTINATION_IP") ]] || continue
 	break
 done
-
 echo
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
-
 echo
 echo 'Installation, please wait...'
 
 # Удалим ненужные службы
-apt-get purge -y ufw || true
-apt-get purge -y firewalld || true
-apt-get purge -y apparmor || true
-apt-get purge -y apport || true
-apt-get purge -y modemmanager || true
-apt-get purge -y snapd || true
-apt-get purge -y upower || true
-apt-get purge -y multipath-tools || true
-apt-get purge -y rsyslog || true
-apt-get purge -y udisks2 || true
-apt-get purge -y qemu-guest-agent || true
-apt-get purge -y tuned || true
-apt-get purge -y sysstat || true
+apt-get purge -y ufw
+apt-get purge -y firewalld
+apt-get purge -y apparmor
+apt-get purge -y apport
+apt-get purge -y modemmanager
+apt-get purge -y snapd
+apt-get purge -y upower
+apt-get purge -y multipath-tools
+apt-get purge -y rsyslog
+apt-get purge -y udisks2
+apt-get purge -y qemu-guest-agent
+apt-get purge -y tuned
+apt-get purge -y sysstat
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == "y" ]]; then
-	apt-get purge -y fail2ban || true
-	apt-get purge -y sshguard || true
+	apt-get purge -y fail2ban
+	apt-get purge -y sshguard
 fi
+
+# Завершим выполнение скрипта при ошибке
+set -e
+
+# Обработка ошибок
+handle_error() {
+	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
+	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 # Автоматически сохраним правила iptables
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
