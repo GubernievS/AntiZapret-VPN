@@ -20,7 +20,7 @@ if [[ -z "$DEFAULT_IP" ]]; then
 fi
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address unavailable!'
-	exit 1
+	exit 2
 fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
