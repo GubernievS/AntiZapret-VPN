@@ -53,10 +53,8 @@ echo
 
 MTU=$(< /sys/class/net/$INTERFACE/mtu)
 if (( MTU < 1500 )); then
-	echo "MTU on ${INTERFACE}: ${MTU}"
-	echo "Warning! MTU < 1500"
-	echo "Change MTU in OpenVPN and WireGuard configs (default 1420) on AntiZapret VPN server"
-	echo "New recommended MTU: $((MTU-80))"
+	echo "Warning! Low MTU on ${INTERFACE}: ${MTU}"
+	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on AntiZapret VPN server"
 	echo
 fi
 
