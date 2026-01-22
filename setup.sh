@@ -46,13 +46,36 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	exit 7
 fi
 
+# Проверка наличия сетевого интерфейса
+DEFAULT_INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+	echo 'Default network interface unavailable!'
+	exit 8
+fi
+
+# Проверка наличия IPv4-адреса
+DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+if [[ -z "$DEFAULT_IP" ]]; then
+	echo 'Default IPv4 address unavailable!'
+	exit 9
+fi
+
 echo
 echo -e '\e[1;32mInstalling AntiZapret VPN + full VPN...\e[0m'
 echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
+echo
+
+MTU=$(< /sys/class/net/$INTERFACE/mtu)
+if (( MTU < 1500 )); then
+	echo "MTU on ${INTERFACE}: ${MTU}"
+	echo "Warning! MTU < 1500"
+	echo "Change MTU in OpenVPN and WireGuard configs (default 1420) on this server after installation"
+	echo "New recommended MTU: $((MTU-80))"
+	echo
+fi
 
 # Спрашиваем о настройках
-echo
 echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
 echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
 echo '    1) Strong      - Recommended by default'
