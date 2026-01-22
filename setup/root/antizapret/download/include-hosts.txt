@@ -920,6 +920,7 @@ xmeye.net
 cardhaus.com
 drivethrurpg.com
 dubizzle.com
+caseend.com
 
 # Блокирует DNS
 library.hydra.wiki
@@ -934,6 +935,7 @@ en.help.roblox.com
 meta.ai
 support.opendns.com
 help.ui.com
+community.pioneerdj.com
 
 # Сертификаты
 letsencrypt.org
