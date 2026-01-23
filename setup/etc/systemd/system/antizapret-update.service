@@ -5,6 +5,7 @@ Wants=network-online.target
 
 [Service]
 WorkingDirectory=/root/antizapret
+ExecStartPre=/bin/sleep 60
 ExecStart=/bin/bash -c 'cat /root/antizapret/doall.sh | bash -s noclear'
 Restart=on-failure
 RestartSec=1h
