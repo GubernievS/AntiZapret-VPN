@@ -51,9 +51,9 @@ setServerHost_FileName(){
 }
 
 setServerIP(){
-	SERVER_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 	if [[ -z "$SERVER_IP" ]]; then
-		echo 'Default IPv4 address unavailable!'
+		echo 'Default IPv4 address not found!'
 		exit 2
 	fi
 }
@@ -105,32 +105,32 @@ initOpenVPN(){
 addOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
 
-	if [[ ! -f /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt ]] || \
-	   [[ ! -f /etc/openvpn/easyrsa3/pki/private/$CLIENT_NAME.key ]]; then
+	if [[ ! -f /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt ]] || \
+	   [[ ! -f /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key ]]; then
 		askClientCertExpire
 		echo
-		EASYRSA_CERT_EXPIRE=$CLIENT_CERT_EXPIRE /usr/share/easy-rsa/easyrsa --batch build-client-full $CLIENT_NAME nopass
+		EASYRSA_CERT_EXPIRE="$CLIENT_CERT_EXPIRE" /usr/share/easy-rsa/easyrsa --batch build-client-full "$CLIENT_NAME" nopass
 	else
 		echo
 		echo 'Client with that name already exists! Please enter different name for new client'
 		echo
 		if [[ "$CLIENT_CERT_EXPIRE" != "0" ]]; then
 			echo 'Current client certificate expiration period:'
-			openssl x509 -in /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt -noout -dates
+			openssl x509 -in /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt -noout -dates
 			echo
 			echo "Attention! Certificate renewal is NOT possible after 'notAfter' date"
 			askClientCertExpire
 			echo
-			rm -f /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt
-			/usr/share/easy-rsa/easyrsa --batch --days=$CLIENT_CERT_EXPIRE sign client $CLIENT_NAME
-			rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
+			rm -f /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt
+			/usr/share/easy-rsa/easyrsa --batch --days="$CLIENT_CERT_EXPIRE" sign client "$CLIENT_NAME"
+			rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt
 		fi
 	fi
 
-	if [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.crt ]] || \
-	   [[ ! -f /etc/openvpn/client/keys/$CLIENT_NAME.key ]]; then
-		cp /etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt /etc/openvpn/client/keys/$CLIENT_NAME.crt
-		cp /etc/openvpn/easyrsa3/pki/private/$CLIENT_NAME.key /etc/openvpn/client/keys/$CLIENT_NAME.key
+	if [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt ]] || \
+	   [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".key ]]; then
+		cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
+		cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
 	fi
 
 	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
@@ -155,19 +155,19 @@ deleteOpenVPN(){
 	setServerHost_FileName "$OPENVPN_HOST"
 	echo
 
-	/usr/share/easy-rsa/easyrsa --batch revoke $CLIENT_NAME
+	/usr/share/easy-rsa/easyrsa --batch revoke "$CLIENT_NAME"
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
 	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 
-	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-$FILE_NAME.ovpn
-	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn
-	rm -f /root/antizapret/client/openvpn/antizapret-tcp/antizapret-$FILE_NAME-tcp.ovpn
-	rm -f /root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn
-	rm -f /root/antizapret/client/openvpn/vpn-udp/vpn-$FILE_NAME-udp.ovpn
-	rm -f /root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn
-	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.crt
-	rm -f /etc/openvpn/client/keys/$CLIENT_NAME.key
+	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-"$FILE_NAME".ovpn
+	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-"$FILE_NAME"-udp.ovpn
+	rm -f /root/antizapret/client/openvpn/antizapret-tcp/antizapret-"$FILE_NAME"-tcp.ovpn
+	rm -f /root/antizapret/client/openvpn/vpn/vpn-"$FILE_NAME".ovpn
+	rm -f /root/antizapret/client/openvpn/vpn-udp/vpn-"$FILE_NAME"-udp.ovpn
+	rm -f /root/antizapret/client/openvpn/vpn-tcp/vpn-"$FILE_NAME"-tcp.ovpn
+	rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt
+	rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".key
 
 	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-udp.sock &>/dev/null || true
 	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-tcp.sock &>/dev/null || true
@@ -224,7 +224,7 @@ addWireGuard(){
 			if ! grep -q "$CLIENT_IP" /etc/wireguard/antizapret.conf; then
 				break
 			fi
-			if [[ $i == 255 ]]; then
+			if [[ "$i" == 255 ]]; then
 				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
 				exit 4
 			fi
@@ -261,7 +261,7 @@ AllowedIPs = ${CLIENT_IP}/32
 			if ! grep -q "$CLIENT_IP" /etc/wireguard/vpn.conf; then
 				break
 			fi
-			if [[ $i == 255 ]]; then
+			if [[ "$i" == 255 ]]; then
 				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
 				exit 5
 			fi
@@ -299,8 +299,8 @@ deleteWireGuard(){
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/antizapret.conf
 	sed -i '/^$/N;/^\n$/D' /etc/wireguard/vpn.conf
 
-	rm -f /root/antizapret/client/{wireguard,amneziawg}/antizapret/antizapret-$FILE_NAME-*.conf
-	rm -f /root/antizapret/client/{wireguard,amneziawg}/vpn/vpn-$FILE_NAME-*.conf
+	rm -f /root/antizapret/client/{wireguard,amneziawg}/antizapret/antizapret-"$FILE_NAME"-*.conf
+	rm -f /root/antizapret/client/{wireguard,amneziawg}/vpn/vpn-"$FILE_NAME"-*.conf
 
 	wg syncconf antizapret <(wg-quick strip antizapret 2>/dev/null) &>/dev/null || true
 	wg syncconf vpn <(wg-quick strip vpn 2>/dev/null) &>/dev/null || true
@@ -388,9 +388,9 @@ source /root/antizapret/setup
 umask 022
 setServerIP
 
-OPTION=$1
-CLIENT_NAME=$2
-CLIENT_CERT_EXPIRE=$3
+OPTION="$1"
+CLIENT_NAME="$2"
+CLIENT_CERT_EXPIRE="$3"
 
 if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
 	echo
