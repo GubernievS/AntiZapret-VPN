@@ -67,7 +67,6 @@ echo
 
 MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
 if (( MTU < 1500 )); then
-	echo
 	echo "Warning! Low MTU on ${DEFAULT_INTERFACE}: ${MTU}"
 	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on this server after installation"
 	echo
