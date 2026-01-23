@@ -6,18 +6,18 @@ cd /root/antizapret
 source setup
 
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
-	DEFAULT_INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
+	DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
 fi
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
-	echo 'Default network interface unavailable!'
+	echo 'Default network interface not found!'
 	exit 1
 fi
 
 if [[ -z "$DEFAULT_IP" ]]; then
-	DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 fi
 if [[ -z "$DEFAULT_IP" ]]; then
-	echo 'Default IPv4 address unavailable!'
+	echo 'Default IPv4 address not found!'
 	exit 2
 fi
 
