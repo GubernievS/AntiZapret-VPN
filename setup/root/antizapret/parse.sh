@@ -72,6 +72,7 @@ export LC_ALL=C
 cd /root/antizapret
 
 rm -f temp/*
+rm -f result/*
 
 source setup
 
