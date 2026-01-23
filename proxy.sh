@@ -33,15 +33,15 @@ elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	exit 6
 fi
 
-INTERFACE="$(ip route | grep '^default' | awk '{print $5}')"
-if [[ -z "$INTERFACE" ]]; then
+DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 7
 fi
 
-EXTERNAL_IP="$(ip -4 addr show dev "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')"
-if [[ -z "$EXTERNAL_IP" ]]; then
-	echo 'External IPv4 address not found on default network interface!'
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+if [[ -z "$DEFAULT_IP" ]]; then
+	echo 'Default IPv4 address not found!'
 	exit 8
 fi
 
@@ -51,9 +51,9 @@ echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/$INTERFACE/mtu)
+MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
 if (( MTU < 1500 )); then
-	echo "Warning! Low MTU on ${INTERFACE}: ${MTU}"
+	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $MTU"
 	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on AntiZapret VPN server"
 	echo
 fi
@@ -202,10 +202,10 @@ iptables -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination "$DE
 iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
 
-iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$EXTERNAL_IP"
+iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
 
 # OpenVPN UDP
 iptables -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
@@ -213,10 +213,10 @@ iptables -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination "$DE
 iptables -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
 
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$EXTERNAL_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
 
 # WireGuard/AmneziaWG 
 iptables -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination "$DESTINATION_IP":51080
@@ -224,10 +224,10 @@ iptables -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination "$DE
 iptables -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":52080
 iptables -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":52443
 
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$EXTERNAL_IP"
-iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$EXTERNAL_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$DEFAULT_IP"
+iptables -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$DEFAULT_IP"
 
 # SSH protection
 if [[ "$SSH_PROTECTION" == "y" ]]; then
