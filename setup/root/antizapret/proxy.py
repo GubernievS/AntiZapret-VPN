@@ -236,7 +236,7 @@ if __name__ == "__main__":
     args = p.parse_args()
     args.dns,_,args.dns_port = args.upstream.partition(":")
     args.dns_port = int(args.dns_port or 53)
-    print("Starting Proxy Resolver (%s:%d -> %s:%d) [%s]" % (
+    print("Starting Proxy Resolver: %s:%d -> %s:%d (%s)" % (
                         args.address or "*",args.port,
                         args.dns,args.dns_port,
                         "UDP/TCP" if args.tcp else "UDP"))
@@ -257,5 +257,6 @@ if __name__ == "__main__":
                                logger=logger,
                                handler=handler)
         tcp_server.start_thread()
+    print("Started Proxy Resolver")
     while udp_server.isAlive():
         time.sleep(1)
