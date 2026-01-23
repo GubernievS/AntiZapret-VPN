@@ -46,17 +46,16 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	exit 7
 fi
 
-# Проверка наличия сетевого интерфейса
-DEFAULT_INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
+# Проверка наличия сетевого интерфейса и IPv4-адреса
+DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
-	echo 'Default network interface unavailable!'
+	echo 'Default network interface not found!'
 	exit 8
 fi
 
-# Проверка наличия IPv4-адреса
-DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 if [[ -z "$DEFAULT_IP" ]]; then
-	echo 'Default IPv4 address unavailable!'
+	echo 'Default IPv4 address not found!'
 	exit 9
 fi
 
@@ -66,7 +65,7 @@ echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
+MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
 if (( MTU < 1500 )); then
 	echo
 	echo "Warning! Low MTU on ${DEFAULT_INTERFACE}: ${MTU}"
@@ -541,7 +540,7 @@ if [[ -z "$(swapon --show)" ]]; then
 	set +e
 	SWAPFILE="/swapfile"
 	SWAPSIZE=1024
-	dd if=/dev/zero of=$SWAPFILE bs=1M count=$SWAPSIZE
+	dd if=/dev/zero of="$SWAPFILE" bs=1M count="$SWAPSIZE"
 	chmod 600 "$SWAPFILE"
 	mkswap "$SWAPFILE"
 	swapon "$SWAPFILE"
