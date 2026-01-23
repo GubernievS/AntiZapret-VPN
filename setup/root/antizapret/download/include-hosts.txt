@@ -921,6 +921,7 @@ cardhaus.com
 drivethrurpg.com
 dubizzle.com
 caseend.com
+netease.com
 
 # Блокирует DNS
 library.hydra.wiki
