@@ -8,28 +8,28 @@ cd /root/antizapret
 source setup
 
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
-	DEFAULT_INTERFACE=$(ip route get 1.2.3.4 | awk '{print $5; exit}')
+	DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
 fi
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
-	echo 'Default network interface unavailable!'
+	echo 'Default network interface not found!'
 	exit 1
 fi
 
 if [[ -z "$DEFAULT_IP" ]]; then
-	DEFAULT_IP=$(ip route get 1.2.3.4 | awk '{print $7; exit}')
+	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 fi
 if [[ -z "$DEFAULT_IP" ]]; then
-	echo 'Default IPv4 address unavailable!'
+	echo 'Default IPv4 address not found!'
 	exit 2
 fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
 
 # SoftIRQ CPU balance
-printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/$DEFAULT_INTERFACE/queues/rx-*/rps_cpus >/dev/null
+printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/"$DEFAULT_INTERFACE"/queues/rx-*/rps_cpus >/dev/null
 
 # Clear knot-resolver cache
-count=$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)
+count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
 echo "DNS cache cleared: $count entries"
 
 # filter
