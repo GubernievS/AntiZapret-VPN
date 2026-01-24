@@ -4,4 +4,6 @@ rutoro.info
 www-torproject.org
 ad.mail.ru
 rs.mail.ru
+rarbg.me
+rarbg.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
