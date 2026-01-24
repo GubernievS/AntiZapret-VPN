@@ -23,7 +23,7 @@ licdn.com
 rutrk.org
 nnm-club.ws
 nnmclub.ch
-pravdabeslana.ru
+#pravdabeslana.ru
 simsync.io
 game-debate.com
 lib.ru
@@ -33,7 +33,7 @@ fb.com
 t.co
 twimg.com
 cdninstagram.com
-theins.ru
+#theins.ru
 acf.international
 rutracker.cc
 x.com
@@ -483,7 +483,7 @@ invent.kde.org
 s-trade.com
 ua
 is.gd
-1plus1tv.ru
+#1plus1tv.ru
 linktr.ee
 anicult.org
 12putinu.net
@@ -921,7 +921,7 @@ cardhaus.com
 drivethrurpg.com
 dubizzle.com
 caseend.com
-netease.com
+#netease.com
 rekordbox.com
 
 # Блокирует DNS
