@@ -51,6 +51,8 @@ image.tmdb.org A 169.150.247.35
 *.image.tmdb.org A 169.150.247.35
 image.tmdb.org A 169.150.247.36
 *.image.tmdb.org A 169.150.247.36
+doh.skydns.ru CNAME .
+*.doh.skydns.ru CNAME .
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
 usmall.ru A 3.162.38.7
