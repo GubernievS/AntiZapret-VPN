@@ -41,6 +41,8 @@ family.adguard-dns.com CNAME .
 *.family.adguard-dns.com CNAME .
 dns.alidns.com CNAME .
 *.dns.alidns.com CNAME .
+doh.skydns.ru CNAME .
+*.doh.skydns.ru CNAME .
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
 usmall.ru A 3.162.38.7
