@@ -6,5 +6,6 @@ ad.mail.ru
 rs.mail.ru
 rarbg.me
 rarbg.com
+publicbt.com
 dnsbl.manitu.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
