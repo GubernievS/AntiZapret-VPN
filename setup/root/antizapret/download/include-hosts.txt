@@ -924,6 +924,7 @@ caseend.com
 #netease.com
 rekordbox.com
 runrepeat.com
+mathworks.com
 
 # Блокирует DNS
 library.hydra.wiki
