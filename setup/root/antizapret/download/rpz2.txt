@@ -59,4 +59,5 @@ usmall.ru A 18.64.119.98
 *.usmall.ru A 18.64.119.98
 usmall.ru A 18.66.192.97
 *.usmall.ru A 18.66.192.97
+tracker.openbittorrent.com A 52.223.13.41
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
