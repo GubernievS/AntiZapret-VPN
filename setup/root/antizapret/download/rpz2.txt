@@ -53,6 +53,13 @@ publicbt.com CNAME .
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
 
+rutor.org CNAME .
+*.rutor.org CNAME .
+rutoro.info CNAME .
+*.rutoro.info CNAME .
+www-torproject.org CNAME .
+*.www-torproject.org CNAME .
+
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
 image.tmdb.org A 185.59.220.198
