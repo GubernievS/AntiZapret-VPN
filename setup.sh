@@ -89,7 +89,7 @@ echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
 echo '       +MSK-IX+SkyDNS *'
-echo '    2) SkyDNS *          - Recommended if this server IP is registered in SkyDNS'
+echo '    2) SkyDNS *          - Recommended for expert users if this server IP is registered in SkyDNS'
 echo '                           Register account (Family plan) and add this server IP at https://skydns.ru'
 echo '    3) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    4) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
