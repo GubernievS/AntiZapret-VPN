@@ -1,7 +1,4 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
-rutor.org
-rutoro.info
-www-torproject.org
 ad.mail.ru
 rs.mail.ru
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
