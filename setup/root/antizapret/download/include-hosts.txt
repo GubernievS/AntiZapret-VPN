@@ -15,7 +15,7 @@ gvt1.com
 gvt2.com
 gvt3.com
 digitalocean.com
-adguard-vpn.com
+#adguard-vpn.com
 signal.org
 hetzner.com
 lostfilm.tv
@@ -48,7 +48,7 @@ discordapp.com
 discordapp.net
 discord.media
 cloudflare-ech.com
-urban-vpn.com
+#urban-vpn.com
 viber.com
 viber.ru
 viber.me
@@ -191,7 +191,7 @@ truthsocial.com
 vagrantcloud.com
 veeam.com
 veritas.com
-vpnunlimited.com
+#vpnunlimited.com
 vyos.io
 wakanim.tv
 watchguard.com
@@ -208,7 +208,7 @@ copilot.microsoft.com
 habr.com
 fluke.com
 formula1.com
-nordvpn.com
+#nordvpn.com
 qualcomm.com
 strava.com
 openai.com
@@ -473,7 +473,7 @@ bbci.co.uk
 radiojar.com
 xvideos.com
 doubleclick.net
-windscribe.com
+#windscribe.com
 vpngate.net
 rebrand.ly
 adguard.com
