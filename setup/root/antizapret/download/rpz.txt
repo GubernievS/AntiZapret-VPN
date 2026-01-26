@@ -53,6 +53,13 @@ publicbt.com CNAME .
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
 
+rutor.org CNAME .
+*.rutor.org CNAME .
+rutoro.info CNAME .
+*.rutoro.info CNAME .
+www-torproject.org CNAME .
+*.www-torproject.org CNAME .
+
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
 usmall.ru A 3.162.38.7
