@@ -102,13 +102,13 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP_A}.29.0.0 255.255.248.0\nroute ${IP_A}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
 	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD ${IP_A}.30.0.0 MASK 255.254.0.0 ${IP_A}.29.8.1" > result/keenetic-wireguard-routes.txt
 	echo "/ip route add dst-address=${IP_A}.30.0.0/15 gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
-	while read -r line; do
-		IP="$(echo $line | awk -F '/' '{print $1}')"
-		MASK="$(sipcalc -- $line | awk '/Network mask/ {print $4; exit;}')"
+	while read -r cidr; do
+		IP="$(echo $cidr | awk -F '/' '{print $1}')"
+		MASK="$(sipcalc -- $cidr | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
 		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
 		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
-		echo "/ip route add dst-address=${line} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
+		echo "/ip route add dst-address=${cidr} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
 	done < result/route-ips.txt
 
 	# Обновляем файл DEFAULT в OpenVPN только если файл изменился
@@ -136,8 +136,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 		{
 			echo 'create antizapret-forward hash:net -exist'
 			echo 'flush antizapret-forward'
-			while read -r line; do
-				echo "add antizapret-forward $line -exist"
+			while read -r cidr; do
+				echo "add antizapret-forward $cidr -exist"
 			done < result/forward-ips.txt
 		} | ipset restore
 	fi
@@ -154,8 +154,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 		{
 			echo 'create antizapret-allow hash:net -exist'
 			echo 'flush antizapret-allow'
-			while read -r line; do
-				echo "add antizapret-allow $line -exist"
+			while read -r cidr; do
+				echo "add antizapret-allow $cidr -exist"
 			done < result/allow-ips.txt
 		} | ipset restore
 	fi
