@@ -926,6 +926,9 @@ rekordbox.com
 runrepeat.com
 mathworks.com
 envatousercontent.com
+mynonpublic.com
+openpli.org
+openbh.net
 
 # Блокирует DNS
 library.hydra.wiki
