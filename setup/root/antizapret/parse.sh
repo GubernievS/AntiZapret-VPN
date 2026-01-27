@@ -2,50 +2,8 @@
 
 ###
 
-if [[ -f /etc/sysctl.d/99-antizapret.conf ]]; then
-
-echo "# AntiZapret parameters modification
-kernel.printk=3 4 1 3
-kernel.panic=1
-kernel.panic_on_oops=1
-kernel.softlockup_panic=1
-kernel.hardlockup_panic=1
-kernel.sched_autogroup_enabled=1
-net.ipv4.ip_forward=1
-net.core.default_qdisc=fq
-net.ipv4.tcp_congestion_control=bbr
-net.ipv4.tcp_mtu_probing=0
-net.core.rmem_max=4194304
-net.core.wmem_max=4194304
-net.ipv4.tcp_rmem=16384 131072 4194304
-net.ipv4.tcp_wmem=16384 131072 4194304
-net.ipv4.tcp_no_metrics_save=1
-net.core.netdev_budget=600
-net.ipv4.tcp_fastopen=1
-net.ipv4.ip_local_port_range=10000 50000
-net.netfilter.nf_conntrack_max=131072
-net.core.netdev_budget_usecs=8000
-net.core.dev_weight=64
-net.ipv4.tcp_max_syn_backlog=1024
-net.netfilter.nf_conntrack_buckets=32768
-net.ipv4.conf.all.rp_filter=0
-net.ipv4.conf.default.rp_filter=0
-net.core.netdev_max_backlog=5000
-net.core.somaxconn=4096
-net.ipv4.tcp_syncookies=1
-net.ipv4.udp_rmem_min=16384
-net.ipv4.udp_wmem_min=16384
-net.core.optmem_max=131072
-net.ipv4.tcp_timestamps=1
-net.ipv4.tcp_tw_reuse=0
-net.ipv4.tcp_slow_start_after_idle=0
-net.netfilter.nf_conntrack_tcp_timeout_established=86400
-net.core.rmem_default=262144
-net.core.wmem_default=262144" > /etc/sysctl.d/99-antizapret.conf
-
-sysctl --system &>/dev/null
-
-fi
+#sed -i 's|, 10.30.0.0/15||g' /etc/wireguard/templates/antizapret-client-*.conf
+#sed -i '/push "route 10.30.0.0 255.254.0.0"/d' /etc/openvpn/server/antizapret-*.conf
 
 ###
 
@@ -96,19 +54,21 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	# Выводим результат
 	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
 
+	[[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
+	[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18.0.0}" || FAKE_IP="${IP}.30.0.0"
+
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
-	[[ "$ALTERNATIVE_IP" == "y" ]] && IP_A="172" || IP_A="10"
-	> result/DEFAULT
-	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP_A}.29.0.0 255.255.248.0\nroute ${IP_A}.30.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
-	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP_A}.29.8.1\nroute ADD ${IP_A}.30.0.0 MASK 255.254.0.0 ${IP_A}.29.8.1" > result/keenetic-wireguard-routes.txt
-	echo "/ip route add dst-address=${IP_A}.30.0.0/15 gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
+	echo "push \"route $FAKE_IP 255.254.0.0\"" > result/DEFAULT
+	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute ${IP}.29.0.0 255.255.248.0\nroute $FAKE_IP 255.254.0.0" > result/tp-link-openvpn-routes.txt
+	echo -e "route ADD DNS_IP MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 ${IP}.29.8.1\nroute ADD $FAKE_IP MASK 255.254.0.0 ${IP}.29.8.1" > result/keenetic-wireguard-routes.txt
+	echo "/ip route add dst-address=${FAKE_IP}/15 gateway=${IP}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
 	while read -r cidr; do
-		IP="$(echo $cidr | awk -F '/' '{print $1}')"
+		NET="$(echo $cidr | awk -F '/' '{print $1}')"
 		MASK="$(sipcalc -- $cidr | awk '/Network mask/ {print $4; exit;}')"
-		echo "push \"route ${IP} ${MASK}\"" >> result/DEFAULT
-		echo "route ${IP} ${MASK}" >> result/tp-link-openvpn-routes.txt
-		echo "route ADD ${IP} MASK ${MASK} ${IP_A}.29.8.1" >> result/keenetic-wireguard-routes.txt
-		echo "/ip route add dst-address=${cidr} gateway=${IP_A}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
+		echo "push \"route $NET $MASK\"" >> result/DEFAULT
+		echo "route $NET $MASK" >> result/tp-link-openvpn-routes.txt
+		echo "route ADD $NET MASK $MASK ${IP}.29.8.1" >> result/keenetic-wireguard-routes.txt
+		echo "/ip route add dst-address=${cidr} gateway=${IP}.29.8.1 distance=1 comment=\"antizapret-wireguard\"" >> result/mikrotik-wireguard-routes.txt
 	done < result/route-ips.txt
 
 	# Обновляем файл DEFAULT в OpenVPN только если файл изменился
@@ -117,7 +77,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	fi
 
 	# Создаем файл ips для WireGuard/AmneziaWG
-	awk '{printf ", %s", $0}' result/route-ips.txt > result/ips
+	echo -n ", $FAKE_IP/15" > result/ips
+	awk '{printf ", %s", $0}' result/route-ips.txt >> result/ips
 
 	# Обновляем файл ips в WireGuard/AmneziaWG только если файл изменился
 	if [[ -f result/ips ]] && ! diff -q result/ips /etc/wireguard/ips; then

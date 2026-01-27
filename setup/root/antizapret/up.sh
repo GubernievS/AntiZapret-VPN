@@ -23,7 +23,8 @@ if [[ -z "$DEFAULT_IP" ]]; then
 	exit 2
 fi
 
-[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
+[[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
+[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18.0.0}" || FAKE_IP="${IP}.30.0.0"
 
 # SoftIRQ CPU balance
 printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/"$DEFAULT_INTERFACE"/queues/rx-*/rps_cpus >/dev/null
@@ -162,11 +163,11 @@ iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p tcp 
 iptables -w -t nat -A PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
-	iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 ! -d ${IP}.30.0.0/15 -j CONNMARK --set-mark 0x1
+	iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 ! -d ${FAKE_IP}/15 -j CONNMARK --set-mark 0x1
 fi
 # Mapping fake IP to real IP
 iptables -w -t nat -S ANTIZAPRET-MAPPING &>/dev/null || iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${IP}.30.0.0/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${FAKE_IP}/15 -j ANTIZAPRET-MAPPING
 # SNAT VPN
 iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
 
