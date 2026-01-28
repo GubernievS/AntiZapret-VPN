@@ -77,7 +77,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	fi
 
 	# Создаем файл ips для WireGuard/AmneziaWG
-	echo -n ", $FAKE_IP/15" > result/ips
+	echo -n ", $FAKE_IP.0.0/15" > result/ips
 	awk '{printf ", %s", $0}' result/route-ips.txt >> result/ips
 
 	# Обновляем файл ips в WireGuard/AmneziaWG только если файл изменился
