@@ -24,7 +24,7 @@ if [[ -z "$DEFAULT_IP" ]]; then
 fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
-[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18.0.0}" || FAKE_IP="${IP}.30.0.0"
+[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 # SoftIRQ CPU balance
 printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/"$DEFAULT_INTERFACE"/queues/rx-*/rps_cpus >/dev/null
@@ -53,10 +53,10 @@ ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 if [[ "$TORRENT_GUARD" == "y" ]]; then
 	ipset create antizapret-torrent hash:ip timeout 60 -exist
-	iptables -w -I FORWARD 2 -s ${IP}.28.0.0/16 -p tcp -m string --string "GET " --algo kmp --to 100 -m string --string "info_hash=" --algo bm -m string --string "peer_id=" --algo bm -m string --string "port=" --algo bm -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 3 -s ${IP}.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 4 -s ${IP}.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 5 -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
+	iptables -w -I FORWARD 2 -s $IP.28.0.0/16 -p tcp -m string --string "GET " --algo kmp --to 100 -m string --string "info_hash=" --algo bm -m string --string "peer_id=" --algo bm -m string --string "port=" --algo bm -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 3 -s $IP.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 4 -s $IP.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
@@ -67,13 +67,13 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 			echo "add antizapret-forward $line"
 		done < result/forward-ips.txt
 	} | ipset restore
-	iptables -w -I FORWARD 2 -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
 # Client isolation
 if [[ "$CLIENT_ISOLATION" == "y" ]]; then
-	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
+	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d $IP.28.0.0/15 -j DROP
 else
-	iptables -w -I FORWARD 2 -d ${IP}.28.0.0/15 -j ACCEPT
+	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
 fi
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == "y" ]]; then
@@ -125,10 +125,10 @@ ip6tables -w -t raw -A PREROUTING -i lo -j NOTRACK
 ip6tables -w -t raw -A OUTPUT -o lo -j NOTRACK
 # NOTRACK DNS
 if ! systemctl is-active --quiet docker 2>/dev/null; then
-	iptables -w -t raw -A PREROUTING ! -s ${IP}.28.0.0/15 -p udp --dport 53 -j NOTRACK
-	iptables -w -t raw -A PREROUTING ! -s ${IP}.28.0.0/15 -p tcp --dport 53 -j NOTRACK
-	iptables -w -t raw -A OUTPUT ! -d ${IP}.28.0.0/15 -p udp --sport 53 -j NOTRACK
-	iptables -w -t raw -A OUTPUT ! -d ${IP}.28.0.0/15 -p tcp --sport 53 -j NOTRACK
+	iptables -w -t raw -A PREROUTING ! -s $IP.28.0.0/15 -p udp --dport 53 -j NOTRACK
+	iptables -w -t raw -A PREROUTING ! -s $IP.28.0.0/15 -p tcp --dport 53 -j NOTRACK
+	iptables -w -t raw -A OUTPUT ! -d $IP.28.0.0/15 -p udp --sport 53 -j NOTRACK
+	iptables -w -t raw -A OUTPUT ! -d $IP.28.0.0/15 -p tcp --sport 53 -j NOTRACK
 fi
 
 # nat
@@ -147,29 +147,29 @@ iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52080 -j
 iptables -w -t nat -A PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # VPN DNS redirection to Knot Resolver
 if [[ "$VPN_DNS" == "1" ]]; then
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
-	iptables -w -t nat -A PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.0.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.4.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.8.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.0.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.4.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.8.1
 fi
 # AntiZapret DNS redirection to Knot Resolver
-iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
-iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
-iptables -w -t nat -A PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
-iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
-iptables -w -t nat -A PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
-iptables -w -t nat -A PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
+iptables -w -t nat -A PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.0.1
+iptables -w -t nat -A PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.4.1
+iptables -w -t nat -A PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.8.1
+iptables -w -t nat -A PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.0.1
+iptables -w -t nat -A PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.4.1
+iptables -w -t nat -A PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.8.1
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == "y" ]]; then
-	iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 ! -d ${FAKE_IP}/15 -j CONNMARK --set-mark 0x1
+	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 fi
 # Mapping fake IP to real IP
 iptables -w -t nat -S ANTIZAPRET-MAPPING &>/dev/null || iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -A PREROUTING -s ${IP}.29.0.0/16 -d ${FAKE_IP}/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT VPN
-iptables -w -t nat -A POSTROUTING -s ${IP}.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
+iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
 
 ./custom-up.sh
 exit 0

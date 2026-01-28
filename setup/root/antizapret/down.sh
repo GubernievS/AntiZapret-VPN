@@ -22,7 +22,7 @@ if [[ -z "$DEFAULT_IP" ]]; then
 fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
-[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18.0.0}" || FAKE_IP="${IP}.30.0.0"
+[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 # filter
 # INPUT connection tracking
@@ -35,15 +35,15 @@ ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
-iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p tcp -m string --string "GET " --algo kmp --to 100 -m string --string "info_hash=" --algo bm -m string --string "peer_id=" --algo bm -m string --string "port=" --algo bm -j SET --add-set antizapret-torrent src --exist
-iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-iptables -w -D FORWARD -s ${IP}.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-iptables -w -D FORWARD -s ${IP}.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
+iptables -w -D FORWARD -s $IP.28.0.0/16 -p tcp -m string --string "GET " --algo kmp --to 100 -m string --string "info_hash=" --algo bm -m string --string "peer_id=" --algo bm -m string --string "port=" --algo bm -j SET --add-set antizapret-torrent src --exist
+iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string "BitTorrent protocol" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string "d1:ad2:id20:" --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 # Restrict forwarding
-iptables -w -D FORWARD -s ${IP}.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 # Client isolation
-iptables -w -D FORWARD ! -i "$DEFAULT_INTERFACE" -d ${IP}.28.0.0/15 -j DROP
-iptables -w -D FORWARD -d ${IP}.28.0.0/15 -j ACCEPT
+iptables -w -D FORWARD ! -i "$DEFAULT_INTERFACE" -d $IP.28.0.0/15 -j DROP
+iptables -w -D FORWARD -d $IP.28.0.0/15 -j ACCEPT
 # Attack and scan protection
 iptables -w -D INPUT -i "$DEFAULT_INTERFACE" -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i "$DEFAULT_INTERFACE" -m set --match-set antizapret-allow src -j ACCEPT
@@ -77,10 +77,10 @@ iptables -w -t raw -D OUTPUT -o lo -j NOTRACK
 ip6tables -w -t raw -D PREROUTING -i lo -j NOTRACK
 ip6tables -w -t raw -D OUTPUT -o lo -j NOTRACK
 # NOTRACK DNS
-iptables -w -t raw -D PREROUTING ! -s ${IP}.28.0.0/15 -p udp --dport 53 -j NOTRACK
-iptables -w -t raw -D PREROUTING ! -s ${IP}.28.0.0/15 -p tcp --dport 53 -j NOTRACK
-iptables -w -t raw -D OUTPUT ! -d ${IP}.28.0.0/15 -p udp --sport 53 -j NOTRACK
-iptables -w -t raw -D OUTPUT ! -d ${IP}.28.0.0/15 -p tcp --sport 53 -j NOTRACK
+iptables -w -t raw -D PREROUTING ! -s $IP.28.0.0/15 -p udp --dport 53 -j NOTRACK
+iptables -w -t raw -D PREROUTING ! -s $IP.28.0.0/15 -p tcp --dport 53 -j NOTRACK
+iptables -w -t raw -D OUTPUT ! -d $IP.28.0.0/15 -p udp --sport 53 -j NOTRACK
+iptables -w -t raw -D OUTPUT ! -d $IP.28.0.0/15 -p tcp --sport 53 -j NOTRACK
 
 # nat
 # OpenVPN TCP port redirection for backup connections
@@ -93,25 +93,25 @@ iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 443 -j R
 iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -D PREROUTING -i "$DEFAULT_INTERFACE" -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # VPN DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
-iptables -w -t nat -D PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
-iptables -w -t nat -D PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
-iptables -w -t nat -D PREROUTING -s ${IP}.28.0.0/22 ! -d ${IP}.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.0.1
-iptables -w -t nat -D PREROUTING -s ${IP}.28.4.0/22 ! -d ${IP}.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.4.1
-iptables -w -t nat -D PREROUTING -s ${IP}.28.8.0/24 ! -d ${IP}.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.28.8.1
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.0.1
+iptables -w -t nat -D PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.4.1
+iptables -w -t nat -D PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.8.1
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.0.1
+iptables -w -t nat -D PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.4.1
+iptables -w -t nat -D PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.8.1
 # AntiZapret DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
-iptables -w -t nat -D PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
-iptables -w -t nat -D PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
-iptables -w -t nat -D PREROUTING -s ${IP}.29.0.0/22 ! -d ${IP}.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.0.1
-iptables -w -t nat -D PREROUTING -s ${IP}.29.4.0/22 ! -d ${IP}.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.4.1
-iptables -w -t nat -D PREROUTING -s ${IP}.29.8.0/24 ! -d ${IP}.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination ${IP}.29.8.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.0.1
+iptables -w -t nat -D PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.4.1
+iptables -w -t nat -D PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.8.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.0.1
+iptables -w -t nat -D PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.4.1
+iptables -w -t nat -D PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.8.1
 # Restrict forwarding
-iptables -w -t nat -D PREROUTING -s ${IP}.29.0.0/16 ! -d ${FAKE_IP}/15 -j CONNMARK --set-mark 0x1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 # Mapping fake IP to real IP
-iptables -w -t nat -D PREROUTING -s ${IP}.29.0.0/16 -d ${FAKE_IP}/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT VPN
-iptables -w -t nat -D POSTROUTING -s ${IP}.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
 
 ./custom-down.sh
 exit 0
