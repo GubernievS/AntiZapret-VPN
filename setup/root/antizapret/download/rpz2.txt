@@ -62,6 +62,7 @@ www-torproject.org CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
+
 image.tmdb.org A 185.59.220.198
 *.image.tmdb.org A 185.59.220.198
 image.tmdb.org A 185.59.220.199
@@ -70,6 +71,16 @@ image.tmdb.org A 169.150.247.35
 *.image.tmdb.org A 169.150.247.35
 image.tmdb.org A 169.150.247.36
 *.image.tmdb.org A 169.150.247.36
+
+themoviedb.org A 3.160.150.117
+*.themoviedb.org A 3.160.150.117
+themoviedb.org A 3.160.150.18
+*.themoviedb.org A 3.160.150.18
+themoviedb.org A 18.165.140.30
+*.themoviedb.org A 18.165.140.30
+themoviedb.org A 18.165.140.10
+*.themoviedb.org A 18.165.140.10
+
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
 usmall.ru A 3.162.38.7
@@ -78,5 +89,6 @@ usmall.ru A 18.64.119.98
 *.usmall.ru A 18.64.119.98
 usmall.ru A 18.66.192.97
 *.usmall.ru A 18.66.192.97
+
 tracker.openbittorrent.com A 52.223.13.41
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
