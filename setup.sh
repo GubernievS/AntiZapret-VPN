@@ -442,8 +442,8 @@ rm -rf /tmp/antizapret
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
 	# SkyDNS
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/{'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'}/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
 	# Cloudflare+Quad9
 	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
