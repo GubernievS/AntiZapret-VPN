@@ -218,7 +218,7 @@ oaiusercontent.com
 chatgpt.com
 bosch.de
 weather.com
-gemini.google.com
+#gemini.google.com
 claude.ai
 anthropic.com
 chatfuel.com
@@ -236,7 +236,7 @@ tiktokcdn-us.com
 tiktokcdn-eu.com
 ttwstatic.com
 ibyteimg.com
-lookerstudio.google.com
+#lookerstudio.google.com
 soapui.org
 spotify.com
 githubcopilot.com
@@ -286,7 +286,7 @@ clashmini.com
 squadbusters.com
 mo.co
 capacitorjs.com
-aistudio.google.com
+#aistudio.google.com
 clickup.com
 extremetech.com
 downloads.malwarebytes.com
@@ -380,7 +380,7 @@ xmg.gg
 schenker-tech.de
 yeggi.com
 omv-extras.org
-notebooklm.google.com
+#notebooklm.google.com
 members.summerana.com
 anythingllm.com
 wikidot.com
@@ -389,8 +389,8 @@ pcmag.com
 mixupload.com
 codeium.com
 gateway.pinata.cloud
-ai.google.dev
-alkalimakersuite-pa.clients6.google.com
+#ai.google.dev
+#alkalimakersuite-pa.clients6.google.com
 iaai.com
 bid.cars
 api.app.prod.grazie.aws.intellij.net
@@ -466,8 +466,8 @@ download.lenovo.com
 darkproject.eu
 framer.com
 tor.eff.org
-news.google.com
-play.google.com
+#news.google.com
+#play.google.com
 bbc.co.uk
 bbci.co.uk
 radiojar.com
@@ -587,7 +587,7 @@ t3.chat
 tuta.com
 tutamail.com
 worldpay.com
-chromewebstore.google.com
+#chromewebstore.google.com
 kmail-lists.com
 klaviyo.com
 antpool.com
@@ -646,7 +646,7 @@ lifehacker.com
 myheritage.com
 cdn77.com
 absher.sa
-jules.google.com
+#jules.google.com
 stitch.withgoogle.com
 ebay.com
 rapidapi.com
@@ -702,7 +702,7 @@ xe.com
 gql.twitch.tv
 live.chat.eveonline.com
 dyson.fr
-labs.google
+#labs.google
 squarecdn.com
 xgpuweb.gssv-play-prod.xboxlive.com
 auth.xboxlive.com
@@ -874,14 +874,14 @@ ip4.static.sl-reverse.com
 azurefd.net
 reolink.com
 neuesbad.de
-meet.google.com
-stun.l.google.com
-stun-anycast.l.google.com
-stun1.l.google.com
-stun2.l.google.com
-stun3.l.google.com
-stun4.l.google.com
-turns.goog
+#meet.google.com
+#stun.l.google.com
+#stun-anycast.l.google.com
+#stun1.l.google.com
+#stun2.l.google.com
+#stun3.l.google.com
+#stun4.l.google.com
+#turns.goog
 fpvcdn.com
 #stun.cloudflare.com
 #stun.nextcloud.com
@@ -929,6 +929,12 @@ envatousercontent.com
 mynonpublic.com
 openpli.org
 openbh.net
+radzen.com
+packages.unity.com
+google.com
+google.dev
+google
+goog
 
 # Блокирует DNS
 library.hydra.wiki
