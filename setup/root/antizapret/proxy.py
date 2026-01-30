@@ -53,31 +53,30 @@ class ProxyResolver(BaseResolver):
         # Start thread for cleanup fake IPs
         threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
 
-    def get_fake_ip(self,real_ip):
+    def get_fake_ip(self,real_ip,current_time):
         with self.lock:
             entry = self.ip_map.get(real_ip)
             if entry:
-                entry["last_access"] = time.time()
+                entry["last_access"] = current_time
                 return entry["fake_ip"]
-            else:
-                try:
-                    fake_ip = self.ip_pool.popleft()
-                except IndexError:
-                    print("Error: No fake IP left")
-                    return None
-                self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": time.time()}
-                rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
-                subprocess.run(rule,shell=True,check=True)
-                #print(f"Mapping: {fake_ip} to {real_ip}")
-                return fake_ip
+            try:
+                fake_ip = self.ip_pool.popleft()
+            except IndexError:
+                print("Error: No fake IP left")
+                return None
+            self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
+            rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
+            subprocess.run(rule,shell=True,check=True)
+            #print(f"Mapping: {fake_ip} to {real_ip}")
+            return fake_ip
 
-    def mapping_ip(self,real_ip,fake_ip,last_access):
+    def mapping_ip(self,real_ip,fake_ip,current_time):
         if self.ip_map.get(real_ip):
             print(f"Error: Real IP {real_ip} is already mapped")
             return False
         try:
             self.ip_pool.remove(fake_ip)
-            self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": last_access}
+            self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
             #print(f"Mapping: {fake_ip} to {real_ip}")
         except ValueError:
             print(f"Error: Fake IP {fake_ip} not in fake IP pool")
@@ -115,16 +114,15 @@ class ProxyResolver(BaseResolver):
             reply = DNSRecord.parse(proxy_r)
             if request.q.qtype == QTYPE.A:
                 #print("GOT A")
-                newrr = []
+                new_rr = []
+                current_time = time.time()
                 for record in reply.rr:
-                    if record.rtype == QTYPE.A:
-                        newrr.append(record)
-                reply.rr = newrr
-                for record in reply.rr:
+                    if record.rtype != QTYPE.A:
+                        continue
                     #print(dir(record))
                     #print(type(record.rdata))
                     real_ip = str(record.rdata)
-                    fake_ip = self.get_fake_ip(real_ip)
+                    fake_ip = self.get_fake_ip(real_ip,current_time)
                     if not fake_ip:
                         reply = request.reply()
                         reply.header.rcode = RCODE.SERVFAIL
@@ -135,6 +133,8 @@ class ProxyResolver(BaseResolver):
                         record.ttl = self.min_ttl
                     elif record.ttl > self.max_ttl:
                         record.ttl = self.max_ttl
+                    new_rr.append(record)
+                reply.rr = new_rr
             #print(reply)
         except Exception as e:
             print(f"Error: {e}")
