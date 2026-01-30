@@ -81,6 +81,15 @@ themoviedb.org A 18.165.140.30
 themoviedb.org A 18.165.140.10
 *.themoviedb.org A 18.165.140.10
 
+media.themoviedb.org A 185.111.111.157
+*.media.themoviedb.org A 185.111.111.157
+media.themoviedb.org A 185.111.111.158
+*.media.themoviedb.org A 185.111.111.158
+media.themoviedb.org A 51.83.172.163
+*.media.themoviedb.org A 51.83.172.163
+media.themoviedb.org A 37.19.203.178
+*.media.themoviedb.org A 37.19.203.178
+
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
 usmall.ru A 3.162.38.7
