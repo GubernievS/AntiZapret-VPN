@@ -936,6 +936,8 @@ google.dev
 google
 goog
 7tv.io
+vlr.gg
+owcdn.net
 
 # Блокирует DNS
 library.hydra.wiki
