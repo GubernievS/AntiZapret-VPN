@@ -939,6 +939,7 @@ goog
 vlr.gg
 owcdn.net
 squarespace-cdn.com
+mcbluna.net
 
 # Блокирует DNS
 library.hydra.wiki
@@ -954,6 +955,7 @@ meta.ai
 support.opendns.com
 help.ui.com
 community.pioneerdj.com
+support-us.sodastream.com
 
 # Сертификаты
 letsencrypt.org
