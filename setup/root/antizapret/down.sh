@@ -12,13 +12,17 @@ if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 1
 fi
-
-if [[ -z "$DEFAULT_IP" ]]; then
-	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+if [[ -z "$OUT_INTERFACE" ]]; then
+	OUT_INTERFACE="$DEFAULT_INTERFACE"
 fi
+
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 2
+fi
+if [[ -z "$OUT_IP" ]]; then
+	OUT_IP="$DEFAULT_IP"
 fi
 
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
@@ -111,7 +115,7 @@ iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMA
 # Mapping fake IP to real IP
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT VPN
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o "$DEFAULT_INTERFACE" -j SNAT --to-source "$DEFAULT_IP"
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o "$OUT_INTERFACE" -j SNAT --to-source "$OUT_IP"
 
 ./custom-down.sh
 exit 0
