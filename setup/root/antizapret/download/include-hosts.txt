@@ -938,6 +938,7 @@ goog
 7tv.io
 vlr.gg
 owcdn.net
+squarespace-cdn.com
 
 # Блокирует DNS
 library.hydra.wiki
