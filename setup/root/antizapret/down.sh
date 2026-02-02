@@ -46,7 +46,7 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent sr
 # Restrict forwarding
 iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 # Client isolation
-iptables -w -D FORWARD ! -i "$DEFAULT_INTERFACE" ! -i "$OUT_INTERFACE" -d $IP.28.0.0/15 -j DROP
+iptables -w -D FORWARD ! -i "$DEFAULT_INTERFACE" -d $IP.28.0.0/15 -j DROP
 iptables -w -D FORWARD -d $IP.28.0.0/15 -j ACCEPT
 # Attack and scan protection
 iptables -w -D INPUT -i "$DEFAULT_INTERFACE" -p icmp --icmp-type echo-request -j DROP
