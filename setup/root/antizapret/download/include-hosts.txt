@@ -944,6 +944,7 @@ secu100.net
 xmcsrv.net
 myheritage.de
 mhcache.com
+azureedge.us
 
 # Блокирует DNS
 library.hydra.wiki
