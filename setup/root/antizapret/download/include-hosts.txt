@@ -942,6 +942,7 @@ squarespace-cdn.com
 mcbluna.net
 secu100.net
 xmcsrv.net
+myheritage.de
 mhcache.com
 
 # Блокирует DNS
