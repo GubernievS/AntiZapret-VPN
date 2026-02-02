@@ -75,7 +75,7 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 fi
 # Client isolation
 if [[ "$CLIENT_ISOLATION" == "y" ]]; then
-	iptables -w -I FORWARD 2 ! -i "$DEFAULT_INTERFACE" -d $IP.28.0.0/15 -j DROP
+	iptables -w -I FORWARD 2 ! -i "$OUT_INTERFACE" -d $IP.28.0.0/15 -j DROP
 else
 	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
 fi
