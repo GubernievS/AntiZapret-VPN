@@ -129,7 +129,7 @@ kernel.sched_autogroup_enabled=1
 net.ipv4.ip_forward=1
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
-net.ipv4.tcp_mtu_probing=0
+net.ipv4.tcp_mtu_probing=1
 net.core.rmem_max=4194304
 net.core.wmem_max=4194304
 net.ipv4.tcp_rmem=16384 131072 4194304
@@ -156,7 +156,8 @@ net.ipv4.tcp_tw_reuse=0
 net.ipv4.tcp_slow_start_after_idle=0
 net.netfilter.nf_conntrack_tcp_timeout_established=86400
 net.core.rmem_default=262144
-net.core.wmem_default=262144" > /etc/sysctl.d/99-proxy.conf
+net.core.wmem_default=262144
+net.ipv4.tcp_base_mss=1024" > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
 echo "# Disable IPv6
