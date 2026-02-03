@@ -97,7 +97,7 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	iptables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 	iptables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
 	iptables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-	iptables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmp --icmp-type destination-unreachable -j DROP
+	iptables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmp --icmp-type port-unreachable -j DROP
 	ipset create antizapret-allow6 hash:net family inet6 -exist
 	ipset create antizapret-block6 hash:ip timeout 600 family inet6 -exist
 	ipset create antizapret-watch6 hash:ip,port timeout 600 family inet6 -exist
@@ -108,7 +108,7 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	ip6tables -w -I INPUT 6 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 7 -i "$DEFAULT_INTERFACE" -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 	ip6tables -w -I OUTPUT 2 -o "$DEFAULT_INTERFACE" -p tcp --tcp-flags RST RST -j DROP
-	ip6tables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmpv6 --icmpv6-type destination-unreachable -j DROP
+	ip6tables -w -I OUTPUT 3 -o "$DEFAULT_INTERFACE" -p icmpv6 --icmpv6-type port-unreachable -j DROP
 fi
 # SSH protection
 if [[ "$SSH_PROTECTION" == "y" ]]; then
