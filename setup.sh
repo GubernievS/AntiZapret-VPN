@@ -7,10 +7,16 @@
 
 export LC_ALL=C
 
+# Проверка необходимости перезагрузить
+if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades >/dev/null 2>&1; then
+	echo 'Error: You need to reboot this server before installation!'
+	exit 2
+fi
+
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
-	exit 2
+	exit 3
 fi
 
 cd /root
@@ -18,7 +24,7 @@ cd /root
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
-	exit 3
+	exit 4
 fi
 
 # Проверка версии системы
@@ -28,35 +34,35 @@ VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 if [[ "$OS" == "debian" ]]; then
 	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
 		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
-		exit 4
+		exit 5
 	fi
 elif [[ "$OS" == "ubuntu" ]]; then
 	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
 		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
-		exit 5
+		exit 6
 	fi
 elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	echo "Error: Your Linux distribution ($OS) is not supported!"
-	exit 6
+	exit 7
 fi
 
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	echo 'Error: Low disk space! You need 2GB of free space!'
-	exit 7
+	exit 8
 fi
 
 # Проверка наличия сетевого интерфейса и IPv4-адреса
 DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
-	exit 8
+	exit 9
 fi
 
 DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
-	exit 9
+	exit 10
 fi
 
 echo
@@ -237,12 +243,6 @@ done
 echo
 echo 'Installation, please wait...'
 
-# Ожидание пока выполняется apt-get
-while pidof apt-get &>/dev/null; do
-	echo 'Waiting for apt-get to finish...';
-	sleep 5;
-done
-
 # Отключим фоновые обновления системы
 systemctl stop unattended-upgrades
 systemctl stop apt-daily.timer
@@ -348,9 +348,10 @@ fi
 
 # Ставим необходимые пакеты
 apt-get update
-apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance
+apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
+dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
