@@ -1,9 +1,15 @@
 #!/bin/bash
 
+# Проверка необходимости перезагрузить
+if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades >/dev/null 2>&1; then
+	echo 'Error: You need to reboot this server before installation!'
+	exit 2
+fi
+
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
-	exit 2
+	exit 3
 fi
 
 cd /root
@@ -11,7 +17,7 @@ cd /root
 # Проверка на OpenVZ и LXC
 if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
-	exit 3
+	exit 4
 fi
 
 # Проверка версии системы
@@ -21,28 +27,28 @@ VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 if [[ "$OS" == "debian" ]]; then
 	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
 		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
-		exit 4
+		exit 5
 	fi
 elif [[ "$OS" == "ubuntu" ]]; then
 	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
 		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
-		exit 5
+		exit 6
 	fi
 elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
 	echo "Error: Your Linux distribution ($OS) is not supported!"
-	exit 6
+	exit 7
 fi
 
 DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
-	exit 7
+	exit 8
 fi
 
 DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
-	exit 8
+	exit 9
 fi
 
 echo
@@ -114,9 +120,10 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent irqbalance
+apt-get install --reinstall -y iptables iptables-persistent irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
+dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Измененим параметры для прокси
 echo "# Proxy parameters modification
