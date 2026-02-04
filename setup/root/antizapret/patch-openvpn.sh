@@ -60,7 +60,7 @@ rm -rf /usr/local/src/openvpn
 apt-get update
 apt-get dist-upgrade -y
 apt-get install --reinstall -y openvpn curl tar build-essential pkg-config libssl-dev libsystemd-dev libnl-genl-3-dev libcap-ng-dev
-apt-get autoremove -y
+apt-get autoremove --purge -y
 apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 mkdir -p /usr/local/src/openvpn
