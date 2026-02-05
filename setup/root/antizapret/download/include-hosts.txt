@@ -949,6 +949,7 @@ naukri.com
 vost.pw
 1lumen.com
 linkplay.com
+cdnbase.com
 
 # Блокирует DNS
 library.hydra.wiki
