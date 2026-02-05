@@ -1,12 +1,5 @@
 #!/bin/bash
 
-###
-
-sed -i 's|, 10.30.0.0/15||g' /etc/wireguard/templates/antizapret-client-*.conf
-sed -i '/push "route 10.30.0.0 255.254.0.0"/d' /etc/openvpn/server/antizapret-*.conf
-
-###
-
 set -e
 shopt -s nullglob
 
