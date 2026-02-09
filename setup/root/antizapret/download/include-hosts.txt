@@ -957,6 +957,8 @@ xda-developers.com
 xdaforums.com
 xiaomi.eu
 #tradingview.com
+calibre-ebook.com
+vladimirkhil.com
 
 # Блокирует DNS
 library.hydra.wiki
