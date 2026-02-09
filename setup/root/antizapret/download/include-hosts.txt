@@ -955,6 +955,8 @@ edx.org
 python.org
 xda-developers.com
 xdaforums.com
+xiaomi.eu
+#tradingview.com
 
 # Блокирует DNS
 library.hydra.wiki
