@@ -953,6 +953,7 @@ cdnbase.com
 ouraring.com
 edx.org
 python.org
+xda-developers.com
 
 # Блокирует DNS
 library.hydra.wiki
