@@ -962,7 +962,7 @@ calibre-ebook.com
 vladimirkhil.com
 cellmapper.net
 warcrier.net
-warhammer.com
+#warhammer.com
 
 # Блокирует DNS
 library.hydra.wiki
