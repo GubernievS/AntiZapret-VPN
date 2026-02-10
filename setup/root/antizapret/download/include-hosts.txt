@@ -961,6 +961,8 @@ xiaomi.eu
 calibre-ebook.com
 vladimirkhil.com
 cellmapper.net
+warcrier.net
+warhammer.com
 
 # Блокирует DNS
 library.hydra.wiki
