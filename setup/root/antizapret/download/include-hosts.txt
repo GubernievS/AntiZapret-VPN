@@ -298,6 +298,7 @@ redis.io
 fw-download.ubnt.com
 download.screamingfrog.co.uk
 etsy.com
+etsystatic.com
 wetransfer.com
 app.zerossl.com
 bosch-home.com
@@ -959,6 +960,7 @@ xiaomi.eu
 #tradingview.com
 calibre-ebook.com
 vladimirkhil.com
+cellmapper.net
 
 # Блокирует DNS
 library.hydra.wiki
