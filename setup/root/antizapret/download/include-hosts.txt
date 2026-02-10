@@ -460,7 +460,6 @@ nflximg.com
 nflxsearch.net
 nflxso.net
 nflxvideo.net
-amazonaws.com
 nba.com
 delltechnologies.com
 download.lenovo.com
@@ -722,7 +721,9 @@ westernunion.com
 coinpayments.net
 netacad.com
 amazon.com
+amazonaws.com
 awsstatic.com
+awswaf.com
 signal.art
 signal.group
 signal.link
