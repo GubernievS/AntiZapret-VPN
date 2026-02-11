@@ -965,6 +965,8 @@ cellmapper.net
 warcrier.net
 #warhammer.com
 victorinox.com
+russiancourses.net
+keil.com
 
 # Блокирует DNS
 library.hydra.wiki
