@@ -964,6 +964,7 @@ vladimirkhil.com
 cellmapper.net
 warcrier.net
 #warhammer.com
+victorinox.com
 
 # Блокирует DNS
 library.hydra.wiki
