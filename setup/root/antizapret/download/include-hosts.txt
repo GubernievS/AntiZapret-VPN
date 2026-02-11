@@ -965,7 +965,7 @@ cellmapper.net
 warcrier.net
 #warhammer.com
 victorinox.com
-russiancourses.net
+#russiancourses.net
 keil.com
 
 # Блокирует DNS
