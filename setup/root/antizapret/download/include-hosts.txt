@@ -854,7 +854,7 @@ thetvdb.com
 entware.net
 roblox.com
 rbxcdn.com
-facetime.apple.com 
+facetime.apple.com
 facetime-apple-com.we.apple-dns.net
 pepephone.com
 onlineprinters.com
@@ -968,6 +968,7 @@ victorinox.com
 #russiancourses.net
 keil.com
 kymcoforum.com
+gmail.com
 
 # Блокирует DNS
 library.hydra.wiki
