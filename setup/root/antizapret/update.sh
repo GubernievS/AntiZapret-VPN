@@ -31,8 +31,9 @@ PARSE_PATH="parse.sh"
 DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh"
 DOALL_PATH="doall.sh"
 
-DOMAIN_LINK="https://antifilter.download/list/domains.lst"
+DOMAIN_LINK="https://raw.githubusercontent.com/bol-van/rulist/refs/heads/main/reestr_hostname.txt"
 DOMAIN_PATH="download/domain.txt"
+#DOMAIN_LINK="https://antifilter.download/list/domains.lst"
 
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
