@@ -32,8 +32,10 @@ DOALL_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/set
 DOALL_PATH="doall.sh"
 
 DOMAIN_LINK="https://raw.githubusercontent.com/bol-van/rulist/refs/heads/main/reestr_hostname.txt"
-DOMAIN_PATH="download/domain.txt"
-#DOMAIN_LINK="https://antifilter.download/list/domains.lst"
+DOMAIN_PATH="download/bol-van-domain.txt"
+
+DOMAIN2_LINK="https://antifilter.download/list/domains.lst"
+DOMAIN2_PATH="download/antifilter-download-domain.txt"
 
 RPZ_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/rpz.txt"
 RPZ_PATH="download/rpz.txt"
@@ -60,7 +62,7 @@ ADGUARD_LINK="https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
 ADGUARD_PATH="download/adguard.txt"
 
 OISD_LINK="https://raw.githubusercontent.com/sjhgvr/oisd/refs/heads/main/domainswild2_small.txt"
-OISD_PATH="download/oisd.txt"
+OISD_PATH="download/oisd-include-adblock-hosts.txt"
 
 DISCORD_IPS_LINK="https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/discord-ips.txt"
 DISCORD_IPS_PATH="download/discord-ips.txt"
@@ -131,6 +133,7 @@ source setup
 
 if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
 	download $DOMAIN_PATH $DOMAIN_LINK
+	( download $DOMAIN2_PATH $DOMAIN2_LINK ) || true
 	download $RPZ_PATH $RPZ_LINK
 	download $RPZ2_PATH $RPZ2_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
