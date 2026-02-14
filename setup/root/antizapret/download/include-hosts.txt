@@ -970,6 +970,8 @@ keil.com
 kymcoforum.com
 gmail.com
 rabby.io
+rovio.com
+angrybirdsbigadventure.net
 
 # Блокирует DNS
 library.hydra.wiki
