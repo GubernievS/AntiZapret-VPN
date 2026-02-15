@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import socket,struct,subprocess,sys,time,argparse,threading
+import socket,struct,subprocess,sys,time,argparse,threading,copy
 from collections import deque
 from ipaddress import IPv4Network
 from dnslib import DNSRecord,RCODE,QTYPE,A
@@ -116,9 +116,18 @@ class ProxyResolver(BaseResolver):
                 #print("GOT A")
                 new_rr = []
                 current_time = time.time()
+                qname = request.q.qname
+                is_smtp = qname.label and b'smtp' in qname.label[0]
                 for record in reply.rr:
                     if record.rtype != QTYPE.A:
                         continue
+                    record.rname = qname
+                    if record.ttl < self.min_ttl:
+                        record.ttl = self.min_ttl
+                    elif record.ttl > self.max_ttl:
+                        record.ttl = self.max_ttl
+                    if is_smtp:
+                        new_rr.append(copy.copy(record))
                     #print(dir(record))
                     #print(type(record.rdata))
                     real_ip = str(record.rdata)
@@ -128,11 +137,6 @@ class ProxyResolver(BaseResolver):
                         reply.header.rcode = RCODE.SERVFAIL
                         return reply
                     record.rdata = A(fake_ip)
-                    record.rname = request.q.qname
-                    if record.ttl < self.min_ttl:
-                        record.ttl = self.min_ttl
-                    elif record.ttl > self.max_ttl:
-                        record.ttl = self.max_ttl
                     new_rr.append(record)
                 reply.rr = new_rr
             #print(reply)
