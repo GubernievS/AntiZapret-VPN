@@ -65,10 +65,10 @@ class ProxyResolver(BaseResolver):
                 print("Error: No fake IP left")
                 return None
             self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
-            rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
-            subprocess.run(rule,shell=True,check=True)
-            #print(f"Mapping: {fake_ip} to {real_ip}")
-            return fake_ip
+        rule = f"iptables -w -t nat -A ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}"
+        subprocess.run(rule,shell=True,check=True)
+        #print(f"Mapping: {fake_ip} to {real_ip}")
+        return fake_ip
 
     def mapping_ip(self,real_ip,fake_ip,current_time):
         if self.ip_map.get(real_ip):
