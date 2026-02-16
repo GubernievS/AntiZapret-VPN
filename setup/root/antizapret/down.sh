@@ -29,6 +29,9 @@ fi
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
 [[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
+# WARP
+wg-quick down /etc/wireguard/warp.conf
+
 # filter
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP

@@ -31,6 +31,51 @@ fi
 [[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
 [[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
+# WARP
+if [[ "$WARP_OUTBOUND" == "y" ]]; then
+	set +e
+	WARP_INTERFACE='warp'
+	echo "Starting $WARP_INTERFACE..."
+	PRIVATE_KEY=$(wg genkey)
+	KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
+	WARP_PATH="/etc/wireguard/$WARP_INTERFACE.conf"
+
+	REG=$(curl -sfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0i1909051800/reg" \
+		-H 'Content-Type: application/json' \
+		-d "{\"key\":\"$KEY\",\"warp_enabled\":true}")
+
+	PUBLIC_KEY=$(echo "$REG" | jq -r '.result.config.peers[0].public_key')
+	ENDPOINT=$(echo "$REG" | jq -r '.result.config.peers[0].endpoint.host')
+	ADDRESS=$(echo "$REG" | jq -r '.result.config.interface.addresses.v4')
+
+	echo "[Interface]
+	PrivateKey = $PRIVATE_KEY
+	Address = $ADDRESS
+	MTU = 1420
+	Table = 13335
+	PostUp = ip rule add from $IP.28.0.0/15 to $IP.28.0.0/15 lookup main priority 5000
+	PostUp = ip rule add from $IP.28.0.0/15 to $FAKE_IP.0.0/15 lookup main priority 5000
+	PostUp = ip rule add from $IP.28.0.0/15 lookup 13335 priority 10000
+	PostDown = ip rule del from $IP.28.0.0/15 to $IP.28.0.0/15 priority 5000
+	PostDown = ip rule del from $IP.28.0.0/15 to $FAKE_IP.0.0/15 priority 5000
+	PostDown = ip rule del from $IP.28.0.0/15 lookup 13335 priority 10000
+	[Peer]
+	PublicKey = $PUBLIC_KEY
+	AllowedIPs = 0.0.0.0/0
+	Endpoint = $ENDPOINT" > "$WARP_PATH"
+
+	wg-quick up "$WARP_PATH"
+
+	if [[ $? -eq 0 ]]; then
+		echo "Started $WARP_INTERFACE: $ENDPOINT connected"
+		OUT_INTERFACE="$WARP_INTERFACE"
+		OUT_IP="$ADDRESS"	
+	else
+		echo "Starting $WARP_INTERFACE failed! Use $OUT_INTERFACE"
+	fi
+	set -e
+fi
+
 # SoftIRQ CPU balance
 printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/"$DEFAULT_INTERFACE"/queues/rx-*/rps_cpus >/dev/null
 
