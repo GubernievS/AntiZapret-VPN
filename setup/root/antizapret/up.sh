@@ -49,20 +49,21 @@ if [[ "$WARP_OUTBOUND" == "y" ]]; then
 	ADDRESS=$(echo "$REG" | jq -r '.result.config.interface.addresses.v4')
 
 	echo "[Interface]
-	PrivateKey = $PRIVATE_KEY
-	Address = $ADDRESS
-	MTU = 1420
-	Table = 13335
-	PostUp = ip rule add from $IP.28.0.0/15 to $IP.28.0.0/15 lookup main priority 5000
-	PostUp = ip rule add from $IP.28.0.0/15 to $FAKE_IP.0.0/15 lookup main priority 5000
-	PostUp = ip rule add from $IP.28.0.0/15 lookup 13335 priority 10000
-	PostDown = ip rule del from $IP.28.0.0/15 to $IP.28.0.0/15 priority 5000
-	PostDown = ip rule del from $IP.28.0.0/15 to $FAKE_IP.0.0/15 priority 5000
-	PostDown = ip rule del from $IP.28.0.0/15 lookup 13335 priority 10000
-	[Peer]
-	PublicKey = $PUBLIC_KEY
-	AllowedIPs = 0.0.0.0/0
-	Endpoint = $ENDPOINT" > "$WARP_PATH"
+PrivateKey = $PRIVATE_KEY
+Address = $ADDRESS
+MTU = 1420
+Table = 13335
+PostUp = ip rule add from $IP.28.0.0/15 to $IP.28.0.0/15 lookup main priority 5000
+PostUp = ip rule add from $IP.28.0.0/15 to $FAKE_IP.0.0/15 lookup main priority 5000
+PostUp = ip rule add from $IP.28.0.0/15 lookup 13335 priority 10000
+PostDown = ip rule del from $IP.28.0.0/15 to $IP.28.0.0/15 priority 5000
+PostDown = ip rule del from $IP.28.0.0/15 to $FAKE_IP.0.0/15 priority 5000
+PostDown = ip rule del from $IP.28.0.0/15 lookup 13335 priority 10000
+
+[Peer]
+PublicKey = $PUBLIC_KEY
+AllowedIPs = 0.0.0.0/0
+Endpoint = $ENDPOINT" > "$WARP_PATH"
 
 	wg-quick up "$WARP_PATH"
 
