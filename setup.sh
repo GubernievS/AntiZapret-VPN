@@ -275,6 +275,7 @@ apt-get purge -y udisks2
 apt-get purge -y qemu-guest-agent
 apt-get purge -y tuned
 apt-get purge -y sysstat
+apt-get purge -y acpid
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == "y" ]]; then
@@ -348,7 +349,7 @@ fi
 
 # Ставим необходимые пакеты
 apt-get update
-apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades
+apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
