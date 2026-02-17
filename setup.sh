@@ -93,7 +93,7 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 done
 echo
 until [[ "$WARP_OUTBOUND" =~ (y|n) ]]; do
-	read -rp $'Enable Cloudflare WARP as outbound interface for \e[1;32mall VPN\e[0m traffic? [y/n]: ' -e -i n WARP_OUTBOUND
+	read -rp $'Use Cloudflare WARP for \001\e[1;32m\002all VPN\001\e[0m\002 outbound traffic? [y/n]: ' -e -i n WARP_OUTBOUND
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
@@ -182,7 +182,7 @@ until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
 done
 echo
 until [[ "$CLIENT_ISOLATION" =~ (y|n) ]]; do
-	read -rp $'Enable \e[1;32mall VPN\e[0m client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
+	read -rp $'Enable \001\e[1;32m\002all VPN\001\e[0m\002 client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
