@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import Header from './Header'
 import Sidebar from './Sidebar'
 
