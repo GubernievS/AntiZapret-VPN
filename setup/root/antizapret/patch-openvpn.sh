@@ -31,7 +31,7 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-if [[ "$ALGORITHM" == "0" ]]; then
+if [[ "$ALGORITHM" == '0' ]]; then
 	if [[ -d /usr/local/src/openvpn ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
@@ -49,10 +49,10 @@ if [[ "$ALGORITHM" == "0" ]]; then
 	echo
 	echo 'OpenVPN patch not installed!'
 	exit 0
-elif [[ "$ALGORITHM" == "2" ]]; then
-    ERROR_FREE="#define ERROR_FREE"
+elif [[ "$ALGORITHM" == '2' ]]; then
+    ERROR_FREE='#define ERROR_FREE'
 else
-    ERROR_FREE="#undef ERROR_FREE"
+    ERROR_FREE='#undef ERROR_FREE'
 fi
 
 make -C /usr/local/src/openvpn uninstall || true
