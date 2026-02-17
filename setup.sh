@@ -155,6 +155,10 @@ until [[ "$OPENVPN_BACKUP_UDP" =~ (y|n) ]]; do
 	read -rp 'Use UDP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_BACKUP_UDP
 done
 echo
+until [[ "$WIREGUARD_BACKUP" =~ (y|n) ]]; do
+	read -rp 'Use ports 540, 580 as backup for WireGuard/AmneziaWG connections? [y/n]: ' -e -i y WIREGUARD_BACKUP
+done
+echo
 until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
 	read -rp 'Allow multiple clients connecting to OpenVPN using same profile file (*.ovpn)? [y/n]: ' -e -i y OPENVPN_DUPLICATE
 done
@@ -400,6 +404,7 @@ ALTERNATIVE_IP=$ALTERNATIVE_IP
 ALTERNATIVE_FAKE_IP=$ALTERNATIVE_FAKE_IP
 OPENVPN_BACKUP_TCP=$OPENVPN_BACKUP_TCP
 OPENVPN_BACKUP_UDP=$OPENVPN_BACKUP_UDP
+WIREGUARD_BACKUP=$WIREGUARD_BACKUP
 OPENVPN_DUPLICATE=$OPENVPN_DUPLICATE
 OPENVPN_LOG=$OPENVPN_LOG
 SSH_PROTECTION=$SSH_PROTECTION
