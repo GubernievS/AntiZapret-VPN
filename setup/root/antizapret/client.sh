@@ -80,8 +80,8 @@ initOpenVPN(){
 		rm -rf /etc/openvpn/server/keys
 		rm -rf /etc/openvpn/client/keys
 		/usr/share/easy-rsa/easyrsa init-pki
-		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
-		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
+		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn='AntiZapret CA' build-ca nopass
+		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full 'antizapret-server' nopass
 	fi
 
 	mkdir -p /etc/openvpn/server/keys
