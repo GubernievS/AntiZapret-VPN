@@ -15,7 +15,7 @@ fi
 cd /root
 
 # Проверка на OpenVZ и LXC
-if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+if [[ "$(systemd-detect-virt)" == 'openvz' || "$(systemd-detect-virt)" == 'lxc' ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
 	exit 4
 fi
@@ -24,13 +24,13 @@ fi
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
-if [[ "$OS" == "debian" ]]; then
-	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
+if [[ "$OS" == 'debian' ]]; then
+	if [[ "$VERSION" != '11' ]] && [[ "$VERSION" != '12' ]]; then
 		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
 		exit 5
 	fi
-elif [[ "$OS" == "ubuntu" ]]; then
-	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
+elif [[ "$OS" == 'ubuntu' ]]; then
+	if [[ "$VERSION" != '22' ]] && [[ "$VERSION" != '24' ]]; then
 		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
 		exit 6
 	fi
@@ -94,7 +94,7 @@ apt-get purge -y sysstat
 apt-get purge -y acpid
 
 # SSH protection включён
-if [[ "$SSH_PROTECTION" == "y" ]]; then
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	apt-get purge -y fail2ban
 	apt-get purge -y sshguard
 fi
@@ -248,7 +248,7 @@ iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j S
 iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$DEFAULT_IP"
 
 # SSH protection
-if [[ "$SSH_PROTECTION" == "y" ]]; then
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
 	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
 fi
