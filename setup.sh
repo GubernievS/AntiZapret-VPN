@@ -92,6 +92,10 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp 'Turn on OpenVPN DCO? [y/n]: ' -e -i y OPENVPN_DCO
 done
 echo
+until [[ "$WARP_OUTBOUND" =~ (y|n) ]]; do
+	read -rp $'Enable Cloudflare WARP as outbound interface for \e[1;32mall VPN\e[0m traffic? [y/n]: ' -e -i n WARP_OUTBOUND
+done
+echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
 echo '       +MSK-IX+SkyDNS *'
@@ -388,6 +392,7 @@ rm -rf /root/custom
 echo "SETUP_DATE=$(date --iso-8601=seconds)
 OPENVPN_PATCH=$OPENVPN_PATCH
 OPENVPN_DCO=$OPENVPN_DCO
+WARP_OUTBOUND=$WARP_OUTBOUND
 ANTIZAPRET_DNS=$ANTIZAPRET_DNS
 VPN_DNS=$VPN_DNS
 BLOCK_ADS=$BLOCK_ADS
@@ -417,7 +422,6 @@ OVH_INCLUDE=$OVH_INCLUDE
 GOOGLE_INCLUDE=$GOOGLE_INCLUDE
 AKAMAI_INCLUDE=$AKAMAI_INCLUDE
 CLEAR_HOSTS=y
-WARP_OUTBOUND=
 DEFAULT_INTERFACE=
 OUT_INTERFACE=
 OUT_IP=
