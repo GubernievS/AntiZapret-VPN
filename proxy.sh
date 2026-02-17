@@ -34,7 +34,7 @@ elif [[ "$OS" == 'ubuntu' ]]; then
 		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
 		exit 6
 	fi
-elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
+else
 	echo "Error: Your Linux distribution ($OS) is not supported!"
 	exit 7
 fi
