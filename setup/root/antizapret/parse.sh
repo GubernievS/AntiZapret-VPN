@@ -11,9 +11,9 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-if [[ -n "$1" && "$1" != "ip" && "$1" != "ips" && "$1" != "host" && "$1" != "hosts" && "$1" != "noclear" && "$1" != "noclean" ]]; then
+if [[ -n "$1" && "$1" != 'ip' && "$1" != 'ips' && "$1" != 'host' && "$1" != 'hosts' && "$1" != 'noclear' && "$1" != 'noclean' ]]; then
 	echo "Ignored invalid parameter: $1"
-	set -- ""
+	set --
 fi
 
 echo 'Parse AntiZapret VPN files:'
@@ -31,7 +31,7 @@ for file in config/*.txt; do
 	sed -i -e '$a\' "$file"
 done
 
-if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "noclean" ]]; then
+if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
 	echo 'IPs...'
 
 	# Обрабатываем конфигурационные файлы
@@ -47,8 +47,8 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	# Выводим результат
 	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
 
-	[[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
-	[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+	[[ "$ALTERNATIVE_IP" == 'y' ]] && IP="${IP:-172}" || IP=10
+	[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	echo "push \"route $FAKE_IP.0.0 255.254.0.0\"" > result/DEFAULT
@@ -78,7 +78,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 		cp -f result/ips /etc/wireguard/ips
 	fi
 
-	if [[ "$RESTRICT_FORWARD" == "y" ]]; then
+	if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 		# Обрабатываем конфигурационные файлы
 		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u \
 		| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/forward-ips.txt
@@ -96,7 +96,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 		} | ipset restore
 	fi
 
-	if [[ "$ATTACK_PROTECTION" == "y" ]]; then
+	if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 		# Обрабатываем конфигурационные файлы
 		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*allow-ips.txt | sort -u \
 		| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/allow-ips.txt
@@ -115,7 +115,7 @@ if [[ -z "$1" || "$1" == "ip" || "$1" == "ips" || "$1" == "noclear" || "$1" == "
 	fi
 fi
 
-if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" == "noclean" ]]; then
+if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
 	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
@@ -171,7 +171,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
-	if [[ "$CLEAR_HOSTS" == "y" ]]; then
+	if [[ "$CLEAR_HOSTS" == 'y' ]]; then
 		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|official|slottica|sykaaa|admiral-*x|x-*admiral|pinup-*bet|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|newretro|platinum|igrat|flagman|arkada' temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
 	else
 		sort -u temp/include-hosts.txt > temp/include-hosts2.txt
@@ -182,7 +182,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 	comm -13 temp/remove-hosts.txt temp/exclude-hosts.txt > result/exclude-hosts.txt
 
 	# Удаляем избыточные поддомены
-	if [[ "$ROUTE_ALL" = "y" ]]; then
+	if [[ "$ROUTE_ALL" = 'y' ]]; then
 		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt > temp/include-hosts4.txt
 	else
 		# Добавляем исключённые домены для дальнейшего удаления избыточных доменов
@@ -201,7 +201,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 		print $0
 	}' | rev | sort -u > temp/include-hosts5.txt
 
-	if [[ "$ROUTE_ALL" = "y" ]]; then
+	if [[ "$ROUTE_ALL" = 'y' ]]; then
 		# Пустим все домены через AntiZapret VPN
 		sed '1i.' temp/include-hosts5.txt > result/include-hosts.txt
 	else
@@ -223,7 +223,7 @@ if [[ -z "$1" || "$1" == "host" || "$1" == "hosts" || "$1" == "noclear" || "$1" 
 		cp -f result/proxy.rpz /etc/knot-resolver/proxy.rpz.tmp
 		mv -f /etc/knot-resolver/proxy.rpz.tmp /etc/knot-resolver/proxy.rpz
 		sleep 5
-		if [[ "$1" != "noclear" && "$1" != "noclean" ]]; then
+		if [[ "$1" != 'noclear' && "$1" != 'noclean' ]]; then
 			# Очищаем кэш Knot Resolver
 			count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
 			echo "DNS cache cleared: $count entries"
