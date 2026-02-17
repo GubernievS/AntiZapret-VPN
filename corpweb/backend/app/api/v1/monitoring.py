@@ -1,7 +1,9 @@
 """
 Monitoring API endpoints
 """
+import re
 import uuid
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -19,25 +21,73 @@ from app.schemas.monitoring import (
     ConnectionLogResponse,
 )
 
+# Pattern to extract client_name from filename:
+# antizapret-{client_name}-({server_ip})-am.conf  OR  antizapret-{client_name}-am.conf
+_CONF_NAME_RE = re.compile(r'^(?:antizapret|vpn)-(.+?)(?:-\([^)]+\))?-am\.conf$')
+
+
+def _parse_address_from_file(path: Path) -> str | None:
+    """Extract client VPN IP from [Interface] Address = ... line."""
+    try:
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if line.lower().startswith('address'):
+                ip_part = line.split('=', 1)[1].strip()
+                return ip_part.split('/')[0].strip()
+    except OSError:
+        pass
+    return None
+
+
+def _build_ip_to_name_map_from_files(client_dir: Path) -> dict:
+    """
+    Scan antizapret/vpn config directories and build IP -> client_name mapping.
+    Extracts client_name from filename, VPN IP from file content.
+    Works for all existing configs regardless of how they were created.
+    """
+    ip_map: dict = {}
+    for subdir in ('antizapret', 'vpn'):
+        dir_path = client_dir / 'amneziawg' / subdir
+        if not dir_path.exists():
+            continue
+        for conf_file in dir_path.glob('*.conf'):
+            m = _CONF_NAME_RE.match(conf_file.name)
+            if not m:
+                continue
+            client_name = m.group(1)
+            ip = _parse_address_from_file(conf_file)
+            if ip and client_name:
+                ip_map[ip] = client_name
+    return ip_map
+
 
 def _build_ip_to_name_map(db: Session) -> dict:
     """
-    Build a mapping of VPN IP -> client_name from config_metadata.
-    Used to resolve monitoring client names from WireGuard allowed_ips.
+    Build a mapping of VPN IP -> client_name.
+    Priority:
+      1. vpn_ip stored in config_metadata (new configs)
+      2. Scan actual config files on disk (covers all existing configs)
     """
-    ip_map: dict = {}
+    from app.config import settings as app_settings
+    client_dir = Path(app_settings.VPN_CLIENT_DIR)
+
+    # Start with full file-scan (covers existing configs too)
+    ip_map = _build_ip_to_name_map_from_files(client_dir)
+
+    # Override/add entries from DB metadata (most authoritative for new configs)
     configs = db.query(VPNConfig).filter(VPNConfig.is_active == True).all()
     for cfg in configs:
         meta = cfg.config_metadata or {}
         vpn_ip = meta.get("vpn_ip")
         if vpn_ip:
             ip_map[vpn_ip] = cfg.client_name
+
     return ip_map
 
 
 def _resolve_client_name(conn: dict, ip_map: dict) -> str | None:
     """
-    Try to resolve a human-readable client_name for a live connection.
+    Resolve a human-readable client_name for a live connection.
     - WireGuard: match allowed_ips (e.g. '10.8.0.2/32') against ip_map
     - OpenVPN: use common_name directly (it matches client_name)
     """
