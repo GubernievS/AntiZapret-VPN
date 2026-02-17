@@ -31,7 +31,7 @@ else
 	done
 fi
 
-if [[ "$DCO" == "y" ]]; then
+if [[ "$DCO" == 'y' ]]; then
 	export DEBIAN_FRONTEND=noninteractive
 	apt-get update
 	apt-get dist-upgrade -y
