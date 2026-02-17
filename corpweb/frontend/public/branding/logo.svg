@@ -1,0 +1,13 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield icon -->
+  <path d="M30 10L15 15V25C15 35 22.5 43.5 30 45C37.5 43.5 45 35 45 25V15L30 10Z" fill="#3B82F6" stroke="#1E40AF" stroke-width="2"/>
+  <path d="M30 20L25 25L28 28L30 26L35 31L40 26L30 20Z" fill="white"/>
+
+  <!-- Text -->
+  <text x="55" y="35" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#1E40AF">
+    CorpWeb
+  </text>
+  <text x="55" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748B">
+    VPN Admin Panel
+  </text>
+</svg>

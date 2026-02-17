@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: corpweb-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - corpweb-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: corpweb-backend
+    command: ["--reload"]
+    volumes:
+      - /root/antizapret:/root/antizapret:ro  # Read-only access to client.sh
+      - ./backend:/app
+    environment:
+      DB_USER: ${DB_USER}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      SECRET_KEY: ${SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_OAUTH_DOMAIN: ${GOOGLE_OAUTH_DOMAIN}
+      FRONTEND_URL: ${FRONTEND_URL}
+      BACKEND_URL: ${BACKEND_URL}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      VPN_CLIENT_SCRIPT: ${VPN_CLIENT_SCRIPT:-/root/antizapret/client.sh}
+      VPN_CLIENT_DIR: ${VPN_CLIENT_DIR:-/root/antizapret/client}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - corpweb-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder
+    container_name: corpweb-frontend-builder
+    volumes:
+      - frontend_dist:/app/dist
+    command: sh -c "cp -r /app/dist/* /output/ 2>/dev/null || npm run build && cp -r /app/dist/* /output/"
+    networks:
+      - corpweb-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: corpweb-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - frontend_dist:/usr/share/nginx/html:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - corpweb-network
+
+volumes:
+  postgres_data:
+  frontend_dist:
+
+networks:
+  corpweb-network:
+    driver: bridge
