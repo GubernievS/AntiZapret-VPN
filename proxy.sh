@@ -105,7 +105,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 # Принудительная загрузка модуля nf_conntrack
-echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
+echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
 
 # Завершим выполнение скрипта при ошибке
 set -e
