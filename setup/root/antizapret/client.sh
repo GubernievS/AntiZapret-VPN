@@ -376,8 +376,8 @@ backup(){
 	cp -r /root/antizapret/custom*.sh /root/antizapret/backup/custom
 
 	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
-	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
-	tar -tzf "$BACKUP_FILE" >/dev/null
+	tar -czf $BACKUP_FILE -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
+	tar -tzf $BACKUP_FILE >/dev/null
 
 	rm -rf /root/antizapret/backup
 
