@@ -28,13 +28,13 @@ if [[ -z "$OUT_INTERFACE" ]]; then
 	fi
 fi
 
-[[ "$ALTERNATIVE_IP" == "y" ]] && IP="${IP:-172}" || IP="10"
-[[ "$ALTERNATIVE_FAKE_IP" == "y" ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+[[ "$ALTERNATIVE_IP" == 'y' ]] && IP="${IP:-172}" || IP=10
+[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 # WARP
-WARP_INTERFACE='warp'
+WARP_INTERFACE=warp
 WARP_PATH="/etc/wireguard/$WARP_INTERFACE.conf"
-if [[ "$WARP_OUTBOUND" == "y" ]]; then
+if [[ "$WARP_OUTBOUND" == 'y' ]]; then
 	set +e
 	echo "Starting $WARP_INTERFACE..."
 	PRIVATE_KEY=$(wg genkey)
@@ -104,7 +104,7 @@ ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
-if [[ "$TORRENT_GUARD" == "y" ]]; then
+if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	ipset create antizapret-torrent hash:ip timeout 60 -exist
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/16 -p tcp -m string --string 'GET ' --algo kmp --to 100 -m string --string 'info_hash=' --algo bm -m string --string 'peer_id=' --algo bm -m string --string 'port=' --algo bm -j SET --add-set antizapret-torrent src --exist
 	iptables -w -I FORWARD 3 -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent protocol' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
@@ -112,7 +112,7 @@ if [[ "$TORRENT_GUARD" == "y" ]]; then
 	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Restrict forwarding
-if [[ "$RESTRICT_FORWARD" == "y" ]]; then
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	{
 		echo 'create antizapret-forward hash:net -exist'
 		echo 'flush antizapret-forward'
@@ -123,13 +123,13 @@ if [[ "$RESTRICT_FORWARD" == "y" ]]; then
 	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
 # Client isolation
-if [[ "$CLIENT_ISOLATION" == "y" ]]; then
+if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	iptables -w -I FORWARD 2 ! -i $OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
 else
 	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
 fi
 # Attack and scan protection
-if [[ "$ATTACK_PROTECTION" == "y" ]]; then
+if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	{
 		echo 'create antizapret-allow hash:net -exist'
 		echo 'flush antizapret-allow'
@@ -160,7 +160,7 @@ if [[ "$ATTACK_PROTECTION" == "y" ]]; then
 	ip6tables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
 fi
 # SSH protection
-if [[ "$SSH_PROTECTION" == "y" ]]; then
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
 	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
 fi
@@ -186,12 +186,12 @@ fi
 
 # nat
 # OpenVPN TCP port redirection for backup connections
-if [[ "$OPENVPN_80_443_TCP" == "y" ]]; then
+if [[ "$OPENVPN_80_443_TCP" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 80 -j REDIRECT --to-ports 50080
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 443 -j REDIRECT --to-ports 50443
 fi
 # OpenVPN UDP port redirection for backup connections
-if [[ "$OPENVPN_80_443_UDP" == "y" ]]; then
+if [[ "$OPENVPN_80_443_UDP" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 80 -j REDIRECT --to-ports 50080
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 443 -j REDIRECT --to-ports 50443
 fi
@@ -199,7 +199,7 @@ fi
 iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # VPN DNS redirection to Knot Resolver
-if [[ "$VPN_DNS" == "1" ]]; then
+if [[ "$VPN_DNS" == '1' ]]; then
 	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.0.1
 	iptables -w -t nat -A PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.4.1
 	iptables -w -t nat -A PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.8.1
@@ -215,7 +215,7 @@ iptables -w -t nat -A PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p tcp --dp
 iptables -w -t nat -A PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.4.1
 iptables -w -t nat -A PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.8.1
 # Restrict forwarding
-if [[ "$RESTRICT_FORWARD" == "y" ]]; then
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 fi
 # Mapping fake IP to real IP
