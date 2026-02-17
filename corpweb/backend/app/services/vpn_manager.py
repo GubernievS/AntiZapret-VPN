@@ -79,6 +79,35 @@ class VPNManager:
         except PermissionError:
             raise VPNManagerError(f"No permission to execute: {self.client_script}")
 
+    def _find_config_file(self, directory: Path, prefix: str, client_name: str) -> Optional[Path]:
+        """
+        Find actual config file using glob pattern.
+        Antizapret script may append server IP to filename:
+        e.g., antizapret-ivan-1-(213.148.6.245)-am.conf
+        Tries exact match first, then glob pattern.
+        """
+        exact = directory / f"{prefix}-{client_name}-am.conf"
+        if exact.exists():
+            return exact
+
+        matches = list(directory.glob(f"{prefix}-{client_name}-*-am.conf"))
+        if matches:
+            return matches[0]
+
+        return None
+
+    def _extract_address(self, file_path: Path) -> Optional[str]:
+        """Extract client VPN IP from [Interface] Address field in config file."""
+        try:
+            for line in file_path.read_text().splitlines():
+                line = line.strip()
+                if line.lower().startswith('address'):
+                    ip_part = line.split('=', 1)[1].strip()
+                    return ip_part.split('/')[0].strip()
+        except OSError:
+            pass
+        return None
+
     def add_client(self, client_name: str) -> Dict[str, str]:
         """
         Create an AmneziaWG client config.
@@ -90,14 +119,26 @@ class VPNManager:
 
         result = self._run_script(["4", client_name])
 
-        # Expected config file paths
-        antizapret_path = self.client_dir / "amneziawg" / "antizapret" / f"antizapret-{client_name}-am.conf"
-        vpn_path = self.client_dir / "amneziawg" / "vpn" / f"vpn-{client_name}-am.conf"
+        # Find actual config files (script may include server IP in filename)
+        antizapret_dir = self.client_dir / "amneziawg" / "antizapret"
+        vpn_dir = self.client_dir / "amneziawg" / "vpn"
+
+        antizapret_file = self._find_config_file(antizapret_dir, "antizapret", client_name)
+        vpn_file = self._find_config_file(vpn_dir, "vpn", client_name)
+
+        # Extract client VPN IP to enable monitoring name resolution
+        vpn_ip = None
+        for f in (antizapret_file, vpn_file):
+            if f:
+                vpn_ip = self._extract_address(f)
+                if vpn_ip:
+                    break
 
         return {
             "client_name": client_name,
-            "antizapret_path": str(antizapret_path) if antizapret_path.exists() else None,
-            "vpn_path": str(vpn_path) if vpn_path.exists() else None,
+            "antizapret_path": str(antizapret_file) if antizapret_file else None,
+            "vpn_path": str(vpn_file) if vpn_file else None,
+            "vpn_ip": vpn_ip,
             "output": result.stdout
         }
 
@@ -146,13 +187,15 @@ class VPNManager:
         self._validate_client_name(client_name)
 
         if config_type == "awg_antizapret":
-            path = self.client_dir / "amneziawg" / "antizapret" / f"antizapret-{client_name}-am.conf"
+            directory = self.client_dir / "amneziawg" / "antizapret"
+            found = self._find_config_file(directory, "antizapret", client_name)
         elif config_type == "awg_vpn":
-            path = self.client_dir / "amneziawg" / "vpn" / f"vpn-{client_name}-am.conf"
+            directory = self.client_dir / "amneziawg" / "vpn"
+            found = self._find_config_file(directory, "vpn", client_name)
         else:
             return None
 
-        return str(path) if path.exists() else None
+        return str(found) if found else None
 
     def read_config_file(self, file_path: str) -> Optional[str]:
         """

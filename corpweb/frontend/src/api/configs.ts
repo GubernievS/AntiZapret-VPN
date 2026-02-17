@@ -1,6 +1,13 @@
 import api from './client'
 import type { ConfigCreateRequest, ConfigListResponse, ConfigDetail } from '../types'
 
+export interface ClientLinks {
+  google_play_url: string | null
+  app_store_url: string | null
+  apk_url: string | null
+  windows_url: string | null
+}
+
 export const configsApi = {
   list: () =>
     api.get<ConfigListResponse>('/configs'),
@@ -16,4 +23,7 @@ export const configsApi = {
 
   delete: (id: string) =>
     api.delete(`/configs/${id}`),
+
+  getClientLinks: () =>
+    api.get<ClientLinks>('/configs/client-links'),
 }

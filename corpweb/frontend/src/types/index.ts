@@ -80,12 +80,20 @@ export interface ConfigListResponse {
 // === Settings types ===
 export interface SystemSettings {
   max_configs_per_user: number
+  google_play_url: string | null
+  app_store_url: string | null
+  apk_url: string | null
+  windows_url: string | null
   updated_at: string
   updated_by: string | null
 }
 
 export interface SystemSettingsUpdate {
   max_configs_per_user: number
+  google_play_url: string | null
+  app_store_url: string | null
+  apk_url: string | null
+  windows_url: string | null
 }
 
 // === Dashboard types ===

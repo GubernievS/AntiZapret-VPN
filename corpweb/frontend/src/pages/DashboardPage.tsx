@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle } from 'lucide-react'
+import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink } from 'lucide-react'
 import { configsApi } from '../api/configs'
+import type { ClientLinks } from '../api/configs'
 import { useAuthStore } from '../store/authStore'
 import type { VPNConfig } from '../types'
 
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [clientLinks, setClientLinks] = useState<ClientLinks | null>(null)
 
   const loadConfigs = useCallback(async () => {
     try {
@@ -39,6 +41,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadConfigs()
+    configsApi.getClientLinks().then(({ data }) => setClientLinks(data)).catch(() => {})
   }, [loadConfigs])
 
   const handleCreate = async (configType: 'awg_antizapret' | 'awg_vpn') => {
@@ -91,6 +94,14 @@ export default function DashboardPage() {
   }
 
   const canCreate = user && user.config_count < user.max_configs
+
+  // Determine which client links are present
+  const hasLinks = clientLinks && (
+    clientLinks.google_play_url ||
+    clientLinks.app_store_url ||
+    clientLinks.apk_url ||
+    clientLinks.windows_url
+  )
 
   if (loading) {
     return (
@@ -195,6 +206,97 @@ export default function DashboardPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Client App Download Links */}
+      {hasLinks && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Клиентские приложения</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Для использования конфигурации установите приложение AmneziaWG на своё устройство
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {clientLinks?.google_play_url && (
+              <a
+                href={clientLinks.google_play_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50/40 transition group"
+              >
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Smartphone className="w-5 h-5 text-green-700" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500">Android</p>
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-green-700 transition flex items-center gap-1">
+                    Google Play
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {clientLinks?.app_store_url && (
+              <a
+                href={clientLinks.app_store_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/40 transition group"
+              >
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Smartphone className="w-5 h-5 text-blue-700" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500">iOS</p>
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-blue-700 transition flex items-center gap-1">
+                    App Store
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {clientLinks?.apk_url && (
+              <a
+                href={clientLinks.apk_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50/40 transition group"
+              >
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Download className="w-5 h-5 text-orange-700" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500">Android APK</p>
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-orange-700 transition flex items-center gap-1">
+                    Скачать APK
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </p>
+                </div>
+              </a>
+            )}
+
+            {clientLinks?.windows_url && (
+              <a
+                href={clientLinks.windows_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/40 transition group"
+              >
+                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Monitor className="w-5 h-5 text-indigo-700" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500">Windows</p>
+                  <p className="text-sm font-medium text-gray-900 group-hover:text-indigo-700 transition flex items-center gap-1">
+                    Скачать .exe
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </p>
+                </div>
+              </a>
+            )}
+          </div>
         </div>
       )}
 

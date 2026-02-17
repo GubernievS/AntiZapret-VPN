@@ -4,6 +4,7 @@ Creates default admin user and system settings on first run
 """
 import uuid
 from datetime import datetime
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.db.base import Base
 from app.db.models import User, SystemSettings
@@ -64,6 +65,21 @@ def init_db() -> None:
             print("✅ System settings created (max_configs_per_user: 2)")
         else:
             print(f"✅ System settings already exist (max_configs_per_user: {settings.max_configs_per_user})")
+
+        # Add new columns to system_settings if they don't exist (safe migration)
+        try:
+            db.execute(text("""
+                ALTER TABLE system_settings
+                    ADD COLUMN IF NOT EXISTS google_play_url VARCHAR(500),
+                    ADD COLUMN IF NOT EXISTS app_store_url VARCHAR(500),
+                    ADD COLUMN IF NOT EXISTS apk_url VARCHAR(500),
+                    ADD COLUMN IF NOT EXISTS windows_url VARCHAR(500)
+            """))
+            db.commit()
+            print("✅ System settings columns verified/migrated")
+        except Exception as e:
+            db.rollback()
+            print(f"⚠️  Column migration skipped (may already exist): {e}")
 
         print("✅ Database initialization completed!")
 

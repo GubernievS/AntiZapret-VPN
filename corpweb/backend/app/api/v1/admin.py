@@ -246,6 +246,10 @@ async def update_settings(
         )
 
     settings.max_configs_per_user = data.max_configs_per_user
+    settings.google_play_url = data.google_play_url
+    settings.app_store_url = data.app_store_url
+    settings.apk_url = data.apk_url
+    settings.windows_url = data.windows_url
     settings.updated_by = admin.username
     db.commit()
     db.refresh(settings)

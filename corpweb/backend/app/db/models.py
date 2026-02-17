@@ -94,9 +94,11 @@ class SystemSettings(Base):
     # Maximum number of configs per user (configurable by admin, default: 2)
     max_configs_per_user = Column(Integer, nullable=False, default=2)
 
-    # Other global settings can be added here
-    # maintenance_mode = Column(Boolean, default=False)
-    # allow_registration = Column(Boolean, default=True)
+    # Client download links (shown to users on dashboard)
+    google_play_url = Column(String(500), nullable=True)
+    app_store_url = Column(String(500), nullable=True)
+    apk_url = Column(String(500), nullable=True)
+    windows_url = Column(String(500), nullable=True)
 
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     updated_by = Column(String(50), nullable=True)  # Username who made the change

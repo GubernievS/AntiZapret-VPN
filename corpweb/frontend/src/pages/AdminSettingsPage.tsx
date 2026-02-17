@@ -9,7 +9,12 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
   const [maxConfigs, setMaxConfigs] = useState(2)
+  const [googlePlayUrl, setGooglePlayUrl] = useState('')
+  const [appStoreUrl, setAppStoreUrl] = useState('')
+  const [apkUrl, setApkUrl] = useState('')
+  const [windowsUrl, setWindowsUrl] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -17,6 +22,10 @@ export default function AdminSettingsPage() {
         const { data } = await adminApi.getSettings()
         setSettings(data)
         setMaxConfigs(data.max_configs_per_user)
+        setGooglePlayUrl(data.google_play_url ?? '')
+        setAppStoreUrl(data.app_store_url ?? '')
+        setApkUrl(data.apk_url ?? '')
+        setWindowsUrl(data.windows_url ?? '')
       } catch {
         setError('Не удалось загрузить настройки')
       } finally {
@@ -32,7 +41,13 @@ export default function AdminSettingsPage() {
     setError('')
     setSuccess('')
     try {
-      const { data } = await adminApi.updateSettings({ max_configs_per_user: maxConfigs })
+      const { data } = await adminApi.updateSettings({
+        max_configs_per_user: maxConfigs,
+        google_play_url: googlePlayUrl || null,
+        app_store_url: appStoreUrl || null,
+        apk_url: apkUrl || null,
+        windows_url: windowsUrl || null,
+      })
       setSettings(data)
       setSuccess('Настройки сохранены')
       setTimeout(() => setSuccess(''), 3000)
@@ -71,8 +86,10 @@ export default function AdminSettingsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6 max-w-lg">
-        <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-6 max-w-lg">
+        {/* VPN Config limit */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-4">Лимиты</h2>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Максимум конфигураций на пользователя
@@ -86,27 +103,89 @@ export default function AdminSettingsPage() {
               className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Лимит активных VPN конфигураций для каждого пользователя (1-10)
+              Лимит активных VPN конфигураций для каждого пользователя (1–10)
             </p>
           </div>
+        </div>
 
-          {settings?.updated_at && (
-            <p className="text-xs text-gray-400">
-              Последнее обновление: {new Date(settings.updated_at).toLocaleString('ru-RU')}
-              {settings.updated_by && ` (${settings.updated_by})`}
-            </p>
-          )}
+        {/* Client download links */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-1">Ссылки на клиенты</h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Отображаются пользователям на странице «Мои конфигурации». Оставьте пустым чтобы скрыть.
+          </p>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition font-medium disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Сохранить
-          </button>
-        </form>
-      </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Google Play (Android)
+              </label>
+              <input
+                type="url"
+                value={googlePlayUrl}
+                onChange={(e) => setGooglePlayUrl(e.target.value)}
+                placeholder="https://play.google.com/store/apps/..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                App Store (iOS)
+              </label>
+              <input
+                type="url"
+                value={appStoreUrl}
+                onChange={(e) => setAppStoreUrl(e.target.value)}
+                placeholder="https://apps.apple.com/..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                APK-файл (Android, прямая ссылка)
+              </label>
+              <input
+                type="url"
+                value={apkUrl}
+                onChange={(e) => setApkUrl(e.target.value)}
+                placeholder="https://example.com/app.apk"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Windows (.exe)
+              </label>
+              <input
+                type="url"
+                value={windowsUrl}
+                onChange={(e) => setWindowsUrl(e.target.value)}
+                placeholder="https://example.com/amneziawg-setup.exe"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {settings?.updated_at && (
+          <p className="text-xs text-gray-400">
+            Последнее обновление: {new Date(settings.updated_at).toLocaleString('ru-RU')}
+            {settings.updated_by && ` (${settings.updated_by})`}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition font-medium disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Сохранить
+        </button>
+      </form>
     </div>
   )
 }

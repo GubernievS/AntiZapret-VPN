@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, require_admin
 from app.db.session import get_db
-from app.db.models import User
+from app.db.models import User, VPNConfig
 from app.crud import monitoring as crud_monitoring
 from app.crud import config as crud_config
 from app.services.monitoring import MonitoringService
@@ -18,6 +18,39 @@ from app.schemas.monitoring import (
     MonitoringOverviewResponse,
     ConnectionLogResponse,
 )
+
+
+def _build_ip_to_name_map(db: Session) -> dict:
+    """
+    Build a mapping of VPN IP -> client_name from config_metadata.
+    Used to resolve monitoring client names from WireGuard allowed_ips.
+    """
+    ip_map: dict = {}
+    configs = db.query(VPNConfig).filter(VPNConfig.is_active == True).all()
+    for cfg in configs:
+        meta = cfg.config_metadata or {}
+        vpn_ip = meta.get("vpn_ip")
+        if vpn_ip:
+            ip_map[vpn_ip] = cfg.client_name
+    return ip_map
+
+
+def _resolve_client_name(conn: dict, ip_map: dict) -> str | None:
+    """
+    Try to resolve a human-readable client_name for a live connection.
+    - WireGuard: match allowed_ips (e.g. '10.8.0.2/32') against ip_map
+    - OpenVPN: use common_name directly (it matches client_name)
+    """
+    if conn.get("protocol") == "openvpn":
+        return conn.get("common_name")
+
+    allowed_ips = conn.get("allowed_ips", "") or ""
+    # allowed_ips may be comma-separated; each entry like '10.8.0.2/32'
+    for entry in allowed_ips.split(","):
+        ip = entry.strip().split("/")[0]
+        if ip in ip_map:
+            return ip_map[ip]
+    return None
 
 router = APIRouter()
 
@@ -33,11 +66,19 @@ def get_stats(
 
 @router.get("/connections", response_model=list[LiveConnectionResponse])
 def get_live_connections(
+    db: Session = Depends(get_db),
     _user: User = Depends(require_admin),
 ):
     """Get live connections from wg show + OpenVPN status (admin only)"""
+    ip_map = _build_ip_to_name_map(db)
     raw = MonitoringService.get_all_connections()
-    return [LiveConnectionResponse(**conn) for conn in raw]
+    result = []
+    for conn in raw:
+        conn = dict(conn)
+        if not conn.get("client_name"):
+            conn["client_name"] = _resolve_client_name(conn, ip_map)
+        result.append(LiveConnectionResponse(**conn))
+    return result
 
 
 @router.get("/history", response_model=list[ConnectionLogResponse])
@@ -69,9 +110,15 @@ def get_overview(
     _user: User = Depends(require_admin),
 ):
     """Get full monitoring overview: stats + live connections + traffic (admin only)"""
+    ip_map = _build_ip_to_name_map(db)
     stats = crud_monitoring.get_stats(db)
     live_raw = MonitoringService.get_all_connections()
-    live = [LiveConnectionResponse(**conn) for conn in live_raw]
+    live = []
+    for conn in live_raw:
+        conn = dict(conn)
+        if not conn.get("client_name"):
+            conn["client_name"] = _resolve_client_name(conn, ip_map)
+        live.append(LiveConnectionResponse(**conn))
     traffic = crud_monitoring.get_daily_traffic(db, days=7)
 
     return MonitoringOverviewResponse(

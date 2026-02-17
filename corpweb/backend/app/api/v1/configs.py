@@ -19,6 +19,26 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/client-links")
+async def get_client_links(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get client app download links from system settings.
+    Accessible to all authenticated users.
+    """
+    sys_settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    if not sys_settings:
+        return {}
+    return {
+        "google_play_url": sys_settings.google_play_url,
+        "app_store_url": sys_settings.app_store_url,
+        "apk_url": sys_settings.apk_url,
+        "windows_url": sys_settings.windows_url,
+    }
+
+
 @router.get("", response_model=ConfigListResponse)
 async def list_configs(
     current_user: User = Depends(get_current_user),
@@ -90,6 +110,7 @@ async def create_config(
         config_metadata={
             "antizapret_path": result.get("antizapret_path"),
             "vpn_path": result.get("vpn_path"),
+            "vpn_ip": result.get("vpn_ip"),
         }
     )
 
@@ -171,11 +192,8 @@ async def download_config(
             detail="Config file not found on server"
         )
 
-    # Determine filename
-    if config.config_type == "awg_antizapret":
-        filename = f"antizapret-{config.client_name}-am.conf"
-    else:
-        filename = f"vpn-{config.client_name}-am.conf"
+    # Return file with a user-friendly name: username-N.conf
+    filename = f"{config.client_name}.conf"
 
     return PlainTextResponse(
         content=content,
