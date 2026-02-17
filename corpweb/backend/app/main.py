@@ -13,7 +13,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.config import settings
 
 # Import routers
-from app.api.v1 import auth, configs, admin, monitoring
+from app.api.v1 import auth, configs, admin, monitoring, antizapret
 
 
 @asynccontextmanager
@@ -81,6 +81,7 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(configs.router, prefix="/api/v1/configs", tags=["configs"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(monitoring.router, prefix="/api/v1/monitoring", tags=["monitoring"])
+app.include_router(antizapret.router, prefix="/api/v1/antizapret", tags=["antizapret"])
 
 
 if __name__ == "__main__":

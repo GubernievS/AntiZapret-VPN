@@ -12,8 +12,8 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Allowed characters in client names (security: prevent command injection)
-CLIENT_NAME_PATTERN = re.compile(r'^[a-zA-Z0-9._-]+$')
+# Allowed characters in client names — matches client.sh: alphanumeric, underscore, dash only (no dots)
+CLIENT_NAME_PATTERN = re.compile(r'^[a-zA-Z0-9_-]+$')
 
 
 class VPNManagerError(Exception):
@@ -182,8 +182,8 @@ def generate_client_name(username: str, existing_names: List[str]) -> str:
         username: User's username (without @domain)
         existing_names: List of existing client names for this user
     """
-    # Clean username: take part before @ if email
-    base_name = username.split("@")[0]
+    # Clean username: take part before @ if email, then replace disallowed chars with underscore
+    base_name = re.sub(r'[^a-zA-Z0-9_-]', '_', username.split("@")[0])
 
     # Find max number among existing names
     max_number = 0

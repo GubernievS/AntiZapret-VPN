@@ -10,6 +10,8 @@ import AdminUsersPage from './pages/AdminUsersPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import MonitoringPage from './pages/MonitoringPage'
+import AdminFilesPage from './pages/AdminFilesPage'
+import AdminAntizapretPage from './pages/AdminAntizapretPage'
 
 import Layout from './components/layout/Layout'
 import ProtectedRoute from './routes/ProtectedRoute'
@@ -69,6 +71,22 @@ function App() {
             element={
               <ProtectedRoute requireAdmin>
                 <MonitoringPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/antizapret/files"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminFilesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/antizapret/settings"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminAntizapretPage />
               </ProtectedRoute>
             }
           />

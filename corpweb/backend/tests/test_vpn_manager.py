@@ -12,9 +12,13 @@ class TestClientNameValidation:
     def test_valid_names(self):
         # Should not raise
         self.mgr._validate_client_name("user-1")
-        self.mgr._validate_client_name("john.doe-2")
+        self.mgr._validate_client_name("john_doe-2")
         self.mgr._validate_client_name("test_user")
         self.mgr._validate_client_name("Admin123")
+
+    def test_dot_is_invalid(self):
+        with pytest.raises(VPNManagerError):
+            self.mgr._validate_client_name("john.doe-2")
 
     def test_invalid_special_chars(self):
         for bad_name in ["user;rm", "user|cat", "user&bg", "user$(cmd)", "user`cmd`"]:
@@ -49,6 +53,10 @@ class TestGenerateClientName:
     def test_email_username(self):
         name = generate_client_name("john@company.com", [])
         assert name == "john-1"
+
+    def test_dotted_username_sanitized(self):
+        name = generate_client_name("alexander.brolin@company.com", [])
+        assert name == "alexander_brolin-1"
 
     def test_no_matching_existing(self):
         name = generate_client_name("alice", ["bob-1", "charlie-2"])
