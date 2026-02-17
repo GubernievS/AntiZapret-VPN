@@ -1,12 +1,14 @@
 """
 Application configuration using Pydantic Settings
 """
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+
     # Application
     APP_NAME: str = "CorpWeb"
     APP_VERSION: str = "0.1.0"
@@ -44,10 +46,6 @@ class Settings(BaseSettings):
     # Monitoring
     MONITORING_UPDATE_INTERVAL: int = 30  # seconds
     OPENVPN_STATUS_LOG_DIR: str = "/etc/openvpn/server/logs"
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
 
     def get_cors_origins(self) -> list[str]:
         """Parse CORS origins from comma-separated string"""

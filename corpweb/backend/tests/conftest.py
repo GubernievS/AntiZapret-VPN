@@ -25,6 +25,7 @@ os.environ.update({
 })
 
 from sqlalchemy import create_engine, event, String, Text, types
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
@@ -69,9 +70,11 @@ for table in Base.metadata.tables.values():
 
 
 # ── SQLite engine ──
+# NullPool prevents stale connections surviving between tests when test.db is deleted
 engine = create_engine(
     "sqlite:///./test.db",
     connect_args={"check_same_thread": False},
+    poolclass=NullPool,
 )
 
 
@@ -86,11 +89,13 @@ TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 # ── Import app AFTER env override (so settings read test values) ──
-# Patch scheduler to prevent background threads during tests
+# Patch scheduler and init_db to prevent side effects during tests
 _start_patcher = patch("app.services.scheduler.start_scheduler")
 _stop_patcher = patch("app.services.scheduler.stop_scheduler")
+_init_db_patcher = patch("app.db.init_db.init_db")
 _start_patcher.start()
 _stop_patcher.start()
+_init_db_patcher.start()
 
 from app.main import app  # noqa: E402 — must import after env + patches
 
@@ -103,6 +108,10 @@ def setup_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+    # Dispose app engine connections so file can be cleanly deleted
+    from app.db.session import engine as app_engine
+    app_engine.dispose()
+    engine.dispose()
     try:
         os.remove("test.db")
     except OSError:
