@@ -32,7 +32,7 @@ fi
 export DEBIAN_FRONTEND=noninteractive
 
 if [[ "$ALGORITHM" == "0" ]]; then
-	if [[ -d "/usr/local/src/openvpn" ]]; then
+	if [[ -d /usr/local/src/openvpn ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
 		apt-get update
@@ -122,7 +122,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 #endif\
 	return buffer_sent;\
 }\
-' "/usr/local/src/openvpn/src/openvpn/socket.h"
+' /usr/local/src/openvpn/src/openvpn/socket.h
 
 (
 	cd /usr/local/src/openvpn
