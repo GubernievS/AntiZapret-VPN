@@ -59,7 +59,7 @@ setServerIP(){
 }
 
 render() {
-	local IFS=''
+	local IFS=
 	while read -r line; do
 		while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]]; do
 			local LHS="${BASH_REMATCH[1]}"
@@ -321,7 +321,7 @@ recreate(){
 	find /root/antizapret/client -type f -delete
 
 	# OpenVPN
-	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
+	if [[ -d /etc/openvpn/easyrsa3/pki/issued ]]; then
 		initOpenVPN
 		CLIENT_CERT_EXPIRE=0
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
@@ -333,7 +333,7 @@ recreate(){
 			fi
 		done
 	else
-		CLIENT_NAME="antizapret-client"
+		CLIENT_NAME=antizapret-client
 		CLIENT_CERT_EXPIRE=3650
 		echo "Creating OpenVPN server keys and first OpenVPN client: '$CLIENT_NAME'"
 		initOpenVPN
@@ -351,7 +351,7 @@ recreate(){
 			fi
 		done
 	else
-		CLIENT_NAME="antizapret-client"
+		CLIENT_NAME=antizapret-client
 		echo "Creating WireGuard/AmneziaWG server keys and first WireGuard/AmneziaWG client: '$CLIENT_NAME'"
 		initWireGuard
 		addWireGuard >/dev/null
