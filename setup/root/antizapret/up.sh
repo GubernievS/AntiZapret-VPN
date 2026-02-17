@@ -186,14 +186,18 @@ fi
 
 # nat
 # OpenVPN TCP port redirection for backup connections
-if [[ "$OPENVPN_80_443_TCP" == 'y' ]]; then
+if [[ "$OPENVPN_BACKUP_TCP" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 80 -j REDIRECT --to-ports 50080
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 443 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 504 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 508 -j REDIRECT --to-ports 50080
 fi
 # OpenVPN UDP port redirection for backup connections
-if [[ "$OPENVPN_80_443_UDP" == 'y' ]]; then
+if [[ "$OPENVPN_BACKUP_UDP" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 80 -j REDIRECT --to-ports 50080
 	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 443 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 504 -j REDIRECT --to-ports 50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 508 -j REDIRECT --to-ports 50080
 fi
 # AmneziaWG redirection ports to WireGuard
 iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52080 -j REDIRECT --to-ports 51080

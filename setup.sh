@@ -147,12 +147,12 @@ until [[ "$ALTERNATIVE_FAKE_IP" =~ (y|n) ]]; do
 	read -rp 'Use alternative range of FAKE IP addresses? [y/n]: ' -e -i n ALTERNATIVE_FAKE_IP
 done
 echo
-until [[ "$OPENVPN_80_443_TCP" =~ (y|n) ]]; do
-	read -rp 'Use TCP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i n OPENVPN_80_443_TCP
+until [[ "$OPENVPN_BACKUP_TCP" =~ (y|n) ]]; do
+	read -rp 'Use TCP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i n OPENVPN_BACKUP_TCP
 done
 echo
-until [[ "$OPENVPN_80_443_UDP" =~ (y|n) ]]; do
-	read -rp 'Use UDP ports 80 and 443 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_80_443_UDP
+until [[ "$OPENVPN_BACKUP_UDP" =~ (y|n) ]]; do
+	read -rp 'Use UDP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_BACKUP_UDP
 done
 echo
 until [[ "$OPENVPN_DUPLICATE" =~ (y|n) ]]; do
@@ -398,8 +398,8 @@ VPN_DNS=$VPN_DNS
 BLOCK_ADS=$BLOCK_ADS
 ALTERNATIVE_IP=$ALTERNATIVE_IP
 ALTERNATIVE_FAKE_IP=$ALTERNATIVE_FAKE_IP
-OPENVPN_80_443_TCP=$OPENVPN_80_443_TCP
-OPENVPN_80_443_UDP=$OPENVPN_80_443_UDP
+OPENVPN_BACKUP_TCP=$OPENVPN_BACKUP_TCP
+OPENVPN_BACKUP_UDP=$OPENVPN_BACKUP_UDP
 OPENVPN_DUPLICATE=$OPENVPN_DUPLICATE
 OPENVPN_LOG=$OPENVPN_LOG
 SSH_PROTECTION=$SSH_PROTECTION

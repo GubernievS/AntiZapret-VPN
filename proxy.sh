@@ -53,7 +53,7 @@ fi
 
 echo
 echo -e '\e[1;32mInstalling proxy for AntiZapret VPN server\e[0m'
-echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
+echo 'Proxied ports: 80, 443, 504, 508, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
@@ -215,37 +215,35 @@ ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --cla
 
 # nat
 # OpenVPN TCP
-iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
+iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":50080
+iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":50080
 iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
 
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
 iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
 iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
 
 # OpenVPN UDP
-iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
+iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":50080
+iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":50080
 iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
 
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
 iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
 iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
 
-# WireGuard/AmneziaWG 
+# WireGuard/AmneziaWG
 iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination "$DESTINATION_IP":51080
 iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination "$DESTINATION_IP":51443
-iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":52080
-iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":52443
+iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":51080
+iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":51443
 
 iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT --to-source "$DEFAULT_IP"
 iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$DEFAULT_IP"
 
 # SSH protection
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
