@@ -22,7 +22,7 @@ fi
 cd /root
 
 # Проверка на OpenVZ и LXC
-if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+if [[ "$(systemd-detect-virt)" == 'openvz' || "$(systemd-detect-virt)" == 'lxc' ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
 	exit 4
 fi
@@ -31,13 +31,13 @@ fi
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
-if [[ "$OS" == "debian" ]]; then
-	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
+if [[ "$OS" == 'debian' ]]; then
+	if [[ "$VERSION" != '11' ]] && [[ "$VERSION" != '12' ]]; then
 		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
 		exit 5
 	fi
-elif [[ "$OS" == "ubuntu" ]]; then
-	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
+elif [[ "$OS" == 'ubuntu' ]]; then
+	if [[ "$VERSION" != '22' ]] && [[ "$VERSION" != '24' ]]; then
 		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
 		exit 6
 	fi
@@ -136,7 +136,7 @@ until [[ "$ALTERNATIVE_IP" =~ (y|n) ]]; do
 	read -rp 'Use alternative range of IP addresses? [y/n]: ' -e -i n ALTERNATIVE_IP
 done
 echo
-[[ "$ALTERNATIVE_IP" == "y" ]] && IP="172" || IP="10"
+[[ "$ALTERNATIVE_IP" == 'y' ]] && IP=172 || IP=10
 echo "Default FAKE IP address range:     $IP.30.0.0/15"
 echo 'Alternative FAKE IP address range: 198.18.0.0/15'
 until [[ "$ALTERNATIVE_FAKE_IP" =~ (y|n) ]]; do
@@ -163,12 +163,12 @@ until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
-echo "Warning! Network attack and scan protection may block VPN or third-party applications!"
+echo 'Warning! Network attack and scan protection may block VPN or third-party applications!'
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
 done
 echo
-echo "Warning! Torrent guard block VPN traffic for 1 minute on torrent detection!"
+echo 'Warning! Torrent guard block VPN traffic for 1 minute on torrent detection!'
 until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
 	read -rp $'Enable torrent guard for \001\e[1;32m\002full VPN\001\e[0m\002? [y/n]: ' -e -i y TORRENT_GUARD
 done
@@ -278,7 +278,7 @@ apt-get purge -y sysstat
 apt-get purge -y acpid
 
 # SSH protection включён
-if [[ "$SSH_PROTECTION" == "y" ]]; then
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	apt-get purge -y fail2ban || true
 	apt-get purge -y sshguard || true
 fi
@@ -339,7 +339,7 @@ curl -fL --connect-timeout 30 https://swupdate.openvpn.net/repos/repo-public.gpg
 echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 # Добавим репозиторий Debian Backports
-if [[ "$OS" == "debian" ]]; then
+if [[ "$OS" == 'debian' ]]; then
 	if [[ "$VERSION" -ge 12 ]]; then
 		echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
 	elif [[ "$VERSION" -eq 11 ]]; then
@@ -444,49 +444,49 @@ rm -rf /tmp/dnslib
 rm -rf /tmp/antizapret
 
 # Настраиваем DNS в AntiZapret VPN
-if [[ "$ANTIZAPRET_DNS" == "2" ]]; then
+if [[ "$ANTIZAPRET_DNS" == '2' ]]; then
 	# SkyDNS
 	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/{'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'}/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "3" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == '3' ]]; then
 	# Cloudflare+Quad9
 	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == '4' ]]; then
 	# Comss
 	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == '5' ]]; then
 	# XBox
 	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
-elif [[ "$ANTIZAPRET_DNS" == "6" ]]; then
+elif [[ "$ANTIZAPRET_DNS" == '6' ]]; then
 	# Malw
 	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'127.0.0.1'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
 fi
 
 # Настраиваем DNS в full VPN
-if [[ "$VPN_DNS" == "3" ]]; then
+if [[ "$VPN_DNS" == '3' ]]; then
 	# Quad9
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 9.9.9.10"\npush "dhcp-option DNS 149.112.112.10"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/9.9.9.10, 149.112.112.10/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "4" ]]; then
+elif [[ "$VPN_DNS" == '4' ]]; then
 	# Google
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 8.8.8.8"\npush "dhcp-option DNS 8.8.4.4"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/8.8.8.8, 8.8.4.4/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "5" ]]; then
+elif [[ "$VPN_DNS" == '5' ]]; then
 	# AdGuard
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.140.14.14"\npush "dhcp-option DNS 94.140.15.15"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/94.140.14.14, 94.140.15.15/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "6" ]]; then
+elif [[ "$VPN_DNS" == '6' ]]; then
 	# Comss
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 83.220.169.155"\npush "dhcp-option DNS 212.109.195.93"\npush "dhcp-option DNS 195.133.25.16"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/83.220.169.155, 212.109.195.93, 195.133.25.16/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "7" ]]; then
+elif [[ "$VPN_DNS" == '7' ]]; then
 	# XBox
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 176.99.11.77"\npush "dhcp-option DNS 80.78.247.254"\npush "dhcp-option DNS 31.192.108.180"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254, 31.192.108.180/' /etc/wireguard/templates/vpn-client*.conf
-elif [[ "$VPN_DNS" == "8" ]]; then
+elif [[ "$VPN_DNS" == '8' ]]; then
 	# Malw
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 193.23.209.189"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 193.23.209.189/' /etc/wireguard/templates/vpn-client*.conf
@@ -494,13 +494,13 @@ fi
 
 # Используем альтернативные диапазоны подменных IPv4-адресов
 # 10(172).28.0.0/15 => 198.18.0.0/15
-if [[ "$ALTERNATIVE_FAKE_IP" == "y" ]]; then
+if [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]]; then
 	sed -i 's/10\.30\./198\.18\./g' /root/antizapret/proxy.py
 fi
 
 # Используем альтернативные диапазоны IPv4-адресов
 # 10.28.0.0/15 => 172.28.0.0/15
-if [[ "$ALTERNATIVE_IP" == "y" ]]; then
+if [[ "$ALTERNATIVE_IP" == 'y' ]]; then
 	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
@@ -511,12 +511,12 @@ else
 fi
 
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
-if [[ "$OPENVPN_DUPLICATE" == "n" ]]; then
+if [[ "$OPENVPN_DUPLICATE" == 'n' ]]; then
 	sed -i '/duplicate/s/^/#/' /etc/openvpn/server/*.conf
 fi
 
 # Включим подробные логи в OpenVPN
-if [[ "$OPENVPN_LOG" == "y" ]]; then
+if [[ "$OPENVPN_LOG" == 'y' ]]; then
 	sed -i '/^#\(verb\|log\)/s/^#//' /etc/openvpn/server/*.conf
 fi
 
@@ -541,15 +541,15 @@ systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret
 systemctl enable wg-quick@vpn
 
-ERRORS=""
+ERRORS=
 
-if [[ "$OPENVPN_PATCH" != "0" ]]; then
+if [[ "$OPENVPN_PATCH" != '0' ]]; then
 	if ! /root/antizapret/patch-openvpn.sh "$OPENVPN_PATCH"; then
 		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run '/root/antizapret/patch-openvpn.sh' after rebooting\n"
 	fi
 fi
 
-if [[ "$OPENVPN_DCO" == "y" ]]; then
+if [[ "$OPENVPN_DCO" == 'y' ]]; then
 	if ! /root/antizapret/openvpn-dco.sh y; then
 		ERRORS+="\n\e[1;31mOpenVPN DCO has not turn on!\e[0m Please run '/root/antizapret/openvpn-dco.sh y' after rebooting\n"
 	fi
@@ -563,13 +563,13 @@ fi
 # Создадим файл подкачки размером 1 Гб если его нет
 if [[ -z "$(swapon --show)" ]]; then
 	set +e
-	SWAPFILE="/swapfile"
+	SWAPFILE=/swapfile
 	SWAPSIZE=1024
-	dd if=/dev/zero of="$SWAPFILE" bs=1M count="$SWAPSIZE"
-	chmod 600 "$SWAPFILE"
-	mkswap "$SWAPFILE"
-	swapon "$SWAPFILE"
-	echo "$SWAPFILE none swap sw 0 0" >> /etc/fstab
+	dd if=/dev/zero of=$SWAPFILE bs=1M count=$SWAPSIZE
+	chmod 600 $SWAPFILE
+	mkswap $SWAPFILE
+	swapon $SWAPFILE
+	echo $SWAPFILE none swap sw 0 0 >> /etc/fstab
 fi
 
 # Перезагружаем
