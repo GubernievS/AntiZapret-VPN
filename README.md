@@ -184,7 +184,8 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10% к первому пополнению - Внимание! По UDP низкая скорость, не рекомендуется!
 - [waicore.com](https://waicore.com/?from=11334) - просто реферальная ссылка
 - [senko.digital](https://senko.digital/?ref=1483520) - просто реферальная ссылка
-- [u1host.com](https://u1host.com/?from=26312) - просто реферальная ссылка
+- [timeweb.com](https://timeweb.com/ru/?i=138897) - просто реферальная ссылка
+- [u1host.com](https://u1host.com/?from=26312) - просто реферальная ссылка - Внимание! Могут блокировать их IP-адреса, не рекомендуется!
 
 Регистрируясь и покупая по реферальным ссылкам Вы поддерживаете проект!
 
