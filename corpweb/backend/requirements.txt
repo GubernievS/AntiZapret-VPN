@@ -32,6 +32,10 @@ slowapi==0.1.9
 # CORS
 python-dotenv==1.0.0
 
+# QR code generation
+qrcode[pil]==7.4.2
+Pillow==10.2.0
+
 # Utilities
 python-dateutil==2.8.2
 

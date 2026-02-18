@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink } from 'lucide-react'
+import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink, QrCode, X } from 'lucide-react'
 import { configsApi } from '../api/configs'
 import type { ClientLinks } from '../api/configs'
 import { useAuthStore } from '../store/authStore'
@@ -27,6 +27,9 @@ export default function DashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [clientLinks, setClientLinks] = useState<ClientLinks | null>(null)
+  const [qrConfig, setQrConfig] = useState<VPNConfig | null>(null)
+  const [qrUrl, setQrUrl] = useState<string | null>(null)
+  const [qrLoading, setQrLoading] = useState(false)
 
   const loadConfigs = useCallback(async () => {
     try {
@@ -74,6 +77,28 @@ export default function DashboardPage() {
     } catch {
       setError('Ошибка скачивания конфигурации')
     }
+  }
+
+  const handleShowQR = async (config: VPNConfig) => {
+    setQrConfig(config)
+    setQrUrl(null)
+    setQrLoading(true)
+    try {
+      const { data } = await configsApi.getQR(config.id)
+      const url = URL.createObjectURL(data)
+      setQrUrl(url)
+    } catch {
+      setError('Ошибка загрузки QR кода')
+      setQrConfig(null)
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  const handleCloseQR = () => {
+    if (qrUrl) URL.revokeObjectURL(qrUrl)
+    setQrConfig(null)
+    setQrUrl(null)
   }
 
   const handleDelete = async (id: string) => {
@@ -192,6 +217,13 @@ export default function DashboardPage() {
                     Скачать .conf
                   </button>
                   <button
+                    onClick={() => handleShowQR(config)}
+                    title="Показать QR код для импорта в приложение"
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-violet-50 text-violet-700 rounded-lg hover:bg-violet-100 transition text-sm font-medium"
+                  >
+                    <QrCode className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => handleDelete(config.id)}
                     disabled={deletingId === config.id}
                     className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium disabled:opacity-50"
@@ -296,6 +328,38 @@ export default function DashboardPage() {
                 </div>
               </a>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {qrConfig && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={handleCloseQR}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">QR код для импорта</h2>
+                <p className="text-sm text-gray-500">{qrConfig.client_name}</p>
+              </div>
+              <button
+                onClick={handleCloseQR}
+                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center bg-gray-50 rounded-xl p-4 mb-4 min-h-[280px]">
+              {qrLoading ? (
+                <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
+              ) : qrUrl ? (
+                <img src={qrUrl} alt="QR код конфигурации" className="w-full max-w-[260px]" />
+              ) : null}
+            </div>
+
+            <p className="text-xs text-gray-500 text-center">
+              Откройте приложение <span className="font-medium">AmneziaWG</span> → «+» → «Сканировать QR код»
+            </p>
           </div>
         </div>
       )}

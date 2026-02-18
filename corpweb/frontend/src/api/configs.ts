@@ -21,6 +21,9 @@ export const configsApi = {
   download: (id: string) =>
     api.get<string>(`/configs/${id}/download`, { responseType: 'text' }),
 
+  getQR: (id: string) =>
+    api.get<Blob>(`/configs/${id}/qr`, { responseType: 'blob' }),
+
   delete: (id: string) =>
     api.delete(`/configs/${id}`),
 

@@ -1,10 +1,13 @@
 """
 VPN Config API endpoints
 """
+import io
 import uuid
 import logging
+import qrcode
+import qrcode.constants
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -200,6 +203,71 @@ async def download_config(
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"'
         }
+    )
+
+
+@router.get("/{config_id}/qr")
+async def get_config_qr(
+    config_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Generate QR code PNG image for a config.
+    The QR contains the raw awg-quick config text — compatible with AmneziaWG mobile clients.
+    """
+    config = crud_config.get_by_id(db, config_id)
+    if not config:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Config not found"
+        )
+
+    # Check ownership
+    if current_user.role != "admin" and config.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+
+    if not config.config_file_path:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Config file path not set"
+        )
+
+    try:
+        content = vpn_manager.read_config_file(config.config_file_path)
+    except VPNManagerError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e)
+        )
+
+    if content is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Config file not found on server"
+        )
+
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(content)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+
+    return Response(
+        content=buf.getvalue(),
+        media_type="image/png",
+        headers={"Cache-Control": "no-store"},
     )
 
 
