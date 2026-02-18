@@ -3,11 +3,13 @@ Public (unauthenticated) endpoints.
 Currently used for temporary config file download links
 shared via QR codes.
 """
+import io
 import uuid
 import logging
+import zipfile
 
 from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
@@ -27,9 +29,14 @@ async def download_shared_config(
     db: Session = Depends(get_db),
 ):
     """
-    Download a config file using a temporary share token.
+    Download a config file as ZIP using a temporary share token.
     No authentication required — the signed JWT token serves as proof.
     Used when antizapret configs are too large for a direct QR code.
+
+    Returns a ZIP archive containing the .conf file.
+    ZIP format is used because mobile browsers (Chrome) rename
+    plain .conf downloads to .conf.txt, breaking import into AmneziaWG.
+    AmneziaWG natively supports importing .zip archives with .conf files inside.
     """
     config_id_str = verify_config_share_token(token)
     if config_id_str is None:
@@ -74,11 +81,19 @@ async def download_shared_config(
             detail="Config file not found on server",
         )
 
-    filename = f"{config.client_name}.conf"
+    # Build ZIP archive in memory with the .conf file inside
+    conf_filename = f"{config.client_name}.conf"
+    zip_filename = f"{config.client_name}.zip"
 
-    return PlainTextResponse(
-        content=content,
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(conf_filename, content)
+    buf.seek(0)
+
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/zip",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Disposition": f'attachment; filename="{zip_filename}"',
         },
     )

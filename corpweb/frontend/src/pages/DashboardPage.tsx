@@ -69,11 +69,10 @@ export default function DashboardPage() {
   const handleDownload = async (config: VPNConfig) => {
     try {
       const { data } = await configsApi.download(config.id)
-      const blob = new Blob([data], { type: 'text/plain' })
-      const url = URL.createObjectURL(blob)
+      const url = URL.createObjectURL(data)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${config.client_name}.conf`
+      a.download = `${config.client_name}.zip`
       a.click()
       URL.revokeObjectURL(url)
     } catch {
@@ -231,7 +230,7 @@ export default function DashboardPage() {
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
                   >
                     <Download className="w-4 h-4" />
-                    Скачать .conf
+                    Скачать
                   </button>
                   <button
                     onClick={() => handleShowQR(config)}

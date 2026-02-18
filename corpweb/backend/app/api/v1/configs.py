@@ -4,10 +4,11 @@ VPN Config API endpoints
 import io
 import uuid
 import logging
+import zipfile
 import qrcode
 import qrcode.constants
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import PlainTextResponse, Response
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -160,8 +161,10 @@ async def download_config(
     db: Session = Depends(get_db)
 ):
     """
-    Download .conf file for a config.
-    Returns the raw config text as a file download.
+    Download config as a ZIP archive containing the .conf file.
+    ZIP format is used because mobile browsers (Chrome) rename
+    plain .conf downloads to .conf.txt, breaking import into AmneziaWG.
+    AmneziaWG natively supports importing .zip archives.
     """
     config = crud_config.get_by_id(db, config_id)
     if not config:
@@ -197,14 +200,20 @@ async def download_config(
             detail="Config file not found on server"
         )
 
-    # Return file with a user-friendly name: username-N.conf
-    filename = f"{config.client_name}.conf"
+    conf_filename = f"{config.client_name}.conf"
+    zip_filename = f"{config.client_name}.zip"
 
-    return PlainTextResponse(
-        content=content,
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(conf_filename, content)
+    buf.seek(0)
+
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/zip",
         headers={
-            "Content-Disposition": f'attachment; filename="{filename}"'
-        }
+            "Content-Disposition": f'attachment; filename="{zip_filename}"',
+        },
     )
 
 
@@ -263,7 +272,7 @@ async def get_config_qr(
         qr_type = "config"
     else:
         token = create_config_share_token(str(config_id))
-        download_url = f"{settings.BACKEND_URL}/api/v1/public/config/{token}"
+        download_url = f"{settings.FRONTEND_URL}/api/v1/public/config/{token}"
         qr_data = download_url
         qr_type = "download-link"
 

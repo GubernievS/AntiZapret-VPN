@@ -19,7 +19,7 @@ export const configsApi = {
     api.get<ConfigDetail>(`/configs/${id}`),
 
   download: (id: string) =>
-    api.get<string>(`/configs/${id}/download`, { responseType: 'text' }),
+    api.get<Blob>(`/configs/${id}/download`, { responseType: 'blob' }),
 
   getQR: (id: string) =>
     api.get<Blob>(`/configs/${id}/qr`, { responseType: 'blob' }),
