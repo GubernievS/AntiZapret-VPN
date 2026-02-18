@@ -200,8 +200,12 @@ async def download_config(
             detail="Config file not found on server"
         )
 
-    conf_filename = f"{config.client_name}.conf"
-    zip_filename = f"{config.client_name}.zip"
+    # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ)
+    server = settings.get_short_server_name()
+    suffix = "az" if config.config_type == "awg_antizapret" else "vpn"
+    short_name = f"{server}-{suffix}"
+    conf_filename = f"{short_name}.conf"
+    zip_filename = f"{short_name}.zip"
 
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:

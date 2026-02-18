@@ -1,6 +1,7 @@
 """
 Application configuration using Pydantic Settings
 """
+from urllib.parse import urlparse
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 from functools import lru_cache
@@ -50,6 +51,15 @@ class Settings(BaseSettings):
     def get_cors_origins(self) -> list[str]:
         """Parse CORS origins from comma-separated string"""
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+
+    def get_short_server_name(self) -> str:
+        """
+        Extract subdomain from FRONTEND_URL for short config filenames.
+        e.g. 'https://wgfi2.p4i.ru' -> 'wgfi2'
+        Tunnel names in AmneziaWG are limited to 15 chars (IFNAMSIZ).
+        """
+        hostname = urlparse(self.FRONTEND_URL).hostname or "server"
+        return hostname.split(".")[0]
 
 
 @lru_cache()

@@ -68,11 +68,14 @@ export default function DashboardPage() {
 
   const handleDownload = async (config: VPNConfig) => {
     try {
-      const { data } = await configsApi.download(config.id)
-      const url = URL.createObjectURL(data)
+      const response = await configsApi.download(config.id)
+      const disposition = response.headers['content-disposition'] || ''
+      const match = disposition.match(/filename="?(.+?)"?$/i)
+      const filename = match?.[1] || `${config.client_name}.zip`
+      const url = URL.createObjectURL(response.data)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${config.client_name}.zip`
+      a.download = filename
       a.click()
       URL.revokeObjectURL(url)
     } catch {

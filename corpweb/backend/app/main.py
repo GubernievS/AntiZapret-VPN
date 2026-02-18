@@ -57,7 +57,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-QR-Type"],
+    expose_headers=["X-QR-Type", "Content-Disposition"],
 )
 
 
