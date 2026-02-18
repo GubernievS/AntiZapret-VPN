@@ -975,6 +975,7 @@ angrybirdsbigadventure.net
 imgbb.com
 ibb.co
 simgbb.com
+notion.site
 
 # Блокирует DNS
 library.hydra.wiki
