@@ -977,6 +977,7 @@ ibb.co
 simgbb.com
 notion.site
 sndcdn.com
+soundcloud.cloud
 wgcdn.co
 
 # Блокирует DNS
