@@ -127,3 +127,28 @@ def decode_token(token: str) -> Optional[Dict[str, Any]]:
         return payload
     except JWTError:
         return None
+
+
+def create_config_share_token(config_id: str, expires_minutes: int = 10) -> str:
+    """
+    Create a short-lived JWT token for public config file download.
+    Used when config is too large for a QR code.
+    """
+    expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
+    payload = {
+        "sub": config_id,
+        "type": "config_share",
+        "exp": expire,
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def verify_config_share_token(token: str) -> Optional[str]:
+    """
+    Verify a config share token and return the config_id.
+    Returns None if the token is invalid or expired.
+    """
+    payload = decode_token(token)
+    if payload is None or payload.get("type") != "config_share":
+        return None
+    return payload.get("sub")

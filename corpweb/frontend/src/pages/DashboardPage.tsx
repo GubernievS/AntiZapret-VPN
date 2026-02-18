@@ -31,6 +31,7 @@ export default function DashboardPage() {
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [qrLoading, setQrLoading] = useState(false)
   const [qrError, setQrError] = useState<string | null>(null)
+  const [qrType, setQrType] = useState<string | null>(null)
 
   const loadConfigs = useCallback(async () => {
     try {
@@ -84,11 +85,13 @@ export default function DashboardPage() {
     setQrConfig(config)
     setQrUrl(null)
     setQrError(null)
+    setQrType(null)
     setQrLoading(true)
     try {
-      const { data } = await configsApi.getQR(config.id)
-      const url = URL.createObjectURL(data)
+      const response = await configsApi.getQR(config.id)
+      const url = URL.createObjectURL(response.data)
       setQrUrl(url)
+      setQrType(response.headers['x-qr-type'] || 'config')
     } catch (err: unknown) {
       let message = 'Ошибка загрузки QR кода'
       try {
@@ -112,6 +115,7 @@ export default function DashboardPage() {
     setQrConfig(null)
     setQrUrl(null)
     setQrError(null)
+    setQrType(null)
   }
 
   const handleDelete = async (id: string) => {
@@ -375,11 +379,16 @@ export default function DashboardPage() {
               ) : null}
             </div>
 
-            {!qrError && (
+            {!qrError && qrType === 'download-link' ? (
+              <p className="text-xs text-gray-500 text-center">
+                Отсканируйте QR <span className="font-medium">камерой телефона</span>. Скачайте файл и импортируйте
+                в <span className="font-medium">AmneziaWG</span> через «+» → «Импорт из файла»
+              </p>
+            ) : !qrError && qrUrl ? (
               <p className="text-xs text-gray-500 text-center">
                 Откройте приложение <span className="font-medium">AmneziaWG</span> → «+» → «Сканировать QR код»
               </p>
-            )}
+            ) : null}
           </div>
         </div>
       )}

@@ -6,7 +6,6 @@ import uuid
 import logging
 import qrcode
 import qrcode.constants
-import qrcode.exceptions
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import PlainTextResponse, Response
 from sqlalchemy.orm import Session
@@ -17,6 +16,8 @@ from app.crud import config as crud_config
 from app.schemas.config import ConfigCreate, ConfigResponse, ConfigDetailResponse, ConfigListResponse
 from app.api.deps import get_current_user, require_admin
 from app.services.vpn_manager import vpn_manager, generate_client_name, VPNManagerError
+from app.core.security import create_config_share_token
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +252,21 @@ async def get_config_qr(
             detail="Config file not found on server"
         )
 
+    # QR Code version 40 with ERROR_CORRECT_L supports max 2953 bytes.
+    # Antizapret configs contain thousands of AllowedIPs entries and
+    # easily exceed this limit — use a temporary download link instead.
+    MAX_QR_BYTES = 2953
+    content_size = len(content.encode("utf-8"))
+
+    if content_size <= MAX_QR_BYTES:
+        qr_data = content
+        qr_type = "config"
+    else:
+        token = create_config_share_token(str(config_id))
+        download_url = f"{settings.BACKEND_URL}/api/v1/public/config/{token}"
+        qr_data = download_url
+        qr_type = "download-link"
+
     try:
         qr = qrcode.QRCode(
             version=None,
@@ -258,26 +274,27 @@ async def get_config_qr(
             box_size=10,
             border=4,
         )
-        qr.add_data(content)
+        qr.add_data(qr_data)
         qr.make(fit=True)
-    except qrcode.exceptions.DataOverflowError:
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+    except Exception as e:
+        logger.error(f"QR generation failed for config {config_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                "Config file is too large to encode as a QR code. "
-                "Use the download option instead."
-            ),
+            detail="Не удалось сгенерировать QR-код. Используйте скачивание файла.",
         )
-
-    img = qr.make_image(fill_color="black", back_color="white")
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    buf.seek(0)
 
     return Response(
         content=buf.getvalue(),
         media_type="image/png",
-        headers={"Cache-Control": "no-store"},
+        headers={
+            "Cache-Control": "no-store",
+            "X-QR-Type": qr_type,
+        },
     )
 
 
