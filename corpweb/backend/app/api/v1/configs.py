@@ -6,6 +6,7 @@ import uuid
 import logging
 import qrcode
 import qrcode.constants
+import qrcode.exceptions
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import PlainTextResponse, Response
 from sqlalchemy.orm import Session
@@ -250,14 +251,23 @@ async def get_config_qr(
             detail="Config file not found on server"
         )
 
-    qr = qrcode.QRCode(
-        version=None,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(content)
-    qr.make(fit=True)
+    try:
+        qr = qrcode.QRCode(
+            version=None,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(content)
+        qr.make(fit=True)
+    except qrcode.exceptions.DataOverflowError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "Config file is too large to encode as a QR code. "
+                "Use the download option instead."
+            ),
+        )
 
     img = qr.make_image(fill_color="black", back_color="white")
     buf = io.BytesIO()

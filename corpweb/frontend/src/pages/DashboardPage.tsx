@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [qrConfig, setQrConfig] = useState<VPNConfig | null>(null)
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [qrLoading, setQrLoading] = useState(false)
+  const [qrError, setQrError] = useState<string | null>(null)
 
   const loadConfigs = useCallback(async () => {
     try {
@@ -82,14 +83,25 @@ export default function DashboardPage() {
   const handleShowQR = async (config: VPNConfig) => {
     setQrConfig(config)
     setQrUrl(null)
+    setQrError(null)
     setQrLoading(true)
     try {
       const { data } = await configsApi.getQR(config.id)
       const url = URL.createObjectURL(data)
       setQrUrl(url)
-    } catch {
-      setError('Ошибка загрузки QR кода')
-      setQrConfig(null)
+    } catch (err: unknown) {
+      let message = 'Ошибка загрузки QR кода'
+      try {
+        const response = (err as { response?: { data?: Blob } }).response
+        if (response?.data instanceof Blob) {
+          const text = await response.data.text()
+          const json = JSON.parse(text)
+          if (json?.detail) message = json.detail
+        }
+      } catch {
+        // ignore parse errors, use default message
+      }
+      setQrError(message)
     } finally {
       setQrLoading(false)
     }
@@ -99,6 +111,7 @@ export default function DashboardPage() {
     if (qrUrl) URL.revokeObjectURL(qrUrl)
     setQrConfig(null)
     setQrUrl(null)
+    setQrError(null)
   }
 
   const handleDelete = async (id: string) => {
@@ -354,12 +367,19 @@ export default function DashboardPage() {
                 <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
               ) : qrUrl ? (
                 <img src={qrUrl} alt="QR код конфигурации" className="w-full max-w-[260px]" />
+              ) : qrError ? (
+                <div className="text-center px-2">
+                  <p className="text-sm text-red-600 font-medium mb-1">Не удалось создать QR код</p>
+                  <p className="text-xs text-gray-500">{qrError}</p>
+                </div>
               ) : null}
             </div>
 
-            <p className="text-xs text-gray-500 text-center">
-              Откройте приложение <span className="font-medium">AmneziaWG</span> → «+» → «Сканировать QR код»
-            </p>
+            {!qrError && (
+              <p className="text-xs text-gray-500 text-center">
+                Откройте приложение <span className="font-medium">AmneziaWG</span> → «+» → «Сканировать QR код»
+              </p>
+            )}
           </div>
         </div>
       )}
