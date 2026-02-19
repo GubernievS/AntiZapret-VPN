@@ -134,7 +134,7 @@ apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
-# Измененим параметры для прокси
+# Изменим параметры для прокси
 echo "# Proxy parameters modification
 kernel.printk=3 4 1 3
 kernel.panic=1
@@ -181,7 +181,7 @@ net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1" > /etc/sysctl.d/99-disable-ipv6.conf
 
-# Очистка iptables
+# Очистка правил iptables
 iptables -w -F
 iptables -w -t nat -F
 iptables -w -t mangle -F
@@ -190,6 +190,16 @@ ip6tables -w -F
 ip6tables -w -t nat -F
 ip6tables -w -t mangle -F
 ip6tables -w -t raw -F
+
+# Сброс счётчиков
+iptables -w -Z
+iptables -w -t nat -Z
+iptables -w -t mangle -Z
+iptables -w -t raw -Z
+ip6tables -w -Z
+ip6tables -w -t nat -Z
+ip6tables -w -t mangle -Z
+ip6tables -w -t raw -Z
 
 # Новые правила iptables
 # filter
