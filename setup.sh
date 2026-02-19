@@ -123,7 +123,7 @@ echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=73
 echo '    7) XBox **      - More details: https://xbox-dns.ru'
 echo '    8) Malw **      - More details: https://info.dns.malw.link'
 echo
-echo '  * - DNS resolvers supports EDNS Client Subnet'
+echo '  * - DNS resolvers support EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
 until [[ "$VPN_DNS" =~ ^[1-8]$ ]]; do
@@ -176,7 +176,7 @@ until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
 done
 echo
-echo 'Warning! Torrent guard block VPN traffic for 1 minute on torrent detection!'
+echo 'Warning! Torrent guard blocks VPN traffic for 1 minute on torrent detection!'
 until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
 	read -rp $'Enable torrent guard for \001\e[1;32m\002full VPN\001\e[0m\002? [y/n]: ' -e -i y TORRENT_GUARD
 done
