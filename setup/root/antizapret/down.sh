@@ -29,12 +29,6 @@ fi
 [[ "$ALTERNATIVE_IP" == 'y' ]] && IP="${IP:-172}" || IP=10
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
-# WARP
-WARP_INTERFACE=warp
-WARP_PATH="/etc/wireguard/$WARP_INTERFACE.conf"
-wg-quick down $WARP_PATH
-ip link delete dev $WARP_INTERFACE
-
 # filter
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
@@ -126,6 +120,16 @@ iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPR
 # SNAT/MASQUERADE VPN
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j SNAT --to-source $OUT_IP
+
+# WARP
+WARP_INTERFACE=warp
+WARP_PATH="/etc/wireguard/$WARP_INTERFACE.conf"
+if [[ -f $WARP_PATH ]]; then
+	wg-quick down $WARP_PATH
+fi
+if ip link show dev $WARP_INTERFACE &>/dev/null; then
+	ip link delete dev $WARP_INTERFACE
+fi
 
 ./custom-down.sh
 exit 0
