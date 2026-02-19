@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { UserPlus, Ban, Unlock, Trash2, Loader2, AlertCircle, Search } from 'lucide-react'
+import { UserPlus, Ban, Unlock, Trash2, Loader2, AlertCircle, AlertTriangle, Search } from 'lucide-react'
 import { adminApi } from '../api/admin'
 import type { User } from '../types'
 
@@ -7,6 +7,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const [search, setSearch] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -54,8 +55,16 @@ export default function AdminUsersPage() {
 
   const handleToggleBlock = async (id: string) => {
     setActionId(id)
+    setWarning('')
     try {
-      await adminApi.toggleBlock(id)
+      const { data } = await adminApi.toggleBlock(id)
+      // Check for VPN warnings (207 partial success)
+      if (data.vpn_warnings && data.vpn_warnings.length > 0) {
+        const action = data.is_active ? 'разблокирован' : 'заблокирован'
+        setWarning(
+          `Пользователь ${action}, но возникли ошибки VPN: ${data.vpn_warnings.join('; ')}`
+        )
+      }
       await loadUsers()
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -112,6 +121,14 @@ export default function AdminUsersPage() {
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
           <button onClick={() => setError('')} className="ml-auto text-red-500 hover:text-red-700">&times;</button>
+        </div>
+      )}
+
+      {warning && (
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          {warning}
+          <button onClick={() => setWarning('')} className="ml-auto text-amber-500 hover:text-amber-700">&times;</button>
         </div>
       )}
 

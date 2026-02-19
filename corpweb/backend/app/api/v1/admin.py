@@ -3,15 +3,21 @@ Admin API endpoints
 Users management, system settings, dashboard
 """
 import uuid
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.db.models import User, VPNConfig, ConnectionLog, SystemSettings
 from app.crud import user as crud_user
+from app.crud import config as crud_config
 from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserListResponse
 from app.schemas.settings import SystemSettingsResponse, SystemSettingsUpdate
 from app.api.deps import require_admin
+from app.services.vpn_manager import vpn_manager, VPNManagerError
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -148,13 +154,19 @@ async def update_user(
     )
 
 
-@router.patch("/users/{user_id}/block", response_model=UserResponse)
+@router.patch("/users/{user_id}/block")
 async def toggle_user_block(
     user_id: uuid.UUID,
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
-    """Toggle user block/unblock (admin only)"""
+    """
+    Toggle user block/unblock (admin only).
+
+    Block:   removes all WG peers via client.sh 5, marks configs inactive.
+    Unblock: recreates peers via client.sh 4, restores saved keys so
+             existing client configs keep working.
+    """
     user = crud_user.get_by_id(db, user_id)
     if not user:
         raise HTTPException(
@@ -168,6 +180,94 @@ async def toggle_user_block(
             detail="Cannot block the admin user"
         )
 
+    is_blocking = user.is_active  # currently active → about to block
+    vpn_errors: list[str] = []
+
+    if is_blocking:
+        # ---- BLOCK: delete all active peers from WG server ----
+        active_configs = crud_config.get_active_by_user(db, user.id)
+        for config in active_configs:
+            try:
+                vpn_manager.delete_client(config.client_name)
+            except VPNManagerError as e:
+                logger.error(f"Failed to delete VPN client {config.client_name}: {e}")
+                vpn_errors.append(config.client_name)
+            # Always deactivate in DB — even if WG delete failed,
+            # the user is blocked and can't access the admin panel
+            crud_config.deactivate(db, config)
+    else:
+        # ---- UNBLOCK: restore all inactive configs ----
+        inactive_configs = crud_config.get_inactive_by_user(db, user.id)
+        for config in inactive_configs:
+            try:
+                metadata = config.config_metadata or {}
+                saved_configs = {
+                    'antizapret_content': metadata.get('antizapret_content'),
+                    'vpn_content': metadata.get('vpn_content'),
+                }
+                content_key = (
+                    'antizapret_content'
+                    if config.config_type == 'awg_antizapret'
+                    else 'vpn_content'
+                )
+                has_saved_keys = bool(saved_configs.get(content_key))
+
+                if has_saved_keys:
+                    # Restore with original keys (key swap)
+                    result = vpn_manager.restore_client(
+                        config.client_name, saved_configs,
+                    )
+                else:
+                    # No saved content (pre-feature config) — create fresh
+                    try:
+                        vpn_manager.delete_client(config.client_name)
+                    except VPNManagerError:
+                        pass
+                    result = vpn_manager.add_client(config.client_name)
+
+                # Determine new file path for this config type
+                if config.config_type == 'awg_antizapret':
+                    new_path = result.get('antizapret_path')
+                else:
+                    new_path = result.get('vpn_path')
+
+                # Re-read config contents for backup
+                new_antizapret_content = None
+                new_vpn_content = None
+                if result.get('antizapret_path'):
+                    try:
+                        new_antizapret_content = vpn_manager.read_config_file(
+                            result['antizapret_path']
+                        )
+                    except VPNManagerError:
+                        pass
+                if result.get('vpn_path'):
+                    try:
+                        new_vpn_content = vpn_manager.read_config_file(
+                            result['vpn_path']
+                        )
+                    except VPNManagerError:
+                        pass
+
+                new_metadata = {
+                    'antizapret_path': result.get('antizapret_path'),
+                    'vpn_path': result.get('vpn_path'),
+                    'vpn_ip': result.get('vpn_ip'),
+                    'antizapret_content': new_antizapret_content,
+                    'vpn_content': new_vpn_content,
+                }
+
+                crud_config.update_after_restore(
+                    db, config, new_path, new_metadata,
+                )
+            except VPNManagerError as e:
+                logger.error(
+                    f"Failed to restore VPN client {config.client_name}: {e}"
+                )
+                vpn_errors.append(config.client_name)
+                # Config stays inactive if restoration fails
+
+    # Toggle user active status in DB
     user = crud_user.toggle_active(db, user)
 
     config_count = db.query(VPNConfig).filter(
@@ -175,7 +275,7 @@ async def toggle_user_block(
         VPNConfig.is_active == True
     ).count()
 
-    return UserResponse(
+    response_data = UserResponse(
         id=user.id,
         email=user.email,
         username=user.username,
@@ -186,6 +286,20 @@ async def toggle_user_block(
         last_login=user.last_login,
         config_count=config_count
     )
+
+    if vpn_errors:
+        return JSONResponse(
+            status_code=207,
+            content={
+                **response_data.model_dump(mode="json"),
+                "vpn_warnings": [
+                    f"Ошибка обработки VPN конфига: {name}"
+                    for name in vpn_errors
+                ],
+            },
+        )
+
+    return response_data
 
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -208,7 +322,21 @@ async def delete_user(
             detail="Cannot delete the admin user"
         )
 
-    # TODO: Also delete VPN configs on the server via VPNManager
+    # Delete all VPN peers from WG server before DB cascade.
+    # Only delete active configs — inactive ones were already removed
+    # from WG when the user was blocked.
+    all_configs = crud_config.get_by_user(db, user.id)
+    for config in all_configs:
+        if config.is_active:
+            try:
+                vpn_manager.delete_client(config.client_name)
+            except VPNManagerError as e:
+                logger.error(
+                    f"Failed to delete VPN client {config.client_name}: {e}"
+                )
+                # Best-effort: continue with remaining configs and DB cleanup
+
+    # DB cascade handles config records + connection logs
     crud_user.delete_user(db, user)
 
 

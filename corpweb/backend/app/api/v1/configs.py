@@ -106,6 +106,20 @@ async def create_config(
     else:  # awg_vpn
         config_file_path = result.get("vpn_path")
 
+    # Read config file contents for backup in DB (enables key restoration on unblock)
+    antizapret_content = None
+    vpn_content = None
+    if result.get("antizapret_path"):
+        try:
+            antizapret_content = vpn_manager.read_config_file(result["antizapret_path"])
+        except VPNManagerError:
+            pass
+    if result.get("vpn_path"):
+        try:
+            vpn_content = vpn_manager.read_config_file(result["vpn_path"])
+        except VPNManagerError:
+            pass
+
     # Save to database
     config = crud_config.create(
         db,
@@ -117,6 +131,8 @@ async def create_config(
             "antizapret_path": result.get("antizapret_path"),
             "vpn_path": result.get("vpn_path"),
             "vpn_ip": result.get("vpn_ip"),
+            "antizapret_content": antizapret_content,
+            "vpn_content": vpn_content,
         }
     )
 

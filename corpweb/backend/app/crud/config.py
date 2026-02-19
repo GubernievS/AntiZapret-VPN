@@ -94,6 +94,32 @@ def delete_config(db: Session, config: VPNConfig) -> None:
 def deactivate(db: Session, config: VPNConfig) -> VPNConfig:
     """Mark config as inactive"""
     config.is_active = False
+    config.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(config)
+    return config
+
+
+def get_inactive_by_user(db: Session, user_id: uuid.UUID) -> list[VPNConfig]:
+    """Get inactive (blocked) configs for a user"""
+    return db.query(VPNConfig).filter(
+        VPNConfig.user_id == user_id,
+        VPNConfig.is_active == False
+    ).order_by(VPNConfig.created_at.desc()).all()
+
+
+def update_after_restore(
+    db: Session,
+    config: VPNConfig,
+    config_file_path: Optional[str],
+    config_metadata: Optional[dict],
+) -> VPNConfig:
+    """Update config record after VPN client restoration (possibly new paths)."""
+    config.config_file_path = config_file_path
+    if config_metadata is not None:
+        config.config_metadata = config_metadata
+    config.is_active = True
+    config.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(config)
     return config

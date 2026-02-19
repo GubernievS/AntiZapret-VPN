@@ -5,6 +5,7 @@ Interface with /root/antizapret/client.sh for config management
 import re
 import subprocess
 import logging
+import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -215,6 +216,244 @@ class VPNManager:
             return None
 
         return path.read_text()
+
+    # ------------------------------------------------------------------
+    # Key management: parsing, derivation, peer swap for block/unblock
+    # ------------------------------------------------------------------
+
+    def _parse_config_key(self, config_content: str, key_name: str) -> Optional[str]:
+        """Parse a key = value field from WireGuard/AmneziaWG config text."""
+        for line in config_content.splitlines():
+            stripped = line.strip()
+            if stripped.lower().startswith(key_name.lower()):
+                parts = stripped.split('=', 1)
+                if len(parts) == 2:
+                    return parts[1].strip()
+        return None
+
+    def derive_public_key(self, private_key: str) -> str:
+        """Derive WireGuard public key from private key using `wg pubkey`."""
+        try:
+            result = subprocess.run(
+                ['wg', 'pubkey'],
+                input=private_key,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode != 0:
+                raise VPNManagerError(f"wg pubkey failed: {result.stderr.strip()}")
+            return result.stdout.strip()
+        except FileNotFoundError:
+            raise VPNManagerError("wg command not found")
+        except subprocess.TimeoutExpired:
+            raise VPNManagerError("wg pubkey timed out")
+
+    def _get_wg_interfaces(self) -> List[str]:
+        """Get list of active WireGuard/AmneziaWG interfaces."""
+        try:
+            result = subprocess.run(
+                ['wg', 'show', 'interfaces'],
+                capture_output=True, text=True, timeout=5,
+            )
+            if result.returncode != 0:
+                return []
+            return result.stdout.strip().split()
+        except Exception:
+            return []
+
+    def _swap_wg_peer(
+        self,
+        new_pubkey: str,
+        old_pubkey: str,
+        old_psk: Optional[str],
+        fallback_allowed_ips: Optional[str],
+    ) -> None:
+        """
+        Replace the NEW peer with the OLD peer on every WG interface
+        where the new peer is present (runtime — does not touch config files).
+        """
+        for iface in self._get_wg_interfaces():
+            # wg show <iface> dump: first line = interface, rest = peers
+            # peer columns: pubkey  psk  endpoint  allowed-ips  handshake  rx  tx  keepalive
+            try:
+                dump = subprocess.run(
+                    ['wg', 'show', iface, 'dump'],
+                    capture_output=True, text=True, timeout=5,
+                )
+            except Exception:
+                continue
+
+            peer_allowed_ips = None
+            for line in dump.stdout.strip().splitlines()[1:]:
+                cols = line.split('\t')
+                if cols[0] == new_pubkey:
+                    peer_allowed_ips = cols[3] if len(cols) > 3 else None
+                    break
+
+            if peer_allowed_ips is None:
+                continue  # new peer not on this interface
+
+            # Remove new peer
+            subprocess.run(
+                ['wg', 'set', iface, 'peer', new_pubkey, 'remove'],
+                capture_output=True, text=True, timeout=5,
+            )
+
+            # Build command to add old peer
+            allowed = peer_allowed_ips or fallback_allowed_ips or '0.0.0.0/0'
+            cmd = ['wg', 'set', iface, 'peer', old_pubkey,
+                   'allowed-ips', allowed]
+
+            if old_psk:
+                psk_path = None
+                try:
+                    with tempfile.NamedTemporaryFile(
+                        mode='w', suffix='.psk', delete=False
+                    ) as f:
+                        f.write(old_psk)
+                        psk_path = f.name
+                    cmd.extend(['preshared-key', psk_path])
+                    subprocess.run(
+                        cmd, capture_output=True, text=True, timeout=5,
+                    )
+                finally:
+                    if psk_path:
+                        Path(psk_path).unlink(missing_ok=True)
+            else:
+                subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=5,
+                )
+
+            logger.info(f"Swapped peer on {iface}: {new_pubkey[:8]}… → {old_pubkey[:8]}…")
+
+    def _update_server_configs(
+        self,
+        new_pubkey: str,
+        old_pubkey: str,
+        new_psk: Optional[str],
+        old_psk: Optional[str],
+    ) -> None:
+        """
+        Replace new pubkey/psk with old ones in server config files
+        so the change persists across WG restarts.
+        """
+        search_dirs = [
+            Path('/etc/amnezia/amneziawg'),
+            Path('/etc/amnezia'),
+            Path('/etc/wireguard'),
+        ]
+
+        for search_dir in search_dirs:
+            if not search_dir.exists():
+                continue
+            for conf_file in search_dir.rglob('*.conf'):
+                try:
+                    content = conf_file.read_text()
+                    if new_pubkey not in content:
+                        continue
+
+                    content = content.replace(new_pubkey, old_pubkey)
+                    if new_psk and old_psk and new_psk != old_psk:
+                        content = content.replace(new_psk, old_psk)
+
+                    conf_file.write_text(content)
+                    logger.info(f"Updated server config: {conf_file}")
+                except OSError as e:
+                    logger.warning(f"Failed to update {conf_file}: {e}")
+
+    def restore_client(
+        self,
+        client_name: str,
+        saved_configs: Dict[str, Optional[str]],
+    ) -> Dict[str, str]:
+        """
+        Restore a previously blocked client with its original keys.
+
+        1. client.sh 4  — create fresh peer (new keys, correct server-side setup)
+        2. Parse new & old configs to extract keys
+        3. Overwrite client config files with saved content (old keys)
+        4. Swap peers on running WG interfaces
+        5. Update server config files for persistence
+
+        If saved content is missing for a config type, that file keeps
+        its new keys (fallback for pre-feature configs).
+        """
+        # Safety: remove leftover peer if somehow still present
+        try:
+            self.delete_client(client_name)
+        except VPNManagerError:
+            pass
+
+        # Step 1: create fresh client
+        result = self.add_client(client_name)
+
+        swapped_pubkeys: set = set()
+
+        config_pairs = [
+            (result.get('antizapret_path'), saved_configs.get('antizapret_content')),
+            (result.get('vpn_path'), saved_configs.get('vpn_content')),
+        ]
+
+        for new_path, saved_content in config_pairs:
+            if not new_path or not saved_content:
+                continue
+
+            try:
+                new_content = Path(new_path).read_text()
+            except OSError:
+                continue
+
+            new_privkey = self._parse_config_key(new_content, 'PrivateKey')
+            old_privkey = self._parse_config_key(saved_content, 'PrivateKey')
+
+            if not new_privkey or not old_privkey:
+                # Can't parse keys — just overwrite file
+                Path(new_path).write_text(saved_content)
+                continue
+
+            if new_privkey == old_privkey:
+                # Keys identical — overwrite for other fields (AllowedIPs etc.)
+                Path(new_path).write_text(saved_content)
+                continue
+
+            new_pubkey = self.derive_public_key(new_privkey)
+            old_pubkey = self.derive_public_key(old_privkey)
+
+            # Overwrite client config file with saved content
+            Path(new_path).write_text(saved_content)
+
+            # Swap peer on WG interfaces (once per unique key pair)
+            if new_pubkey not in swapped_pubkeys:
+                swapped_pubkeys.add(new_pubkey)
+
+                old_psk = self._parse_config_key(saved_content, 'PresharedKey')
+                new_psk = self._parse_config_key(new_content, 'PresharedKey')
+                old_address = self._parse_config_key(saved_content, 'Address')
+
+                try:
+                    self._swap_wg_peer(
+                        new_pubkey, old_pubkey, old_psk, old_address,
+                    )
+                    self._update_server_configs(
+                        new_pubkey, old_pubkey, new_psk, old_psk,
+                    )
+                except Exception as e:
+                    logger.error(f"Key swap failed for {client_name}: {e}")
+                    # Peer was created successfully by add_client,
+                    # but with new keys — user will need to re-download
+
+        # Re-extract VPN IP from restored config
+        vpn_ip = None
+        for path_key in ('antizapret_path', 'vpn_path'):
+            p = result.get(path_key)
+            if p:
+                vpn_ip = self._extract_address(Path(p))
+                if vpn_ip:
+                    break
+        result['vpn_ip'] = vpn_ip
+
+        return result
 
 
 def generate_client_name(username: str, existing_names: List[str]) -> str:
