@@ -56,8 +56,8 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 $IP.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 $IP.29.8.1\nroute ADD $FAKE_IP.0.0 MASK 255.254.0.0 $IP.29.8.1" > result/keenetic-wireguard-routes.txt
 	echo "/ip route add dst-address=$FAKE_IP.0.0/15 gateway=$IP.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
 	while read -r cidr; do
-		NET="$(echo $cidr | awk -F '/' '{print $1}')"
-		MASK="$(sipcalc -- $cidr | awk '/Network mask/ {print $4; exit;}')"
+		NET="$(echo "$cidr" | awk -F '/' '{print $1}')"
+		MASK="$(sipcalc -- "$cidr" | awk '/Network mask/ {print $4; exit;}')"
 		echo "push \"route $NET $MASK\"" >> result/DEFAULT
 		echo "route $NET $MASK" >> result/tp-link-openvpn-routes.txt
 		echo "route ADD $NET MASK $MASK $IP.29.8.1" >> result/keenetic-wireguard-routes.txt
