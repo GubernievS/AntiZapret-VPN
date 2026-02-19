@@ -108,16 +108,8 @@ def get_inactive_by_user(db: Session, user_id: uuid.UUID) -> list[VPNConfig]:
     ).order_by(VPNConfig.created_at.desc()).all()
 
 
-def update_after_restore(
-    db: Session,
-    config: VPNConfig,
-    config_file_path: Optional[str],
-    config_metadata: Optional[dict],
-) -> VPNConfig:
-    """Update config record after VPN client restoration (possibly new paths)."""
-    config.config_file_path = config_file_path
-    if config_metadata is not None:
-        config.config_metadata = config_metadata
+def activate(db: Session, config: VPNConfig) -> VPNConfig:
+    """Mark config as active (reverse of deactivate)"""
     config.is_active = True
     config.updated_at = datetime.utcnow()
     db.commit()

@@ -163,9 +163,9 @@ async def toggle_user_block(
     """
     Toggle user block/unblock (admin only).
 
-    Block:   removes all WG peers via client.sh 5, marks configs inactive.
-    Unblock: recreates peers via client.sh 4, restores saved keys so
-             existing client configs keep working.
+    Block:   comments out PublicKey/PresharedKey in server WG configs,
+             marks configs inactive. IP reservation preserved.
+    Unblock: uncomments keys, marks configs active. No re-download needed.
     """
     user = crud_user.get_by_id(db, user_id)
     if not user:
@@ -183,89 +183,37 @@ async def toggle_user_block(
     is_blocking = user.is_active  # currently active → about to block
     vpn_errors: list[str] = []
 
+    # Collect unique client_names (a user may have multiple configs
+    # sharing the same client_name but different config_type)
     if is_blocking:
-        # ---- BLOCK: delete all active peers from WG server ----
-        active_configs = crud_config.get_active_by_user(db, user.id)
-        for config in active_configs:
-            try:
-                vpn_manager.delete_client(config.client_name)
-            except VPNManagerError as e:
-                logger.error(f"Failed to delete VPN client {config.client_name}: {e}")
-                vpn_errors.append(config.client_name)
-            # Always deactivate in DB — even if WG delete failed,
-            # the user is blocked and can't access the admin panel
-            crud_config.deactivate(db, config)
+        configs = crud_config.get_active_by_user(db, user.id)
     else:
-        # ---- UNBLOCK: restore all inactive configs ----
-        inactive_configs = crud_config.get_inactive_by_user(db, user.id)
-        for config in inactive_configs:
-            try:
-                metadata = config.config_metadata or {}
-                saved_configs = {
-                    'antizapret_content': metadata.get('antizapret_content'),
-                    'vpn_content': metadata.get('vpn_content'),
-                }
-                content_key = (
-                    'antizapret_content'
-                    if config.config_type == 'awg_antizapret'
-                    else 'vpn_content'
-                )
-                has_saved_keys = bool(saved_configs.get(content_key))
+        configs = crud_config.get_inactive_by_user(db, user.id)
 
-                if has_saved_keys:
-                    # Restore with original keys (key swap)
-                    result = vpn_manager.restore_client(
-                        config.client_name, saved_configs,
-                    )
+    processed_clients: set[str] = set()
+
+    for config in configs:
+        client_name = config.client_name
+        try:
+            # Each client_name appears in server configs once per interface.
+            # disable_peer/enable_peer processes ALL interfaces at once,
+            # so we only need to call it once per unique client_name.
+            if client_name not in processed_clients:
+                processed_clients.add(client_name)
+                if is_blocking:
+                    vpn_manager.disable_peer(client_name)
                 else:
-                    # No saved content (pre-feature config) — create fresh
-                    try:
-                        vpn_manager.delete_client(config.client_name)
-                    except VPNManagerError:
-                        pass
-                    result = vpn_manager.add_client(config.client_name)
+                    vpn_manager.enable_peer(client_name)
+        except VPNManagerError as e:
+            logger.error(f"Failed to {'disable' if is_blocking else 'enable'} "
+                         f"peer {client_name}: {e}")
+            vpn_errors.append(client_name)
 
-                # Determine new file path for this config type
-                if config.config_type == 'awg_antizapret':
-                    new_path = result.get('antizapret_path')
-                else:
-                    new_path = result.get('vpn_path')
-
-                # Re-read config contents for backup
-                new_antizapret_content = None
-                new_vpn_content = None
-                if result.get('antizapret_path'):
-                    try:
-                        new_antizapret_content = vpn_manager.read_config_file(
-                            result['antizapret_path']
-                        )
-                    except VPNManagerError:
-                        pass
-                if result.get('vpn_path'):
-                    try:
-                        new_vpn_content = vpn_manager.read_config_file(
-                            result['vpn_path']
-                        )
-                    except VPNManagerError:
-                        pass
-
-                new_metadata = {
-                    'antizapret_path': result.get('antizapret_path'),
-                    'vpn_path': result.get('vpn_path'),
-                    'vpn_ip': result.get('vpn_ip'),
-                    'antizapret_content': new_antizapret_content,
-                    'vpn_content': new_vpn_content,
-                }
-
-                crud_config.update_after_restore(
-                    db, config, new_path, new_metadata,
-                )
-            except VPNManagerError as e:
-                logger.error(
-                    f"Failed to restore VPN client {config.client_name}: {e}"
-                )
-                vpn_errors.append(config.client_name)
-                # Config stays inactive if restoration fails
+        # Always update DB status
+        if is_blocking:
+            crud_config.deactivate(db, config)
+        else:
+            crud_config.activate(db, config)
 
     # Toggle user active status in DB
     user = crud_user.toggle_active(db, user)
