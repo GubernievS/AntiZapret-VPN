@@ -7,6 +7,7 @@
 # Срок действия в днях - только для OpenVPN
 #
 set -e
+shopt -s nullglob
 
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
