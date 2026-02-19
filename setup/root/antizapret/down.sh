@@ -87,11 +87,6 @@ iptables -w -t raw -D PREROUTING -i lo -j NOTRACK
 iptables -w -t raw -D OUTPUT -o lo -j NOTRACK
 ip6tables -w -t raw -D PREROUTING -i lo -j NOTRACK
 ip6tables -w -t raw -D OUTPUT -o lo -j NOTRACK
-# NOTRACK DNS
-iptables -w -t raw -D PREROUTING ! -s $IP.28.0.0/15 -p udp --dport 53 -j NOTRACK
-iptables -w -t raw -D PREROUTING ! -s $IP.28.0.0/15 -p tcp --dport 53 -j NOTRACK
-iptables -w -t raw -D OUTPUT ! -d $IP.28.0.0/15 -p udp --sport 53 -j NOTRACK
-iptables -w -t raw -D OUTPUT ! -d $IP.28.0.0/15 -p tcp --sport 53 -j NOTRACK
 
 # nat
 # OpenVPN TCP port redirection for backup connections
