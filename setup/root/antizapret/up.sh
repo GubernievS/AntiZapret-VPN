@@ -116,9 +116,11 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	{
 		echo 'create antizapret-forward hash:net -exist'
 		echo 'flush antizapret-forward'
-		while read -r line; do
-			echo "add antizapret-forward $line"
-		done < result/forward-ips.txt
+		if [[ -f result/forward-ips.txt ]]; then
+			while read -r line; do
+				echo "add antizapret-forward $line"
+			done < result/forward-ips.txt
+		fi
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
@@ -133,9 +135,11 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	{
 		echo 'create antizapret-allow hash:net -exist'
 		echo 'flush antizapret-allow'
-		while read -r line; do
-			echo "add antizapret-allow $line"
-		done < result/allow-ips.txt
+		if [[ -f result/allow-ips.txt ]]; then
+			while read -r line; do
+				echo "add antizapret-allow $line"
+			done < result/allow-ips.txt
+		fi
 	} | ipset restore
 	ipset create antizapret-block hash:ip timeout 600 -exist
 	ipset create antizapret-watch hash:ip,port timeout 600 -exist
