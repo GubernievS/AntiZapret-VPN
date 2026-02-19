@@ -244,6 +244,29 @@ class VPNManager:
             return []
         return list(self._SERVER_CONFIG_DIR.glob('*.conf'))
 
+    def _extract_peer_public_key(self, content: str, client_name: str) -> Optional[str]:
+        """
+        Extract PublicKey for a specific client from server config content.
+        Works with both active (uncommented) and commented-out keys.
+        """
+        lines = content.split('\n')
+        in_target_peer = False
+
+        for line in lines:
+            stripped = line.strip()
+
+            if stripped.startswith('# Client') and '=' in stripped:
+                peer_name = stripped.split('=', 1)[1].strip()
+                in_target_peer = (peer_name == client_name)
+
+            if in_target_peer:
+                # Match both "PublicKey = ..." and "#PublicKey = ..."
+                check = stripped.lstrip('#').strip()
+                if check.lower().startswith('publickey') and '=' in check:
+                    return check.split('=', 1)[1].strip()
+
+        return None
+
     def _comment_peer_keys(self, content: str, client_name: str) -> str:
         """
         Comment out PublicKey and PresharedKey lines in a [Peer] block
@@ -265,7 +288,9 @@ class VPNManager:
             #PresharedKey = xyz789
             AllowedIPs = 10.28.8.5/32
         """
-        lines = content.splitlines()
+        # split('\n') preserves trailing newline (as empty last element),
+        # unlike splitlines() which drops it — critical for file integrity.
+        lines = content.split('\n')
         result_lines = []
         in_target_peer = False
 
@@ -297,7 +322,7 @@ class VPNManager:
         Uncomment PublicKey and PresharedKey lines in a [Peer] block
         belonging to client_name (reverse of _comment_peer_keys).
         """
-        lines = content.splitlines()
+        lines = content.split('\n')
         result_lines = []
         in_target_peer = False
 
@@ -329,17 +354,36 @@ class VPNManager:
 
         return '\n'.join(result_lines)
 
+    def _remove_wg_peer(self, iface: str, public_key: str) -> None:
+        """
+        Remove a specific peer from a running WireGuard interface.
+        Uses `wg set <iface> peer <pubkey> remove`.
+        """
+        try:
+            result = subprocess.run(
+                ['wg', 'set', iface, 'peer', public_key, 'remove'],
+                capture_output=True, text=True, timeout=10,
+            )
+            if result.returncode != 0:
+                logger.warning(
+                    f"wg set {iface} peer remove failed: {result.stderr.strip()}"
+                )
+            else:
+                logger.info(f"Removed peer {public_key[:8]}... from {iface}")
+        except Exception as e:
+            logger.warning(f"Failed to remove peer from {iface}: {e}")
+
     def _apply_wg_config(self, conf_path: Path) -> None:
         """
         Apply config changes to the running WireGuard interface
         without restarting it (no disconnects for other peers).
 
         Uses `wg syncconf <iface> <(wg-quick strip <iface>)` pattern.
+        Only safe when ALL [Peer] blocks have a valid PublicKey
+        (i.e. after uncommenting / enabling peers).
         """
         iface = conf_path.stem  # e.g. /etc/wireguard/vpn.conf → "vpn"
         try:
-            # wg-quick strip removes wg-quick-specific directives,
-            # producing a pure wg config suitable for `wg syncconf`
             result = subprocess.run(
                 ['bash', '-c', f'wg syncconf {iface} <(wg-quick strip {iface})'],
                 capture_output=True, text=True, timeout=10,
@@ -356,14 +400,17 @@ class VPNManager:
     def disable_peer(self, client_name: str) -> None:
         """
         Disable a peer by commenting out its PublicKey/PresharedKey
-        in all server config files, then syncing the running WG config.
+        in all server config files, then removing it from running WG.
+
+        Uses `wg set <iface> peer <pubkey> remove` instead of
+        `wg syncconf` because commented-out [Peer] blocks (without
+        PublicKey) would make wg syncconf fail.
 
         The peer's IP reservation (AllowedIPs) is preserved, preventing
         IP conflicts if new clients are created while this one is blocked.
         Client config files on disk are untouched.
         """
         self._validate_client_name(client_name)
-        modified_configs = []
 
         for conf_path in self._find_server_configs():
             try:
@@ -371,25 +418,30 @@ class VPNManager:
                 if f'# Client = {client_name}' not in content:
                     continue
 
+                # Extract PublicKey BEFORE commenting it out
+                pubkey = self._extract_peer_public_key(content, client_name)
+
                 new_content = self._comment_peer_keys(content, client_name)
                 if new_content != content:
                     conf_path.write_text(new_content)
-                    modified_configs.append(conf_path)
                     logger.info(f"Disabled peer {client_name} in {conf_path}")
+
+                    # Remove peer from running WG interface by its PublicKey
+                    if pubkey:
+                        iface = conf_path.stem
+                        self._remove_wg_peer(iface, pubkey)
+                    else:
+                        logger.warning(
+                            f"No PublicKey found for {client_name} in {conf_path}"
+                        )
             except OSError as e:
                 raise VPNManagerError(f"Failed to modify {conf_path}: {e}")
-
-        if not modified_configs:
-            logger.warning(f"Peer {client_name} not found in server configs")
-
-        # Apply changes to running WG interfaces
-        for conf_path in modified_configs:
-            self._apply_wg_config(conf_path)
 
     def enable_peer(self, client_name: str) -> None:
         """
         Re-enable a previously disabled peer by uncommenting its
-        PublicKey/PresharedKey in all server config files.
+        PublicKey/PresharedKey in all server config files, then
+        applying via wg syncconf (safe because all peers are now valid).
         """
         self._validate_client_name(client_name)
         modified_configs = []
@@ -411,6 +463,7 @@ class VPNManager:
         if not modified_configs:
             logger.warning(f"Peer {client_name} not found in server configs")
 
+        # wg syncconf is safe here — all [Peer] blocks now have valid PublicKey
         for conf_path in modified_configs:
             self._apply_wg_config(conf_path)
 
