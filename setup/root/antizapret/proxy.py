@@ -214,7 +214,7 @@ if __name__ == "__main__":
                     metavar="<timeout>",
                     help="Upstream timeout (default: 5s)")
     p.add_argument("--passthrough",action="store_true",default=False,
-                    help="Dont decode/re-encode request/response (default: False)")
+                    help="Don't decode/re-encode request/response (default: False)")
     p.add_argument("--log",default="truncated,error",
                     help="Log hooks to enable (default: +truncated,+error,-request,-reply,-recv,-send,-data)")
     p.add_argument("--log-prefix",action="store_true",default=False,
