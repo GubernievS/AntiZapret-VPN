@@ -88,19 +88,13 @@ initOpenVPN(){
 	mkdir -p /etc/openvpn/server/keys
 	mkdir -p /etc/openvpn/client/keys
 
-	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
-		cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
-		cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-		cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-	fi
+	cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
+	cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
+	cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 
-	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
-		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-		chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
-		cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
-	fi
+	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
+	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 }
 
 addOpenVPN(){
@@ -128,11 +122,8 @@ addOpenVPN(){
 		fi
 	fi
 
-	if [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt ]] || \
-	   [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".key ]]; then
-		cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
-		cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
-	fi
+	cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
+	cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
 
 	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
 	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")"
