@@ -176,13 +176,6 @@ iptables -w -t raw -A PREROUTING -i lo -j NOTRACK
 iptables -w -t raw -A OUTPUT -o lo -j NOTRACK
 ip6tables -w -t raw -A PREROUTING -i lo -j NOTRACK
 ip6tables -w -t raw -A OUTPUT -o lo -j NOTRACK
-# NOTRACK DNS
-if ! systemctl is-active --quiet docker 2>/dev/null; then
-	iptables -w -t raw -A PREROUTING ! -s $IP.28.0.0/15 -p udp --dport 53 -j NOTRACK
-	iptables -w -t raw -A PREROUTING ! -s $IP.28.0.0/15 -p tcp --dport 53 -j NOTRACK
-	iptables -w -t raw -A OUTPUT ! -d $IP.28.0.0/15 -p udp --sport 53 -j NOTRACK
-	iptables -w -t raw -A OUTPUT ! -d $IP.28.0.0/15 -p tcp --sport 53 -j NOTRACK
-fi
 
 # nat
 # OpenVPN TCP port redirection for backup connections
