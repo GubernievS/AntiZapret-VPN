@@ -185,9 +185,11 @@ net.ipv6.conf.lo.disable_ipv6=1" > /etc/sysctl.d/99-disable-ipv6.conf
 iptables -w -F
 iptables -w -t nat -F
 iptables -w -t mangle -F
+iptables -w -t raw -F
 ip6tables -w -F
 ip6tables -w -t nat -F
 ip6tables -w -t mangle -F
+ip6tables -w -t raw -F
 
 # Новые правила iptables
 # filter
