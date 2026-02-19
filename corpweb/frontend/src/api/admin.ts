@@ -1,6 +1,6 @@
 import api from './client'
 import type {
-  UserListResponse, UserCreateRequest, UserUpdateRequest, User,
+  UserListResponse, UserCreateRequest, UserUpdateRequest, User, UserBlockResponse,
   SystemSettings, SystemSettingsUpdate, DashboardStats
 } from '../types'
 
@@ -16,7 +16,7 @@ export const adminApi = {
     api.put<User>(`/admin/users/${id}`, data),
 
   toggleBlock: (id: string) =>
-    api.patch<User>(`/admin/users/${id}/block`),
+    api.patch<UserBlockResponse>(`/admin/users/${id}/block`),
 
   deleteUser: (id: string) =>
     api.delete(`/admin/users/${id}`),

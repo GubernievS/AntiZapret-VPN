@@ -32,6 +32,10 @@ export interface UserListResponse {
   total: number
 }
 
+export interface UserBlockResponse extends User {
+  vpn_warnings?: string[]
+}
+
 // === Auth types ===
 export interface LoginRequest {
   login: string
