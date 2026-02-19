@@ -204,22 +204,14 @@ fi
 # AmneziaWG redirection ports to WireGuard
 iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52443 -j REDIRECT --to-ports 51443
+# AntiZapret DNS redirection to Knot Resolver
+iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
 # VPN DNS redirection to Knot Resolver
 if [[ "$VPN_DNS" == '1' ]]; then
-	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.0.1
-	iptables -w -t nat -A PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.4.1
-	iptables -w -t nat -A PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.28.8.1
-	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/22 ! -d $IP.28.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.0.1
-	iptables -w -t nat -A PREROUTING -s $IP.28.4.0/22 ! -d $IP.28.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.4.1
-	iptables -w -t nat -A PREROUTING -s $IP.28.8.0/24 ! -d $IP.28.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.28.8.1
+	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2
+	iptables -w -t nat -A PREROUTING -s $IP.28.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2
 fi
-# AntiZapret DNS redirection to Knot Resolver
-iptables -w -t nat -A PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.0.1
-iptables -w -t nat -A PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.4.1
-iptables -w -t nat -A PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p udp --dport 53 -j DNAT --to-destination $IP.29.8.1
-iptables -w -t nat -A PREROUTING -s $IP.29.0.0/22 ! -d $IP.29.0.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.0.1
-iptables -w -t nat -A PREROUTING -s $IP.29.4.0/22 ! -d $IP.29.4.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.4.1
-iptables -w -t nat -A PREROUTING -s $IP.29.8.0/24 ! -d $IP.29.8.1/32 -p tcp --dport 53 -j DNAT --to-destination $IP.29.8.1
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
