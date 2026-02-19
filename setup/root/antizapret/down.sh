@@ -118,8 +118,11 @@ iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMA
 # Mapping fake IP to real IP
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT/MASQUERADE VPN
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j SNAT --to-source $OUT_IP
+if [[ -z "$OUT_IP" ]]; then
+	iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j MASQUERADE
+else
+	iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j SNAT --to-source $OUT_IP
+fi
 
 # WARP
 WARP_INTERFACE=warp
