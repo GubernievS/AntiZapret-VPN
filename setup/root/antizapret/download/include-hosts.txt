@@ -979,6 +979,7 @@ notion.site
 sndcdn.com
 soundcloud.cloud
 wgcdn.co
+greenvalleyintl.com
 
 # Блокирует DNS
 library.hydra.wiki
