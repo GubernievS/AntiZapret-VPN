@@ -980,6 +980,8 @@ sndcdn.com
 soundcloud.cloud
 wgcdn.co
 greenvalleyintl.com
+cdn77.org
+atlas.co
 
 # Блокирует DNS
 library.hydra.wiki
