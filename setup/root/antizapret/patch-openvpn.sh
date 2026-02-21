@@ -50,9 +50,9 @@ if [[ "$ALGORITHM" == '0' ]]; then
 	echo 'OpenVPN patch not installed!'
 	exit 0
 elif [[ "$ALGORITHM" == '2' ]]; then
-    ERROR_FREE='#define ERROR_FREE'
+	ERROR_FREE='#define ERROR_FREE'
 else
-    ERROR_FREE='#undef ERROR_FREE'
+	ERROR_FREE='#undef ERROR_FREE'
 fi
 
 make -C /usr/local/src/openvpn uninstall || true
