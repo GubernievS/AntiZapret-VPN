@@ -92,6 +92,7 @@ apt-get purge -y qemu-guest-agent
 apt-get purge -y tuned
 apt-get purge -y sysstat
 apt-get purge -y acpid
+apt-get purge -y fwupd
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
