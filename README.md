@@ -41,7 +41,7 @@ chrome://flags/#local-network-access-check
 OpenVPN позволяет нескольким клиентам использовать один и тот же файл подключения (\*.ovpn) для подключения к серверу, по умолчанию создается один клиент 'antizapret-client'\
 Если ваш провайдер блокирует протокол OpenVPN - установите патч для обхода блокировки протокола (только для UDP соединений)\
 По умолчанию используется протокол шифрования AES-128-GCM, если ваше устройство не поддерживает аппаратное шифрование AES-NI, то рекомендуется попробовать в файле подключения (\*.ovpn) заменить AES-128-GCM на CHACHA20-POLY1305\
-VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN (Windows)](https://openvpn.net/community-downloads)
+VPN-клиенты: [OpenVPN Connect](https://openvpn.net/client), [OpenVPN Community Edition](https://openvpn.net/community)
 
 **WireGuard** (файлы \*-wg.conf)\
 Поддерживается подключение по UDP, используются порты 51080 и 51443, а также резервные порты 540 и 580 для обхода блокировок портов\
