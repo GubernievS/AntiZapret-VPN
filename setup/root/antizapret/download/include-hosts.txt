@@ -982,6 +982,7 @@ wgcdn.co
 greenvalleyintl.com
 cdn77.org
 atlas.co
+sjinn.ai
 
 # Блокирует DNS
 library.hydra.wiki
