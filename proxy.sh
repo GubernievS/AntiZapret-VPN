@@ -75,6 +75,11 @@ until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
+echo 'Warning! Network attack and scan protection may block VPN or third-party applications!'
+until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
+done
+echo
 echo 'Installation, please wait...'
 
 # Удалим ненужные службы
@@ -130,7 +135,7 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent irqbalance unattended-upgrades
+apt-get install --reinstall -y iptables iptables-persistent ipset irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
@@ -192,15 +197,8 @@ ip6tables -w -t nat -F
 ip6tables -w -t mangle -F
 ip6tables -w -t raw -F
 
-# Сброс счётчиков
-iptables -w -Z
-iptables -w -t nat -Z
-iptables -w -t mangle -Z
-iptables -w -t raw -Z
-ip6tables -w -Z
-ip6tables -w -t nat -Z
-ip6tables -w -t mangle -Z
-ip6tables -w -t raw -Z
+# Очистка ipset
+for SETNAME in $(ipset list -n); do ipset destroy "$SETNAME"; done
 
 # Новые правила iptables
 # filter
@@ -220,6 +218,36 @@ ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
+# SSH protection
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
+fi
+# Attack and scan protection
+if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
+	ipset create proxy-allow hash:net -exist
+	ipset create proxy-block hash:ip timeout 600 -exist
+	ipset create proxy-watch hash:ip,port timeout 600 -exist
+	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
+	iptables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow src -j ACCEPT
+	iptables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
+	iptables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
+	iptables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block src -j DROP
+	iptables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch src,dst --exist
+	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
+	ipset create proxy-allow6 hash:net family inet6 -exist
+	ipset create proxy-block6 hash:ip timeout 600 family inet6 -exist
+	ipset create proxy-watch6 hash:ip,port timeout 600 family inet6 -exist
+	ip6tables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
+	ip6tables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow6 src -j ACCEPT
+	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan6 --hashlimit-htable-expire 600000 -j SET --add-set proxy-block6 src --exist
+	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set proxy-block6 src --exist
+	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block6 src -j DROP
+	ip6tables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch6 src,dst --exist
+	ip6tables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	ip6tables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
+fi
 
 # mangle
 # Clamp TCP MSS
@@ -227,34 +255,39 @@ iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clam
 ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # nat
+# OpenVPN TCP
 iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
 iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":504
 iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":508
 iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
 iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
-
+# OpenVPN UDP
 iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
 iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
 iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":504
 iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":508
 iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
 iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
-
+# WireGuard/AmneziaWG
 iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination "$DESTINATION_IP":540
 iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination "$DESTINATION_IP":580
 iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination "$DESTINATION_IP":51080
 iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination "$DESTINATION_IP":51443
 iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":52080
 iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":52443
-
+# SNAT
 iptables -w -t nat -A POSTROUTING -d "$DESTINATION_IP" -j SNAT --to-source "$DEFAULT_IP"
 
-# SSH protection
-if [[ "$SSH_PROTECTION" == 'y' ]]; then
-	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
-	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
-fi
+# Сброс счётчиков
+iptables -w -Z
+iptables -w -t nat -Z
+iptables -w -t mangle -Z
+iptables -w -t raw -Z
+ip6tables -w -Z
+ip6tables -w -t nat -Z
+ip6tables -w -t mangle -Z
+ip6tables -w -t raw -Z
 
 # Сохранение новых правил iptables
 netfilter-persistent save
