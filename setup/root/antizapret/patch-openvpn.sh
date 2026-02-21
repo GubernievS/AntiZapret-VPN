@@ -86,7 +86,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	#endif\
 #endif\
 	uint16_t buffer_len = BLEN(buf);\
-	srand((unsigned)clock());\
+	srand((unsigned)time(NULL));\
 	for (int i = 0; i < 2; i++) {\
 		uint16_t data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
