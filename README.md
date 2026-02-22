@@ -96,6 +96,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений и Telegram-бот
 	- [AdminAntizapret](https://github.com/Kirito0098/AdminAntizapret) - управление и конфигурация
 	- [TG-Bot-OpenVPN-Antizapret](https://github.com/VATAKATru61/TG-Bot-OpenVPN-Antizapret) - Telegram-бот (только OpenVPN)
+	- Установка прокси для Telegram (MTProxy): \`sudo bash mtproxy-install.sh\` — скрипт по [официальной инструкции](https://github.com/TelegramMessenger/MTProxy)
 
 ***
 
@@ -182,7 +183,7 @@ WireGuard/AmneziaWG на роутерах [Keenetic](https://4pda.to/forum/index
 - [aeza.ru](https://aeza.ru/?ref=445073) - чуть дешевле чем на .net - ссылка для регистрации с бонусом 15% к первому пополнению который будет действовать 24 часа
 - [4vps.su](https://4vps.su/r/cPe6t2yHR101) - ссылка для регистрации со скидкой 20% на первую покупку
 - [4vps.su](https://4vps.su/r/hUR44U5dcD3J) - ссылка для регистрации с бонусом 20% к первому пополнению
-- [waicore.com](https://waicore.com/?from=11334) - просто реферальная ссылка - Внимание! Лимит исходящего трафика 20 Тб
+- [waicore.com](https://waicore.com/?from=11334) - просто реферальная ссылка
 - [senko.digital](https://senko.digital/?ref=1483520) - просто реферальная ссылка
 - [timeweb.com](https://timeweb.com/ru/?i=138897) - просто реферальная ссылка
 - [vdsina.com](https://www.vdsina.com/?partner=9br77jaat2) - ссылка для регистрации с бонусом 10% к первому пополнению - Внимание! По UDP низкая скорость, не рекомендуется!
