@@ -75,9 +75,8 @@ until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
-echo 'Warning! Network attack and scan protection may block VPN or third-party applications!'
-until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
-	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
+until [[ "$SCAN_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
 done
 echo
 echo 'Installation, please wait...'
@@ -135,7 +134,7 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent ipset irqbalance unattended-upgrades
+apt-get install --reinstall -y iptables iptables-persistent irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
@@ -197,9 +196,6 @@ ip6tables -w -t nat -F
 ip6tables -w -t mangle -F
 ip6tables -w -t raw -F
 
-# Очистка ipset
-for SETNAME in $(ipset list -n); do ipset destroy $SETNAME; done
-
 # Новые правила iptables
 # filter
 # Default policy
@@ -223,31 +219,12 @@ if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
 	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
 fi
-# Attack and scan protection
-if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
-	ipset create proxy-allow hash:net -exist
-	ipset create proxy-block hash:ip timeout 600 -exist
-	ipset create proxy-watch hash:ip,port timeout 600 -exist
-	# Не применять защиту к трафику от VPN-сервера (ответы на перенаправленный трафик)
-	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -s $DESTINATION_IP -j ACCEPT
-	iptables -w -I INPUT 3 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
-	iptables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow src -j ACCEPT
-	iptables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
-	iptables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
-	iptables -w -I INPUT 8 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block src -j DROP
-	iptables -w -I INPUT 9 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch src,dst --exist
-	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -d $DESTINATION_IP -j ACCEPT
-	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
-	iptables -w -I OUTPUT 4 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
-	ipset create proxy-allow6 hash:net family inet6 -exist
-	ipset create proxy-block6 hash:ip timeout 600 family inet6 -exist
-	ipset create proxy-watch6 hash:ip,port timeout 600 family inet6 -exist
+# Scan protection
+if [[ "$SCAN_PROTECTION" == 'y' ]]; then
+	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
+	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
 	ip6tables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
-	ip6tables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow6 src -j ACCEPT
-	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan6 --hashlimit-htable-expire 600000 -j SET --add-set proxy-block6 src --exist
-	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set proxy-block6 src --exist
-	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block6 src -j DROP
-	ip6tables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch6 src,dst --exist
 	ip6tables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
 	ip6tables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
 fi
