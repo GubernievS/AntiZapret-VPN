@@ -937,6 +937,7 @@ google.com
 google.dev
 google
 goog
+google.ru
 7tv.io
 vlr.gg
 owcdn.net
