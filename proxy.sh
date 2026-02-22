@@ -57,7 +57,7 @@ echo 'Proxied ports: 80, 443, 504, 508, 540, 580, 50080, 50443, 51080, 51443, 52
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
+MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
 if (( MTU < 1500 )); then
 	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $MTU"
 	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on AntiZapret VPN server"
@@ -198,7 +198,7 @@ ip6tables -w -t mangle -F
 ip6tables -w -t raw -F
 
 # Очистка ipset
-for SETNAME in $(ipset list -n); do ipset destroy "$SETNAME"; done
+for SETNAME in $(ipset list -n); do ipset destroy $SETNAME; done
 
 # Новые правила iptables
 # filter
@@ -228,14 +228,17 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ipset create proxy-allow hash:net -exist
 	ipset create proxy-block hash:ip timeout 600 -exist
 	ipset create proxy-watch hash:ip,port timeout 600 -exist
-	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
-	iptables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow src -j ACCEPT
-	iptables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
-	iptables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
-	iptables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block src -j DROP
-	iptables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch src,dst --exist
-	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
-	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
+	# Не применять защиту к трафику от VPN-сервера (ответы на перенаправленный трафик)
+	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -s $DESTINATION_IP -j ACCEPT
+	iptables -w -I INPUT 3 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
+	iptables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m set --match-set proxy-allow src -j ACCEPT
+	iptables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set proxy-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name proxy-scan --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
+	iptables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name proxy-ddos --hashlimit-htable-expire 600000 -j SET --add-set proxy-block src --exist
+	iptables -w -I INPUT 8 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set proxy-block src -j DROP
+	iptables -w -I INPUT 9 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set proxy-watch src,dst --exist
+	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -d $DESTINATION_IP -j ACCEPT
+	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	iptables -w -I OUTPUT 4 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
 	ipset create proxy-allow6 hash:net family inet6 -exist
 	ipset create proxy-block6 hash:ip timeout 600 family inet6 -exist
 	ipset create proxy-watch6 hash:ip,port timeout 600 family inet6 -exist
@@ -256,28 +259,28 @@ ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --cla
 
 # nat
 # OpenVPN TCP
-iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
-iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
-iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":504
-iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":508
-iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
+iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
+iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
+iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
 # OpenVPN UDP
-iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
-iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
-iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination "$DESTINATION_IP":504
-iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination "$DESTINATION_IP":508
-iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
+iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
+iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
+iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
 # WireGuard/AmneziaWG
-iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination "$DESTINATION_IP":540
-iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination "$DESTINATION_IP":580
-iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination "$DESTINATION_IP":51080
-iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination "$DESTINATION_IP":51443
-iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":52080
-iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":52443
+iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:540
+iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:580
+iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination $DESTINATION_IP:51080
+iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination $DESTINATION_IP:51443
+iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:52080
+iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:52443
 # SNAT
-iptables -w -t nat -A POSTROUTING -d "$DESTINATION_IP" -j SNAT --to-source "$DEFAULT_IP"
+iptables -w -t nat -A POSTROUTING -d $DESTINATION_IP -j SNAT --to-source $DEFAULT_IP
 
 # Сброс счётчиков
 iptables -w -Z
