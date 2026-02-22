@@ -71,7 +71,7 @@ echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
+MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
 if (( MTU < 1500 )); then
 	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $MTU"
 	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on this server after installation"
