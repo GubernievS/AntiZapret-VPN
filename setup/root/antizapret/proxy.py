@@ -37,8 +37,7 @@ class ProxyResolver(BaseResolver):
         for mapping in mappings:
             fake_ip,real_ip = mapping.split(" ")
             if not self.mapping_ip(real_ip,fake_ip,current_time):
-                rule = "iptables -w -t nat -F ANTIZAPRET-MAPPING"
-                subprocess.run(rule,shell=True,check=True)
+                subprocess.run(["iptables","-w","-t","nat","-F","ANTIZAPRET-MAPPING"],check=True)
                 sys.exit(1)
         print(f"Loaded: {len(mappings)} fake IPs")
         self.address = address
@@ -63,7 +62,7 @@ class ProxyResolver(BaseResolver):
                 return None
             fake_ip = self.ip_pool.pop()
             self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
-        subprocess.run(["iptables", "-w", "-t", "nat", "-A", "ANTIZAPRET-MAPPING", "-d", fake_ip, "-j", "DNAT", "--to", real_ip], check=True)
+        subprocess.run(["iptables","-w","-t","nat","-A","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to",real_ip],check=True)
         #print(f"Mapping: {fake_ip} to {real_ip}")
         return fake_ip
 
