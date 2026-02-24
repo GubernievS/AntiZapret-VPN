@@ -985,6 +985,8 @@ cdn77.org
 atlas.co
 sjinn.ai
 archlinuxarm.org
+disqus.com
+disquscdn.com
 
 # Блокирует DNS
 library.hydra.wiki
