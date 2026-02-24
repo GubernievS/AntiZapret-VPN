@@ -1,7 +1,6 @@
 #!/usr/bin/env -S python3 -u
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 import socket,struct,subprocess,sys,time,argparse,threading,copy
 from ipaddress import IPv4Network
 from dnslib import DNSRecord,RCODE,QTYPE,A
@@ -91,9 +90,9 @@ class ProxyResolver(BaseResolver):
             current_time = time.time()
             cleanup_ips = []
             rules = ["*nat"]
-            for key,entry in self.ip_map.items():
+            for real_ip,entry in self.ip_map.items():
                 if current_time - entry["last_access"] > self.cleanup_expiry:
-                    cleanup_ips.append((key,entry["fake_ip"]))
+                    cleanup_ips.append((real_ip,entry["fake_ip"]))
             for real_ip,fake_ip in cleanup_ips:
                 self.ip_pool.add(fake_ip)
                 del self.ip_map[real_ip]
@@ -107,10 +106,10 @@ class ProxyResolver(BaseResolver):
     def resolve(self,request,handler):
         try:
             if handler.protocol == "udp":
-                proxy_r = request.send(self.address,self.port,timeout=self.timeout)
+                data = request.send(self.address,self.port,timeout=self.timeout)
             else:
-                proxy_r = request.send(self.address,self.port,tcp=True,timeout=self.timeout)
-            reply = DNSRecord.parse(proxy_r)
+                data = request.send(self.address,self.port,tcp=True,timeout=self.timeout)
+            reply = DNSRecord.parse(data)
             if request.q.qtype == QTYPE.A:
                 #print("GOT A")
                 new_rr = []
