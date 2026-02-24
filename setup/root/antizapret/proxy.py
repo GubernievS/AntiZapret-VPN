@@ -31,15 +31,18 @@ class ProxyResolver(BaseResolver):
         self.ip_pool = {str(x) for x in IPv4Network(ip_range).hosts()}
         self.ip_map = {}
         # Loading existing mappings
-        rule = "iptables -w -t nat -S ANTIZAPRET-MAPPING | awk '{if (NR<2) {next}; print substr($4, 1, length($4)-3), $8}'"
-        mappings = subprocess.run(rule,shell=True,check=True,capture_output=True,text=True).stdout.splitlines()
+        result = subprocess.run(["iptables","-w","-t","nat","-S","ANTIZAPRET-MAPPING"],capture_output=True,text=True,check=True)
         current_time = time.time()
-        for mapping in mappings:
-            fake_ip,real_ip = mapping.split(" ")
+        for line in result.stdout.splitlines():
+            parts = line.split()
+            if len(parts) < 8:
+                continue
+            fake_ip = parts[3].split("/")[0]
+            real_ip = parts[7]
             if not self.mapping_ip(real_ip,fake_ip,current_time):
                 subprocess.run(["iptables","-w","-t","nat","-F","ANTIZAPRET-MAPPING"],check=True)
                 sys.exit(1)
-        print(f"Loaded: {len(mappings)} fake IPs")
+        print(f"Loaded: {len(self.ip_map)} fake IPs")
         self.address = address
         self.port = port
         self.timeout = timeout
@@ -62,7 +65,7 @@ class ProxyResolver(BaseResolver):
                 return None
             fake_ip = self.ip_pool.pop()
             self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
-        subprocess.run(["iptables","-w","-t","nat","-A","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to",real_ip],check=True)
+        subprocess.run(["iptables","-w","-t","nat","-A","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to-destination",real_ip],check=True)
         #print(f"Mapping: {fake_ip} to {real_ip}")
         return fake_ip
 
@@ -94,7 +97,7 @@ class ProxyResolver(BaseResolver):
             for real_ip,fake_ip in cleanup_ips:
                 self.ip_pool.add(fake_ip)
                 del self.ip_map[real_ip]
-                rules.append(f"-D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to {real_ip}")
+                rules.append(f"-D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to-destination {real_ip}")
                 #print(f"Unmapping: {fake_ip} to {real_ip}")
             if cleanup_ips:
                 rules.append("COMMIT")
