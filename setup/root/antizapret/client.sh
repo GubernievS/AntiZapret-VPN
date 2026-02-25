@@ -304,7 +304,7 @@ listWireGuard(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo
 	echo 'WireGuard/AmneziaWG client names:'
-	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
+	grep -hE "^# Client" /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 }
 
 recreate(){
@@ -334,7 +334,7 @@ recreate(){
 
 	# WireGuard/AmneziaWG
 	if [[ -f /etc/wireguard/key && -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
-		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
+		grep -hE "^# Client" /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard >/dev/null
 				echo "WireGuard/AmneziaWG profile files recreated for client '$CLIENT_NAME'"
