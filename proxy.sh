@@ -109,6 +109,9 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
+# Удаляем переопределённые параметры ядра
+sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+
 # Принудительная загрузка модуля nf_conntrack
 echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
 
@@ -146,7 +149,7 @@ kernel.panic=1
 kernel.panic_on_oops=1
 kernel.softlockup_panic=1
 kernel.hardlockup_panic=1
-kernel.sched_autogroup_enabled=1
+kernel.sched_autogroup_enabled=0
 net.ipv4.ip_forward=1
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
@@ -171,7 +174,7 @@ net.core.somaxconn=4096
 net.ipv4.tcp_syncookies=1
 net.ipv4.udp_rmem_min=16384
 net.ipv4.udp_wmem_min=16384
-net.core.optmem_max=131072
+net.core.optmem_max=20480
 net.ipv4.tcp_timestamps=1
 net.ipv4.tcp_tw_reuse=0
 net.ipv4.tcp_slow_start_after_idle=0
