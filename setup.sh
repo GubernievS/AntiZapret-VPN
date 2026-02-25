@@ -285,6 +285,7 @@ apt-get purge -y tuned
 apt-get purge -y sysstat
 apt-get purge -y acpid
 apt-get purge -y fwupd
+apt-get purge -y watchdog
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
