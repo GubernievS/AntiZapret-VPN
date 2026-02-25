@@ -63,6 +63,7 @@ PostDown = ip rule del from $IP.28.0.0/15 lookup 13335 priority 10000
 [Peer]
 PublicKey = $PUBLIC_KEY
 AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 15
 Endpoint = $ENDPOINT" > $WARP_PATH
 
 	wg-quick up $WARP_PATH
