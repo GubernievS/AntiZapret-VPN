@@ -987,6 +987,7 @@ sjinn.ai
 archlinuxarm.org
 disqus.com
 disquscdn.com
+picovr.com
 
 # Блокирует DNS
 library.hydra.wiki
