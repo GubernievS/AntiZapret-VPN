@@ -63,6 +63,7 @@ AmneziaWG не позволяет нескольким клиентам испо
 VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases), [AmneziaWG (Android)](https://play.google.com/store/apps/details?id=org.amnezia.awg), [AmneziaWG (Apple)](https://apps.apple.com/ru/app/amneziawg/id6478942365)
 
 Скрипт удаляет некоторые пакеты, в том числе UFW и Firewalld, при необходимости их необходимо установить и настроить вручную\
+Скрипт отключает входящие подключения по IPv6 на сервере, а DNS АнтиЗапрета не возвращает IPv6-адреса (AAAA-записи) доменов\
 Ваш сервер должен быть расположен за пределами России и стран бывшего Советского Союза, в противном случае разблокировка сайтов не гарантируется\
 Протестировано на Ubuntu 22.04/24.04 и Debian 11/12 - Процессор: 1 core, Память: 1 Gb, Хранилище: 10 Gb, Внешний IPv4-адрес\
 За основу взяты [эти исходники](https://bitbucket.org/anticensority/antizapret-vpn-container/src/master) разработанные ValdikSS
