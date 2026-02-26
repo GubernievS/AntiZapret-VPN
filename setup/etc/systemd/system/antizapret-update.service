@@ -6,12 +6,12 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+Type=oneshot
 WorkingDirectory=/root/antizapret
 ExecStart=/bin/bash -c 'cat /root/antizapret/doall.sh | bash -s noclear'
 Restart=on-failure
 RestartSec=1h
 TimeoutSec=1h
-SuccessExitStatus=0
 
 [Install]
 WantedBy=multi-user.target
