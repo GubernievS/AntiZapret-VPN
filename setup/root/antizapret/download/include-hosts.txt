@@ -988,6 +988,8 @@ archlinuxarm.org
 disqus.com
 disquscdn.com
 picovr.com
+wahapedia.ru
+warhammer-community.com
 
 # Блокирует DNS
 library.hydra.wiki
