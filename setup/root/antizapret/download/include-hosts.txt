@@ -990,6 +990,7 @@ disquscdn.com
 picovr.com
 wahapedia.ru
 warhammer-community.com
+kawasaki.com
 
 # Блокирует DNS
 library.hydra.wiki
