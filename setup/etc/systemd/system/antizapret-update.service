@@ -1,7 +1,7 @@
 [Unit]
 Description=AntiZapret VPN update
-After=antizapret-vpn.service
-Wants=antizapret-vpn.service
+After=antizapret.service
+Requires=antizapret.service
 After=network-online.target
 Wants=network-online.target
 
