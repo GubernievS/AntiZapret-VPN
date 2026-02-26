@@ -66,7 +66,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 Endpoint = $ENDPOINT" > $WARP_PATH
 
-	wg-quick up $WARP_PATH
+	wg-quick up $WARP_PATH 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $WARP_INTERFACE: $ENDPOINT connected"
