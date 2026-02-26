@@ -186,7 +186,7 @@ until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
 done
 echo
 until [[ "$CLIENT_ISOLATION" =~ (y|n) ]]; do
-	read -rp $'Enable \001\e[1;32m\002all VPN\001\e[0m\002 client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
+	read -rp $'Enable \001\e[1;32m\002all VPN\001\e[0m\002 client and server isolation? [y/n]: ' -e -i y CLIENT_ISOLATION
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST

@@ -125,9 +125,11 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
-# Client isolation
+# Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	iptables -w -I FORWARD 2 ! -i $OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 else
 	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
 fi

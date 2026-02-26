@@ -48,6 +48,8 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent sr
 iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 # Client isolation
 iptables -w -D FORWARD ! -i $OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 iptables -w -D FORWARD -d $IP.28.0.0/15 -j ACCEPT
 # SSH protection
 iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
