@@ -88,7 +88,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 	- Разрешить нескольким клиентам подключаться к OpenVPN используя один и тот же файл подключения (\*.ovpn)
 	- Включить защиту от перебора паролей SSH и защиту от сканирования и сетевых атак
 	- Ограничить маршрутизацию через AntiZapret VPN только к IP-адресам из config/forward-ips.txt и result/route-ips.txt
-	- Включить изоляцию VPN-клиентов
+	- Включить изоляцию VPN-клиентов и сервера
 	- Указать доменное имя для подключения к OpenVPN и WireGuard/AmneziaWG
 	- Пустить все домены через AntiZapret VPN кроме российских доменов и доменов из config/exclude-hosts.txt
 	- Добавить IP-адреса: Discord, Telegram, WhatsApp, Roblox, Cloudflare, Amazon, Hetzner, DigitalOcean, OVH, Google и Akamai
