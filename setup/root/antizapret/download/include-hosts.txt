@@ -991,6 +991,7 @@ picovr.com
 wahapedia.ru
 warhammer-community.com
 kawasaki.com
+quiver.ai
 
 # Блокирует DNS
 library.hydra.wiki
