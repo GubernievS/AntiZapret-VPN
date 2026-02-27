@@ -994,6 +994,7 @@ kawasaki.com
 quiver.ai
 kawasaki-global-admin.com
 browserleaks.com
+vast.ai
 
 # Блокирует DNS
 library.hydra.wiki
