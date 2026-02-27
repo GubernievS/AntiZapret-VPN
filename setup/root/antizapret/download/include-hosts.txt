@@ -250,6 +250,7 @@ dyson.com
 dyson.nl
 dyson.de
 dyson.fr
+dyson.video
 informit.com
 getsafeonline.org
 scamadviser.com
