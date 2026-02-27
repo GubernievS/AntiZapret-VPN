@@ -53,13 +53,13 @@ if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 fi
 
 # Проверка наличия сетевого интерфейса и IPv4-адреса
-DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
+DEFAULT_INTERFACE=$(ip -o route get 1.2.3.4 | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 9
 fi
 
-DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+DEFAULT_IP=$(ip -o route get 1.2.3.4 | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}')
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 10
