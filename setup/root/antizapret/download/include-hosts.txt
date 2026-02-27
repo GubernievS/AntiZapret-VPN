@@ -992,6 +992,7 @@ wahapedia.ru
 warhammer-community.com
 kawasaki.com
 quiver.ai
+kawasaki-global-admin.com
 
 # Блокирует DNS
 library.hydra.wiki
