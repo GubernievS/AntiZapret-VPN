@@ -182,7 +182,15 @@ net.ipv4.tcp_slow_start_after_idle=0
 net.netfilter.nf_conntrack_tcp_timeout_established=86400
 net.core.rmem_default=262144
 net.core.wmem_default=262144
-net.ipv4.tcp_base_mss=1024" > /etc/sysctl.d/99-proxy.conf
+net.ipv4.tcp_base_mss=1024
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0" > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
 echo "# Disable IPv6
