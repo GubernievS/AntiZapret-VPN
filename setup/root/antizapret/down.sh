@@ -57,7 +57,7 @@ ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit
 # Attack and scan protection
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
-iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
+iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
@@ -65,7 +65,7 @@ iptables -w -D OUTPUT -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
 iptables -w -D OUTPUT -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow6 src -j ACCEPT
-ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
+ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
