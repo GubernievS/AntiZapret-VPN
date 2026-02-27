@@ -248,6 +248,8 @@ seekvectorlogo.net
 cesium.com
 dyson.com
 dyson.nl
+dyson.de
+dyson.fr
 informit.com
 getsafeonline.org
 scamadviser.com
@@ -701,7 +703,6 @@ jetbrains.com
 xe.com
 gql.twitch.tv
 live.chat.eveonline.com
-dyson.fr
 #labs.google
 squarecdn.com
 xgpuweb.gssv-play-prod.xboxlive.com
