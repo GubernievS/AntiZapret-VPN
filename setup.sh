@@ -268,6 +268,7 @@ systemctl disable --now openvpn-server@vpn-udp 2>/dev/null
 systemctl disable --now openvpn-server@vpn-tcp 2>/dev/null
 systemctl disable --now wg-quick@antizapret 2>/dev/null
 systemctl disable --now wg-quick@vpn 2>/dev/null
+systemctl disable --now kres-cache-gc 2>/dev/null
 
 # Удалим ненужные службы
 apt-get purge -y ufw
@@ -542,7 +543,7 @@ fi
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/antizapret/client.sh 7
 
-# Включим обновляемые службы
+# Включим/выключим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
 systemctl enable antizapret
@@ -554,6 +555,8 @@ systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret
 systemctl enable wg-quick@vpn
+systemctl mask kres-cache-gc
+systemctl disable kres-cache-gc
 
 ERRORS=
 
