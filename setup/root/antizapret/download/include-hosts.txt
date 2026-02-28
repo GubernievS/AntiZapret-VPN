@@ -997,6 +997,8 @@ quiver.ai
 kawasaki-global-admin.com
 browserleaks.com
 vast.ai
+skyscanner.com
+pikpok.com
 
 # Блокирует DNS
 library.hydra.wiki
