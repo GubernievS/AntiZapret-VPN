@@ -235,10 +235,6 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 			echo "DNS cache cleared: $count entries"
 		fi
 	fi
-
-	# Knot Resolver cache garbage collector
-	kres-cache-gc -c /var/cache/knot-resolver >/dev/null
-	kres-cache-gc -c /var/cache/knot-resolver2 >/dev/null
 fi
 
 ./custom-parse.sh "$1" || true
