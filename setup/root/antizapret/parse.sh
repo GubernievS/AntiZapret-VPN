@@ -1,5 +1,11 @@
 #!/bin/bash
 
+###
+systemctl mask kres-cache-gc
+systemctl disable kres-cache-gc
+systemctl stop kres-cache-gc
+###
+
 set -e
 shopt -s nullglob
 
