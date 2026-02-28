@@ -39,13 +39,13 @@ else
 	exit 7
 fi
 
-DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
+DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')"
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 8
 fi
 
-DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 9

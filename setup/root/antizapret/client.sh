@@ -52,7 +52,7 @@ setServerHost_FileName(){
 }
 
 setServerIP(){
-	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 	if [[ -z "$SERVER_IP" ]]; then
 		echo 'Default IPv4 address not found!'
 		exit 2
