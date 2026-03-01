@@ -999,6 +999,7 @@ browserleaks.com
 vast.ai
 skyscanner.com
 pikpok.com
+korter.ge
 
 # Блокирует DNS
 library.hydra.wiki
