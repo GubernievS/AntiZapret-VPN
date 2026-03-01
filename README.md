@@ -91,7 +91,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 	- Включить изоляцию VPN-клиентов и сервера
 	- Указать доменное имя для подключения к OpenVPN и WireGuard/AmneziaWG
 	- Пустить все домены через AntiZapret VPN кроме российских доменов и доменов из config/exclude-hosts.txt
-	- Добавить IP-адреса: Discord, Telegram, WhatsApp, Roblox, Cloudflare, Amazon, Hetzner, DigitalOcean, OVH, Google и Akamai
+	- Добавить IP-адреса необходимые для работы: Discord, Telegram, WhatsApp, Roblox и Cloudflare
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXtrem, FileZilla или WinSCP)\
 5. Установить дополнения:
 	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений и Telegram-бот
