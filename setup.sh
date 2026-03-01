@@ -225,30 +225,30 @@ until [[ "$ROBLOX_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y ROBLOX_INCLUDE
 done
 echo
-until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
-done
-echo
-until [[ "$HETZNER_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Hetzner IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n HETZNER_INCLUDE
-done
-echo
-until [[ "$DIGITALOCEAN_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include DigitalOcean IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DIGITALOCEAN_INCLUDE
-done
-echo
-until [[ "$OVH_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include OVH IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n OVH_INCLUDE
-done
-echo
-until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Google IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n GOOGLE_INCLUDE
-done
-echo
-until [[ "$AKAMAI_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Akamai IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AKAMAI_INCLUDE
-done
-echo
+#until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
+#done
+#echo
+#until [[ "$HETZNER_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Hetzner IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n HETZNER_INCLUDE
+#done
+#echo
+#until [[ "$DIGITALOCEAN_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include DigitalOcean IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DIGITALOCEAN_INCLUDE
+#done
+#echo
+#until [[ "$OVH_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include OVH IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n OVH_INCLUDE
+#done
+#echo
+#until [[ "$GOOGLE_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Google IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n GOOGLE_INCLUDE
+#done
+#echo
+#until [[ "$AKAMAI_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Akamai IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AKAMAI_INCLUDE
+#done
+#echo
 echo 'Installation, please wait...'
 
 # Отключим фоновые обновления системы
