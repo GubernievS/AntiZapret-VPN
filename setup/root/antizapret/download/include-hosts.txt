@@ -1000,6 +1000,7 @@ vast.ai
 skyscanner.com
 pikpok.com
 korter.ge
+korterstatic.net
 
 # Блокирует DNS
 library.hydra.wiki
