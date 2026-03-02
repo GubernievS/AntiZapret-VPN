@@ -58,7 +58,7 @@ AmneziaWG работает в [режиме обфускации Wireguard](http
 AmneziaWG не позволяет нескольким клиентам использовать один и тот же файл подключения (\*-am.conf) для подключения к серверу, поэтому каждому клиенту необходимо создать свой личный файл подключения\
 Файлы подключения клиентов для WireGuard и AmneziaWG создаются сразу, по умолчанию создается один клиент 'antizapret-client'\
 Если ваш провайдер (встречается на мобильных) блокирует протокол AmneziaWG - попробуйте в настройке подключения поменять Jc на 3, 4, 5 или используйте OpenVPN\
-Если ваш клиент не поддерживает AmneziaWG 1.5 — удалите из файла подключения (\*-am.conf) строку I1\
+Если ваш клиент не поддерживает AmneziaWG 1.5 — удалите из файла подключения (\*-am.conf) строку I1 = <b...\
 Не используйте VPN-клиент AmneziaVPN - он подменяет DNS АнтиЗапрета на свои, из-за чего AntiZapret VPN не работает, используйте только VPN-клиент AmneziaWG\
 При ошибке загрузки файла подключения необходимо сократить длину имени файла до 32 (Windows) или 15 (Linux/Android/iOS) символов и удалить скобки\
 VPN-клиенты: [AmneziaWG (Windows)](https://github.com/amnezia-vpn/amneziawg-windows-client/releases), [AmneziaWG (Android)](https://play.google.com/store/apps/details?id=org.amnezia.awg), [AmneziaWG (Apple)](https://apps.apple.com/ru/app/amneziawg/id6478942365)
