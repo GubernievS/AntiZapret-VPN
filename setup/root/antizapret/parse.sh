@@ -4,6 +4,10 @@
 systemctl mask kres-cache-gc
 systemctl disable kres-cache-gc
 systemctl stop kres-cache-gc
+
+rm -f /etc/systemd/journald.conf
+apt-get update
+apt-get install --reinstall -o Dpkg::Options::="--force-confmiss" systemd
 ###
 
 set -e
