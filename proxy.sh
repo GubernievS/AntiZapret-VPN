@@ -150,8 +150,8 @@ echo "# Proxy parameters modification
 kernel.printk=3 4 1 3
 kernel.panic=1
 kernel.panic_on_oops=1
-kernel.softlockup_panic=1
-kernel.hardlockup_panic=1
+kernel.softlockup_panic=0
+kernel.hardlockup_panic=0
 kernel.sched_autogroup_enabled=0
 net.ipv4.ip_forward=1
 net.core.default_qdisc=fq
