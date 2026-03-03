@@ -80,13 +80,6 @@ else
 	rm -f $WARP_PATH
 fi
 
-# SoftIRQ CPU balance
-printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/$DEFAULT_INTERFACE/queues/rx-*/rps_cpus >/dev/null
-
-# Clear knot-resolver cache
-count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
-echo "DNS cache cleared: $count entries"
-
 # filter
 # Default policy
 iptables -w -P INPUT ACCEPT
@@ -135,8 +128,8 @@ else
 fi
 # SSH protection
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
-	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
-	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 600000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 600000 -j DROP
 fi
 # Attack and scan protection
 if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
@@ -227,6 +220,23 @@ if [[ -z "$OUT_IP" ]]; then
 	iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j MASQUERADE
 else
 	iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $OUT_INTERFACE -j SNAT --to-source $OUT_IP
+fi
+
+# Network performance tuning
+ethtool -K $DEFAULT_INTERFACE tso on gso on gro on rx-udp-gro-forwarding on tx-checksum-ip-generic on rx-checksum on
+
+# SoftIRQ CPU balance
+printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/$DEFAULT_INTERFACE/queues/rx-*/rps_cpus >/dev/null
+
+# Set TX queue
+for dev in /sys/class/net/*; do
+	ip link set "${dev##*/}" txqueuelen 10000
+done
+
+# Clear Knot Resolver cache
+if [[ "$(iptables -w -t nat -S ANTIZAPRET-MAPPING | wc -l)" -eq 1 ]]; then
+	count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
+	echo "AntiZapret DNS cache cleared: $count entries"
 fi
 
 ./custom-up.sh

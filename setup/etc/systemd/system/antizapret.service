@@ -1,7 +1,8 @@
 [Unit]
 Description=AntiZapret VPN
-After=network-online.target
+After=network-online.target systemd-networkd.service
 Wants=network-online.target
+PartOf=systemd-networkd.service
 
 [Service]
 LimitNPROC=infinity

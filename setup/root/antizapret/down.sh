@@ -52,8 +52,8 @@ iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 iptables -w -D FORWARD -d $IP.28.0.0/15 -j ACCEPT
 # SSH protection
-iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
-ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
+iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 600000 -j DROP
+ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 600000 -j DROP
 # Attack and scan protection
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
