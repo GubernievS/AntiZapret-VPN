@@ -1004,6 +1004,7 @@ korterstatic.net
 tampermonkey.net
 failiem.lv
 ru-board.com
+sirv.com
 
 # Блокирует DNS
 library.hydra.wiki
