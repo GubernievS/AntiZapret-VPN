@@ -1001,6 +1001,7 @@ skyscanner.com
 pikpok.com
 korter.ge
 korterstatic.net
+tampermonkey.net
 
 # Блокирует DNS
 library.hydra.wiki
