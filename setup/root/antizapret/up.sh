@@ -228,7 +228,7 @@ ethtool -K $DEFAULT_INTERFACE tso on gso on gro on rx-udp-gro-forwarding on tx-c
 # SoftIRQ CPU balance
 printf '%x' $(( (1 << $(nproc)) - 1 )) | tee /sys/class/net/$DEFAULT_INTERFACE/queues/rx-*/rps_cpus >/dev/null
 
-# Set TX queue
+# Set TX queue length
 for dev in /sys/class/net/*; do
 	ip link set "${dev##*/}" txqueuelen 10000
 done
