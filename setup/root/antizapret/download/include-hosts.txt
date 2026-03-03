@@ -1002,6 +1002,8 @@ pikpok.com
 korter.ge
 korterstatic.net
 tampermonkey.net
+failiem.lv
+ru-board.com
 
 # Блокирует DNS
 library.hydra.wiki
