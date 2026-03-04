@@ -998,6 +998,7 @@ kawasaki-global-admin.com
 browserleaks.com
 vast.ai
 skyscanner.com
+skyscnr.com
 pikpok.com
 korter.ge
 korterstatic.net
