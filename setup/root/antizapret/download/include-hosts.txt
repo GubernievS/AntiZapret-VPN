@@ -1009,6 +1009,7 @@ sirv.com
 bancosantander.es
 leqr.us
 digiphile.co
+slproweb.com
 
 # Блокирует DNS
 library.hydra.wiki
