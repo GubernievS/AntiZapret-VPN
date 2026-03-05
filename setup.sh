@@ -537,6 +537,9 @@ if [[ "$OPENVPN_LOG" == 'y' ]]; then
 	sed -i '/^#\(verb\|log\)/s/^#//' /etc/openvpn/server/*.conf
 fi
 
+# Изменяем поведение policy.PASS в Knot Resolver
+sed -i '/function policy\.PASS(state, _)/,/^end$/s/return state/return nil/' /usr/lib/knot-resolver/kres_modules/policy.lua
+
 # Загружаем и создаем списки исключений
 /root/antizapret/doall.sh noclear
 
