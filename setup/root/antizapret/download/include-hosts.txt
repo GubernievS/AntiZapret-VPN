@@ -1006,6 +1006,8 @@ tampermonkey.net
 failiem.lv
 ru-board.com
 sirv.com
+bancosantander.es
+leqr.us
 
 # Блокирует DNS
 library.hydra.wiki
@@ -1014,7 +1016,6 @@ oculus.com
 support.logi.com
 support.native-instruments.com
 support.brave.app
-myfootball.life
 support.pokemon.com
 meta.ai
 support.opendns.com
