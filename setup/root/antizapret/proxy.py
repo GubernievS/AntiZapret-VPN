@@ -174,6 +174,6 @@ if __name__ == "__main__":
                            logger=logger,
                            handler=DNSHandler)
     tcp_server.start_thread()
-    print("Started Proxy Resolver: %s:%d -> %s:%d (UDP/TCP)" % (args.address or "*",args.port,args.dns,args.dns_port))
+    print("Started Proxy Resolver: %s:%d -> %s:%d" % (args.address or "*",args.port,args.dns,args.dns_port))
     while udp_server.isAlive():
         time.sleep(1)
