@@ -1008,6 +1008,7 @@ ru-board.com
 sirv.com
 bancosantander.es
 leqr.us
+digiphile.co
 
 # Блокирует DNS
 library.hydra.wiki
