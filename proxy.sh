@@ -140,7 +140,7 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent irqbalance unattended-upgrades
+apt-get install -y iptables iptables-persistent irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades

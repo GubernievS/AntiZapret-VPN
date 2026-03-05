@@ -341,7 +341,7 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y curl gpg
+apt-get install -y curl gpg
 
 # Папка для ключей
 mkdir -p /etc/apt/keyrings
@@ -365,7 +365,7 @@ fi
 
 # Ставим необходимые пакеты
 apt-get update
-apt-get install --reinstall -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
+apt-get install -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
