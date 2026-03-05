@@ -98,10 +98,10 @@ done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) Cloudflare+Quad9  - Recommended by default'
-echo '       +MSK-IX+SkyDNS *'
-echo '    2) SkyDNS *          - Recommended for expert users if this server IP is registered in SkyDNS'
-echo '                           Register account (Family plan) and add this server IP at https://skydns.ru'
-echo '    3) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
+echo '        +MSK-IX+NSDI *'
+echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
+echo '        +SkyDNS *          Need register account (Family plan) & add this server IP at https://skydns.ru'
+echo '    3) Cloudflare+Quad9  - Use if previous choice fails to resolve domains'
 echo '    4) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    5) XBox **           - More details: https://xbox-dns.ru'
 echo '    6) Malw **           - More details: https://info.dns.malw.link'
@@ -114,10 +114,10 @@ until [[ "$ANTIZAPRET_DNS" =~ ^[1-6]$ ]]; do
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'
-echo '    1) Self-hosted  - Use previous DNS choice, recommended by default'
-echo '    2) Cloudflare   - Use if Self-hosted fails to resolve domains'
-echo '    3) Quad9        - Use if Self-hosted/Cloudflare fails to resolve domains'
-echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve domains'
+echo '    1) Self-hosted  - Use previous choice for AntiZapret VPN, recommended by default'
+echo '    2) Cloudflare   - Use if default choice fails to resolve domains'
+echo '    3) Quad9        - Use if previous choice fails to resolve domains'
+echo '    4) Google *     - Use if previous choice fails to resolve domains'
 echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
 echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    7) XBox **      - More details: https://xbox-dns.ru'
@@ -462,23 +462,22 @@ rm -rf /tmp/antizapret
 
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" == '2' ]]; then
-	# SkyDNS
-	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'}/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/{'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'}/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
+	# Cloudflare+Quad9+SkyDNS
+	sed -i "s/{'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'}/'193.58.251.251'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == '3' ]]; then
 	# Cloudflare+Quad9
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'1.1.1.1', '1.0.0.1', '9.9.9.10', '149.112.112.10'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == '4' ]]; then
 	# Comss
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'83.220.169.155', '212.109.195.93', '195.133.25.16'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == '5' ]]; then
 	# XBox
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == '6' ]]; then
 	# Malw
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
 fi
 
