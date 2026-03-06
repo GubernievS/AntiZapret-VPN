@@ -1011,6 +1011,8 @@ leqr.us
 digiphile.co
 slproweb.com
 imagekit.io
+keplr.app
+arcade.software
 
 # Блокирует DNS
 library.hydra.wiki
