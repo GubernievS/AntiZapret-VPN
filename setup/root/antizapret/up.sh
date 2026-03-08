@@ -53,6 +53,7 @@ PrivateKey = $PRIVATE_KEY
 Address = $ADDRESS
 MTU = 1420
 Table = 13335
+PostUp = ip link set dev $WARP_INTERFACE txqueuelen 10000
 PostUp = ip rule add from $IP.28.0.0/15 to $IP.28.0.0/15 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.28.0.0/15 to $FAKE_IP.0.0/15 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.28.0.0/15 lookup 13335 priority 10000 || true
