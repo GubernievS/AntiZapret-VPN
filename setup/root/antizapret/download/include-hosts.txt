@@ -1016,6 +1016,8 @@ arcade.software
 planfix.com
 zoo.dev
 opus.pro
+captions-cdn.xyz
+captions-api.xyz
 
 # Блокирует DNS
 library.hydra.wiki
