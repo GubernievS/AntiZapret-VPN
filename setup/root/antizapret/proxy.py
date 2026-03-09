@@ -116,7 +116,7 @@ class ProxyResolver(BaseResolver):
                     new_rr.append(record)
                 reply.rr = new_rr
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error: {e} (qname={request.q.qname} qtype={QTYPE[request.q.qtype]} protocol={handler.protocol})")
             reply = request.reply()
             reply.header.rcode = RCODE.SERVFAIL
         return reply
