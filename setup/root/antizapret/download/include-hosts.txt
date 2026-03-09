@@ -1015,6 +1015,7 @@ keplr.app
 arcade.software
 planfix.com
 zoo.dev
+opus.pro
 
 # Блокирует DNS
 library.hydra.wiki
