@@ -1020,6 +1020,7 @@ captions-cdn.xyz
 captions-api.xyz
 smartthings.com
 mui.com
+ups.com
 
 # Блокирует DNS
 library.hydra.wiki
