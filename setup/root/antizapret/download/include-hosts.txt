@@ -1019,6 +1019,7 @@ opus.pro
 captions-cdn.xyz
 captions-api.xyz
 smartthings.com
+mui.com
 
 # Блокирует DNS
 library.hydra.wiki
