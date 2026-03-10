@@ -1018,6 +1018,7 @@ zoo.dev
 opus.pro
 captions-cdn.xyz
 captions-api.xyz
+smartthings.com
 
 # Блокирует DNS
 library.hydra.wiki
