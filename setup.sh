@@ -30,6 +30,8 @@ fi
 # Проверка версии системы
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
+CODENAME="$(lsb_release -cs)"
+ARCH="$(dpkg --print-architecture)"
 
 if [[ "$OS" == 'debian' ]]; then
 	if [[ "$VERSION" != '11' ]] && [[ "$VERSION" != '12' ]]; then
@@ -348,24 +350,27 @@ mkdir -p /etc/apt/keyrings
 
 # Добавим репозиторий Knot Resolver
 curl -fL --connect-timeout 30 https://pkg.labs.nic.cz/gpg -o /etc/apt/keyrings/cznic-labs-pkg.gpg
-echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $(lsb_release -cs) main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
+echo "deb [signed-by=/etc/apt/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-resolver $CODENAME main" > /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 
 # Добавим репозиторий OpenVPN
 curl -fL --connect-timeout 30 https://swupdate.openvpn.net/repos/repo-public.gpg | gpg --yes --dearmor -o /etc/apt/keyrings/openvpn-repo-public.gpg
-echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.6 $(lsb_release -cs) main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
+echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.openvpn.net/debian/openvpn/release/2.7 $CODENAME main" > /etc/apt/sources.list.d/openvpn-aptrepo.list
 
 # Добавим репозиторий Debian Backports
 if [[ "$OS" == 'debian' ]]; then
-	if [[ "$VERSION" -ge 12 ]]; then
-		echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
-	elif [[ "$VERSION" -eq 11 ]]; then
-		echo "deb http://archive.debian.org/debian $(lsb_release -cs)-backports main" > /etc/apt/sources.list.d/backports.list
-	fi
+	echo "deb http://deb.debian.org/debian $CODENAME-backports main
+deb http://archive.debian.org/debian $CODENAME-backports main" > /etc/apt/sources.list.d/backports.list
 fi
 
-# Ставим необходимые пакеты
+# Ставим необходимое ядро и пакеты
 apt-get update
-apt-get install -y git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
+INSTALL=
+if [[ "$OS" == 'ubuntu' ]]; then
+	INSTALL="linux-generic-hwe-${VERSION}.04"
+elif [[ "$OS" == 'debian' ]]; then
+	INSTALL="-t $CODENAME-backports linux-image-$ARCH linux-headers-$ARCH"
+fi
+apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades

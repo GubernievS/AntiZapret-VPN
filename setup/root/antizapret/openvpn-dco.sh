@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Включить/выключить DCO (Data Channel Offload) в OpenVpn 2.6
+# Включить/выключить DCO (Data Channel Offload) в OpenVPN 2.7
 #
 # chmod +x openvpn-dco.sh && ./openvpn-dco.sh [y/n]
 #
@@ -16,8 +16,8 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 export LC_ALL=C
 
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
-if [[ ! "$VERSION" =~ ^2\.6 ]]; then
-	echo 'Cannot turn on/off DCO because OpenVPN version 2.6 is required'
+if [[ ! "$VERSION" =~ ^2\.7 ]]; then
+	echo 'Cannot turn on/off DCO because OpenVPN version 2.7 is required'
 	exit 2
 fi
 
@@ -32,14 +32,6 @@ else
 fi
 
 if [[ "$DCO" == 'y' ]]; then
-	export DEBIAN_FRONTEND=noninteractive
-	apt-get update
-	apt-get dist-upgrade -y
-	apt-get install -y linux-headers-generic linux-headers-$(uname -r) openvpn-dco-dkms
-	apt-get autoremove --purge -y
-	apt-get clean
-	modprobe -r ovpn_dco_v2
-	modprobe ovpn_dco_v2
 	sed -i '/data-ciphers\|disable-dco/d' /etc/openvpn/server/*.conf
 	for f in /etc/openvpn/server/*.conf; do
 		echo 'data-ciphers "AES-128-GCM:AES-256-GCM:CHACHA20-POLY1305"' >> "$f"

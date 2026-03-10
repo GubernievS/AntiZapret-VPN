@@ -64,7 +64,7 @@ apt-get autoremove --purge -y
 apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 mkdir -p /usr/local/src/openvpn
-curl -fL --connect-timeout 30 https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz || curl -fL --connect-timeout 30 https://github.com/OpenVPN/openvpn/releases/download/v2.6.19/openvpn-2.6.19.tar.gz -o /usr/local/src/openvpn.tar.gz
+curl -fL --connect-timeout 30 https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz || curl -fL --connect-timeout 30 https://github.com/OpenVPN/openvpn/releases/download/v$VERSION/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 
@@ -74,8 +74,8 @@ link_socket_write_udp(struct link_socket *sock,\
 					struct link_socket_actual *to)\
 {\
 '"$ERROR_FREE"'\
-	uint16_t buffer_sent = 0;\
-	uint8_t opcode = *BPTR(buf) >> 3;\
+	ssize_t buffer_sent = 0;\
+	int opcode = *BPTR(buf) >> 3;\
 if (opcode == 7 || opcode == 8 || opcode == 10)\
 {\
 #ifdef ERROR_FREE\
@@ -85,20 +85,20 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
 	#endif\
 #endif\
-	uint16_t buffer_len = BLEN(buf);\
+	int buffer_len = BLEN(buf);\
 	srand((unsigned)time(NULL));\
 	for (int i = 0; i < 2; i++) {\
-		uint16_t data_len = rand() % 101 + buffer_len;\
+		int data_len = rand() % 101 + buffer_len;\
 		uint8_t data[data_len];\
 #ifdef ERROR_FREE\
 		memcpy(data, BPTR(buf), buffer_len);\
-		data[0] = 40;\
+		data[0] = (uint8_t)40;\
 		for (int k = buffer_len; k < data_len; k++) {\
-			data[k] = rand() % 256;\
+			data[k] = (uint8_t)(rand() % 256);\
 		}\
 #else\
 		for (int k = 0; k < data_len; k++) {\
-			data[k] = rand() % 256;\
+			data[k] = (uint8_t)(rand() % 256);\
 		}\
 #endif\
 		struct buffer data_buffer = alloc_buf(data_len);\
@@ -130,6 +130,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	./configure \
 		--enable-systemd \
 		--enable-dco \
+		--enable-comp-stub \
 		--enable-small \
 		--enable-port-share \
 		--disable-debug \
@@ -138,10 +139,11 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 		--disable-ofb-cfb \
 		--disable-plugins \
 		--disable-fragment \
+		--disable-unit-tests \
+		--disable-ntlm \
 		--disable-wolfssl-options-h \
 		--disable-pam-dlopen \
 		--disable-plugin-auth-pam \
-		--disable-x509-alt-username \
 		--disable-pkcs11 \
 		--disable-selinux \
 		--disable-plugin-down-root
