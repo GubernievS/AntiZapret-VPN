@@ -358,8 +358,7 @@ echo "deb [signed-by=/etc/apt/keyrings/openvpn-repo-public.gpg] https://build.op
 
 # Добавим репозиторий Debian Backports
 if [[ "$OS" == 'debian' ]]; then
-	echo "deb http://deb.debian.org/debian $CODENAME-backports main
-deb http://archive.debian.org/debian $CODENAME-backports main" > /etc/apt/sources.list.d/backports.list
+	echo "deb http://deb.debian.org/debian $CODENAME-backports main" > /etc/apt/sources.list.d/backports.list
 fi
 
 # Ставим необходимое ядро и пакеты
