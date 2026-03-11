@@ -1021,6 +1021,7 @@ captions-api.xyz
 smartthings.com
 mui.com
 ups.com
+woolyss.com
 
 # Блокирует DNS
 library.hydra.wiki
