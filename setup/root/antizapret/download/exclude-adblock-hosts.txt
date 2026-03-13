@@ -3,4 +3,5 @@ metrika.yandex.ru
 sbermarketing.ru
 admitad-connect.com
 app.uaas.yandex.ru
+fvds.ru
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
