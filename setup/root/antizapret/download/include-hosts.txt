@@ -1023,6 +1023,7 @@ mui.com
 ups.com
 woolyss.com
 openwebui.com
+alphaxiv.org
 
 # Блокирует DNS
 library.hydra.wiki
