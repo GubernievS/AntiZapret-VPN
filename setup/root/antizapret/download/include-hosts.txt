@@ -1024,6 +1024,7 @@ ups.com
 woolyss.com
 openwebui.com
 alphaxiv.org
+coda.io
 
 # Блокирует DNS
 library.hydra.wiki
