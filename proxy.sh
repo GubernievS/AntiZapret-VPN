@@ -25,8 +25,8 @@ OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
 if [[ "$OS" == 'debian' ]]; then
-	if (( VERSION < 11 )); then
-		echo "Error: Debian $VERSION is not supported! Minimal supported version is 11"
+	if (( VERSION < 12 )); then
+		echo "Error: Debian $VERSION is not supported! Minimal supported version is 12"
 		exit 5
 	fi
 elif [[ "$OS" == 'ubuntu' ]]; then
