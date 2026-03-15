@@ -119,11 +119,12 @@ link_socket_write_udp(struct link_socket *sock,\
 			}\
 			free_buf(&data_buffer);\
 		}\
-		usleep(100000);\
-	}\
 #ifdef ERROR_FREE\
-	usleep(100000);\
+		return buffer_sent;\
+#else\
+		usleep(100000);\
 #endif\
+	}\
 #ifdef _WIN32\
 	buffer_sent += link_socket_write_win32(sock, buf, to);\
 #else\
