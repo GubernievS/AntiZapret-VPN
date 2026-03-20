@@ -7,6 +7,7 @@ import AuthCallbackPage from './pages/AuthCallbackPage'
 import DashboardPage from './pages/DashboardPage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import AdminUsersPage from './pages/AdminUsersPage'
+import AdminUserDetailPage from './pages/AdminUserDetailPage'
 import AdminSettingsPage from './pages/AdminSettingsPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import MonitoringPage from './pages/MonitoringPage'
@@ -47,6 +48,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin>
                 <AdminUsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:userId"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminUserDetailPage />
               </ProtectedRoute>
             }
           />

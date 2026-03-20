@@ -47,15 +47,17 @@ async def get_client_links(
 
 @router.get("", response_model=ConfigListResponse)
 async def list_configs(
+    skip: int = 0,
+    limit: int = 100,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     List configs for current user.
-    Admin sees all configs; regular users see only their own.
+    Admin sees all configs (paginated); regular users see only their own.
     """
     if current_user.role == "admin":
-        configs = crud_config.get_all(db)
+        configs = crud_config.get_all(db, skip=skip, limit=limit)
         total = crud_config.get_total_count(db)
     else:
         configs = crud_config.get_by_user(db, current_user.id)

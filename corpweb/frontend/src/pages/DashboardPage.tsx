@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink, QrCode, X } from 'lucide-react'
+import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink, QrCode, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { configsApi } from '../api/configs'
 import type { ClientLinks } from '../api/configs'
 import { useAuthStore } from '../store/authStore'
@@ -18,6 +18,8 @@ const CONFIG_TYPE_LABELS: Record<string, { label: string; desc: string; icon: ty
   },
 }
 
+const PAGE_SIZE = 20
+
 export default function DashboardPage() {
   const { user, fetchMe } = useAuthStore()
   const [configs, setConfigs] = useState<VPNConfig[]>([])
@@ -33,16 +35,24 @@ export default function DashboardPage() {
   const [qrError, setQrError] = useState<string | null>(null)
   const [qrType, setQrType] = useState<string | null>(null)
 
+  // Pagination (admin only)
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState(0)
+  const isAdmin = user?.role === 'admin'
+
   const loadConfigs = useCallback(async () => {
     try {
-      const { data } = await configsApi.list()
+      const skip = isAdmin ? page * PAGE_SIZE : undefined
+      const limit = isAdmin ? PAGE_SIZE : undefined
+      const { data } = await configsApi.list(skip, limit)
       setConfigs(data.items)
+      setTotal(data.total)
     } catch {
       setError('Не удалось загрузить конфигурации')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isAdmin, page])
 
   useEffect(() => {
     loadConfigs()
@@ -138,6 +148,7 @@ export default function DashboardPage() {
   }
 
   const canCreate = user && user.config_count < user.max_configs
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   // Determine which client links are present
   const hasLinks = clientLinks && (
@@ -198,66 +209,101 @@ export default function DashboardPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {configs.map((config) => {
-            const typeInfo = CONFIG_TYPE_LABELS[config.config_type]
-            const Icon = typeInfo?.icon ?? Shield
-            return (
-              <div key={config.id} className="bg-white rounded-xl border border-gray-200 p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-blue-600" />
+        <>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {configs.map((config) => {
+              const typeInfo = CONFIG_TYPE_LABELS[config.config_type]
+              const Icon = typeInfo?.icon ?? Shield
+              return (
+                <div key={config.id} className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{config.client_name}</h3>
+                        <p className="text-xs text-gray-500">{typeInfo?.label}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{config.client_name}</h3>
-                      <p className="text-xs text-gray-500">{typeInfo?.label}</p>
+                    <div className="flex items-center gap-2">
+                      {config.connection_status === 'connected' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Онлайн
+                        </span>
+                      )}
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        config.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {config.is_active ? 'Активен' : 'Отключен'}
+                      </span>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                    config.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {config.is_active ? 'Активен' : 'Отключен'}
-                  </span>
-                </div>
 
-                <p className="text-sm text-gray-500 mb-4">{typeInfo?.desc}</p>
+                  <p className="text-sm text-gray-500 mb-4">{typeInfo?.desc}</p>
 
-                <div className="text-xs text-gray-400 mb-4">
-                  Создан: {new Date(config.created_at).toLocaleDateString('ru-RU')}
-                </div>
+                  <div className="text-xs text-gray-400 mb-4">
+                    Создан: {new Date(config.created_at).toLocaleDateString('ru-RU')}
+                  </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleDownload(config)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
-                  >
-                    <Download className="w-4 h-4" />
-                    Скачать
-                  </button>
-                  <button
-                    onClick={() => handleShowQR(config)}
-                    title="Показать QR код для импорта в приложение"
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-violet-50 text-violet-700 rounded-lg hover:bg-violet-100 transition text-sm font-medium"
-                  >
-                    <QrCode className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(config.id)}
-                    disabled={deletingId === config.id}
-                    className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium disabled:opacity-50"
-                  >
-                    {deletingId === config.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleDownload(config)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
+                    >
+                      <Download className="w-4 h-4" />
+                      Скачать
+                    </button>
+                    <button
+                      onClick={() => handleShowQR(config)}
+                      title="Показать QR код для импорта в приложение"
+                      className="flex items-center justify-center gap-2 px-3 py-2 bg-violet-50 text-violet-700 rounded-lg hover:bg-violet-100 transition text-sm font-medium"
+                    >
+                      <QrCode className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(config.id)}
+                      disabled={deletingId === config.id}
+                      className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium disabled:opacity-50"
+                    >
+                      {deletingId === config.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
+              )
+            })}
+          </div>
+
+          {/* Pagination (admin sees all configs) */}
+          {isAdmin && totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-1">
+              <p className="text-sm text-gray-500">
+                {page * PAGE_SIZE + 1}&ndash;{Math.min((page + 1) * PAGE_SIZE, total)} из {total}
+              </p>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setPage(p => p - 1)}
+                  disabled={page === 0}
+                  className="p-1.5 rounded-lg border border-gray-300 hover:bg-white text-gray-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={page + 1 >= totalPages}
+                  className="p-1.5 rounded-lg border border-gray-300 hover:bg-white text-gray-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            )
-          })}
-        </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Client App Download Links */}
@@ -384,11 +430,11 @@ export default function DashboardPage() {
             {!qrError && qrType === 'download-link' ? (
               <p className="text-xs text-gray-500 text-center">
                 Отсканируйте QR <span className="font-medium">камерой телефона</span>. Скачайте файл и импортируйте
-                в <span className="font-medium">AmneziaWG</span> через «+» → «Импорт из файла»
+                в <span className="font-medium">AmneziaWG</span> через «+» &rarr; «Импорт из файла»
               </p>
             ) : !qrError && qrUrl ? (
               <p className="text-xs text-gray-500 text-center">
-                Откройте приложение <span className="font-medium">AmneziaWG</span> → «+» → «Сканировать QR код»
+                Откройте приложение <span className="font-medium">AmneziaWG</span> &rarr; «+» &rarr; «Сканировать QR код»
               </p>
             ) : null}
           </div>

@@ -217,25 +217,26 @@ class VPNManager:
         return path.read_text()
 
     # ------------------------------------------------------------------
-    # Peer disable/enable via commenting keys in server config files.
+    # Peer disable/enable via key reversal in server config files.
     #
     # Server config format (/etc/wireguard/vpn.conf, antizapret.conf):
     #
     #   # Client = ivan-1
     #   # PrivateKey = ...
     #   [Peer]
-    #   PublicKey = ...
-    #   PresharedKey = ...
+    #   PublicKey = abc123...XYZ=
+    #   PresharedKey = def456...UVW=
     #   AllowedIPs = 10.28.8.5/32
     #
-    # To disable: comment out PublicKey and PresharedKey lines.
-    # WireGuard ignores [Peer] blocks without a PublicKey, so the
-    # peer becomes inactive while IP reservation (AllowedIPs) stays.
+    # To disable: reverse PublicKey and PresharedKey values (preserving
+    # trailing '=' base64 padding). The [Peer] block stays syntactically
+    # valid — WireGuard parses it without errors — but the reversed key
+    # won't match any client, so the peer can't connect.
+    #
+    # To re-enable: reverse again (the operation is its own inverse).
+    # AllowedIPs (IP reservation) is always preserved.
     # ------------------------------------------------------------------
 
-    # Regex to find a peer block for a specific client name.
-    # Captures everything from "# Client = <name>" through the next
-    # blank line or next "# Client" comment or EOF.
     _SERVER_CONFIG_DIR = Path('/etc/wireguard')
 
     def _find_server_configs(self) -> List[Path]:
@@ -247,7 +248,7 @@ class VPNManager:
     def _extract_peer_public_key(self, content: str, client_name: str) -> Optional[str]:
         """
         Extract PublicKey for a specific client from server config content.
-        Works with both active (uncommented) and commented-out keys.
+        Returns the current value (which may be reversed if the peer is blocked).
         """
         lines = content.split('\n')
         in_target_peer = False
@@ -259,34 +260,48 @@ class VPNManager:
                 peer_name = stripped.split('=', 1)[1].strip()
                 in_target_peer = (peer_name == client_name)
 
-            if in_target_peer:
-                # Match both "PublicKey = ..." and "#PublicKey = ..."
-                check = stripped.lstrip('#').strip()
-                if check.lower().startswith('publickey') and '=' in check:
-                    return check.split('=', 1)[1].strip()
+            if in_target_peer and not stripped.startswith('#'):
+                if stripped.lower().startswith('publickey') and '=' in stripped:
+                    return stripped.split('=', 1)[1].strip()
 
         return None
 
-    def _comment_peer_keys(self, content: str, client_name: str) -> str:
+    @staticmethod
+    def _reverse_key(key: str) -> str:
         """
-        Comment out PublicKey and PresharedKey lines in a [Peer] block
+        Reverse a WireGuard base64 key while preserving trailing '='
+        padding.  The operation is its own inverse:
+        _reverse_key(_reverse_key(x)) == x.
+
+        Example: 'aBcDeFgH12345=' -> '54321HgFeDcBa='
+        """
+        stripped = key.rstrip('=')
+        padding = key[len(stripped):]
+        return stripped[::-1] + padding
+
+    def _reverse_peer_keys(self, content: str, client_name: str) -> str:
+        """
+        Reverse PublicKey and PresharedKey values in a [Peer] block
         belonging to client_name.
 
         Before:
             # Client = ivan-1
             # PrivateKey = ...
             [Peer]
-            PublicKey = abc123
-            PresharedKey = xyz789
+            PublicKey = abc123XYZ=
+            PresharedKey = def456UVW=
             AllowedIPs = 10.28.8.5/32
 
         After:
             # Client = ivan-1
             # PrivateKey = ...
             [Peer]
-            #PublicKey = abc123
-            #PresharedKey = xyz789
+            PublicKey = ZYX321cba=
+            PresharedKey = WVU654fed=
             AllowedIPs = 10.28.8.5/32
+
+        The [Peer] block stays syntactically valid.  Calling this method
+        again on the same client reverses the keys back to the originals.
         """
         # split('\n') preserves trailing newline (as empty last element),
         # unlike splitlines() which drops it — critical for file integrity.
@@ -306,49 +321,15 @@ class VPNManager:
             if stripped == '[Peer]' and not in_target_peer:
                 in_target_peer = False
 
-            # Comment out keys in the target peer block
+            # Reverse key values in the target peer block
             if in_target_peer and not stripped.startswith('#'):
                 lower = stripped.lower()
                 if lower.startswith('publickey') or lower.startswith('presharedkey'):
-                    result_lines.append('#' + line)
-                    continue
-
-            result_lines.append(line)
-
-        return '\n'.join(result_lines)
-
-    def _uncomment_peer_keys(self, content: str, client_name: str) -> str:
-        """
-        Uncomment PublicKey and PresharedKey lines in a [Peer] block
-        belonging to client_name (reverse of _comment_peer_keys).
-        """
-        lines = content.split('\n')
-        result_lines = []
-        in_target_peer = False
-
-        for line in lines:
-            stripped = line.strip()
-
-            if stripped.startswith('# Client') and '=' in stripped:
-                peer_name = stripped.split('=', 1)[1].strip()
-                in_target_peer = (peer_name == client_name)
-
-            if stripped == '[Peer]' and not in_target_peer:
-                in_target_peer = False
-
-            # Uncomment keys in the target peer block
-            if in_target_peer and stripped.startswith('#'):
-                uncommented = stripped[1:]
-                lower = uncommented.strip().lower()
-                if lower.startswith('publickey') or lower.startswith('presharedkey'):
-                    # Preserve leading whitespace from original line,
-                    # remove the single '#' we added
-                    if line.lstrip().startswith('#'):
-                        idx = line.index('#')
-                        result_lines.append(line[:idx] + line[idx + 1:])
-                    else:
-                        result_lines.append(uncommented)
-                    continue
+                    key_part, sep, value = line.partition('=')
+                    if sep and value.strip():
+                        reversed_val = self._reverse_key(value.strip())
+                        result_lines.append(f"{key_part}= {reversed_val}")
+                        continue
 
             result_lines.append(line)
 
@@ -399,12 +380,14 @@ class VPNManager:
 
     def disable_peer(self, client_name: str) -> None:
         """
-        Disable a peer by commenting out its PublicKey/PresharedKey
+        Disable a peer by reversing its PublicKey/PresharedKey values
         in all server config files, then removing it from running WG.
 
-        Uses `wg set <iface> peer <pubkey> remove` instead of
-        `wg syncconf` because commented-out [Peer] blocks (without
-        PublicKey) would make wg syncconf fail.
+        The reversed keys keep the [Peer] block syntactically valid
+        (no wg config parse errors) but won't match any client.
+
+        Uses `wg set <iface> peer <pubkey> remove` to drop the peer
+        from the running interface immediately.
 
         The peer's IP reservation (AllowedIPs) is preserved, preventing
         IP conflicts if new clients are created while this one is blocked.
@@ -418,15 +401,15 @@ class VPNManager:
                 if f'# Client = {client_name}' not in content:
                     continue
 
-                # Extract PublicKey BEFORE commenting it out
+                # Extract PublicKey BEFORE reversing it
                 pubkey = self._extract_peer_public_key(content, client_name)
 
-                new_content = self._comment_peer_keys(content, client_name)
+                new_content = self._reverse_peer_keys(content, client_name)
                 if new_content != content:
                     conf_path.write_text(new_content)
                     logger.info(f"Disabled peer {client_name} in {conf_path}")
 
-                    # Remove peer from running WG interface by its PublicKey
+                    # Remove peer from running WG interface by its original PublicKey
                     if pubkey:
                         iface = conf_path.stem
                         self._remove_wg_peer(iface, pubkey)
@@ -439,9 +422,10 @@ class VPNManager:
 
     def enable_peer(self, client_name: str) -> None:
         """
-        Re-enable a previously disabled peer by uncommenting its
-        PublicKey/PresharedKey in all server config files, then
-        applying via wg syncconf (safe because all peers are now valid).
+        Re-enable a previously disabled peer by reversing its keys back
+        to the originals (_reverse_peer_keys is its own inverse), then
+        applying via wg syncconf (safe because all [Peer] blocks have
+        valid PublicKey).
         """
         self._validate_client_name(client_name)
         modified_configs = []
@@ -452,7 +436,7 @@ class VPNManager:
                 if f'# Client = {client_name}' not in content:
                     continue
 
-                new_content = self._uncomment_peer_keys(content, client_name)
+                new_content = self._reverse_peer_keys(content, client_name)
                 if new_content != content:
                     conf_path.write_text(new_content)
                     modified_configs.append(conf_path)
@@ -463,7 +447,7 @@ class VPNManager:
         if not modified_configs:
             logger.warning(f"Peer {client_name} not found in server configs")
 
-        # wg syncconf is safe here — all [Peer] blocks now have valid PublicKey
+        # wg syncconf is safe — all [Peer] blocks have valid PublicKey
         for conf_path in modified_configs:
             self._apply_wg_config(conf_path)
 

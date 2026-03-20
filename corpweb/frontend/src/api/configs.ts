@@ -9,8 +9,13 @@ export interface ClientLinks {
 }
 
 export const configsApi = {
-  list: () =>
-    api.get<ConfigListResponse>('/configs'),
+  list: (skip?: number, limit?: number) =>
+    api.get<ConfigListResponse>('/configs', {
+      params: {
+        ...(skip !== undefined ? { skip } : {}),
+        ...(limit !== undefined ? { limit } : {}),
+      }
+    }),
 
   create: (data: ConfigCreateRequest) =>
     api.post('/configs', data),

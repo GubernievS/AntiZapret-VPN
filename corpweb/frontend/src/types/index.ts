@@ -9,6 +9,7 @@ export interface User {
   created_at: string
   last_login: string | null
   config_count: number
+  blocked_config_count: number
 }
 
 export interface MeResponse extends User {

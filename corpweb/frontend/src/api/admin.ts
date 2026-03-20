@@ -1,13 +1,21 @@
 import api from './client'
 import type {
   UserListResponse, UserCreateRequest, UserUpdateRequest, User, UserBlockResponse,
-  SystemSettings, SystemSettingsUpdate, DashboardStats
+  SystemSettings, SystemSettingsUpdate, DashboardStats, ConfigListResponse
 } from '../types'
 
 export const adminApi = {
   // Users
-  listUsers: (skip = 0, limit = 100) =>
-    api.get<UserListResponse>('/admin/users', { params: { skip, limit } }),
+  listUsers: (skip = 0, limit = 20, search?: string) =>
+    api.get<UserListResponse>('/admin/users', {
+      params: { skip, limit, ...(search ? { search } : {}) }
+    }),
+
+  getUser: (id: string) =>
+    api.get<User>(`/admin/users/${id}`),
+
+  getUserConfigs: (userId: string) =>
+    api.get<ConfigListResponse>(`/admin/users/${userId}/configs`),
 
   createUser: (data: UserCreateRequest) =>
     api.post<User>('/admin/users', data),

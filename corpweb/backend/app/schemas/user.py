@@ -36,6 +36,7 @@ class UserResponse(BaseModel):
     created_at: datetime
     last_login: Optional[datetime] = None
     config_count: int = 0
+    blocked_config_count: int = 0
 
     model_config = {"from_attributes": True}
 

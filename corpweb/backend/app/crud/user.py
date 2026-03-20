@@ -42,6 +42,39 @@ def get_total_count(db: Session) -> int:
     return db.query(User).count()
 
 
+def get_all_filtered(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = None
+) -> list[User]:
+    """Get users with optional ILIKE search on username/email."""
+    query = db.query(User)
+    if search:
+        pattern = f"%{search}%"
+        query = query.filter(
+            or_(
+                User.username.ilike(pattern),
+                User.email.ilike(pattern)
+            )
+        )
+    return query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+
+
+def get_filtered_count(db: Session, search: Optional[str] = None) -> int:
+    """Count users matching optional search filter."""
+    query = db.query(User)
+    if search:
+        pattern = f"%{search}%"
+        query = query.filter(
+            or_(
+                User.username.ilike(pattern),
+                User.email.ilike(pattern)
+            )
+        )
+    return query.count()
+
+
 def create_local_user(
     db: Session,
     email: str,

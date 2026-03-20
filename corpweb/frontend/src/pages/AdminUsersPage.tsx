@@ -1,33 +1,54 @@
 import { useState, useEffect, useCallback } from 'react'
-import { UserPlus, Ban, Unlock, Trash2, Loader2, AlertCircle, AlertTriangle, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { UserPlus, Ban, Unlock, Trash2, Loader2, AlertCircle, AlertTriangle, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { adminApi } from '../api/admin'
 import type { User } from '../types'
 
+const PAGE_SIZE = 20
+
 export default function AdminUsersPage() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [warning, setWarning] = useState('')
-  const [search, setSearch] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [creating, setCreating] = useState(false)
   const [actionId, setActionId] = useState<string | null>(null)
+
+  // Server-side search with debounce
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+
+  // Pagination
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState(0)
 
   // Create form
   const [newEmail, setNewEmail] = useState('')
   const [newUsername, setNewUsername] = useState('')
   const [newPassword, setNewPassword] = useState('')
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput)
+      setPage(0)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
   const loadUsers = useCallback(async () => {
     try {
-      const { data } = await adminApi.listUsers()
+      const { data } = await adminApi.listUsers(page * PAGE_SIZE, PAGE_SIZE, search || undefined)
       setUsers(data.items)
+      setTotal(data.total)
     } catch {
       setError('Не удалось загрузить пользователей')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [page, search])
 
   useEffect(() => {
     loadUsers()
@@ -90,10 +111,7 @@ export default function AdminUsersPage() {
     }
   }
 
-  const filtered = users.filter(u =>
-    u.username.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase())
-  )
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   if (loading) {
     return (
@@ -136,8 +154,8 @@ export default function AdminUsersPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Поиск по имени или email..."
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
         />
@@ -153,12 +171,17 @@ export default function AdminUsersPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Конфигов</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Статус</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Создан</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Последний вход</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Действия</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
+              {users.map((u) => (
+                <tr
+                  key={u.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/admin/users/${u.id}`)}
+                >
                   <td className="px-4 py-3">
                     <p className="text-sm font-medium text-gray-900">{u.username}</p>
                     <p className="text-xs text-gray-500">{u.email}</p>
@@ -170,7 +193,12 @@ export default function AdminUsersPage() {
                       {u.auth_provider === 'google' ? 'Google' : 'Local'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{u.config_count}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {u.config_count}
+                    {u.blocked_config_count > 0 && (
+                      <span className="text-xs text-gray-400 ml-1">(+{u.blocked_config_count} заблок.)</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                       u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
@@ -181,12 +209,18 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {new Date(u.created_at).toLocaleDateString('ru-RU')}
                   </td>
+                  <td className="px-4 py-3 text-sm text-gray-500">
+                    {u.last_login
+                      ? new Date(u.last_login).toLocaleDateString('ru-RU')
+                      : <span className="text-gray-400">Не входил</span>
+                    }
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       {u.role !== 'admin' && (
                         <>
                           <button
-                            onClick={() => handleToggleBlock(u.id)}
+                            onClick={(e) => { e.stopPropagation(); handleToggleBlock(u.id) }}
                             disabled={actionId === u.id}
                             title={u.is_active ? 'Заблокировать' : 'Разблокировать'}
                             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition disabled:opacity-50"
@@ -200,7 +234,7 @@ export default function AdminUsersPage() {
                             )}
                           </button>
                           <button
-                            onClick={() => handleDelete(u.id, u.username)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(u.id, u.username) }}
                             disabled={actionId === u.id}
                             title="Удалить"
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600 transition disabled:opacity-50"
@@ -213,9 +247,9 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-500">
                     {search ? 'Ничего не найдено' : 'Нет пользователей'}
                   </td>
                 </tr>
@@ -223,6 +257,31 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
+            <p className="text-sm text-gray-500">
+              {page * PAGE_SIZE + 1}&ndash;{Math.min((page + 1) * PAGE_SIZE, total)} из {total}
+            </p>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setPage(p => p - 1)}
+                disabled={page === 0}
+                className="p-1.5 rounded-lg border border-gray-300 hover:bg-white text-gray-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={page + 1 >= totalPages}
+                className="p-1.5 rounded-lg border border-gray-300 hover:bg-white text-gray-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create User Modal */}

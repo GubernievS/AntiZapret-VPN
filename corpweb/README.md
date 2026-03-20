@@ -9,14 +9,21 @@
   - Google Workspace OAuth (автоматическое создание пользователя)
 
 - **Для пользователей:**
-  - Создание до 2 конфигураций (AWG-VPN или AWG-Antizapret)
-  - Скачивание конфигурационных файлов
-  - Мониторинг активных подключений
+  - Создание до N конфигураций (AWG-VPN или AWG-Antizapret), лимит настраивается администратором
+  - Скачивание конфигурационных файлов (ZIP)
+  - QR-коды для импорта в мобильное приложение AmneziaWG
+  - Индикатор онлайн-подключения на карточках конфигов
 
 - **Для администратора:**
   - Управление пользователями (создание, блокировка, удаление)
-  - Просмотр всех конфигураций
-  - Расширенный мониторинг
+  - Серверный поиск и пагинация в списке пользователей
+  - Просмотр конфигураций каждого пользователя (клик по строке → детальная страница)
+  - Управление конфигами пользователей (скачивание, QR, удаление)
+  - Блокировка пользователей с безопасным отключением VPN-пиров (реверс ключей — WG конфиг остаётся валидным)
+  - Пагинация конфигурации в разделе «Мои конфиги»
+  - Расширенный мониторинг (активные подключения, трафик, история)
+  - Управление настройками AntiZapret (сервисы, маршрутизация, файлы)
+  - Настройка лимитов конфигов, ссылок на клиентские приложения
 
 ## Требования
 
@@ -44,13 +51,102 @@ sudo ./install-native.sh
 ```
 
 Скрипт автоматически:
-- Установит зависимости
+- Установит зависимости (PostgreSQL, Python, Node.js, Nginx, Certbot)
 - Создаст БД PostgreSQL
-- Настроит backend (systemd сервис)
+- Настроит backend (systemd сервис `corpweb-backend`)
 - Соберет frontend
 - Настроит Nginx с reverse proxy
 - Получит SSL сертификат через Certbot
 - Создаст первого админа (admin/admin)
+
+### Расположение файлов после установки
+
+| Что | Путь |
+|-----|------|
+| Backend (код + venv) | `/opt/corpweb/backend/` |
+| Frontend (собранный) | `/opt/corpweb/frontend/` |
+| Конфигурация | `/opt/corpweb/backend/.env` |
+| Systemd сервис | `/etc/systemd/system/corpweb-backend.service` |
+| Nginx конфиг | `/etc/nginx/sites-available/corpweb` |
+| Логи backend | `journalctl -u corpweb-backend -f` |
+
+## Обновление
+
+### Прямая установка (native)
+
+При обновлении кода **данные в БД не теряются** — обновляются только файлы backend и frontend.
+
+```bash
+# 1. Перейти в директорию с исходниками
+cd /path/to/corpweb
+
+# 2. Забрать новый код
+git pull
+
+# 3. Обновить backend: скопировать код (НЕ .env!)
+sudo rsync -av --exclude='venv' --exclude='.env' --exclude='__pycache__' \
+    backend/ /opt/corpweb/backend/
+
+# 4. Установить/обновить Python-зависимости (если изменился requirements.txt)
+sudo /opt/corpweb/backend/venv/bin/pip install -r /opt/corpweb/backend/requirements.txt
+
+# 5. Собрать и обновить frontend
+cd frontend
+npm install
+npm run build
+sudo rm -rf /opt/corpweb/frontend/assets
+sudo cp -r dist/* /opt/corpweb/frontend/
+
+# 6. Перезапустить backend
+sudo systemctl restart corpweb-backend
+
+# 7. Проверить что всё работает
+sudo systemctl status corpweb-backend
+```
+
+#### Что сохраняется при обновлении
+
+- **База данных PostgreSQL** — не затрагивается, все пользователи, конфиги, настройки на месте
+- **Файл `.env`** — не перезаписывается (шаг 3 явно исключает его)
+- **WireGuard конфиги клиентов** — лежат в `/root/antizapret/client/`, не затрагиваются
+- **SSL сертификаты** — в `/etc/letsencrypt/`, не затрагиваются
+- **Nginx конфиг** — не перезаписывается
+
+#### Если обновление содержит миграции БД
+
+Если в обновлении добавлены новые поля в БД (это будет указано в changelog), после шага 4 выполните:
+
+```bash
+cd /opt/corpweb/backend
+sudo /opt/corpweb/backend/venv/bin/python -m app.db.init_db
+```
+
+Скрипт `init_db` безопасен для повторного запуска — он создаёт только отсутствующие таблицы и колонки.
+
+#### Откат при проблемах
+
+Если после обновления что-то сломалось:
+
+```bash
+# Посмотреть логи
+sudo journalctl -u corpweb-backend -n 50 --no-pager
+
+# Откатить код (если git)
+cd /path/to/corpweb
+git checkout HEAD~1
+# Повторить шаги 3-6
+```
+
+### Docker Compose
+
+```bash
+cd corpweb
+git pull
+docker-compose build
+docker-compose up -d
+```
+
+Данные PostgreSQL хранятся в Docker volume `postgres_data` и сохраняются при пересборке.
 
 ## Настройка Google OAuth
 
@@ -69,12 +165,20 @@ sudo ./install-native.sh
 2. Войти как `admin` / `admin`
 3. **Сменить пароль admin!**
 
-## Обновление
+## Управление сервисом
 
 ```bash
-cd corpweb
-git pull
-./install.sh  # Повторно запустит установку
+# Статус
+sudo systemctl status corpweb-backend
+
+# Перезапуск
+sudo systemctl restart corpweb-backend
+
+# Логи (последние, в реальном времени)
+sudo journalctl -u corpweb-backend -f
+
+# Логи (последние 100 строк)
+sudo journalctl -u corpweb-backend -n 100 --no-pager
 ```
 
 ## Удаление
@@ -83,11 +187,6 @@ git pull
 cd corpweb
 sudo ./uninstall.sh
 ```
-
-## Поддержка
-
-- Основной репозиторий: [CorpAdmin-AZ](https://github.com/your-repo/CorpAdmin-AZ)
-- Issues: [GitHub Issues](https://github.com/your-repo/CorpAdmin-AZ/issues)
 
 ## API Документация
 

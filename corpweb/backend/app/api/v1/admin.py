@@ -4,6 +4,7 @@ Users management, system settings, dashboard
 """
 import uuid
 import logging
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -13,6 +14,7 @@ from app.db.models import User, VPNConfig, ConnectionLog, SystemSettings
 from app.crud import user as crud_user
 from app.crud import config as crud_config
 from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserListResponse
+from app.schemas.config import ConfigResponse, ConfigListResponse
 from app.schemas.settings import SystemSettingsResponse, SystemSettingsUpdate
 from app.api.deps import require_admin
 from app.services.vpn_manager import vpn_manager, VPNManagerError
@@ -26,35 +28,43 @@ router = APIRouter()
 # Users Management
 # ============================================
 
+def _build_user_response(db: Session, user: User) -> UserResponse:
+    """Build UserResponse with active and blocked config counts."""
+    active = db.query(VPNConfig).filter(
+        VPNConfig.user_id == user.id,
+        VPNConfig.is_active == True
+    ).count()
+    blocked = db.query(VPNConfig).filter(
+        VPNConfig.user_id == user.id,
+        VPNConfig.is_active == False
+    ).count()
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        role=user.role,
+        auth_provider=user.auth_provider,
+        is_active=user.is_active,
+        created_at=user.created_at,
+        last_login=user.last_login,
+        config_count=active,
+        blocked_config_count=blocked,
+    )
+
+
 @router.get("/users", response_model=UserListResponse)
 async def list_users(
     skip: int = 0,
     limit: int = 100,
+    search: Optional[str] = None,
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
-    """List all users with config counts"""
-    users = crud_user.get_all(db, skip=skip, limit=limit)
-    total = crud_user.get_total_count(db)
+    """List all users with config counts, optionally filtered by search"""
+    users = crud_user.get_all_filtered(db, skip=skip, limit=limit, search=search)
+    total = crud_user.get_filtered_count(db, search=search)
 
-    items = []
-    for user in users:
-        config_count = db.query(VPNConfig).filter(
-            VPNConfig.user_id == user.id,
-            VPNConfig.is_active == True
-        ).count()
-        items.append(UserResponse(
-            id=user.id,
-            email=user.email,
-            username=user.username,
-            role=user.role,
-            auth_provider=user.auth_provider,
-            is_active=user.is_active,
-            created_at=user.created_at,
-            last_login=user.last_login,
-            config_count=config_count
-        ))
-
+    items = [_build_user_response(db, u) for u in users]
     return UserListResponse(items=items, total=total)
 
 
@@ -85,17 +95,7 @@ async def create_user(
         role="user"
     )
 
-    return UserResponse(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        role=user.role,
-        auth_provider=user.auth_provider,
-        is_active=user.is_active,
-        created_at=user.created_at,
-        last_login=user.last_login,
-        config_count=0
-    )
+    return _build_user_response(db, user)
 
 
 @router.put("/users/{user_id}", response_model=UserResponse)
@@ -136,22 +136,7 @@ async def update_user(
         is_active=data.is_active
     )
 
-    config_count = db.query(VPNConfig).filter(
-        VPNConfig.user_id == user.id,
-        VPNConfig.is_active == True
-    ).count()
-
-    return UserResponse(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        role=user.role,
-        auth_provider=user.auth_provider,
-        is_active=user.is_active,
-        created_at=user.created_at,
-        last_login=user.last_login,
-        config_count=config_count
-    )
+    return _build_user_response(db, user)
 
 
 @router.patch("/users/{user_id}/block")
@@ -218,22 +203,7 @@ async def toggle_user_block(
     # Toggle user active status in DB
     user = crud_user.toggle_active(db, user)
 
-    config_count = db.query(VPNConfig).filter(
-        VPNConfig.user_id == user.id,
-        VPNConfig.is_active == True
-    ).count()
-
-    response_data = UserResponse(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        role=user.role,
-        auth_provider=user.auth_provider,
-        is_active=user.is_active,
-        created_at=user.created_at,
-        last_login=user.last_login,
-        config_count=config_count
-    )
+    response_data = _build_user_response(db, user)
 
     if vpn_errors:
         return JSONResponse(
@@ -286,6 +256,41 @@ async def delete_user(
 
     # DB cascade handles config records + connection logs
     crud_user.delete_user(db, user)
+
+
+@router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(
+    user_id: uuid.UUID,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """Get single user details (admin only)"""
+    user = crud_user.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return _build_user_response(db, user)
+
+
+@router.get("/users/{user_id}/configs", response_model=ConfigListResponse)
+async def list_user_configs(
+    user_id: uuid.UUID,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """List all VPN configs for a specific user (admin only)"""
+    user = crud_user.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    configs = crud_config.get_by_user(db, user_id)
+    items = [ConfigResponse.model_validate(c) for c in configs]
+    return ConfigListResponse(items=items, total=len(items))
 
 
 # ============================================
