@@ -2,6 +2,7 @@
 VPN Manager Service
 Interface with /root/antizapret/client.sh for config management
 """
+import base64
 import re
 import subprocess
 import logging
@@ -269,15 +270,19 @@ class VPNManager:
     @staticmethod
     def _reverse_key(key: str) -> str:
         """
-        Reverse a WireGuard base64 key while preserving trailing '='
-        padding.  The operation is its own inverse:
-        _reverse_key(_reverse_key(x)) == x.
-
-        Example: 'aBcDeFgH12345=' -> '54321HgFeDcBa='
+        Reverse a WireGuard base64 key at the byte level.
+        Decodes base64 → reverses raw bytes → re-encodes.
+        Always produces valid base64 of the correct length.
+        The operation is its own inverse: _reverse_key(_reverse_key(x)) == x.
         """
-        stripped = key.rstrip('=')
-        padding = key[len(stripped):]
-        return stripped[::-1] + padding
+        try:
+            raw = base64.b64decode(key)
+            return base64.b64encode(raw[::-1]).decode()
+        except Exception:
+            # Fallback for keys reversed with old char-level method (invalid base64)
+            stripped = key.rstrip('=')
+            padding = key[len(stripped):]
+            return stripped[::-1] + padding
 
     def _reverse_peer_keys(self, content: str, client_name: str) -> str:
         """
