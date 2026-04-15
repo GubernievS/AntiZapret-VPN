@@ -7,6 +7,7 @@
 # Срок действия в днях - только для OpenVPN
 #
 set -e
+shopt -s nullglob
 
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
@@ -51,7 +52,7 @@ setServerHost_FileName(){
 }
 
 setServerIP(){
-	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 	if [[ -z "$SERVER_IP" ]]; then
 		echo 'Default IPv4 address not found!'
 		exit 2
@@ -59,7 +60,7 @@ setServerIP(){
 }
 
 render() {
-	local IFS=''
+	local IFS=
 	while read -r line; do
 		while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]]; do
 			local LHS="${BASH_REMATCH[1]}"
@@ -80,26 +81,20 @@ initOpenVPN(){
 		rm -rf /etc/openvpn/server/keys
 		rm -rf /etc/openvpn/client/keys
 		/usr/share/easy-rsa/easyrsa init-pki
-		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn="AntiZapret CA" build-ca nopass
-		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full "antizapret-server" nopass
+		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn='AntiZapret CA' build-ca nopass
+		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full 'antizapret-server' nopass
 	fi
 
 	mkdir -p /etc/openvpn/server/keys
 	mkdir -p /etc/openvpn/client/keys
 
-	if [[ ! -f /etc/openvpn/server/keys/ca.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.crt ]] || \
-	   [[ ! -f /etc/openvpn/server/keys/antizapret-server.key ]]; then
-		cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
-		cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-		cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-	fi
+	cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
+	cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
+	cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
 
-	if [[ ! -f /etc/openvpn/server/keys/crl.pem ]]; then
-		EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
-		chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
-		cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
-	fi
+	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
+	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 }
 
 addOpenVPN(){
@@ -127,11 +122,8 @@ addOpenVPN(){
 		fi
 	fi
 
-	if [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt ]] || \
-	   [[ ! -f /etc/openvpn/client/keys/"$CLIENT_NAME".key ]]; then
-		cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
-		cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
-	fi
+	cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
+	cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
 
 	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
 	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")"
@@ -312,7 +304,7 @@ listWireGuard(){
 	[[ -n "$CLIENT_NAME" ]] && return
 	echo
 	echo 'WireGuard/AmneziaWG client names:'
-	cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u
+	grep -hE "^# Client" /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | cut -d '=' -f 2 | sed 's/ //g' | sort -u
 }
 
 recreate(){
@@ -321,7 +313,7 @@ recreate(){
 	find /root/antizapret/client -type f -delete
 
 	# OpenVPN
-	if [[ -d "/etc/openvpn/easyrsa3/pki/issued" ]]; then
+	if [[ -d /etc/openvpn/easyrsa3/pki/issued ]]; then
 		initOpenVPN
 		CLIENT_CERT_EXPIRE=0
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
@@ -333,7 +325,7 @@ recreate(){
 			fi
 		done
 	else
-		CLIENT_NAME="antizapret-client"
+		CLIENT_NAME=antizapret-client
 		CLIENT_CERT_EXPIRE=3650
 		echo "Creating OpenVPN server keys and first OpenVPN client: '$CLIENT_NAME'"
 		initOpenVPN
@@ -342,7 +334,7 @@ recreate(){
 
 	# WireGuard/AmneziaWG
 	if [[ -f /etc/wireguard/key && -f /etc/wireguard/antizapret.conf && -f /etc/wireguard/vpn.conf ]]; then
-		cat /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | grep -E "^# Client" | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
+		grep -hE "^# Client" /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard >/dev/null
 				echo "WireGuard/AmneziaWG profile files recreated for client '$CLIENT_NAME'"
@@ -351,7 +343,7 @@ recreate(){
 			fi
 		done
 	else
-		CLIENT_NAME="antizapret-client"
+		CLIENT_NAME=antizapret-client
 		echo "Creating WireGuard/AmneziaWG server keys and first WireGuard/AmneziaWG client: '$CLIENT_NAME'"
 		initWireGuard
 		addWireGuard >/dev/null
@@ -371,13 +363,13 @@ backup(){
 	cp -r /etc/wireguard/antizapret.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/vpn.conf /root/antizapret/backup/wireguard
 	cp -r /etc/wireguard/key /root/antizapret/backup/wireguard
-	cp -r /root/antizapret/config/*.txt /root/antizapret/backup/config
-	cp -r /etc/knot-resolver/*.lua /root/antizapret/backup/knot-resolver
-	cp -r /root/antizapret/custom*.sh /root/antizapret/backup/custom
+	cp -r /root/antizapret/config/*.txt /root/antizapret/backup/config || true
+	cp -r /etc/knot-resolver/*.lua /root/antizapret/backup/knot-resolver || true
+	cp -r /root/antizapret/custom*.sh /root/antizapret/backup/custom || true
 
 	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
-	tar -czf "$BACKUP_FILE" -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
-	tar -tzf "$BACKUP_FILE" >/dev/null
+	tar -czf $BACKUP_FILE -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
+	tar -tzf $BACKUP_FILE >/dev/null
 
 	rm -rf /root/antizapret/backup
 

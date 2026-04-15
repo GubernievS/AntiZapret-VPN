@@ -31,13 +31,13 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-if [[ "$ALGORITHM" == "0" ]]; then
-	if [[ -d "/usr/local/src/openvpn" ]]; then
+if [[ "$ALGORITHM" == '0' ]]; then
+	if [[ -d /usr/local/src/openvpn ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
 		apt-get update
 		apt-get dist-upgrade -y
-		apt-get install --reinstall -y openvpn
+		apt-get install -y openvpn
 		apt-get autoremove --purge -y
 		apt-get clean
 		systemctl daemon-reload
@@ -49,22 +49,22 @@ if [[ "$ALGORITHM" == "0" ]]; then
 	echo
 	echo 'OpenVPN patch not installed!'
 	exit 0
-elif [[ "$ALGORITHM" == "2" ]]; then
-    ERROR_FREE="#define ERROR_FREE"
+elif [[ "$ALGORITHM" == '2' ]]; then
+	ERROR_FREE='#define ERROR_FREE'
 else
-    ERROR_FREE="#undef ERROR_FREE"
+	ERROR_FREE='#undef ERROR_FREE'
 fi
 
 make -C /usr/local/src/openvpn uninstall || true
 rm -rf /usr/local/src/openvpn
 apt-get update
 apt-get dist-upgrade -y
-apt-get install --reinstall -y openvpn curl tar build-essential pkg-config libssl-dev libsystemd-dev libnl-genl-3-dev libcap-ng-dev
+apt-get install -y openvpn curl tar build-essential pkg-config libssl-dev libsystemd-dev libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove --purge -y
 apt-get clean
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 mkdir -p /usr/local/src/openvpn
-curl -fL --connect-timeout 30 https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz || curl -fL --connect-timeout 30 https://github.com/OpenVPN/openvpn/releases/download/v2.6.19/openvpn-2.6.19.tar.gz -o /usr/local/src/openvpn.tar.gz
+curl -fL --connect-timeout 30 https://build.openvpn.net/downloads/releases/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz || curl -fL --connect-timeout 30 https://github.com/OpenVPN/openvpn/releases/download/v$VERSION/openvpn-$VERSION.tar.gz -o /usr/local/src/openvpn.tar.gz
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 
@@ -74,47 +74,57 @@ link_socket_write_udp(struct link_socket *sock,\
 					struct link_socket_actual *to)\
 {\
 '"$ERROR_FREE"'\
-	uint16_t buffer_sent = 0;\
-	uint8_t opcode = *BPTR(buf) >> 3;\
-if (opcode == 7 || opcode == 8 || opcode == 10)\
-{\
+	ssize_t buffer_sent = 0;\
+	int opcode = *BPTR(buf) >> 3;\
+	if (opcode == 7 || opcode == 8 || opcode == 10)\
+	{\
 #ifdef ERROR_FREE\
-	#ifdef _WIN32\
-		buffer_sent = link_socket_write_win32(sock, buf, to);\
-	#else\
-		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
-	#endif\
-#endif\
-	uint16_t buffer_len = BLEN(buf);\
-	srand(time(NULL));\
-	for (int i = 0; i < 2; i++) {\
-		uint16_t data_len = rand() % 101 + buffer_len;\
-		uint8_t data[data_len];\
-#ifdef ERROR_FREE\
-		memcpy(data, BPTR(buf), buffer_len);\
-		data[0] = 40;\
-		for (int k = buffer_len; k < data_len; k++) {\
-			data[k] = rand() % 256;\
-		}\
-#else\
-		for (int k = 0; k < data_len; k++) {\
-			data[k] = rand() % 256;\
-		}\
-#endif\
-		struct buffer data_buffer = alloc_buf(data_len);\
-		buf_write(&data_buffer, data, data_len);\
-		int data_repeat = rand() % 101 + 100;\
-		for (int j = 0; j < data_repeat; j++) {\
 #ifdef _WIN32\
-			buffer_sent += link_socket_write_win32(sock, &data_buffer, to);\
+		buffer_sent = link_socket_write_win32(sock, buf, to);\
 #else\
-			buffer_sent += link_socket_write_udp_posix(sock, &data_buffer, to);\
+		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
 #endif\
+		usleep(100000);\
+#endif\
+		int buffer_len = BLEN(buf);\
+		srand((unsigned)time(NULL));\
+		for (int i = 0; i < 2; i++) {\
+			int data_len = rand() % 101 + buffer_len;\
+			uint8_t data[data_len];\
+#ifdef ERROR_FREE\
+			memcpy(data, BPTR(buf), buffer_len);\
+			data[0] = (uint8_t)40;\
+			for (int k = buffer_len; k < data_len; k++) {\
+				data[k] = (uint8_t)(rand() % 256);\
+			}\
+#else\
+			uint8_t first_byte;\
+			do {\
+				first_byte = (uint8_t)(rand() % 256);\
+			} while ((first_byte >> 3) >= 1 && (first_byte >> 3) <= 11);\
+			data[0] = first_byte;\
+			for (int k = 1; k < data_len; k++) {\
+				data[k] = (uint8_t)(rand() % 256);\
+			}\
+#endif\
+			struct buffer data_buffer = alloc_buf(data_len);\
+			buf_write(&data_buffer, data, data_len);\
+			int data_repeat = rand() % 101 + 100;\
+			for (int j = 0; j < data_repeat; j++) {\
+#ifdef _WIN32\
+				buffer_sent += link_socket_write_win32(sock, &data_buffer, to);\
+#else\
+				buffer_sent += link_socket_write_udp_posix(sock, &data_buffer, to);\
+#endif\
+			}\
+			free_buf(&data_buffer);\
 		}\
-		free_buf(&data_buffer);\
-		usleep(data_repeat * 1000);\
+#ifdef ERROR_FREE\
+		return buffer_sent;\
+#else\
+		usleep(100000);\
+#endif\
 	}\
-}\
 #ifdef _WIN32\
 	buffer_sent += link_socket_write_win32(sock, buf, to);\
 #else\
@@ -122,7 +132,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 #endif\
 	return buffer_sent;\
 }\
-' "/usr/local/src/openvpn/src/openvpn/socket.h"
+' /usr/local/src/openvpn/src/openvpn/socket.h
 
 (
 	cd /usr/local/src/openvpn
@@ -130,6 +140,7 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 	./configure \
 		--enable-systemd \
 		--enable-dco \
+		--enable-comp-stub \
 		--enable-small \
 		--enable-port-share \
 		--disable-debug \
@@ -138,10 +149,11 @@ if (opcode == 7 || opcode == 8 || opcode == 10)\
 		--disable-ofb-cfb \
 		--disable-plugins \
 		--disable-fragment \
+		--disable-unit-tests \
+		--disable-ntlm \
 		--disable-wolfssl-options-h \
 		--disable-pam-dlopen \
 		--disable-plugin-auth-pam \
-		--disable-x509-alt-username \
 		--disable-pkcs11 \
 		--disable-selinux \
 		--disable-plugin-down-root

@@ -10,15 +10,12 @@ if [[ ! -v duplicate_cn ]]; then
 	done
 fi
 
-if [[ "$IV_PLAT" == "android" || "$IV_PLAT" == "ios" ]]; then
-	echo "push \"ifconfig-ipv6 fd00::dead/64 fd00::1\"
-push \"route-ipv6 ::/1\"
-push \"route-ipv6 8000::/1\"
-push \"block-ipv6\"" >> "$1"
-elif [[ "$IV_PLAT" == "win" || "$IV_PLAT" == "mac" ]]; then
-	echo "push \"ifconfig-ipv6 fd00::dead/64 fd00::1\"
-push \"route-ipv6 ::/1\"
-push \"route-ipv6 8000::/1\"" >> "$1"
+if [[ "$IV_PLAT" != 'linux' ]]; then
+	echo 'push "ifconfig-ipv6 fdea:dead::2/64 fdea:dead::1"
+push "route-ipv6 ::/1"
+push "route-ipv6 8000::/1"
+push "route-ipv6 2000::/3"
+push "block-ipv6"' >> "$1"
 fi
 
 exit 0

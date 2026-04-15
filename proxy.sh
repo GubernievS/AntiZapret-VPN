@@ -15,7 +15,7 @@ fi
 cd /root
 
 # Проверка на OpenVZ и LXC
-if [[ "$(systemd-detect-virt)" == "openvz" || "$(systemd-detect-virt)" == "lxc" ]]; then
+if [[ "$(systemd-detect-virt)" == 'openvz' || "$(systemd-detect-virt)" == 'lxc' ]]; then
 	echo 'Error: OpenVZ and LXC are not supported!'
 	exit 4
 fi
@@ -24,28 +24,28 @@ fi
 OS="$(lsb_release -si | tr '[:upper:]' '[:lower:]')"
 VERSION="$(lsb_release -rs | cut -d '.' -f1)"
 
-if [[ "$OS" == "debian" ]]; then
-	if [[ "$VERSION" != "11" ]] && [[ "$VERSION" != "12" ]]; then
-		echo "Error: Debian $VERSION is not supported! Only versions 11 and 12 are allowed"
+if [[ "$OS" == 'debian' ]]; then
+	if (( VERSION < 12 )); then
+		echo "Error: Debian $VERSION is not supported! Minimal supported version is 12"
 		exit 5
 	fi
-elif [[ "$OS" == "ubuntu" ]]; then
-	if [[ "$VERSION" != "22" ]] && [[ "$VERSION" != "24" ]]; then
-		echo "Error: Ubuntu $VERSION is not supported! Only versions 22 and 24 are allowed"
+elif [[ "$OS" == 'ubuntu' ]]; then
+	if (( VERSION < 22 )); then
+		echo "Error: Ubuntu $VERSION is not supported! Minimal supported version is 22"
 		exit 6
 	fi
-elif [[ "$OS" != "debian" ]] && [[ "$OS" != "ubuntu" ]]; then
+else
 	echo "Error: Your Linux distribution ($OS) is not supported!"
 	exit 7
 fi
 
-DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $5; exit}')"
+DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')"
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 8
 fi
 
-DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | awk '{print $7; exit}')"
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 9
@@ -53,11 +53,11 @@ fi
 
 echo
 echo -e '\e[1;32mInstalling proxy for AntiZapret VPN server\e[0m'
-echo 'Proxied ports: 80, 443, 50080, 50443, 51080, 51443, 52080, 52443'
+echo 'Proxied ports: 80, 443, 504, 508, 540, 580, 50080, 50443, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/"$DEFAULT_INTERFACE"/mtu)
+MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
 if (( MTU < 1500 )); then
 	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $MTU"
 	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on AntiZapret VPN server"
@@ -73,6 +73,10 @@ done
 echo
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
+done
+echo
+until [[ "$SCAN_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
 done
 echo
 echo 'Installation, please wait...'
@@ -92,9 +96,13 @@ apt-get purge -y qemu-guest-agent
 apt-get purge -y tuned
 apt-get purge -y sysstat
 apt-get purge -y acpid
+apt-get purge -y fwupd
+apt-get purge -y watchdog
+apt-get purge -y pcscd
+apt-get purge -y packagekit
 
 # SSH protection включён
-if [[ "$SSH_PROTECTION" == "y" ]]; then
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	apt-get purge -y fail2ban
 	apt-get purge -y sshguard
 fi
@@ -104,8 +112,11 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
+# Удаляем переопределённые параметры ядра
+sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+
 # Принудительная загрузка модуля nf_conntrack
-echo "nf_conntrack" > /etc/modules-load.d/nf_conntrack.conf
+echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
 
 # Завершим выполнение скрипта при ошибке
 set -e
@@ -129,27 +140,27 @@ apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
 apt-get dist-upgrade -y
-apt-get install --reinstall -y iptables iptables-persistent irqbalance unattended-upgrades
+apt-get install -y iptables iptables-persistent irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
-# Измененим параметры для прокси
+# Изменим параметры для прокси
 echo "# Proxy parameters modification
 kernel.printk=3 4 1 3
 kernel.panic=1
 kernel.panic_on_oops=1
-kernel.softlockup_panic=1
-kernel.hardlockup_panic=1
-kernel.sched_autogroup_enabled=1
+kernel.softlockup_panic=0
+kernel.hardlockup_panic=0
+kernel.sched_autogroup_enabled=0
 net.ipv4.ip_forward=1
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 net.ipv4.tcp_mtu_probing=1
-net.core.rmem_max=4194304
-net.core.wmem_max=4194304
-net.ipv4.tcp_rmem=16384 131072 4194304
-net.ipv4.tcp_wmem=16384 131072 4194304
+net.core.rmem_max=6291456
+net.core.wmem_max=6291456
+net.ipv4.tcp_rmem=16384 131072 6291456
+net.ipv4.tcp_wmem=16384 131072 6291456
 net.ipv4.tcp_no_metrics_save=1
 net.core.netdev_budget=600
 net.ipv4.tcp_fastopen=1
@@ -161,19 +172,27 @@ net.ipv4.tcp_max_syn_backlog=1024
 net.netfilter.nf_conntrack_buckets=32768
 net.ipv4.conf.all.rp_filter=0
 net.ipv4.conf.default.rp_filter=0
-net.core.netdev_max_backlog=5000
+net.core.netdev_max_backlog=10000
 net.core.somaxconn=4096
 net.ipv4.tcp_syncookies=1
 net.ipv4.udp_rmem_min=16384
 net.ipv4.udp_wmem_min=16384
-net.core.optmem_max=131072
+net.core.optmem_max=20480
 net.ipv4.tcp_timestamps=1
 net.ipv4.tcp_tw_reuse=0
 net.ipv4.tcp_slow_start_after_idle=0
 net.netfilter.nf_conntrack_tcp_timeout_established=86400
 net.core.rmem_default=262144
 net.core.wmem_default=262144
-net.ipv4.tcp_base_mss=1024" > /etc/sysctl.d/99-proxy.conf
+net.ipv4.tcp_base_mss=1024
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0" > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
 echo "# Disable IPv6
@@ -181,13 +200,15 @@ net.ipv6.conf.all.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.lo.disable_ipv6=1" > /etc/sysctl.d/99-disable-ipv6.conf
 
-# Очистка iptables
+# Очистка правил iptables
 iptables -w -F
 iptables -w -t nat -F
 iptables -w -t mangle -F
+iptables -w -t raw -F
 ip6tables -w -F
 ip6tables -w -t nat -F
 ip6tables -w -t mangle -F
+ip6tables -w -t raw -F
 
 # Новые правила iptables
 # filter
@@ -207,6 +228,20 @@ ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
+# SSH protection
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
+fi
+# Scan protection
+if [[ "$SCAN_PROTECTION" == 'y' ]]; then
+	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
+	iptables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	iptables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
+	ip6tables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
+	ip6tables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
+	ip6tables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
+fi
 
 # mangle
 # Clamp TCP MSS
@@ -215,43 +250,38 @@ ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --cla
 
 # nat
 # OpenVPN TCP
-iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
-iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
-iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
-
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p tcp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
-
+iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
+iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
+iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
+iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
 # OpenVPN UDP
-iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination "$DESTINATION_IP":80
-iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination "$DESTINATION_IP":50080
-iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination "$DESTINATION_IP":443
-iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination "$DESTINATION_IP":50443
+iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
+iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
+iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
+iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
+# WireGuard/AmneziaWG
+iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:540
+iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:580
+iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination $DESTINATION_IP:51080
+iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination $DESTINATION_IP:51443
+iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:52080
+iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:52443
+# SNAT
+iptables -w -t nat -A POSTROUTING -d $DESTINATION_IP -j SNAT --to-source $DEFAULT_IP
 
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 80 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 443 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 50443 -j SNAT --to-source "$DEFAULT_IP"
-
-# WireGuard/AmneziaWG 
-iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination "$DESTINATION_IP":51080
-iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination "$DESTINATION_IP":51443
-iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination "$DESTINATION_IP":52080
-iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination "$DESTINATION_IP":52443
-
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 51443 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52080 -j SNAT --to-source "$DEFAULT_IP"
-iptables -w -t nat -A POSTROUTING -p udp -d "$DESTINATION_IP" --dport 52443 -j SNAT --to-source "$DEFAULT_IP"
-
-# SSH protection
-if [[ "$SSH_PROTECTION" == "y" ]]; then
-	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
-	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 3/hour --hashlimit-burst 3 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
-fi
+# Сброс счётчиков
+iptables -w -Z
+iptables -w -t nat -Z
+iptables -w -t mangle -Z
+iptables -w -t raw -Z
+ip6tables -w -Z
+ip6tables -w -t nat -Z
+ip6tables -w -t mangle -Z
+ip6tables -w -t raw -Z
 
 # Сохранение новых правил iptables
 netfilter-persistent save
