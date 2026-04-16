@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Plus, Download, Trash2, Shield, Globe, Loader2, AlertCircle, Smartphone, Monitor, ExternalLink, QrCode, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { configsApi } from '../api/configs'
 import type { ClientLinks } from '../api/configs'
+import { waitForApply } from '../api/applyStatus'
 import { useAuthStore } from '../store/authStore'
 import type { VPNConfig } from '../types'
 
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [creating, setCreating] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [clientLinks, setClientLinks] = useState<ClientLinks | null>(null)
@@ -64,15 +66,19 @@ export default function DashboardPage() {
     setError('')
     try {
       await configsApi.create({ config_type: configType })
+      setCreating(false)
+      setShowCreateModal(false)
+      setIsApplying(true)
+      await waitForApply('/etc/wireguard/antizapret.conf')
       await loadConfigs()
       await fetchMe()
-      setShowCreateModal(false)
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
         || 'Ошибка создания конфигурации'
       setError(message)
-    } finally {
       setCreating(false)
+    } finally {
+      setIsApplying(false)
     }
   }
 
@@ -190,6 +196,13 @@ export default function DashboardPage() {
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
+        </div>
+      )}
+
+      {isApplying && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm flex items-center gap-2 text-blue-600">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 flex-shrink-0" />
+          Применяю конфигурацию...
         </div>
       )}
 
