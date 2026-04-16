@@ -1,0 +1,24 @@
+[Unit]
+Description=CorpWeb Sync Agent — WireGuard config sync daemon
+Documentation=https://github.com/your-org/CorpAdmin-AZ
+After=network-online.target wg-quick@antizapret.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/corpweb-sync-agent.env
+ExecStart=/usr/local/bin/corpweb-sync-agent
+Restart=on-failure
+RestartSec=5
+
+# Tighten privileges where possible
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+# Stdout/stderr go to journald
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=corpweb-sync-agent
+
+[Install]
+WantedBy=multi-user.target
