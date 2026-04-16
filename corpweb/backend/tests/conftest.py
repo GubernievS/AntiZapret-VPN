@@ -59,6 +59,18 @@ class SQLiteJSON(types.TypeDecorator):
     impl = Text
     cache_ok = True
 
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            import json
+            return json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            import json
+            return json.loads(value)
+        return value
+
 
 # Replace PG types in all registered model columns
 for table in Base.metadata.tables.values():
