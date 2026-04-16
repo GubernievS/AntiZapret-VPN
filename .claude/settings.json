@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no -p 2201 brolin@wgfi2-ssh.p4i.ru \"ls -la /etc/wireguard/\")",
+      "Bash(ssh -o StrictHostKeyChecking=no -p 2201 brolin@wgfi2-ssh.p4i.ru \"systemctl list-units --type=service --all | grep -iE 'wg|awg|wireguard|amnezia' && echo '---' && systemctl list-units --type=service --all | grep -iE 'quick'\")",
+      "Bash(ssh -o:*)",
+      "Bash(python -m pytest tests/test_models_ha.py -v)",
+      "Bash(pip list:*)",
+      "Bash(.venv/bin/pip list:*)",
+      "Bash(.venv/bin/python3 -m pip list)",
+      "Bash(.venv/bin/python3 -c \"import sqlalchemy; print\\(sqlalchemy.__version__\\)\")",
+      "Bash(.venv/bin/python3 -m pip install -r requirements.txt)",
+      "Bash(.venv/bin/python3 -m pip install -r /dev/stdin)",
+      "Bash(.venv/bin/python3 -m pip install fastapi==0.109.0 'uvicorn[standard]==0.27.0' python-multipart==0.0.6 sqlalchemy==2.0.25 alembic==1.13.1 pydantic==2.5.3 pydantic-settings==2.1.0 'python-jose[cryptography]==3.3.0' 'passlib[bcrypt]==1.7.4' bcrypt==3.2.2 authlib==1.3.0 httpx==0.26.0 itsdangerous==2.1.2 starlette==0.35.1 apscheduler==3.10.4 slowapi==0.1.9 python-dotenv==1.0.0 'qrcode[pil]==7.4.2' Pillow python-dateutil==2.8.2 pytest==7.4.4 pytest-asyncio==0.23.3)",
+      "Bash(/home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/corpweb/backend/.venv/bin/python3 --version)",
+      "Bash(.venv/bin/python3 -m pip install fastapi 'uvicorn[standard]' python-multipart sqlalchemy alembic pydantic pydantic-settings 'python-jose[cryptography]' 'passlib[bcrypt]' bcrypt authlib httpx itsdangerous starlette apscheduler slowapi python-dotenv 'qrcode[pil]' Pillow python-dateutil pytest pytest-asyncio)",
+      "Bash(.venv/bin/python3 -m pytest tests/test_models_ha.py -v)",
+      "Bash(.venv/bin/python3 -m pytest tests/ -v)",
+      "Bash(.venv/bin/python -m pytest tests/test_wg_templates.py -x --no-header -q)",
+      "Bash(.venv/bin/python -m pytest tests/test_wg_templates.py -v --no-header --tb=short)",
+      "Bash(.venv/bin/python -m pytest tests/test_wg_templates.py::TestReversePeerKeys::test_self_inverse -vv --no-header --tb=long)",
+      "Bash(.venv/bin/python -m pytest tests/ -v --no-header --tb=short)",
+      "Bash(.venv/bin/python -m pytest tests/test_wg_templates.py tests/test_vpn_manager.py tests/test_models_ha.py tests/test_monitoring_service.py -v --no-header --tb=short)",
+      "Bash(.venv/bin/python3 -c ':*)",
+      "Bash(python -m pytest tests/test_wg_templates.py -v --tb=short)",
+      "Bash(.venv/bin/python -m pytest tests/test_wg_blob_store.py -v)",
+      "Bash(.venv/bin/python -m pytest --tb=short -q)",
+      "Bash(python -c \"from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey; import base64; k = X25519PrivateKey.generate\\(\\); print\\('OK:', base64.b64encode\\(k.private_bytes_raw\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(python -m pytest tests/test_wg_blob_store.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_vpn_manager_new.py -v --tb=short)",
+      "Bash(python -m pytest --tb=short)",
+      "Bash(python -m pytest tests/test_vpn_manager_new.py tests/test_wg_blob_store.py tests/test_wg_templates.py tests/test_models_ha.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_agent_api.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_agent_api.py::TestAgentHeartbeat -v --tb=long)",
+      "Bash(python -m pytest tests/test_agent_api.py::TestAgentHeartbeat -v --tb=long -s)",
+      "Bash(python -m pip install 'bcrypt==4.0.1')",
+      "Bash(python -m pytest tests/test_models_ha.py tests/test_wg_templates.py tests/test_wg_blob_store.py tests/test_vpn_manager_new.py tests/test_agent_api.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_vpn_manager_new.py::TestGetClientConf::test_wg_has_no_obfuscation -v --tb=long)",
+      "Bash(chmod +x /home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/agent/install.sh /home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/agent/check.sh)",
+      "Bash(bash -n /home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/agent/install.sh)",
+      "Bash(bash -n /home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/agent/check.sh)",
+      "Bash(chmod +x /home/brolin/Documents/ITSS/AdminAZWG/CorpAdmin-AZ/control-plane/install.sh)",
+      "Bash(python -m pytest tests/test_import_wgfiles.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_models_ha.py tests/test_wg_templates.py tests/test_wg_blob_store.py tests/test_vpn_manager_new.py tests/test_agent_api.py tests/test_import_wgfiles.py -v --tb=short)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  }
+}
