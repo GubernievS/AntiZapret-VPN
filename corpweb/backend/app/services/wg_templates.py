@@ -246,7 +246,7 @@ def next_free_ip(peers: List[Peer], subnet: str) -> str:
 # ---------------------------------------------------------------------------
 
 def render_server_conf(
-    iface: dict,
+    iface: str,
     peers: List[Peer],
     server_privkey: str,
     address: str,
@@ -255,16 +255,17 @@ def render_server_conf(
     Render a full WireGuard server config file.
 
     Args:
-        iface: dict with 'listen_port' and 'address' keys.
+        iface: interface name ("antizapret" or "vpn").
         peers: list of Peer objects.
         server_privkey: server private key.
         address: server address with CIDR (e.g. "10.29.8.1/21").
     """
+    port = _PORT_MAP[(iface, "wg")]
     lines = [
         "[Interface]",
         f"PrivateKey = {server_privkey}",
         f"Address = {address}",
-        f"ListenPort = {iface['listen_port']}",
+        f"ListenPort = {port}",
     ]
 
     for peer in peers:

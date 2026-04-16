@@ -236,13 +236,11 @@ class TestNextFreeIp:
 # ---------------------------------------------------------------------------
 
 class TestRenderServerConf:
-    def _make_iface(self):
-        """Return iface params dict."""
-        return {"listen_port": 51443, "address": "10.29.8.1/21"}
+    _IFACE = "antizapret"
 
     def test_contains_interface_section(self):
         conf = render_server_conf(
-            iface=self._make_iface(),
+            iface=self._IFACE,
             peers=[],
             server_privkey="servpriv==",
             address="10.29.8.1/21",
@@ -251,12 +249,21 @@ class TestRenderServerConf:
 
     def test_correct_listen_port(self):
         conf = render_server_conf(
-            iface={"listen_port": 52443, "address": "10.29.8.1/21"},
+            iface="antizapret",
             peers=[],
             server_privkey="servpriv==",
             address="10.29.8.1/21",
         )
-        assert "ListenPort = 52443" in conf
+        assert "ListenPort = 51443" in conf
+
+    def test_vpn_listen_port(self):
+        conf = render_server_conf(
+            iface="vpn",
+            peers=[],
+            server_privkey="servpriv==",
+            address="10.28.8.1/21",
+        )
+        assert "ListenPort = 51080" in conf
 
     def test_includes_all_peers(self):
         peers = [
@@ -264,7 +271,7 @@ class TestRenderServerConf:
             Peer(name="bob-2", public_key="bpub==", preshared_key="bpsk==", allowed_ips="10.29.8.3/32"),
         ]
         conf = render_server_conf(
-            iface=self._make_iface(),
+            iface=self._IFACE,
             peers=peers,
             server_privkey="servpriv==",
             address="10.29.8.1/21",
@@ -279,7 +286,7 @@ class TestRenderServerConf:
 
     def test_private_key_in_output(self):
         conf = render_server_conf(
-            iface=self._make_iface(),
+            iface=self._IFACE,
             peers=[],
             server_privkey="MY_SECRET_KEY==",
             address="10.29.8.1/21",
