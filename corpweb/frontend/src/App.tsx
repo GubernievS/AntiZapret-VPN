@@ -13,6 +13,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage'
 import MonitoringPage from './pages/MonitoringPage'
 import AdminFilesPage from './pages/AdminFilesPage'
 import AdminAntizapretPage from './pages/AdminAntizapretPage'
+import NodesPage from './pages/NodesPage'
 
 import Layout from './components/layout/Layout'
 import ProtectedRoute from './routes/ProtectedRoute'
@@ -96,6 +97,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin>
                 <AdminAntizapretPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/nodes"
+            element={
+              <ProtectedRoute requireAdmin>
+                <NodesPage />
               </ProtectedRoute>
             }
           />

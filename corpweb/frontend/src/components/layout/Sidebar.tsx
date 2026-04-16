@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Shield, Users, Settings, Wifi, FileText, SlidersHorizontal } from 'lucide-react'
+import { LayoutDashboard, Shield, Users, Settings, Wifi, FileText, SlidersHorizontal, Server } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { cn } from '../../utils/cn'
 
@@ -49,6 +49,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
             <NavLink to="/admin/monitoring" className={navLinkClass}>
               <Wifi className="w-5 h-5" />
               Мониторинг
+            </NavLink>
+            <NavLink to="/nodes" className={navLinkClass}>
+              <Server className="w-5 h-5" />
+              Ноды
             </NavLink>
             <div className="pt-3 pb-1 px-4">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
