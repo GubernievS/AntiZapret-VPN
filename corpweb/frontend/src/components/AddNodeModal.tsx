@@ -115,21 +115,16 @@ export default function AddNodeModal({ onClose, onCreated }: AddNodeModalProps) 
 
   // Commands for step 2
   const azSetupCmd = `curl -fsSL https://raw.githubusercontent.com/your-org/antizapret/main/install.sh | bash`
-  const agentInstallCmd = [
-    `CORPWEB_CP_URL="${CP_URL}"`,
-    `CORPWEB_TOKEN="${enrollToken}"`,
-    `bash <(curl -fsSL ${CP_URL}/agent-install.sh)`,
-  ].join(' \\\n  ')
+  const agentInstallCmd = `curl -fsSL "${CP_URL}/api/v1/agent/install.sh?token=${enrollToken}" | bash`
 
   // Nginx snippet for step 3
-  const nginxSnippet = `# Добавьте в upstream antizapret_nodes:
-upstream antizapret_nodes {
-    # ... existing nodes ...
-    server ${createdIp}:443;  # ${createdHostname}
-}
+  const nginxSnippet = `# Добавьте в каждый upstream блок в nginx.conf:
+server ${createdIp}:51443 max_fails=3 fail_timeout=10s;  # ${createdHostname}
+server ${createdIp}:51080 max_fails=3 fail_timeout=10s;
+server ${createdIp}:52443 max_fails=3 fail_timeout=10s;
+server ${createdIp}:52080 max_fails=3 fail_timeout=10s;
 
-# Затем перезагрузите nginx:
-sudo nginx -s reload`
+# Затем: nginx -s reload`
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
