@@ -2,10 +2,11 @@
 Admin API endpoints
 Users management, system settings, dashboard
 """
+import base64
 import uuid
 import logging
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,8 @@ from app.schemas.config import ConfigResponse, ConfigListResponse
 from app.schemas.settings import SystemSettingsResponse, SystemSettingsUpdate
 from app.api.deps import require_admin
 from app.services.vpn_manager import vpn_manager, VPNManagerError
+from app.services.wg_blob_store import WgBlobStore
+from app.db.models import WgServerKeys
 
 logger = logging.getLogger(__name__)
 
@@ -384,3 +387,55 @@ async def admin_dashboard(
             "max_configs_per_user": sys_settings.max_configs_per_user if sys_settings else 2
         }
     }
+
+
+# ============================================
+# Import WireGuard files (migration from single node)
+# ============================================
+
+@router.post("/import-wgfiles")
+async def import_wgfiles(
+    antizapret_conf: Optional[UploadFile] = File(None),
+    vpn_conf: Optional[UploadFile] = File(None),
+    wg_key: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """
+    Import WireGuard configs from existing node into DB.
+    One-time migration endpoint: upload confs + server key.
+    """
+    store = WgBlobStore(db)
+    imported = []
+
+    file_map = {
+        "antizapret.conf": (antizapret_conf, "/etc/wireguard/antizapret.conf"),
+        "vpn.conf": (vpn_conf, "/etc/wireguard/vpn.conf"),
+    }
+
+    for label, (upload, path) in file_map.items():
+        if upload:
+            content = await upload.read()
+            store.put(path, content, by=f"import:{admin.username}")
+            imported.append(label)
+
+    if wg_key:
+        from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+
+        key_content = await wg_key.read()
+        priv_b64 = key_content.decode().strip()
+        priv_raw = base64.b64decode(priv_b64)
+        priv_obj = X25519PrivateKey.from_private_bytes(priv_raw)
+        pub_b64 = base64.b64encode(priv_obj.public_key().public_bytes_raw()).decode()
+
+        for iface in ("antizapret", "vpn"):
+            existing = db.get(WgServerKeys, iface)
+            if existing:
+                existing.private_key = priv_b64
+                existing.public_key = pub_b64
+            else:
+                db.add(WgServerKeys(iface=iface, private_key=priv_b64, public_key=pub_b64))
+        db.commit()
+        imported.append("wg_key")
+
+    return {"imported": imported, "count": len(imported)}
