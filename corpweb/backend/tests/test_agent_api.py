@@ -216,3 +216,26 @@ class TestNodesDelete:
     def test_delete_node_not_found(self, client, db, admin_user, admin_token):
         resp = client.delete("/api/v1/nodes/9999", headers=auth_header(admin_token))
         assert resp.status_code == 404
+
+
+# ── Install script endpoints ──
+
+
+class TestInstallScript:
+    def test_install_sh_valid_token(self, client, db):
+        node = _make_node(db)
+        resp = client.get(f"/api/v1/agent/install.sh?token={node.enroll_token}")
+        assert resp.status_code == 200
+        assert "text/plain" in resp.headers["content-type"]
+        body = resp.text
+        assert "#!/usr/bin/env bash" in body
+        assert node.enroll_token in body
+        assert node.hostname in body
+
+    def test_install_sh_invalid_token(self, client, db):
+        resp = client.get("/api/v1/agent/install.sh?token=bad-token")
+        assert resp.status_code == 404
+
+    def test_install_sh_no_token(self, client, db):
+        resp = client.get("/api/v1/agent/install.sh")
+        assert resp.status_code == 422  # missing required query param

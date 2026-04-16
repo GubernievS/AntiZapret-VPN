@@ -159,3 +159,121 @@ def drain(
     node.health = "draining"
     db.commit()
     return {"ok": True, "ttl_minutes": 10}
+
+
+# ---------------------------------------------------------------------------
+# Install script (no auth — token passed as query param)
+# ---------------------------------------------------------------------------
+
+from fastapi import Request
+from fastapi.responses import PlainTextResponse
+from pathlib import Path
+
+_AGENT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "agent"
+
+
+@router.get("/install.sh")
+def install_script(
+    token: str = Query(...),
+    request: Request = None,
+    db: Session = Depends(get_db),
+):
+    """
+    Render a self-contained install script with the CP URL and token baked in.
+    No auth required — the token itself is the secret.
+    Usage: curl https://panel/api/v1/agent/install.sh?token=T | bash
+    """
+    # Verify token is valid
+    node = db.query(Node).filter_by(enroll_token=token).first()
+    if not node:
+        raise HTTPException(status_code=404, detail="Invalid token")
+
+    cp_url = str(request.base_url).rstrip("/")
+    # Use X-Forwarded-Proto if behind nginx
+    if request.headers.get("x-forwarded-proto") == "https":
+        cp_url = cp_url.replace("http://", "https://")
+
+    script = _render_install_script(cp_url, token, node.hostname)
+    return PlainTextResponse(script, media_type="text/plain")
+
+
+@router.get("/sync-agent.py")
+def agent_source(
+    token: str = Query(...),
+    db: Session = Depends(get_db),
+):
+    """Serve the sync-agent Python source. Token required to prevent scraping."""
+    node = db.query(Node).filter_by(enroll_token=token).first()
+    if not node:
+        raise HTTPException(status_code=404, detail="Invalid token")
+    agent_py = _AGENT_DIR / "corpweb_sync_agent.py"
+    if not agent_py.exists():
+        raise HTTPException(status_code=500, detail="Agent source not found on server")
+    return PlainTextResponse(agent_py.read_text(), media_type="text/plain")
+
+
+@router.get("/sync-agent.service")
+def agent_service(
+    token: str = Query(...),
+    db: Session = Depends(get_db),
+):
+    """Serve the systemd unit file."""
+    node = db.query(Node).filter_by(enroll_token=token).first()
+    if not node:
+        raise HTTPException(status_code=404, detail="Invalid token")
+    service_file = _AGENT_DIR / "corpweb-sync-agent.service"
+    if not service_file.exists():
+        raise HTTPException(status_code=500, detail="Service file not found on server")
+    return PlainTextResponse(service_file.read_text(), media_type="text/plain")
+
+
+def _render_install_script(cp_url: str, token: str, hostname: str) -> str:
+    return f'''#!/usr/bin/env bash
+set -euo pipefail
+
+# CorpWeb Sync Agent installer
+# Generated for node: {hostname}
+# CP: {cp_url}
+
+CONTROL_PLANE_URL="{cp_url}"
+AGENT_TOKEN="{token}"
+AGENT_HOSTNAME="{hostname}"
+
+echo "==> Installing CorpWeb Sync Agent on $AGENT_HOSTNAME"
+echo "==> Control plane: $CONTROL_PLANE_URL"
+
+# Install Python requests if missing
+python3 -c "import requests" 2>/dev/null || pip3 install requests
+
+# Download agent
+curl -fsSL "$CONTROL_PLANE_URL/api/v1/agent/sync-agent.py?token=$AGENT_TOKEN" \\
+    -o /usr/local/bin/corpweb-sync-agent.py
+chmod +x /usr/local/bin/corpweb-sync-agent.py
+
+# Create wrapper
+cat > /usr/local/bin/corpweb-sync-agent << 'WRAPPER'
+#!/bin/bash
+exec python3 /usr/local/bin/corpweb-sync-agent.py "$@"
+WRAPPER
+chmod +x /usr/local/bin/corpweb-sync-agent
+
+# Write env file
+cat > /etc/corpweb-sync-agent.env << ENVEOF
+CONTROL_PLANE_URL=$CONTROL_PLANE_URL
+AGENT_TOKEN=$AGENT_TOKEN
+AGENT_HOSTNAME=$AGENT_HOSTNAME
+ENVEOF
+chmod 600 /etc/corpweb-sync-agent.env
+
+# Install systemd service
+curl -fsSL "$CONTROL_PLANE_URL/api/v1/agent/sync-agent.service?token=$AGENT_TOKEN" \\
+    -o /etc/systemd/system/corpweb-sync-agent.service
+
+systemctl daemon-reload
+systemctl enable --now corpweb-sync-agent
+
+echo "==> Agent installed. Status:"
+systemctl status corpweb-sync-agent --no-pager || true
+echo ""
+echo "==> Check logs: journalctl -u corpweb-sync-agent -f"
+'''
