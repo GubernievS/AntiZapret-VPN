@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: corpweb
+      POSTGRES_USER: corpweb
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "corpweb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ../corpweb/backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://corpweb:${DB_PASSWORD}@db:5432/corpweb
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      db: { condition: service_healthy }
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  pgdata:
