@@ -31,7 +31,7 @@ function formatLastSeen(iso: string | null): string {
 
 function activePeers(node: NodeInfo): string {
   if (!node.metrics) return '—'
-  const az = node.metrics.active_peers_az ?? null
+  const az = node.metrics.active_peers_antizapret ?? null
   const vpn = node.metrics.active_peers_vpn ?? null
   if (az === null && vpn === null) return '—'
   return `${az ?? '?'} / ${vpn ?? '?'}`
