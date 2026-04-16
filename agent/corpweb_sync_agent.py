@@ -236,9 +236,22 @@ def _pub_path(iface: str) -> str:
     return os.path.join(WG_KEY_DIR, f"{iface}.key.pub")
 
 
+def _local_ip() -> str:
+    """Best-effort detection of the machine's outbound IP."""
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+
 def register_if_needed() -> None:
     """
-    POST /api/v1/agent/register with our hostname.
+    POST /api/v1/agent/register with hostname + private_ip.
     The server returns wg_server_keys (private + public per iface).
     Writes key files and restarts wg-quick if keys changed.
     """
@@ -246,7 +259,7 @@ def register_if_needed() -> None:
     try:
         resp = api_post(
             "/api/v1/agent/register",
-            {"hostname": HOSTNAME},
+            {"hostname": HOSTNAME, "private_ip": _local_ip()},
         )
     except requests.HTTPError as exc:
         log.error("Registration HTTP error: %s", exc)
@@ -307,22 +320,21 @@ def register_if_needed() -> None:
 def startup_reconcile() -> None:
     """Fetch all 12 managed files from the control plane and apply if changed."""
     log.info("Running startup reconcile for %d files", len(MANAGED_FILES))
-    hook_map = {path: hook for path, hook in MANAGED_FILES}
+    import base64
 
-    try:
-        resp = api_get(f"/api/v1/agent/files?hostname={HOSTNAME}")
-        files_data: dict = resp.json()  # {path: base64_or_text_content, ...}
-    except (requests.HTTPError, requests.ConnectionError) as exc:
-        log.error("Failed to fetch file list during reconcile: %s", exc)
-        return
-
-    for path in MANAGED_PATHS:
-        raw = files_data.get(path)
-        if raw is None:
-            log.debug("Control plane has no data for %s — skipping", path)
-            continue
-        content = raw.encode() if isinstance(raw, str) else raw
-        apply_path(path, content, hook_map[path])
+    for path, hook in MANAGED_FILES:
+        try:
+            resp = api_get(f"/api/v1/agent/file?path={path}")
+            data = resp.json()
+            content = base64.b64decode(data["content"])
+            apply_path(path, content, hook)
+        except requests.HTTPError as exc:
+            if exc.response is not None and exc.response.status_code == 404:
+                log.debug("Control plane has no data for %s — skipping", path)
+            else:
+                log.warning("Failed to fetch %s: %s", path, exc)
+        except (requests.ConnectionError, KeyError) as exc:
+            log.warning("Failed to fetch %s: %s", path, exc)
 
     log.info("Startup reconcile done")
 
@@ -390,7 +402,7 @@ def send_heartbeat() -> None:
     }
     try:
         api_post(
-            f"/api/v1/agent/heartbeat?hostname={HOSTNAME}",
+            "/api/v1/agent/heartbeat",
             payload,
             timeout=15,
         )
@@ -430,7 +442,7 @@ def stream_events() -> None:
     Also fires a heartbeat every HEARTBEAT_INTERVAL seconds.
     Raises ConnectionError on stream loss so the caller can retry.
     """
-    url = f"{CP_URL}/api/v1/agent/events?hostname={HOSTNAME}"
+    url = f"{CP_URL}/api/v1/agent/events"
     log.info("Connecting to SSE stream at %s", url)
 
     hook_map = {path: hook for path, hook in MANAGED_FILES}
@@ -469,30 +481,34 @@ def stream_events() -> None:
 
 
 def _handle_event(evt: dict, hook_map: dict) -> None:
-    event_type = evt.get("event", "message")
+    import base64
+
     data_str = evt.get("data", "")
+    if not data_str:
+        return
 
-    if event_type == "file_update":
-        try:
-            payload: dict = json.loads(data_str)
-        except json.JSONDecodeError:
-            log.error("Bad JSON in file_update event: %r", data_str[:200])
-            return
+    try:
+        payload: dict = json.loads(data_str)
+    except json.JSONDecodeError:
+        log.debug("Non-JSON SSE data: %r", data_str[:100])
+        return
 
-        path: str = payload.get("path", "")
-        if path not in MANAGED_PATHS:
-            log.warning("Received update for unmanaged path %r — ignoring", path)
-            return
+    # SSE sends {"path": "/etc/wireguard/antizapret.conf"} on file change
+    path: str = payload.get("path", "")
+    if not path or path not in MANAGED_PATHS:
+        if path:
+            log.debug("Received update for unmanaged path %r — ignoring", path)
+        return
 
-        raw = payload.get("content", "")
-        content = raw.encode() if isinstance(raw, str) else raw
+    # Fetch the updated file content
+    log.info("SSE: file changed — %s", path)
+    try:
+        resp = api_get(f"/api/v1/agent/file?path={path}")
+        data = resp.json()
+        content = base64.b64decode(data["content"])
         apply_path(path, content, hook_map.get(path))
-
-    elif event_type == "ping":
-        log.debug("SSE ping received")
-
-    else:
-        log.debug("Unknown SSE event type %r — ignoring", event_type)
+    except Exception as exc:
+        log.error("Failed to apply SSE update for %s: %s", path, exc)
 
 
 # ---------------------------------------------------------------------------

@@ -169,7 +169,7 @@ from fastapi import Request
 from fastapi.responses import PlainTextResponse
 from pathlib import Path
 
-_AGENT_DIR = Path(__file__).resolve().parent.parent.parent.parent / "agent"
+_AGENT_DIR = Path(os.environ.get("AGENT_DIR", Path(__file__).resolve().parent.parent.parent.parent / "agent"))
 
 
 @router.get("/install.sh")
