@@ -18,7 +18,7 @@ from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserListRespo
 from app.schemas.config import ConfigResponse, ConfigListResponse
 from app.schemas.settings import SystemSettingsResponse, SystemSettingsUpdate
 from app.api.deps import require_admin
-from app.services.vpn_manager import vpn_manager, VPNManagerError
+from app.services.vpn_manager_new import vpn_manager
 from app.services.wg_blob_store import WgBlobStore
 from app.db.models import WgServerKeys
 
@@ -189,10 +189,10 @@ async def toggle_user_block(
             if client_name not in processed_clients:
                 processed_clients.add(client_name)
                 if is_blocking:
-                    vpn_manager.disable_peer(client_name)
+                    vpn_manager.disable_peer(db, client_name)
                 else:
-                    vpn_manager.enable_peer(client_name)
-        except VPNManagerError as e:
+                    vpn_manager.enable_peer(db, client_name)
+        except Exception as e:
             logger.error(f"Failed to {'disable' if is_blocking else 'enable'} "
                          f"peer {client_name}: {e}")
             vpn_errors.append(client_name)
@@ -250,8 +250,8 @@ async def delete_user(
     for config in all_configs:
         if config.is_active:
             try:
-                vpn_manager.delete_client(config.client_name)
-            except VPNManagerError as e:
+                vpn_manager.delete_peer(db, config.client_name)
+            except Exception as e:
                 logger.error(
                     f"Failed to delete VPN client {config.client_name}: {e}"
                 )

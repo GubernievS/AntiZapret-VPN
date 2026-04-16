@@ -16,7 +16,7 @@ from fastapi import Depends
 from app.db.session import get_db
 from app.crud import config as crud_config
 from app.core.security import verify_config_share_token
-from app.services.vpn_manager import vpn_manager, VPNManagerError
+from app.services.vpn_manager_new import vpn_manager
 
 logger = logging.getLogger(__name__)
 
@@ -60,30 +60,39 @@ async def download_shared_config(
             detail="Config not found",
         )
 
-    if not config.config_file_path:
+    # Render config from DB
+    from urllib.parse import urlparse
+    from app.config import settings as app_settings
+
+    if config.config_type == "awg_antizapret":
+        iface, flavor = "antizapret", "awg"
+    else:
+        iface, flavor = "vpn", "awg"
+
+    endpoint_host = app_settings.LB_ENDPOINT_HOST or urlparse(app_settings.FRONTEND_URL).hostname
+    allowed_ips = vpn_manager.get_antizapret_allowed_ips(db) if iface == "antizapret" else None
+    private_key = config.config_metadata.get("private_key") if config.config_metadata else None
+
+    if private_key is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Config file path not set",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Config missing private key (pre-migration config). Please recreate.",
         )
 
     try:
-        content = vpn_manager.read_config_file(config.config_file_path)
-    except VPNManagerError as e:
-        logger.error(f"Failed to read config file for share link: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to read config file",
+        content = vpn_manager.get_client_conf(
+            db, config.client_name, flavor, endpoint_host, iface,
+            client_private_key=private_key,
+            allowed_ips=allowed_ips,
         )
-
-    if content is None:
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Config file not found on server",
+            detail=str(e),
         )
 
     # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ)
-    from app.config import settings
-    server = settings.get_short_server_name()
+    server = app_settings.get_short_server_name()
     suffix = "az" if config.config_type == "awg_antizapret" else "vpn"
     short_name = f"{server}-{suffix}"
     conf_filename = f"{short_name}.conf"

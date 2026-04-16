@@ -393,3 +393,7 @@ class VpnManager:
             if (node.applied_sha or {}).get(path) != current_sha:
                 return False
         return True
+
+
+# Module-level singleton (mirrors old vpn_manager pattern)
+vpn_manager = VpnManager()
