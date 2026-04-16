@@ -3,7 +3,7 @@ SQLAlchemy database models
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, BigInteger, Text, Integer
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, BigInteger, Text, Integer, LargeBinary
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -105,3 +105,49 @@ class SystemSettings(Base):
 
     def __repr__(self):
         return f"<SystemSettings max_configs={self.max_configs_per_user}>"
+
+
+class WgFileState(Base):
+    """WireGuard config files stored as blobs for HA synchronisation."""
+    __tablename__ = "wg_file_state"
+
+    path = Column(String(500), primary_key=True)
+    content = Column(LargeBinary, nullable=False)
+    sha256 = Column(String(64), nullable=False)
+    size_bytes = Column(Integer, nullable=False)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_by = Column(String(100), nullable=False)
+
+    def __repr__(self):
+        return f"<WgFileState {self.path}>"
+
+
+class WgServerKeys(Base):
+    """Server WireGuard keypairs per interface."""
+    __tablename__ = "wg_server_keys"
+
+    iface = Column(String(50), primary_key=True)
+    private_key = Column(Text, nullable=False)
+    public_key = Column(Text, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<WgServerKeys {self.iface}>"
+
+
+class Node(Base):
+    """Data-plane node registry with health and metrics."""
+    __tablename__ = "nodes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    hostname = Column(String(255), unique=True, nullable=False)
+    private_ip = Column(String(50), nullable=False)
+    enroll_token = Column(String(255), unique=True, nullable=False)
+    last_seen = Column(DateTime, nullable=True)
+    health = Column(String(20), nullable=True)
+    applied_sha = Column(JSONB, nullable=True)
+    metrics = Column(JSONB, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Node {self.hostname}>"
