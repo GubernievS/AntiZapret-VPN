@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     VPN_CLIENT_SCRIPT: str = "/root/antizapret/client.sh"
     VPN_CLIENT_DIR: str = "/root/antizapret/client"
 
+    # Load balancer endpoint host (used when generating client configs)
+    LB_ENDPOINT_HOST: str = ""
+
     # Logging
     LOG_LEVEL: str = "INFO"
 

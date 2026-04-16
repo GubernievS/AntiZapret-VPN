@@ -311,6 +311,9 @@ class VpnManager:
         flavor: str,
         endpoint_host: str,
         iface: str = "antizapret",
+        *,
+        client_private_key: str | None = None,
+        allowed_ips: str | None = None,
     ) -> str:
         """
         Render a client config in-memory from the server conf blob.
@@ -320,6 +323,8 @@ class VpnManager:
             flavor: "wg" or "awg".
             endpoint_host: server hostname or IP.
             iface: "antizapret" or "vpn".
+            client_private_key: if provided, embed the real key instead of placeholder.
+            allowed_ips: override AllowedIPs for antizapret.
 
         Returns:
             Rendered client config string.
@@ -351,4 +356,40 @@ class VpnManager:
             server_pubkey=server_keys.public_key,
             endpoint_host=endpoint_host,
             flavor=flavor,
+            client_private_key=client_private_key,
+            allowed_ips=allowed_ips,
         )
+
+    # ------------------------------------------------------------------
+    # get_antizapret_allowed_ips
+    # ------------------------------------------------------------------
+
+    def get_antizapret_allowed_ips(self, db: Session) -> str | None:
+        """Return the antizapret allowed IPs blob, or None if not set."""
+        store = WgBlobStore(db)
+        blob = store.get("antizapret:allowed_ips")
+        return blob.decode() if blob else None
+
+    # ------------------------------------------------------------------
+    # check_all_nodes_applied
+    # ------------------------------------------------------------------
+
+    def check_all_nodes_applied(self, db: Session, path: str) -> bool:
+        """
+        Return True if all live nodes have applied the current blob at *path*.
+
+        Returns True if there is no current blob or no live nodes.
+        """
+        from app.db.models import Node
+        store = WgBlobStore(db)
+        paths = store.get_all_paths()
+        current_sha = paths.get(path)
+        if not current_sha:
+            return True
+        live_nodes = db.query(Node).filter(Node.health.in_(["ok", "degraded"])).all()
+        if not live_nodes:
+            return True
+        for node in live_nodes:
+            if (node.applied_sha or {}).get(path) != current_sha:
+                return False
+        return True

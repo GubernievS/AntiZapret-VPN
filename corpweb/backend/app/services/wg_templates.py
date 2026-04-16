@@ -286,6 +286,9 @@ def render_client_conf(
     server_pubkey: str,
     endpoint_host: str,
     flavor: str,
+    *,
+    allowed_ips: str | None = None,
+    client_private_key: str | None = None,
 ) -> str:
     """
     Render a WireGuard / AmneziaWG client config.
@@ -296,16 +299,25 @@ def render_client_conf(
         server_pubkey: server public key.
         endpoint_host: server hostname or IP.
         flavor: "wg" or "awg".
+        allowed_ips: override AllowedIPs for antizapret (default: "10.29.8.0/24").
+        client_private_key: if provided, embed the real key; otherwise use placeholder.
     """
     port = _PORT_MAP[(iface, flavor)]
 
     # Extract bare IP from allowed_ips (e.g. "10.29.8.2/32" -> "10.29.8.2")
     client_ip = peer.allowed_ips.split("/")[0]
 
+    # PrivateKey line
+    private_key_line = (
+        f"PrivateKey = {client_private_key}"
+        if client_private_key is not None
+        else "PrivateKey = ${CLIENT_PRIVATE_KEY}"
+    )
+
     # [Interface] section
     lines = [
         "[Interface]",
-        "PrivateKey = ${CLIENT_PRIVATE_KEY}",
+        private_key_line,
         f"Address = {client_ip}/32",
         "DNS = 10.29.8.1",
     ]
@@ -326,7 +338,8 @@ def render_client_conf(
         lines.append("AllowedIPs = 0.0.0.0/0, ::/0")
     else:
         # antizapret: subnet-based split routing
-        lines.append(f"AllowedIPs = 10.29.8.0/24")
+        effective_allowed_ips = allowed_ips if allowed_ips is not None else "10.29.8.0/24"
+        lines.append(f"AllowedIPs = {effective_allowed_ips}")
 
     lines.append("PersistentKeepalive = 15")
     lines.append("")  # trailing newline

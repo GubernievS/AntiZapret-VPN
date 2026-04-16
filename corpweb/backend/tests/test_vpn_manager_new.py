@@ -324,6 +324,47 @@ class TestGetClientConf:
 # generate_client_name (standalone function)
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# get_client_conf — client_private_key and allowed_ips pass-through
+# ---------------------------------------------------------------------------
+
+def test_get_client_conf_with_private_key(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    info = mgr.add_peer(db, "dave-1")
+    conf = mgr.get_client_conf(db, "dave-1", "awg", "lb.example.com",
+                                client_private_key=info["private_key"])
+    assert info["private_key"] in conf
+    assert "${CLIENT_PRIVATE_KEY}" not in conf
+
+
+def test_get_antizapret_allowed_ips_missing(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    assert mgr.get_antizapret_allowed_ips(db) is None
+
+
+def test_get_antizapret_allowed_ips_present(db):
+    from app.services.vpn_manager_new import VpnManager
+    from app.services.wg_blob_store import WgBlobStore
+    mgr = VpnManager()
+    store = WgBlobStore(db)
+    store.put("antizapret:allowed_ips", b"10.29.8.0/24, 1.2.3.0/24", by="test")
+    result = mgr.get_antizapret_allowed_ips(db)
+    assert "1.2.3.0/24" in result
+
+
+def test_check_all_nodes_applied_no_nodes(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    assert mgr.check_all_nodes_applied(db, "/etc/wireguard/antizapret.conf") is True
+
+
+# ---------------------------------------------------------------------------
+# generate_client_name (standalone function)
+# ---------------------------------------------------------------------------
+
 class TestGenerateClientName:
     def test_first_config(self):
         name = generate_client_name("alice", [])

@@ -470,3 +470,23 @@ class TestRenderClientConf:
             flavor="wg",
         )
         assert "DNS = 10.29.8.1" in conf
+
+
+# ---------------------------------------------------------------------------
+# render_client_conf — new keyword-only parameters
+# ---------------------------------------------------------------------------
+
+def test_render_client_conf_custom_allowed_ips():
+    peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.29.8.2/32")
+    out = render_client_conf(peer, "antizapret", "spub==", "lb.example.com", "awg",
+                             allowed_ips="10.29.8.0/24, 1.2.3.0/24, 5.6.7.0/24")
+    assert "1.2.3.0/24" in out
+    assert "5.6.7.0/24" in out
+
+
+def test_render_client_conf_with_private_key():
+    peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.29.8.2/32")
+    out = render_client_conf(peer, "vpn", "spub==", "lb.example.com", "wg",
+                             client_private_key="REAL_PRIV_KEY==")
+    assert "PrivateKey = REAL_PRIV_KEY==" in out
+    assert "${CLIENT_PRIVATE_KEY}" not in out
