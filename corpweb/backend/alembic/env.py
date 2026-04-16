@@ -13,7 +13,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import Base and models
 from app.db.base import Base
-from app.db.models import User, VPNConfig, ConnectionLog, SystemSettings
+from app.db.models import (
+    User, VPNConfig, ConnectionLog, SystemSettings,
+    WgFileState, WgServerKeys, Node,
+)
 from app.config import settings
 
 # this is the Alembic Config object, which provides
