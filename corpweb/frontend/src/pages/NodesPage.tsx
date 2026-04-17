@@ -158,7 +158,7 @@ export default function NodesPage() {
         <h1 className="text-2xl font-bold text-gray-900">Ноды</h1>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { setLoading(true); loadNodes() }}
+            onClick={() => { loadNodes(); loadBalancer() }}
             title="Обновить"
             className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 transition"
           >
