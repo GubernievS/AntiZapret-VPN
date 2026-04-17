@@ -54,9 +54,23 @@ class MonitoringService:
         return {"connections": self.get_active_connections(), "traffic": self.get_traffic_stats()}
 
     def _build_ip_map(self) -> dict[str, str]:
+        """
+        Map VPN IP → client_name.
+        Each client has an antizapret IP (10.29.x.x) and a vpn IP (10.28.x.x)
+        with the same host part. config_metadata stores only the antizapret IP,
+        so we derive the vpn IP by replacing the subnet prefix.
+        """
         configs = self._db.query(VPNConfig).filter(VPNConfig.is_active == True).all()
-        return {
-            (cfg.config_metadata or {}).get("vpn_ip", ""): cfg.client_name
-            for cfg in configs
-            if (cfg.config_metadata or {}).get("vpn_ip")
-        }
+        result = {}
+        for cfg in configs:
+            az_ip = (cfg.config_metadata or {}).get("vpn_ip", "")
+            if not az_ip:
+                continue
+            # antizapret IP: 10.29.x.x
+            result[az_ip] = cfg.client_name
+            # vpn IP: 10.28.x.x (same host part, different subnet)
+            parts = az_ip.split(".")
+            if len(parts) == 4 and parts[0] == "10" and parts[1] == "29":
+                vpn_ip = f"10.28.{parts[2]}.{parts[3]}"
+                result[vpn_ip] = cfg.client_name
+        return result
