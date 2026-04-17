@@ -184,31 +184,69 @@ else
     print_success "DNS: $DOMAIN → $SERVER_IP (совпадает)"
 fi
 
-# Генерация паролей
+# Проверка существующей конфигурации
 DB_NAME="corpweb_db"
 DB_USER="corpweb"
-DB_PASSWORD="$(openssl rand -hex 16)"
-SECRET_KEY="$(openssl rand -hex 32)"
+EXISTING_ENV="$INSTALL_DIR/backend/.env"
+REUSE_DB=false
+
+if [[ -f "$EXISTING_ENV" ]]; then
+    EXISTING_DB_URL=$(grep -E "^DATABASE_URL=" "$EXISTING_ENV" | head -1 | cut -d= -f2-)
+    # Извлечь пароль из DATABASE_URL: postgresql://user:PASSWORD@host/db
+    EXISTING_DB_PASS=$(echo "$EXISTING_DB_URL" | sed -n 's|.*://[^:]*:\([^@]*\)@.*|\1|p')
+
+    if [[ -n "$EXISTING_DB_PASS" && "$EXISTING_DB_PASS" != "change_me" ]]; then
+        print_info "Найден существующий .env с настроенной БД"
+        read -p "Использовать существующую БД? (Y/n): " REUSE_CONFIRM
+        if [[ "$REUSE_CONFIRM" != "n" && "$REUSE_CONFIRM" != "N" ]]; then
+            DB_PASSWORD="$EXISTING_DB_PASS"
+            SECRET_KEY=$(grep -E "^SECRET_KEY=" "$EXISTING_ENV" | head -1 | cut -d= -f2-)
+            REUSE_DB=true
+            print_success "Используем существующую БД (пароль из .env)"
+        fi
+    fi
+fi
+
+if [[ "$REUSE_DB" == "false" ]]; then
+    DB_PASSWORD="$(openssl rand -hex 16)"
+    SECRET_KEY="$(openssl rand -hex 32)"
+    print_info "Сгенерированы новые пароль БД и SECRET_KEY"
+fi
 
 # Google OAuth (опционально)
-echo ""
-read -p "Google OAuth Client ID (пусто — пропустить): " GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_SECRET=""
-GOOGLE_OAUTH_DOMAIN=""
-if [[ -n "$GOOGLE_CLIENT_ID" ]]; then
-    read -p "Google OAuth Client Secret: " GOOGLE_CLIENT_SECRET
-    read -p "Google Workspace домен (например: company.com): " GOOGLE_OAUTH_DOMAIN
+# При повторной установке — берём из существующего .env
+if [[ "$REUSE_DB" == "true" && -f "$EXISTING_ENV" ]]; then
+    GOOGLE_CLIENT_ID=$(grep -E "^GOOGLE_CLIENT_ID=" "$EXISTING_ENV" | head -1 | cut -d= -f2-)
+    GOOGLE_CLIENT_SECRET=$(grep -E "^GOOGLE_CLIENT_SECRET=" "$EXISTING_ENV" | head -1 | cut -d= -f2-)
+    GOOGLE_OAUTH_DOMAIN=$(grep -E "^GOOGLE_OAUTH_DOMAIN=" "$EXISTING_ENV" | head -1 | cut -d= -f2-)
+    if [[ -n "$GOOGLE_CLIENT_ID" && "$GOOGLE_CLIENT_ID" != "disabled" ]]; then
+        print_success "Google OAuth: из существующего .env"
+    fi
+else
+    echo ""
+    read -p "Google OAuth Client ID (пусто — пропустить): " GOOGLE_CLIENT_ID
+    GOOGLE_CLIENT_SECRET=""
+    GOOGLE_OAUTH_DOMAIN=""
+    if [[ -n "$GOOGLE_CLIENT_ID" ]]; then
+        read -p "Google OAuth Client Secret: " GOOGLE_CLIENT_SECRET
+        read -p "Google Workspace домен (например: company.com): " GOOGLE_OAUTH_DOMAIN
+    fi
 fi
 
 # ── Шаг 3: Создание БД ──────────────────────────────────────────────────────
 # Ручная установка:
 #   sudo -u postgres psql -c "CREATE USER corpweb WITH PASSWORD 'YOUR_PASSWORD';"
 #   sudo -u postgres psql -c "CREATE DATABASE corpweb_db OWNER corpweb;"
+# При повторной установке с существующей БД — этот шаг пропускается.
 
-print_info "Создание базы данных..."
-su - postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'\" | grep -q 1 || psql -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';\"" 2>/dev/null
-su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || psql -c \"CREATE DATABASE $DB_NAME OWNER $DB_USER;\"" 2>/dev/null
-print_success "БД: $DB_NAME, пользователь: $DB_USER"
+if [[ "$REUSE_DB" == "true" ]]; then
+    print_success "БД уже существует, пропускаем создание"
+else
+    print_info "Создание базы данных..."
+    su - postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'\" | grep -q 1 || psql -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';\"" 2>/dev/null
+    su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || psql -c \"CREATE DATABASE $DB_NAME OWNER $DB_USER;\"" 2>/dev/null
+    print_success "БД: $DB_NAME, пользователь: $DB_USER"
+fi
 
 # ── Шаг 4: Копирование кода ─────────────────────────────────────────────────
 # Ручная установка:
