@@ -147,6 +147,7 @@ class Node(Base):
     health = Column(String(20), nullable=True)
     applied_sha = Column(JSONB, nullable=True)
     metrics = Column(JSONB, nullable=True)
+    peers_snapshot = Column(JSONB, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
