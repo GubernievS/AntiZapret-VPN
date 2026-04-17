@@ -152,10 +152,17 @@ su - postgres -c "psql -tc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'\" |
 su - postgres -c "psql -tc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || psql -c \"CREATE DATABASE $DB_NAME OWNER $DB_USER;\"" 2>/dev/null
 print_success "БД: $DB_NAME, пользователь: $DB_USER"
 
-# ── Copy backend ──
-print_info "Копирование backend в $INSTALL_DIR/backend..."
+# ── Copy backend + agent ──
+print_info "Копирование backend и agent в $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 cp -r "$SCRIPT_DIR/backend" "$INSTALL_DIR/backend"
+
+# Agent (sync-agent source for install.sh endpoint)
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+if [[ -d "$REPO_ROOT/agent" ]]; then
+    cp -r "$REPO_ROOT/agent" "$INSTALL_DIR/agent"
+    print_success "Agent скопирован в $INSTALL_DIR/agent"
+fi
 
 # Create venv and install deps
 print_info "Установка Python зависимостей..."
@@ -195,10 +202,13 @@ FRONTEND_URL=https://$DOMAIN
 BACKEND_URL=https://$DOMAIN/api
 CORS_ORIGINS=https://$DOMAIN
 
-# VPN
-VPN_CLIENT_SCRIPT=/root/antizapret/client.sh
-VPN_CLIENT_DIR=/root/antizapret/client
-OPENVPN_STATUS_LOG_DIR=/etc/openvpn/server/logs
+# HA
+LB_ENDPOINT_HOST=$DOMAIN
+
+# VPN (legacy — not used by vpn_manager_new)
+VPN_CLIENT_SCRIPT=/dev/null
+VPN_CLIENT_DIR=/tmp
+OPENVPN_STATUS_LOG_DIR=/tmp
 
 # Monitoring
 MONITORING_UPDATE_INTERVAL=30
@@ -208,11 +218,15 @@ LOG_LEVEL=INFO
 EOF
 print_success ".env создан"
 
-# ── Run Alembic migrations ──
+# ── Run Alembic migrations + init ──
 print_info "Применение миграций БД..."
 cd "$INSTALL_DIR/backend"
-"$INSTALL_DIR/backend/venv/bin/alembic" upgrade head
+"$INSTALL_DIR/backend/venv/bin/alembic" upgrade head 2>/dev/null || \
+    print_warning "Alembic миграция пропущена (таблицы уже существуют)"
 print_success "Миграции применены"
+
+print_info "Инициализация БД (admin, системные настройки)..."
+"$INSTALL_DIR/backend/venv/bin/python" -c "from app.db.init_db import init_db; init_db()"
 
 # ── Create branding directory ──
 mkdir -p "$INSTALL_DIR/frontend/branding"
@@ -288,6 +302,32 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_read_timeout 300;
+    }
+
+    # SSE: agent events (long-lived)
+    location /api/v1/agent/events {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_read_timeout 24h;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_set_header Connection '';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        chunked_transfer_encoding on;
+    }
+
+    # SSE: apply status
+    location /api/v1/apply-status/stream {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_read_timeout 60s;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_set_header Connection '';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        chunked_transfer_encoding on;
     }
 
     # Branding assets

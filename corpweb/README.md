@@ -44,6 +44,22 @@
 
 ## Установка Control-Plane
 
+### Автоматическая установка (рекомендуется)
+
+```bash
+git clone https://github.com/AlexanderBrolin/CorpAdmin-AZ.git
+cd CorpAdmin-AZ && git checkout CorpAdmin
+cd corpweb
+sudo ./install-native.sh
+```
+
+Скрипт автоматически установит все зависимости (PostgreSQL, Python, Node.js, nginx, Certbot), создаст БД, соберёт frontend, настроит nginx с SSL, запустит backend.
+
+### Ручная установка
+
+<details>
+<summary>Развернуть пошаговую инструкцию</summary>
+
 ### 1. Подготовка сервера
 
 ```bash
@@ -68,9 +84,6 @@ cp corpweb/backend/alembic.ini /opt/corpweb/backend/
 cp -r corpweb/backend/alembic /opt/corpweb/backend/alembic
 cp corpweb/backend/requirements.txt /opt/corpweb/backend/
 cp -r agent /opt/corpweb/agent
-
-# Создать symlink для agent (backend ищет его по относительному пути)
-ln -s /opt/corpweb/agent /opt/corpweb/backend/agent
 
 # Python venv
 cd /opt/corpweb/backend
@@ -204,6 +217,8 @@ netfilter-persistent save
 cd /opt/corpweb/backend && source venv/bin/activate
 python3 -m app.migrate  # миграция файлов с диска в БД (для существующих нод)
 ```
+
+</details>
 
 ## Подготовка ноды
 

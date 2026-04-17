@@ -182,7 +182,14 @@ from fastapi import Request
 from fastapi.responses import PlainTextResponse
 from pathlib import Path
 
-_AGENT_DIR = Path(os.environ.get("AGENT_DIR", Path(__file__).resolve().parent.parent.parent.parent / "agent"))
+# Agent files: /opt/corpweb/agent/ in production, or ../../../agent relative to backend root
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent  # .../backend/app/api/v1 → .../backend
+_AGENT_DIR = Path(os.environ.get(
+    "AGENT_DIR",
+    # Try /opt/corpweb/agent first (production), fallback to sibling of backend root
+    "/opt/corpweb/agent" if Path("/opt/corpweb/agent").exists()
+    else str(_BACKEND_ROOT.parent / "agent")
+))
 
 
 @router.get("/install.sh")
