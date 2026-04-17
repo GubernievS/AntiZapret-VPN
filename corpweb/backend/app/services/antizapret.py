@@ -1,17 +1,19 @@
 """
 Antizapret configuration service.
-Manages /root/antizapret/setup settings and editable config files.
+Manages /root/antizapret/setup settings and editable config files
+via WgBlobStore (stored in DB, not filesystem).
 """
 import re
-import subprocess
 import logging
-from pathlib import Path
 from typing import Dict, Optional
+
+from sqlalchemy.orm import Session
+
+from app.services.wg_blob_store import WgBlobStore
 
 logger = logging.getLogger(__name__)
 
 ANTIZAPRET_SETUP_FILE = "/root/antizapret/setup"
-ANTIZAPRET_DOALL_SCRIPT = "/root/antizapret/doall.sh"
 
 EDITABLE_FILES: Dict[str, str] = {
     "include_hosts": "/root/antizapret/config/include-hosts.txt",
@@ -56,35 +58,38 @@ class AntizapretServiceError(Exception):
 
 class AntizapretService:
 
+    def __init__(self, db: Session):
+        self._store = WgBlobStore(db)
+
     def get_file_content(self, file_type: str) -> str:
-        """Read one of the editable config files."""
+        """Read one of the editable config files from the blob store."""
         if file_type not in EDITABLE_FILES:
             raise AntizapretServiceError(f"Unknown file type: {file_type}")
-        path = Path(EDITABLE_FILES[file_type])
-        if not path.exists():
+        path = EDITABLE_FILES[file_type]
+        data = self._store.get(path)
+        if data is None:
             return ""
-        return path.read_text(encoding="utf-8")
+        return data.decode("utf-8")
 
     def save_file_content(self, file_type: str, content: str) -> None:
-        """Write one of the editable config files."""
+        """Write one of the editable config files to the blob store."""
         if file_type not in EDITABLE_FILES:
             raise AntizapretServiceError(f"Unknown file type: {file_type}")
-        path = Path(EDITABLE_FILES[file_type])
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
+        path = EDITABLE_FILES[file_type]
+        self._store.put(path, content.encode("utf-8"), by="admin")
         logger.info(f"Saved antizapret file: {path}")
 
     def get_settings(self) -> Dict[str, Optional[str]]:
         """
-        Read /root/antizapret/setup and return known settings.
+        Read /root/antizapret/setup from blob store and return known settings.
         Returns dict where missing keys have value None.
         """
-        path = Path(ANTIZAPRET_SETUP_FILE)
         result: Dict[str, Optional[str]] = {k: None for k in ALL_KNOWN_SETTINGS}
-        if not path.exists():
+        data = self._store.get(ANTIZAPRET_SETUP_FILE)
+        if data is None:
             return result
 
-        content = path.read_text(encoding="utf-8")
+        content = data.decode("utf-8")
         # Match lines like: KEY=value or KEY="value" or KEY='value'
         pattern = re.compile(r'^([A-Z0-9_]+)=["\']?([^"\'#\n]*)["\']?\s*(?:#.*)?$', re.MULTILINE)
         for match in pattern.finditer(content):
@@ -96,16 +101,16 @@ class AntizapretService:
 
     def update_settings(self, new_settings: Dict[str, str]) -> int:
         """
-        Update /root/antizapret/setup with provided key-value pairs.
+        Update /root/antizapret/setup in blob store with provided key-value pairs.
         Only keys in ALL_KNOWN_SETTINGS are accepted.
         Preserves comments and unknown lines.
         Returns count of changed parameters.
         """
-        path = Path(ANTIZAPRET_SETUP_FILE)
-        if not path.exists():
+        data = self._store.get(ANTIZAPRET_SETUP_FILE)
+        if data is None:
             raise AntizapretServiceError(f"Setup file not found: {ANTIZAPRET_SETUP_FILE}")
 
-        content = path.read_text(encoding="utf-8")
+        content = data.decode("utf-8")
         changed = 0
 
         for key, value in new_settings.items():
@@ -123,34 +128,6 @@ class AntizapretService:
                 content = content.rstrip("\n") + f"\n{new_line}\n"
             changed += 1
 
-        path.write_text(content, encoding="utf-8")
+        self._store.put(ANTIZAPRET_SETUP_FILE, content.encode("utf-8"), by="admin")
         logger.info(f"Updated {changed} antizapret settings")
         return changed
-
-    def run_doall(self, timeout: int = 300) -> str:
-        """Execute /root/antizapret/doall.sh to apply changes."""
-        script = Path(ANTIZAPRET_DOALL_SCRIPT)
-        if not script.exists():
-            raise AntizapretServiceError(f"Script not found: {ANTIZAPRET_DOALL_SCRIPT}")
-
-        try:
-            result = subprocess.run(
-                [str(script)],
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                check=False,
-            )
-            if result.returncode != 0:
-                raise AntizapretServiceError(
-                    f"doall.sh failed (exit {result.returncode}): {result.stderr.strip()}"
-                )
-            logger.info("doall.sh completed successfully")
-            return result.stdout
-        except subprocess.TimeoutExpired:
-            raise AntizapretServiceError("doall.sh timed out (limit: 5 min)")
-        except FileNotFoundError:
-            raise AntizapretServiceError(f"Script not executable: {ANTIZAPRET_DOALL_SCRIPT}")
-
-
-antizapret_service = AntizapretService()
