@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { RefreshCw, Loader2, WifiOff, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
 import { getConnections, getTraffic } from '../api/monitoring'
 import type { ActiveConnection, TrafficStats } from '../api/monitoring'
@@ -30,12 +30,17 @@ function interfaceLabel(iface: string): string {
   return iface
 }
 
+type SortField = 'client_name' | 'node' | 'interface' | 'handshake_age' | 'rx_bytes' | 'tx_bytes'
+type SortDir = 'asc' | 'desc'
+
 export default function MonitoringPage() {
   const [connections, setConnections] = useState<ActiveConnection[]>([])
   const [traffic, setTraffic] = useState<TrafficStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [nodeFilter, setNodeFilter] = useState<string>('')
+  const [sortField, setSortField] = useState<SortField>('rx_bytes')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   const load = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true)
@@ -67,6 +72,29 @@ export default function MonitoringPage() {
       ...connections.map(c => c.node),
     ])
   ).sort()
+
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDir('desc')
+    }
+  }
+
+  const sortedConnections = useMemo(() => {
+    return [...connections].sort((a, b) => {
+      const aVal = a[sortField]
+      const bVal = b[sortField]
+      let cmp = 0
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        cmp = aVal - bVal
+      } else {
+        cmp = String(aVal ?? '').localeCompare(String(bVal ?? ''))
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+  }, [connections, sortField, sortDir])
 
   if (loading) {
     return (
@@ -155,17 +183,32 @@ export default function MonitoringPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Клиент</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Нода</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Интерфейс</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Endpoint</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Хендшейк</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">RX</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">TX</th>
+                  {(
+                    [
+                      { field: 'client_name' as SortField, label: 'Клиент', align: 'left' },
+                      { field: 'node' as SortField, label: 'Нода', align: 'left' },
+                      { field: 'interface' as SortField, label: 'Интерфейс', align: 'left' },
+                      { field: null, label: 'Endpoint', align: 'left' },
+                      { field: 'handshake_age' as SortField, label: 'Хендшейк', align: 'left' },
+                      { field: 'rx_bytes' as SortField, label: 'RX', align: 'right' },
+                      { field: 'tx_bytes' as SortField, label: 'TX', align: 'right' },
+                    ] as { field: SortField | null; label: string; align: string }[]
+                  ).map(col => (
+                    <th
+                      key={col.label}
+                      onClick={col.field ? () => handleSort(col.field as SortField) : undefined}
+                      className={`px-4 py-3 text-xs font-semibold text-gray-500 uppercase ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.field ? 'cursor-pointer select-none hover:text-gray-700' : ''}`}
+                    >
+                      {col.label}
+                      {col.field && sortField === col.field && (
+                        <span className="ml-1">{sortDir === 'asc' ? '▲' : '▼'}</span>
+                      )}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {connections.map((conn, i) => (
+                {sortedConnections.map((conn, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3 text-sm font-mono text-gray-900">
                       {conn.client_name || <span className="text-gray-400">—</span>}

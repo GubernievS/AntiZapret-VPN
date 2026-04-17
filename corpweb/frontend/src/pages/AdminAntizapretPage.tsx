@@ -49,6 +49,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 // ── Page ──────────────────────────────────────────────────────────────────
 
 const isY = (v: string | null | undefined) => v === 'y'
+const is1 = (v: string | null | undefined) => v === '1'
 
 export default function AdminAntizapretPage() {
   const [settings, setSettings] = useState<AntizapretSettings | null>(null)
@@ -69,6 +70,10 @@ export default function AdminAntizapretPage() {
 
   const setBool = (key: keyof AntizapretSettings, value: boolean) => {
     setSettings(prev => prev ? { ...prev, [key]: value ? 'y' : 'n' } : prev)
+  }
+
+  const set1 = (key: keyof AntizapretSettings, value: boolean) => {
+    setSettings(prev => prev ? { ...prev, [key]: value ? '1' : '0' } : prev)
   }
 
   const setStr = (key: keyof AntizapretSettings, value: string) => {
@@ -238,6 +243,55 @@ export default function AdminAntizapretPage() {
             value={settings.WIREGUARD_HOST ?? ''}
             onChange={e => setStr('WIREGUARD_HOST', e.target.value)}
             placeholder="vpn.example.com"
+            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </Section>
+
+      {/* DNS */}
+      <Section title="DNS">
+        <Toggle
+          label="DNS-сервер для AntiZapret-режима. Вкл = knot-resolver на ноде, Выкл = системный DNS (ANTIZAPRET_DNS)"
+          value={is1(settings.ANTIZAPRET_DNS)}
+          onChange={v => set1('ANTIZAPRET_DNS', v)}
+        />
+        <Toggle
+          label="DNS-сервер для VPN-режима. Вкл = knot-resolver, Выкл = системный DNS (VPN_DNS)"
+          value={is1(settings.VPN_DNS)}
+          onChange={v => set1('VPN_DNS', v)}
+        />
+      </Section>
+
+      {/* Clients */}
+      <Section title="Клиенты">
+        <Toggle
+          label="Альтернативные подсети для клиентов (при конфликте с локальной сетью) (ALTERNATIVE_CLIENT_IP)"
+          value={isY(settings.ALTERNATIVE_CLIENT_IP)}
+          onChange={v => setBool('ALTERNATIVE_CLIENT_IP', v)}
+        />
+        <Toggle
+          label="Альтернативные фейковые IP для DNS-резолвинга заблокированных доменов (ALTERNATIVE_FAKE_IP)"
+          value={isY(settings.ALTERNATIVE_FAKE_IP)}
+          onChange={v => setBool('ALTERNATIVE_FAKE_IP', v)}
+        />
+        <Toggle
+          label="Изоляция клиентов друг от друга. Вкл = клиенты VPN не видят друг друга (CLIENT_ISOLATION)"
+          value={isY(settings.CLIENT_ISOLATION)}
+          onChange={v => setBool('CLIENT_ISOLATION', v)}
+        />
+      </Section>
+
+      {/* WARP */}
+      <Section title="WARP">
+        <div className="py-2">
+          <label className="text-sm text-gray-700 block mb-1">
+            Маршрутизация исходящего трафика через Cloudflare WARP. Пусто = выключен (WARP_OUTBOUND)
+          </label>
+          <input
+            type="text"
+            value={settings.WARP_OUTBOUND ?? ''}
+            onChange={e => setStr('WARP_OUTBOUND', e.target.value)}
+            placeholder=""
             className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

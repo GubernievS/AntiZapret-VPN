@@ -1,6 +1,15 @@
 import api from './client'
 
-export type FileType = 'include_hosts' | 'exclude_hosts' | 'include_ips'
+export type FileType =
+  | 'include_hosts'
+  | 'exclude_hosts'
+  | 'include_ips'
+  | 'exclude_ips'
+  | 'allow_ips'
+  | 'forward_ips'
+  | 'include_adblock_hosts'
+  | 'exclude_adblock_hosts'
+  | 'remove_hosts'
 
 export interface FileContentResponse {
   file_type: string
@@ -30,6 +39,12 @@ export interface AntizapretSettings {
   ATTACK_PROTECTION: string | null
   TORRENT_GUARD: string | null
   RESTRICT_FORWARD: string | null
+  ANTIZAPRET_DNS: string | null
+  VPN_DNS: string | null
+  ALTERNATIVE_CLIENT_IP: string | null
+  ALTERNATIVE_FAKE_IP: string | null
+  CLIENT_ISOLATION: string | null
+  WARP_OUTBOUND: string | null
 }
 
 export interface DoallResponse {

@@ -18,20 +18,46 @@ const FILE_TABS: { key: FileType; label: string; description: string }[] = [
     label: 'Включить IP',
     description: 'IP-адреса и подсети, принудительно добавляемые в маршрутизацию (по одному на строку)',
   },
+  {
+    key: 'exclude_ips',
+    label: 'Исключить IP из VPN',
+    description: 'IP-адреса и подсети которые НЕ будут маршрутизироваться через VPN. Формат: A.B.C.D/M, по одной записи на строку.',
+  },
+  {
+    key: 'allow_ips',
+    label: 'Разрешить прямой доступ',
+    description: 'IP-адреса исключённые из защиты от атак (allowlist). Формат: A.B.C.D/M, по одной записи на строку.',
+  },
+  {
+    key: 'forward_ips',
+    label: 'Прямая маршрутизация IP',
+    description: 'IP-адреса для прямой маршрутизации без проксирования. Формат: A.B.C.D/M, по одной записи на строку.',
+  },
+  {
+    key: 'include_adblock_hosts',
+    label: 'Блокировка рекламы (+)',
+    description: 'Домены для дополнительной блокировки рекламы. По одному домену на строку.',
+  },
+  {
+    key: 'exclude_adblock_hosts',
+    label: 'Блокировка рекламы (−)',
+    description: 'Домены исключённые из блокировки рекламы. По одному домену на строку.',
+  },
+  {
+    key: 'remove_hosts',
+    label: 'Исключить из обработки',
+    description: 'Домены полностью исключённые из обработки AntiZapret. По одному домену на строку.',
+  },
 ]
 
 export default function AdminFilesPage() {
   const [activeTab, setActiveTab] = useState<FileType>('include_hosts')
-  const [contents, setContents] = useState<Record<FileType, string>>({
-    include_hosts: '',
-    exclude_hosts: '',
-    include_ips: '',
-  })
-  const [loading, setLoading] = useState<Record<FileType, boolean>>({
-    include_hosts: false,
-    exclude_hosts: false,
-    include_ips: false,
-  })
+  const [contents, setContents] = useState<Record<FileType, string>>(
+    Object.fromEntries(FILE_TABS.map(t => [t.key, ''])) as Record<FileType, string>
+  )
+  const [loading, setLoading] = useState<Record<FileType, boolean>>(
+    Object.fromEntries(FILE_TABS.map(t => [t.key, false])) as Record<FileType, boolean>
+  )
   const [saving, setSaving] = useState(false)
   const [applying, setApplying] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,12 +91,7 @@ export default function AdminFilesPage() {
       setSaveSuccess(true)
       setApplying(true)
       const { waitForApply } = await import('../api/applyStatus')
-      const path = FILE_TABS.find(t => t.key === activeTab)?.key === 'include_hosts'
-        ? '/root/antizapret/config/include-hosts.txt'
-        : FILE_TABS.find(t => t.key === activeTab)?.key === 'exclude_hosts'
-        ? '/root/antizapret/config/exclude-hosts.txt'
-        : '/root/antizapret/config/include-ips.txt'
-      const result = await waitForApply(path)
+      const result = await waitForApply('/root/antizapret/config')
       if (result.warning) {
         setError(`Применено с предупреждением: ${result.warning}`)
       } else {
