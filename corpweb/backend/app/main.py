@@ -77,18 +77,18 @@ async def health_check():
     return {"status": "healthy"}
 
 
-# Include routers
+# Include routers (order matters: specific prefixes before parametric ones)
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(configs.router, prefix="/api/v1/configs", tags=["configs"])
+app.include_router(admin_dashboard.router, prefix="/api/v1/admin/dashboard", tags=["admin-dashboard"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(monitoring.router, prefix="/api/v1/monitoring", tags=["monitoring"])
 app.include_router(antizapret.router, prefix="/api/v1/antizapret", tags=["antizapret"])
 app.include_router(public.router, prefix="/api/v1/public", tags=["public"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
+app.include_router(balancer.router, prefix="/api/v1/nodes/balancer", tags=["balancer"])
 app.include_router(nodes.router, prefix="/api/v1/nodes", tags=["nodes"])
 app.include_router(apply_status.router, prefix="/api/v1/apply-status", tags=["apply-status"])
-app.include_router(balancer.router, prefix="/api/v1/nodes/balancer", tags=["balancer"])
-app.include_router(admin_dashboard.router, prefix="/api/v1/admin/dashboard", tags=["admin-dashboard"])
 
 
 if __name__ == "__main__":

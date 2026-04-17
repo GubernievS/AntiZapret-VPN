@@ -3,7 +3,7 @@ import time
 from sqlalchemy.orm import Session
 from app.db.models import Node, VPNConfig
 
-ACTIVE_HANDSHAKE_MAX_AGE = 30  # 2 × PersistentKeepalive
+ACTIVE_HANDSHAKE_MAX_AGE = 180  # 3 minutes — matches WG convention for "active" peer
 
 
 class MonitoringService:

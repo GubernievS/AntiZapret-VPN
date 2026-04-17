@@ -129,11 +129,9 @@ class TestAdminDashboard:
         response = client.get("/api/v1/admin/dashboard", headers=auth_header(admin_token))
         assert response.status_code == 200
         data = response.json()
-        assert "users" in data
-        assert "configs" in data
-        assert "connections" in data
-        assert "settings" in data
-        assert data["users"]["total"] >= 1
+        assert "nodes" in data
+        assert "totals" in data
+        assert data["totals"]["total_users"] >= 1
 
     def test_dashboard_requires_admin(self, client, regular_user, user_token):
         response = client.get("/api/v1/admin/dashboard", headers=auth_header(user_token))
