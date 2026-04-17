@@ -67,7 +67,17 @@ def register(
         row.iface: {"private_key": row.private_key, "public_key": row.public_key}
         for row in db.query(WgServerKeys).all()
     }
-    return {"node_id": node.id, "wg_server_keys": keys}
+    return {
+        "node_id": node.id,
+        "wg_server_keys": keys,
+        "wg_config": {
+            "antizapret_address": "10.29.8.1/21",
+            "antizapret_listen_port": 51443,
+            "vpn_address": "10.28.8.1/21",
+            "vpn_listen_port": 51080,
+            "mtu": 1420,
+        },
+    }
 
 
 @router.get("/file")

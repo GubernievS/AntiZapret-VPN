@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Save, RefreshCw, Loader2, AlertCircle, CheckCircle2, Play } from 'lucide-react'
+import { Save, RefreshCw, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { antizapretApi, type FileType } from '../api/antizapret'
 
 const FILE_TABS: { key: FileType; label: string; description: string }[] = [
@@ -55,33 +55,32 @@ export default function AdminFilesPage() {
     FILE_TABS.forEach(t => loadFile(t.key))
   }, [loadFile])
 
-  const handleSave = async () => {
+  const handleSaveAndApply = async () => {
     setSaving(true)
     setSaveSuccess(false)
+    setApplySuccess(false)
     setError(null)
     try {
       await antizapretApi.saveFile(activeTab, contents[activeTab])
       setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+      setApplying(true)
+      const { waitForApply } = await import('../api/applyStatus')
+      const path = FILE_TABS.find(t => t.key === activeTab)?.key === 'include_hosts'
+        ? '/root/antizapret/config/include-hosts.txt'
+        : FILE_TABS.find(t => t.key === activeTab)?.key === 'exclude_hosts'
+        ? '/root/antizapret/config/exclude-hosts.txt'
+        : '/root/antizapret/config/include-ips.txt'
+      const result = await waitForApply(path)
+      if (result.warning) {
+        setError(`Применено с предупреждением: ${result.warning}`)
+      } else {
+        setApplySuccess(true)
+        setTimeout(() => setApplySuccess(false), 5000)
+      }
     } catch {
-      setError('Ошибка при сохранении файла')
+      setError('Ошибка при сохранении')
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleApply = async () => {
-    setApplying(true)
-    setApplySuccess(false)
-    setError(null)
-    try {
-      await antizapretApi.runDoall()
-      setApplySuccess(true)
-      setTimeout(() => setApplySuccess(false), 5000)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка при применении изменений'
-      setError(msg)
-    } finally {
       setApplying(false)
     }
   }
@@ -93,7 +92,7 @@ export default function AdminFilesPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Редактировать файлы</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Редактирование конфигурационных файлов AntiZapret. После сохранения нажмите «Применить».
+          Редактирование конфигурационных файлов AntiZapret. Сохранение автоматически применяет изменения на всех нодах.
         </p>
       </div>
 
@@ -159,21 +158,12 @@ export default function AdminFilesPage() {
       {/* Actions */}
       <div className="flex items-center gap-3">
         <button
-          onClick={handleSave}
-          disabled={saving || loading[activeTab]}
+          onClick={handleSaveAndApply}
+          disabled={saving || applying || loading[activeTab]}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Сохранить файл
-        </button>
-
-        <button
-          onClick={handleApply}
-          disabled={applying}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-          {applying ? 'Применяется...' : 'Применить (doall.sh)'}
+          {(saving || applying) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {applying ? 'Применяю на нодах...' : 'Сохранить'}
         </button>
 
         {saveSuccess && (

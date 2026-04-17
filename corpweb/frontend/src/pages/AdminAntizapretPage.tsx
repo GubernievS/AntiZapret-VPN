@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Save, Loader2, AlertCircle, CheckCircle2, Play } from 'lucide-react'
+import { Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { antizapretApi, type AntizapretSettings } from '../api/antizapret'
 
 // ── Helper components ──────────────────────────────────────────────────────
@@ -75,11 +75,13 @@ export default function AdminAntizapretPage() {
     setSettings(prev => prev ? { ...prev, [key]: value } : prev)
   }
 
-  const handleSave = async () => {
+  const handleSaveWithApply = async () => {
     if (!settings) return
     setSaving(true)
     setSaveSuccess(false)
+    setApplySuccess(false)
     setError(null)
+
     const payload: Record<string, string> = {}
     for (const [k, v] of Object.entries(settings)) {
       if (v !== null) payload[k] = v as string
@@ -87,27 +89,22 @@ export default function AdminAntizapretPage() {
     try {
       await antizapretApi.updateSettings(payload)
       setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+
+      // Wait for nodes to apply
+      setApplying(true)
+      const { waitForApply } = await import('../api/applyStatus')
+      const result = await waitForApply('/root/antizapret/setup')
+      setApplying(false)
+      if (result.warning) {
+        setError(`Применено с предупреждением: ${result.warning}`)
+      } else {
+        setApplySuccess(true)
+        setTimeout(() => setApplySuccess(false), 5000)
+      }
     } catch {
       setError('Ошибка при сохранении настроек')
     } finally {
       setSaving(false)
-    }
-  }
-
-  const handleSaveAndApply = async () => {
-    await handleSave()
-    if (error) return
-    setApplying(true)
-    setApplySuccess(false)
-    try {
-      await antizapretApi.runDoall()
-      setApplySuccess(true)
-      setTimeout(() => setApplySuccess(false), 5000)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка при применении изменений'
-      setError(msg)
-    } finally {
       setApplying(false)
     }
   }
@@ -249,31 +246,22 @@ export default function AdminAntizapretPage() {
       {/* Actions */}
       <div className="flex items-center gap-3 flex-wrap">
         <button
-          onClick={handleSave}
+          onClick={handleSaveWithApply}
           disabled={saving || applying}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Сохранить
-        </button>
-
-        <button
-          onClick={handleSaveAndApply}
-          disabled={saving || applying}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-          {applying ? 'Применяется...' : 'Сохранить и применить'}
+          {(saving || applying) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {applying ? 'Применяю на нодах...' : 'Сохранить'}
         </button>
 
         {saveSuccess && !applySuccess && (
           <span className="flex items-center gap-1.5 text-sm text-green-600">
-            <CheckCircle2 className="w-4 h-4" /> Настройки сохранены
+            <CheckCircle2 className="w-4 h-4" /> Сохранено, ожидаю подтверждение от нод...
           </span>
         )}
         {applySuccess && (
           <span className="flex items-center gap-1.5 text-sm text-green-600">
-            <CheckCircle2 className="w-4 h-4" /> Изменения применены
+            <CheckCircle2 className="w-4 h-4" /> Применено на всех нодах
           </span>
         )}
       </div>

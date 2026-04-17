@@ -310,7 +310,72 @@ def register_if_needed() -> None:
                         exc.stderr,
                     )
 
+    # Apply wg_config if provided (patch Interface section in WG confs)
+    wg_config = data.get("wg_config")
+    if wg_config:
+        _apply_wg_config(wg_config)
+
     log.info("Registration complete")
+
+
+def _apply_wg_config(cfg: dict) -> None:
+    """Patch [Interface] section in WG conf files with CP-provided config."""
+    iface_map = {
+        "antizapret": {
+            "conf": "/etc/wireguard/antizapret.conf",
+            "address": cfg.get("antizapret_address"),
+            "port": cfg.get("antizapret_listen_port"),
+        },
+        "vpn": {
+            "conf": "/etc/wireguard/vpn.conf",
+            "address": cfg.get("vpn_address"),
+            "port": cfg.get("vpn_listen_port"),
+        },
+    }
+    mtu = cfg.get("mtu")
+
+    for iface, params in iface_map.items():
+        conf_path = params["conf"]
+        if not os.path.exists(conf_path):
+            continue
+
+        content = open(conf_path).read()
+        changed = False
+
+        if params["address"]:
+            import re
+            new_content = re.sub(
+                r'^Address\s*=\s*.*$',
+                f'Address = {params["address"]}',
+                content, flags=re.MULTILINE,
+            )
+            if new_content != content:
+                content = new_content
+                changed = True
+
+        if params["port"]:
+            new_content = re.sub(
+                r'^ListenPort\s*=\s*.*$',
+                f'ListenPort = {params["port"]}',
+                content, flags=re.MULTILINE,
+            )
+            if new_content != content:
+                content = new_content
+                changed = True
+
+        if mtu:
+            new_content = re.sub(
+                r'^MTU\s*=\s*.*$',
+                f'MTU = {mtu}',
+                content, flags=re.MULTILINE,
+            )
+            if new_content != content:
+                content = new_content
+                changed = True
+
+        if changed:
+            write_atomic(conf_path, content.encode())
+            log.info("Patched %s with wg_config from CP", conf_path)
 
 
 # ---------------------------------------------------------------------------

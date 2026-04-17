@@ -51,6 +51,4 @@ export const antizapretApi = {
   updateSettings: (settings: Record<string, string>) =>
     api.patch<DoallResponse>('/antizapret/settings', { settings }).then(r => r.data),
 
-  runDoall: () =>
-    api.post<DoallResponse>('/antizapret/doall').then(r => r.data),
 }
