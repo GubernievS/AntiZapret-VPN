@@ -60,7 +60,6 @@ export default function AddNodeModal({ onClose, onCreated }: AddNodeModalProps) 
 
   // Step 3
   const [createdHostname, setCreatedHostname] = useState('')
-  const [createdIp, setCreatedIp] = useState('')
 
   // Clean up polling on unmount
   useEffect(() => {
@@ -78,7 +77,6 @@ export default function AddNodeModal({ onClose, onCreated }: AddNodeModalProps) 
       setNodeId(result.id)
       setEnrollToken(result.enroll_token)
       setCreatedHostname(hostname.trim())
-      setCreatedIp(privateIp.trim())
       setStep(2)
       startPolling(result.id)
     } catch (err: unknown) {
@@ -116,15 +114,6 @@ export default function AddNodeModal({ onClose, onCreated }: AddNodeModalProps) 
   // Commands for step 2
   const azSetupCmd = `curl -fsSL https://raw.githubusercontent.com/your-org/antizapret/main/install.sh | bash`
   const agentInstallCmd = `curl -fsSL "${CP_URL}/api/v1/agent/install.sh?token=${enrollToken}" | bash`
-
-  // Nginx snippet for step 3
-  const nginxSnippet = `# Добавьте в каждый upstream блок в nginx.conf:
-server ${createdIp}:51443 max_fails=3 fail_timeout=10s;  # ${createdHostname}
-server ${createdIp}:51080 max_fails=3 fail_timeout=10s;
-server ${createdIp}:52443 max_fails=3 fail_timeout=10s;
-server ${createdIp}:52080 max_fails=3 fail_timeout=10s;
-
-# Затем: nginx -s reload`
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -278,7 +267,7 @@ server ${createdIp}:52080 max_fails=3 fail_timeout=10s;
           </div>
         )}
 
-        {/* Step 3: Nginx reminder */}
+        {/* Step 3: Balancer redirect */}
         {step === 3 && (
           <div className="space-y-4">
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-sm text-green-700">
@@ -286,23 +275,22 @@ server ${createdIp}:52080 max_fails=3 fail_timeout=10s;
               Нода <span className="font-semibold mx-1">{createdHostname}</span> добавлена успешно.
             </div>
 
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Добавьте ноду в upstream вашего nginx:
-              </p>
-              <CodeBlock code={nginxSnippet} />
-            </div>
-
-            <p className="text-xs text-gray-500">
-              После перезагрузки nginx трафик AntiZapret начнёт распределяться на новую ноду.
+            <p className="text-sm text-gray-700">
+              Нода добавлена. Перейдите в раздел <span className="font-semibold">«Балансировка»</span> чтобы включить её.
             </p>
 
-            <div className="flex justify-end pt-1">
+            <div className="flex gap-3 pt-1">
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium"
               >
-                Готово
+                Закрыть
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition font-medium"
+              >
+                Перейти к балансировке
               </button>
             </div>
           </div>

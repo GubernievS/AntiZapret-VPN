@@ -2,6 +2,14 @@ import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 
+function AdminRedirect() {
+  const { user } = useAuthStore()
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin/dashboard" replace />
+  }
+  return <Navigate to="/dashboard" replace />
+}
+
 import LoginPage from './pages/LoginPage'
 import AuthCallbackPage from './pages/AuthCallbackPage'
 import DashboardPage from './pages/DashboardPage'
@@ -111,6 +119,14 @@ function App() {
         </Route>
 
         {/* Default redirect */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AdminRedirect />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>

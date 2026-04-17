@@ -1,48 +1,80 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Wifi, WifiOff, ArrowDownToLine, ArrowUpFromLine, RefreshCw, Loader2 } from 'lucide-react'
-import { monitoringApi } from '../api/monitoring'
-import type { MonitoringOverview } from '../api/monitoring'
+import { RefreshCw, Loader2, WifiOff, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
+import { getConnections, getTraffic } from '../api/monitoring'
+import type { ActiveConnection, TrafficStats } from '../api/monitoring'
 
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  if (bytes === 0) return '0 Б'
+  const units = ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ']
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
+function formatBytesPerSec(bps: number): string {
+  if (bps === 0) return '0 Б/с'
+  const units = ['Б/с', 'КБ/с', 'МБ/с', 'ГБ/с']
+  const i = Math.min(Math.floor(Math.log(bps) / Math.log(1024)), units.length - 1)
+  return `${(bps / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+}
+
+function formatHandshakeAge(seconds: number): string {
+  if (seconds < 60) return `${seconds}с назад`
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}м назад`
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}ч назад`
+  return `${Math.floor(seconds / 86400)}д назад`
+}
+
+function interfaceLabel(iface: string): string {
+  if (iface.includes('az') || iface.includes('antizapret')) return 'AZ'
+  if (iface.includes('vpn')) return 'VPN'
+  return iface
+}
+
 export default function MonitoringPage() {
-  const [data, setData] = useState<MonitoringOverview | null>(null)
+  const [connections, setConnections] = useState<ActiveConnection[]>([])
+  const [traffic, setTraffic] = useState<TrafficStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [nodeFilter, setNodeFilter] = useState<string>('')
 
   const load = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true)
     try {
-      const { data: overview } = await monitoringApi.getOverview()
-      setData(overview)
+      const [conns, traf] = await Promise.all([
+        getConnections(nodeFilter || undefined),
+        getTraffic(),
+      ])
+      setConnections(conns)
+      setTraffic(traf)
     } catch {
-      // ignore
+      // ignore transient errors
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [])
+  }, [nodeFilter])
 
   useEffect(() => {
     load()
-    const interval = setInterval(() => load(), 30000)
+    const interval = setInterval(() => load(true), 30000)
     return () => clearInterval(interval)
   }, [load])
 
-  if (loading || !data) {
+  // Collect unique node names for the filter dropdown
+  const allNodes = Array.from(
+    new Set([
+      ...(traffic?.per_node.map(n => n.hostname) ?? []),
+      ...connections.map(c => c.node),
+    ])
+  ).sort()
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     )
   }
-
-  const activeConns = data.live_connections.filter(c => c.is_active)
 
   return (
     <div>
@@ -58,114 +90,100 @@ export default function MonitoringPage() {
         </button>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid gap-4 sm:grid-cols-3 mb-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-              <Wifi className="w-5 h-5 text-green-600" />
-            </div>
-            <span className="text-sm text-gray-600">Активных подключений</span>
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{data.stats.active_connections}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <ArrowDownToLine className="w-5 h-5 text-blue-600" />
-            </div>
-            <span className="text-sm text-gray-600">Получено</span>
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{formatBytes(data.stats.total_bytes_received)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-              <ArrowUpFromLine className="w-5 h-5 text-purple-600" />
-            </div>
-            <span className="text-sm text-gray-600">Отправлено</span>
-          </div>
-          <p className="text-3xl font-bold text-gray-900">{formatBytes(data.stats.total_bytes_sent)}</p>
-        </div>
-      </div>
-
-      {/* Daily traffic chart (simple bar chart) */}
-      {data.daily_traffic.length > 0 && (
+      {/* Traffic per node */}
+      {traffic && traffic.per_node.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Трафик за 7 дней</h3>
-          <div className="flex items-end gap-2 h-32">
-            {data.daily_traffic.map((day) => {
-              const total = day.bytes_sent + day.bytes_received
-              const maxTraffic = Math.max(...data.daily_traffic.map(d => d.bytes_sent + d.bytes_received))
-              const height = maxTraffic > 0 ? (total / maxTraffic) * 100 : 0
-
-              return (
-                <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full flex flex-col justify-end" style={{ height: '100px' }}>
-                    <div
-                      className="bg-blue-500 rounded-t w-full min-h-[2px]"
-                      style={{ height: `${Math.max(height, 2)}%` }}
-                      title={`${formatBytes(total)} (${day.connections} подкл.)`}
-                    />
-                  </div>
-                  <span className="text-xs text-gray-400">
-                    {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+          <h2 className="font-semibold text-gray-900 mb-4">Трафик по нодам</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {traffic.per_node.map(node => (
+              <div key={node.hostname} className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm font-medium text-gray-900 font-mono mb-2">{node.hostname}</p>
+                <div className="flex items-center gap-4 text-xs text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <ArrowDownToLine className="w-3 h-3 text-blue-500" />
+                    {formatBytesPerSec(node.rx_bytes_per_sec)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ArrowUpFromLine className="w-3 h-3 text-green-500" />
+                    {formatBytesPerSec(node.tx_bytes_per_sec)}
                   </span>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-            <span>Суммарный трафик (отправлено + получено) по дням</span>
+          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4 text-sm text-gray-600">
+            <span className="text-gray-400">Суммарно:</span>
+            <span className="flex items-center gap-1">
+              <ArrowDownToLine className="w-3.5 h-3.5 text-blue-500" />
+              {formatBytesPerSec(traffic.total_rx_bytes_per_sec)}
+            </span>
+            <span className="flex items-center gap-1">
+              <ArrowUpFromLine className="w-3.5 h-3.5 text-green-500" />
+              {formatBytesPerSec(traffic.total_tx_bytes_per_sec)}
+            </span>
           </div>
         </div>
       )}
 
-      {/* Live connections table */}
+      {/* Connections */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-900">
-            Подключения ({activeConns.length} активных / {data.live_connections.length} всего)
-          </h3>
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+          <h2 className="font-semibold text-gray-900">
+            Активные подключения ({connections.length})
+          </h2>
+          {allNodes.length > 0 && (
+            <select
+              value={nodeFilter}
+              onChange={e => setNodeFilter(e.target.value)}
+              className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Все ноды</option>
+              {allNodes.map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          )}
         </div>
-        {data.live_connections.length === 0 ? (
+
+        {connections.length === 0 ? (
           <div className="p-8 text-center text-sm text-gray-500">
             <WifiOff className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            Нет подключений
+            Нет активных подключений
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Статус</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Протокол</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Интерфейс</th>
+                <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Клиент</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Нода</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Интерфейс</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Endpoint</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Получено</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Отправлено</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Хендшейк</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">RX</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase">TX</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {data.live_connections.map((conn, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
+                {connections.map((conn, i) => (
+                  <tr key={i} className="hover:bg-gray-50 transition">
+                    <td className="px-4 py-3 text-sm font-mono text-gray-900">
+                      {conn.client_name || <span className="text-gray-400">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-mono text-gray-600">{conn.node}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                        conn.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${conn.is_active ? 'bg-green-500' : 'bg-gray-400'}`} />
-                        {conn.is_active ? 'Online' : 'Offline'}
+                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                        {interfaceLabel(conn.interface)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 uppercase">{conn.protocol}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{conn.interface}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900 font-mono">
-                      {conn.client_name || conn.public_key?.slice(0, 16) || '—'}
+                    <td className="px-4 py-3 text-sm font-mono text-gray-600">
+                      {conn.endpoint || <span className="text-gray-400">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 font-mono">{conn.endpoint || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">{formatBytes(conn.bytes_received)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">{formatBytes(conn.bytes_sent)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {conn.handshake_age > 0 ? formatHandshakeAge(conn.handshake_age) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 text-right font-mono">{formatBytes(conn.rx_bytes)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 text-right font-mono">{formatBytes(conn.tx_bytes)}</td>
                   </tr>
                 ))}
               </tbody>

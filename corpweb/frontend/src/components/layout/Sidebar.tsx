@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Shield, Users, Settings, Wifi, FileText, SlidersHorizontal, Server } from 'lucide-react'
+import { LayoutDashboard, Users, Settings, Wifi, FileText, SlidersHorizontal, Server } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { cn } from '../../utils/cn'
 
@@ -34,6 +34,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                 Администрирование
               </p>
             </div>
+            <NavLink to="/admin/dashboard" className={navLinkClass}>
+              <LayoutDashboard className="w-5 h-5" />
+              Дашборд
+            </NavLink>
             <NavLink to="/admin/users" className={navLinkClass}>
               <Users className="w-5 h-5" />
               Пользователи
@@ -41,10 +45,6 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
             <NavLink to="/admin/settings" className={navLinkClass}>
               <Settings className="w-5 h-5" />
               Настройки
-            </NavLink>
-            <NavLink to="/admin/dashboard" className={navLinkClass}>
-              <Shield className="w-5 h-5" />
-              Статистика
             </NavLink>
             <NavLink to="/admin/monitoring" className={navLinkClass}>
               <Wifi className="w-5 h-5" />

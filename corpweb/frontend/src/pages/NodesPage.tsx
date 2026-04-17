@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ServerCog, Trash2, Info, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
+import { ServerCog, Trash2, Info, Loader2, AlertCircle, RefreshCw, CheckCircle } from 'lucide-react'
 import { listNodes, deleteNode } from '../api/nodes'
 import type { NodeInfo } from '../api/nodes'
+import { getBalancer, updateBalancer } from '../api/balancer'
+import type { BalancerNode } from '../api/balancer'
 import AddNodeModal from '../components/AddNodeModal'
 import NodeDetail from '../components/NodeDetail'
 
@@ -46,6 +48,14 @@ export default function NodesPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [detailNode, setDetailNode] = useState<NodeInfo | null>(null)
 
+  // Balancer state
+  const [balancerNodes, setBalancerNodes] = useState<BalancerNode[]>([])
+  const [balancerEdits, setBalancerEdits] = useState<Record<string, { weight: number; enabled: boolean }>>({})
+  const [balancerLoading, setBalancerLoading] = useState(false)
+  const [balancerSaving, setBalancerSaving] = useState(false)
+  const [balancerError, setBalancerError] = useState('')
+  const [balancerSuccess, setBalancerSuccess] = useState(false)
+
   const loadNodes = useCallback(async () => {
     setError('')
     try {
@@ -58,9 +68,63 @@ export default function NodesPage() {
     }
   }, [])
 
+  const loadBalancer = useCallback(async () => {
+    setBalancerLoading(true)
+    try {
+      const result = await getBalancer()
+      setBalancerNodes(result.nodes)
+      const edits: Record<string, { weight: number; enabled: boolean }> = {}
+      for (const n of result.nodes) {
+        edits[n.ip] = { weight: n.weight, enabled: n.enabled }
+      }
+      setBalancerEdits(edits)
+    } catch {
+      // ignore — balancer section will just show nothing
+    } finally {
+      setBalancerLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     loadNodes()
-  }, [loadNodes])
+    loadBalancer()
+  }, [loadNodes, loadBalancer])
+
+  const handleSaveBalancer = async () => {
+    setBalancerError('')
+    setBalancerSuccess(false)
+
+    // Validate: enabled weights sum to 100
+    const enabledNodes = balancerNodes.filter(n => balancerEdits[n.ip]?.enabled)
+    const totalWeight = enabledNodes.reduce((sum, n) => sum + (balancerEdits[n.ip]?.weight ?? 0), 0)
+    if (enabledNodes.length > 0 && totalWeight !== 100) {
+      setBalancerError(`Сумма весов включённых нод должна быть 100%. Сейчас: ${totalWeight}%`)
+      return
+    }
+
+    setBalancerSaving(true)
+    try {
+      const payload = balancerNodes.map(n => ({
+        ip: n.ip,
+        weight: balancerEdits[n.ip]?.weight ?? n.weight,
+        enabled: balancerEdits[n.ip]?.enabled ?? n.enabled,
+      }))
+      const result = await updateBalancer(payload)
+      setBalancerNodes(result.nodes)
+      const edits: Record<string, { weight: number; enabled: boolean }> = {}
+      for (const n of result.nodes) {
+        edits[n.ip] = { weight: n.weight, enabled: n.enabled }
+      }
+      setBalancerEdits(edits)
+      setBalancerSuccess(true)
+      setTimeout(() => setBalancerSuccess(false), 3000)
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setBalancerError(detail || 'Ошибка сохранения балансировки')
+    } finally {
+      setBalancerSaving(false)
+    }
+  }
 
   const handleDelete = async (node: NodeInfo) => {
     if (!confirm(`Удалить ноду "${node.hostname}"?`)) return
@@ -180,6 +244,116 @@ export default function NodesPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Balancer section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Балансировка</h2>
+          {balancerLoading && <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />}
+        </div>
+
+        {balancerError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            {balancerError}
+            <button onClick={() => setBalancerError('')} className="ml-auto text-red-500 hover:text-red-700">&times;</button>
+          </div>
+        )}
+
+        {balancerSuccess && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 shrink-0" />
+            Балансировка сохранена и применена.
+          </div>
+        )}
+
+        {balancerNodes.length === 0 && !balancerLoading ? (
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-8 text-center text-sm text-gray-400">
+            Нет нод для балансировки
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Hostname</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">IP</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Статус</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Вес, %</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Включена</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {balancerNodes.map(node => {
+                    const edit = balancerEdits[node.ip] ?? { weight: node.weight, enabled: node.enabled }
+                    return (
+                      <tr key={node.id} className="hover:bg-gray-50 transition">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 font-mono">{node.hostname}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600 font-mono">{node.ip}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${healthBadgeClass(node.health)}`}>
+                            {node.health === 'ok' ? 'Онлайн' : node.health === 'degraded' ? 'Деградирован' : node.health === 'down' ? 'Недоступен' : 'Неизвестно'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={edit.weight}
+                            onChange={e => {
+                              const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0))
+                              setBalancerEdits(prev => ({
+                                ...prev,
+                                [node.ip]: { ...edit, weight: val },
+                              }))
+                            }}
+                            className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setBalancerEdits(prev => ({
+                                ...prev,
+                                [node.ip]: { ...edit, enabled: !edit.enabled },
+                              }))
+                            }
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
+                              edit.enabled ? 'bg-blue-600' : 'bg-gray-300'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition ${
+                                edit.enabled ? 'translate-x-4' : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
+              <p className="text-xs text-gray-400">
+                Сумма весов включённых нод должна равняться 100%
+              </p>
+              <button
+                onClick={handleSaveBalancer}
+                disabled={balancerSaving}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
+              >
+                {balancerSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                Сохранить
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {showAddModal && (
