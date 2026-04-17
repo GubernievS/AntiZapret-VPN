@@ -100,6 +100,9 @@ class SystemSettings(Base):
     apk_url = Column(String(500), nullable=True)
     windows_url = Column(String(500), nullable=True)
 
+    # Control-plane IP for DNAT balancer SNAT rules
+    cp_ip = Column(String(50), nullable=True)
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     updated_by = Column(String(50), nullable=True)  # Username who made the change
 

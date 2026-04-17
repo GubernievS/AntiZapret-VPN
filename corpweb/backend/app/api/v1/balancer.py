@@ -20,6 +20,32 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _detect_cp_ip(db: Session) -> str:
+    """
+    Determine control-plane IP for SNAT rules.
+    Priority: system_settings.cp_ip from DB → auto-detect from default route.
+    """
+    from app.db.models import SystemSettings
+    ss = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    if ss and ss.cp_ip:
+        return ss.cp_ip
+
+    # Auto-detect: IP of the default-route interface
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["ip", "-4", "route", "get", "8.8.8.8"],
+            capture_output=True, text=True, timeout=5,
+        )
+        parts = result.stdout.split()
+        if "src" in parts:
+            return parts[parts.index("src") + 1]
+    except Exception:
+        pass
+
+    raise ValueError("Cannot determine CP IP. Set it in Settings → Nodes")
+
+
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 class NodeBalancerEntry(BaseModel):
@@ -78,7 +104,12 @@ def get_balancer_state(
             "enabled": state.get("enabled", False),
         })
 
-    return {"nodes": result}
+    try:
+        cp_ip = _detect_cp_ip(db)
+    except ValueError:
+        cp_ip = ""
+
+    return {"nodes": result, "cp_ip": cp_ip}
 
 
 @router.put("")
@@ -111,12 +142,7 @@ def update_balancer(
             detail=f"Sum of enabled node weights must be 100, got {weight_sum}",
         )
 
-    # Determine control-plane IP from DB (first node, or fallback)
-    # In practice the CP IP is the host running this service.
-    # We pass it through for the SNAT rule; derive from first enabled node's
-    # registered IP if not explicitly configured.
-    from app.config import settings
-    cp_ip = getattr(settings, "CP_IP", None) or enabled_nodes[0].ip
+    cp_ip = _detect_cp_ip(db)
 
     nodes_payload = [
         {"ip": n.ip, "weight": n.weight, "enabled": n.enabled}
@@ -147,4 +173,24 @@ def update_balancer(
             "enabled": state.get("enabled", False),
         })
 
-    return {"nodes": result}
+    return {"nodes": result, "cp_ip": cp_ip}
+
+
+class CpIpUpdate(BaseModel):
+    cp_ip: str
+
+
+@router.put("/cp-ip")
+def update_cp_ip(
+    req: CpIpUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    """Update the control-plane IP stored in system_settings."""
+    from app.db.models import SystemSettings
+    ss = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    if not ss:
+        raise HTTPException(404, "System settings not found")
+    ss.cp_ip = req.cp_ip.strip()
+    db.commit()
+    return {"cp_ip": ss.cp_ip}
