@@ -55,6 +55,9 @@ export default function NodesPage() {
   const [balancerSaving, setBalancerSaving] = useState(false)
   const [balancerError, setBalancerError] = useState('')
   const [balancerSuccess, setBalancerSuccess] = useState(false)
+  const [cpIp, setCpIp] = useState('')
+  const [cpIpEditing, setCpIpEditing] = useState(false)
+  const [cpIpDraft, setCpIpDraft] = useState('')
 
   const loadNodes = useCallback(async () => {
     setError('')
@@ -78,6 +81,10 @@ export default function NodesPage() {
         edits[n.ip] = { weight: n.weight, enabled: n.enabled }
       }
       setBalancerEdits(edits)
+      if (result.cp_ip) {
+        setCpIp(result.cp_ip)
+        setCpIpDraft(result.cp_ip)
+      }
     } catch {
       // ignore — balancer section will just show nothing
     } finally {
@@ -251,6 +258,45 @@ export default function NodesPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Балансировка</h2>
           {balancerLoading && <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />}
+        </div>
+
+        {/* CP IP */}
+        <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-3">
+          <span className="text-sm text-gray-600 whitespace-nowrap">IP балансировщика:</span>
+          {cpIpEditing ? (
+            <>
+              <input
+                type="text"
+                value={cpIpDraft}
+                onChange={e => setCpIpDraft(e.target.value)}
+                className="px-2 py-1 border border-gray-300 rounded text-sm font-mono w-40"
+                placeholder="92.118.85.140"
+              />
+              <button
+                onClick={async () => {
+                  try {
+                    const { updateCpIp } = await import('../api/balancer')
+                    await updateCpIp(cpIpDraft)
+                    setCpIp(cpIpDraft)
+                    setCpIpEditing(false)
+                  } catch { setBalancerError('Ошибка сохранения IP') }
+                }}
+                className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+              >Сохранить</button>
+              <button
+                onClick={() => { setCpIpDraft(cpIp); setCpIpEditing(false) }}
+                className="px-2 py-1 text-gray-500 text-xs hover:text-gray-700"
+              >Отмена</button>
+            </>
+          ) : (
+            <>
+              <span className="text-sm font-mono font-semibold text-gray-900">{cpIp || 'не задан'}</span>
+              <button
+                onClick={() => setCpIpEditing(true)}
+                className="text-xs text-blue-600 hover:underline"
+              >Изменить</button>
+            </>
+          )}
         </div>
 
         {balancerError && (
