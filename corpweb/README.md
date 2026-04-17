@@ -47,9 +47,8 @@
 ### Автоматическая установка (рекомендуется)
 
 ```bash
-git clone https://github.com/AlexanderBrolin/CorpAdmin-AZ.git
-cd CorpAdmin-AZ && git checkout CorpAdmin
-cd corpweb
+git clone https://github.com/AlexanderBrolin/CorpAdmin-AZ.git -b CorpAdmin
+cd CorpAdmin-AZ/corpweb
 sudo ./install-native.sh
 ```
 
@@ -72,8 +71,8 @@ apt-get update && apt-get install -y \
 
 ```bash
 cd /root
-git clone https://github.com/AlexanderBrolin/CorpAdmin-AZ.git
-cd CorpAdmin-AZ && git checkout CorpAdmin
+git clone https://github.com/AlexanderBrolin/CorpAdmin-AZ.git -b CorpAdmin
+cd CorpAdmin-AZ
 
 # Создать директории
 mkdir -p /opt/corpweb/{backend,frontend,agent}
