@@ -33,10 +33,6 @@ class AntizapretSettingsResponse(BaseModel):
     # Features
     BLOCK_ADS: Optional[str] = None
     CLEAR_HOSTS: Optional[str] = None
-    # OpenVPN
-    OPENVPN_80_443_TCP: Optional[str] = None
-    OPENVPN_80_443_UDP: Optional[str] = None
-    OPENVPN_HOST: Optional[str] = None
     # WireGuard
     WIREGUARD_HOST: Optional[str] = None
     # Security
@@ -44,6 +40,15 @@ class AntizapretSettingsResponse(BaseModel):
     ATTACK_PROTECTION: Optional[str] = None
     TORRENT_GUARD: Optional[str] = None
     RESTRICT_FORWARD: Optional[str] = None
+    # DNS
+    ANTIZAPRET_DNS: Optional[str] = None
+    VPN_DNS: Optional[str] = None
+    # Clients
+    ALTERNATIVE_CLIENT_IP: Optional[str] = None
+    ALTERNATIVE_FAKE_IP: Optional[str] = None
+    CLIENT_ISOLATION: Optional[str] = None
+    # WARP
+    WARP_OUTBOUND: Optional[str] = None
 
 
 class AntizapretSettingsUpdate(BaseModel):

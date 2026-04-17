@@ -31,9 +31,6 @@ export interface AntizapretSettings {
   ROBLOX_INCLUDE: string | null
   BLOCK_ADS: string | null
   CLEAR_HOSTS: string | null
-  OPENVPN_80_443_TCP: string | null
-  OPENVPN_80_443_UDP: string | null
-  OPENVPN_HOST: string | null
   WIREGUARD_HOST: string | null
   SSH_PROTECTION: string | null
   ATTACK_PROTECTION: string | null

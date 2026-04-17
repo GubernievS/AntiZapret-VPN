@@ -210,30 +210,6 @@ export default function AdminAntizapretPage() {
         />
       </Section>
 
-      {/* OpenVPN */}
-      <Section title="OpenVPN">
-        <Toggle
-          label="Порты TCP 80/443 (OPENVPN_80_443_TCP)"
-          value={isY(settings.OPENVPN_80_443_TCP)}
-          onChange={v => setBool('OPENVPN_80_443_TCP', v)}
-        />
-        <Toggle
-          label="Порты UDP 80/443 (OPENVPN_80_443_UDP)"
-          value={isY(settings.OPENVPN_80_443_UDP)}
-          onChange={v => setBool('OPENVPN_80_443_UDP', v)}
-        />
-        <div className="py-2">
-          <label className="text-sm text-gray-700 block mb-1">Хост OpenVPN (OPENVPN_HOST)</label>
-          <input
-            type="text"
-            value={settings.OPENVPN_HOST ?? ''}
-            onChange={e => setStr('OPENVPN_HOST', e.target.value)}
-            placeholder="vpn.example.com"
-            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </Section>
-
       {/* WireGuard */}
       <Section title="WireGuard / AmneziaWG">
         <div className="py-2">
