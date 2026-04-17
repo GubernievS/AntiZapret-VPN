@@ -221,6 +221,42 @@ class TestNodesDelete:
 # ── Install script endpoints ──
 
 
+class TestHeartbeatV2:
+    def test_heartbeat_stores_peers_snapshot(self, client, db):
+        node = _make_node(db)
+        resp = client.post(
+            "/api/v1/agent/heartbeat",
+            headers=_agent_auth(node.enroll_token),
+            json={
+                "applied_sha": {},
+                "health": "ok",
+                "metrics": {"active_peers_antizapret": 2, "rx_bytes_per_sec": 1000, "tx_bytes_per_sec": 2000},
+                "peers": [
+                    {"public_key": "pk1==", "allowed_ips": "10.29.8.2/32",
+                     "endpoint": "1.2.3.4:51443", "latest_handshake": 1776359263,
+                     "rx_bytes": 100, "tx_bytes": 200, "interface": "antizapret"},
+                ],
+            },
+        )
+        assert resp.status_code == 200
+        db.refresh(node)
+        assert node.peers_snapshot is not None
+        assert len(node.peers_snapshot) == 1
+        assert node.peers_snapshot[0]["public_key"] == "pk1=="
+
+    def test_heartbeat_without_peers_keeps_old(self, client, db):
+        node = _make_node(db)
+        # Old format without peers
+        resp = client.post(
+            "/api/v1/agent/heartbeat",
+            headers=_agent_auth(node.enroll_token),
+            json={"applied_sha": {}, "health": "ok", "metrics": {}},
+        )
+        assert resp.status_code == 200
+        db.refresh(node)
+        assert node.peers_snapshot is None  # not set
+
+
 class TestInstallScript:
     def test_install_sh_valid_token(self, client, db):
         node = _make_node(db)

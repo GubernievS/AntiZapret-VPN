@@ -370,11 +370,58 @@ def _active_peers(iface: str) -> int:
     return count
 
 
+_prev_net: dict = {"rx": 0, "tx": 0, "ts": 0.0}
+
+
 def collect_metrics() -> dict:
-    return {
+    global _prev_net
+    metrics = {
         "active_peers_antizapret": _active_peers("antizapret"),
         "active_peers_vpn": _active_peers("vpn"),
     }
+    try:
+        with open("/proc/net/dev") as f:
+            for line in f:
+                parts = line.split()
+                if len(parts) >= 10 and any(x in parts[0] for x in ("eth0", "ens")):
+                    rx, tx = int(parts[1]), int(parts[9])
+                    now = time.monotonic()
+                    if _prev_net["ts"] > 0:
+                        dt = max(now - _prev_net["ts"], 1)
+                        metrics["rx_bytes_per_sec"] = int((rx - _prev_net["rx"]) / dt)
+                        metrics["tx_bytes_per_sec"] = int((tx - _prev_net["tx"]) / dt)
+                    _prev_net = {"rx": rx, "tx": tx, "ts": now}
+                    break
+    except Exception:
+        pass
+    return metrics
+
+
+def collect_peers() -> list[dict]:
+    """Collect full peer list from all WG interfaces via wg show dump."""
+    peers = []
+    for iface in ("antizapret", "vpn"):
+        try:
+            result = subprocess.run(
+                ["wg", "show", iface, "dump"],
+                capture_output=True, text=True, check=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+        for line in result.stdout.splitlines()[1:]:  # skip header
+            parts = line.split("\t")
+            if len(parts) < 8:
+                continue
+            peers.append({
+                "interface": iface,
+                "public_key": parts[0],
+                "endpoint": parts[2] if parts[2] != "(none)" else None,
+                "allowed_ips": parts[3],
+                "latest_handshake": int(parts[4]) if parts[4] != "0" else 0,
+                "rx_bytes": int(parts[5]),
+                "tx_bytes": int(parts[6]),
+            })
+    return peers
 
 
 # ---------------------------------------------------------------------------
@@ -399,6 +446,7 @@ def send_heartbeat() -> None:
         "applied_sha": _applied_shas(),
         "health": "ok",
         "metrics": collect_metrics(),
+        "peers": collect_peers(),
     }
     try:
         api_post(

@@ -91,6 +91,7 @@ class HeartbeatRequest(BaseModel):
     applied_sha: dict
     health: str
     metrics: dict = {}
+    peers: list = []
 
 
 @router.post("/heartbeat")
@@ -102,6 +103,8 @@ def heartbeat(
     node.health = req.health
     node.applied_sha = req.applied_sha
     node.metrics = req.metrics
+    if req.peers:
+        node.peers_snapshot = req.peers
     node.last_seen = datetime.utcnow()
     db.commit()
     return {"ok": True}
