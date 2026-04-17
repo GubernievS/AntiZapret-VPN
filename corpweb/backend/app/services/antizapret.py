@@ -16,11 +16,18 @@ logger = logging.getLogger(__name__)
 ANTIZAPRET_SETUP_FILE = "/root/antizapret/setup"
 
 EDITABLE_FILES: Dict[str, str] = {
-    "include_hosts": "/root/antizapret/config/include-hosts.txt",
-    "exclude_hosts": "/root/antizapret/config/exclude-hosts.txt",
-    "include_ips": "/root/antizapret/config/include-ips.txt",
+    "include_hosts":         "/root/antizapret/config/include-hosts.txt",
+    "exclude_hosts":         "/root/antizapret/config/exclude-hosts.txt",
+    "include_ips":           "/root/antizapret/config/include-ips.txt",
+    "exclude_ips":           "/root/antizapret/config/exclude-ips.txt",
+    "allow_ips":             "/root/antizapret/config/allow-ips.txt",
+    "forward_ips":           "/root/antizapret/config/forward-ips.txt",
+    "include_adblock_hosts": "/root/antizapret/config/include-adblock-hosts.txt",
+    "exclude_adblock_hosts": "/root/antizapret/config/exclude-adblock-hosts.txt",
+    "remove_hosts":          "/root/antizapret/config/remove-hosts.txt",
 }
 
+# Settings stored as y/n
 BOOLEAN_SETTINGS = [
     "ROUTE_ALL",
     "DISCORD_INCLUDE",
@@ -36,20 +43,27 @@ BOOLEAN_SETTINGS = [
     "ROBLOX_INCLUDE",
     "BLOCK_ADS",
     "CLEAR_HOSTS",
-    "OPENVPN_80_443_TCP",
-    "OPENVPN_80_443_UDP",
     "SSH_PROTECTION",
     "ATTACK_PROTECTION",
     "TORRENT_GUARD",
     "RESTRICT_FORWARD",
+    "ALTERNATIVE_CLIENT_IP",
+    "ALTERNATIVE_FAKE_IP",
+    "CLIENT_ISOLATION",
+]
+
+# Settings stored as 1/0 (shown as toggle in UI)
+NUMERIC_BOOLEAN_SETTINGS = [
+    "ANTIZAPRET_DNS",
+    "VPN_DNS",
 ]
 
 STRING_SETTINGS = [
-    "OPENVPN_HOST",
     "WIREGUARD_HOST",
+    "WARP_OUTBOUND",
 ]
 
-ALL_KNOWN_SETTINGS = BOOLEAN_SETTINGS + STRING_SETTINGS
+ALL_KNOWN_SETTINGS = BOOLEAN_SETTINGS + NUMERIC_BOOLEAN_SETTINGS + STRING_SETTINGS
 
 
 class AntizapretServiceError(Exception):
@@ -119,6 +133,8 @@ class AntizapretService:
             # Sanitize boolean values
             if key in BOOLEAN_SETTINGS:
                 value = "y" if value.lower() in ("y", "yes", "true", "1") else "n"
+            elif key in NUMERIC_BOOLEAN_SETTINGS:
+                value = "1" if value.lower() in ("1", "y", "yes", "true") else "0"
 
             line_pattern = re.compile(rf'^{re.escape(key)}=.*$', re.MULTILINE)
             new_line = f"{key}={value}"
