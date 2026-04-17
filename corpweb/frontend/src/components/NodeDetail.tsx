@@ -30,7 +30,7 @@ function healthBadgeClass(health: string | null): string {
 }
 
 export default function NodeDetail({ node, onClose }: NodeDetailProps) {
-  const activePeersAz = node.metrics?.active_peers_az ?? null
+  const activePeersAz = node.metrics?.active_peers_antizapret ?? null
   const activePeersVpn = node.metrics?.active_peers_vpn ?? null
   const appliedFiles = node.applied_sha ? Object.entries(node.applied_sha) : []
 

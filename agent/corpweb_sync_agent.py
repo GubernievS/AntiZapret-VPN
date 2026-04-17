@@ -97,10 +97,10 @@ DOALL_DEBOUNCE_SECS = 5.0
 
 
 def _run_doall() -> None:
-    log.info("Running doall.sh")
+    log.info("Running /root/antizapret/doall.sh")
     try:
         subprocess.run(
-            ["doall.sh"],
+            ["/root/antizapret/doall.sh"],
             check=True,
             capture_output=True,
             text=True,
@@ -108,7 +108,7 @@ def _run_doall() -> None:
     except subprocess.CalledProcessError as exc:
         log.error("doall.sh failed (rc=%d): %s", exc.returncode, exc.stderr.strip())
     except FileNotFoundError:
-        log.error("doall.sh not found in PATH")
+        log.error("/root/antizapret/doall.sh not found")
 
 
 def schedule_doall() -> None:
@@ -589,7 +589,7 @@ def stream_events() -> None:
                 if evt is None:
                     continue
                 _handle_event(evt, hook_map)
-    except (requests.ChunkedEncodingError, requests.ConnectionError) as exc:
+    except (requests.exceptions.ChunkedEncodingError, requests.ConnectionError) as exc:
         raise ConnectionError(f"SSE stream lost: {exc}") from exc
 
 
@@ -619,7 +619,10 @@ def _handle_event(evt: dict, hook_map: dict) -> None:
         resp = api_get(f"/api/v1/agent/file?path={path}")
         data = resp.json()
         content = base64.b64decode(data["content"])
-        apply_path(path, content, hook_map.get(path))
+        changed = apply_path(path, content, hook_map.get(path))
+        if changed:
+            # Immediate heartbeat so CP knows we applied
+            send_heartbeat()
     except Exception as exc:
         log.error("Failed to apply SSE update for %s: %s", path, exc)
 
