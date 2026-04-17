@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuthStore } from './store/authStore'
 
 function AdminRedirect() {
-  const { user } = useAuthStore()
+  const { user, isLoading } = useAuthStore()
+  if (isLoading) return null  // wait for auth check
   if (user?.role === 'admin') {
     return <Navigate to="/admin/dashboard" replace />
   }
