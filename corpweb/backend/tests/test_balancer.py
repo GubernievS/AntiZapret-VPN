@@ -168,3 +168,41 @@ DNAT       17   --  0.0.0.0/0            0.0.0.0/0            udp dpt:51443 to:3
     assert abs(result["1.1.1.1"]["weight"] - 50) <= 1
     assert abs(result["2.2.2.2"]["weight"] - 30) <= 1
     assert abs(result["3.3.3.3"]["weight"] - 20) <= 1
+
+
+# ── Safety checks ────────────────────────────────────────────────────────────
+
+
+class TestRuleSafety:
+    """Verify that generated rules cannot break general networking."""
+
+    def test_dnat_rules_only_target_udp(self):
+        """All DNAT rules must specify -p udp and a specific --dport."""
+        nodes = [
+            {"ip": "1.1.1.1", "weight": 50, "enabled": True},
+            {"ip": "2.2.2.2", "weight": 50, "enabled": True},
+        ]
+        rules = generate_iptables_rules(nodes)
+        for rule in rules:
+            assert "-p udp" in rule, f"Rule missing -p udp: {rule}"
+            assert "--dport" in rule, f"Rule missing --dport: {rule}"
+
+    def test_dnat_rules_no_wildcard_snat(self):
+        """DNAT rules must never contain SNAT or MASQUERADE."""
+        nodes = [
+            {"ip": "1.1.1.1", "weight": 50, "enabled": True},
+            {"ip": "2.2.2.2", "weight": 50, "enabled": True},
+        ]
+        rules = generate_iptables_rules(nodes)
+        for rule in rules:
+            assert "SNAT" not in rule
+            assert "MASQUERADE" not in rule
+
+    def test_generate_rules_no_empty_destination(self):
+        """Every rule must have a specific --to-destination with IP:port."""
+        nodes = [
+            {"ip": "10.0.0.1", "weight": 100, "enabled": True},
+        ]
+        rules = generate_iptables_rules(nodes)
+        for rule in rules:
+            assert "--to-destination 10.0.0.1:" in rule

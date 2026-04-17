@@ -178,40 +178,48 @@ def read_current_state() -> dict:
 
 def apply_rules(nodes: list[dict], cp_ip: str) -> dict:
     """
-    Build an iptables-restore script for the nat table and apply it atomically.
+    Apply DNAT + SNAT rules safely using flush + add (NOT iptables-restore).
+
+    iptables-restore replaces the ENTIRE nat table which destroys other
+    chains (INPUT/OUTPUT) and any non-balancer rules. Instead we only
+    flush PREROUTING and POSTROUTING, then add our rules back.
 
     Steps:
-    1. Build PREROUTING DNAT rules + POSTROUTING SNAT masquerade rule.
-    2. Test with ``iptables-restore --test``.
-    3. Apply with ``iptables-restore``.
-    4. Persist with ``netfilter-persistent save``.
-    5. Return current state via :func:`read_current_state`.
+    1. Flush PREROUTING chain (removes old DNAT rules).
+    2. Add new DNAT rules.
+    3. Flush POSTROUTING chain (removes old SNAT rules).
+    4. Add SNAT rules with -d filter (ONLY for traffic to nodes).
+    5. Persist with netfilter-persistent save.
+    6. Return current state.
 
-    ``cp_ip`` is the control-plane IP used for the POSTROUTING SNAT rule.
+    ``cp_ip`` is the control-plane's own IP for SNAT source.
     """
     dnat_rules = generate_iptables_rules(nodes)
+    enabled_ips = {n["ip"] for n in nodes if n.get("enabled")}
 
-    lines = [
-        "*nat",
-        ":PREROUTING ACCEPT [0:0]",
-        ":POSTROUTING ACCEPT [0:0]",
-        ":OUTPUT ACCEPT [0:0]",
-    ]
-    lines.extend(dnat_rules)
-    lines.append(
-        f"-A POSTROUTING -j SNAT --to-source {cp_ip}"
-    )
-    lines.append("COMMIT")
+    # 1. Flush PREROUTING
+    _run(["iptables", "-t", "nat", "-F", "PREROUTING"])
 
-    restore_input = "\n".join(lines) + "\n"
+    # 2. Add DNAT rules
+    for rule in dnat_rules:
+        # rule is like "-A PREROUTING -p udp --dport 51443 ... -j DNAT --to-destination IP:PORT"
+        args = rule.split()
+        # Remove leading "-A PREROUTING" — we'll use iptables -t nat -A PREROUTING
+        if args[0] == "-A" and args[1] == "PREROUTING":
+            args = args[2:]
+        _run(["iptables", "-t", "nat", "-A", "PREROUTING"] + args)
 
-    # Dry-run first
-    _run(["iptables-restore", "--test"], input_data=restore_input)
+    # 3. Flush POSTROUTING
+    _run(["iptables", "-t", "nat", "-F", "POSTROUTING"])
 
-    # Apply
-    _run(["iptables-restore"], input_data=restore_input)
+    # 4. Add SNAT rules — one per node IP, with -d filter
+    for ip in sorted(enabled_ips):
+        _run([
+            "iptables", "-t", "nat", "-A", "POSTROUTING",
+            "-d", ip, "-j", "SNAT", "--to-source", cp_ip,
+        ])
 
-    # Persist across reboots
+    # 5. Persist
     try:
         _run(["netfilter-persistent", "save"])
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
