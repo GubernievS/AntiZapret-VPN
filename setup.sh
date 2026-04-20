@@ -99,7 +99,7 @@ until [[ "$ANTIZAPRET_WARP" =~ (y|n) ]]; do
 done
 echo
 until [[ "$VPN_WARP" =~ (y|n) ]]; do
-	read -rp $'Use Cloudflare WARP for \001\e[1;32m\002full VPN\e[0m\002 (vpn-*) outbound traffic? [y/n]: ' -e -i y VPN_WARP
+	read -rp $'Use Cloudflare WARP for \001\e[1;32m\002full VPN\e[0m\002 (vpn-*) outbound traffic? [y/n]: ' -e -i n VPN_WARP
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
