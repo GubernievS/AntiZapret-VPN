@@ -361,6 +361,39 @@ def test_check_all_nodes_applied_no_nodes(db):
     assert mgr.check_all_nodes_applied(db, "/etc/wireguard/antizapret.conf") is True
 
 
+def test_add_peer_uses_correct_subnet_per_iface(db):
+    """
+    VPN peer must use 10.28.x.x subnet, antizapret peer must use 10.29.x.x,
+    with the SAME host part (last 2 octets). This was a bug: both ifaces
+    used the same IP, causing VPN client Address to be in wrong subnet.
+    """
+    from app.services.vpn_manager_new import VpnManager
+    from app.services.wg_blob_store import WgBlobStore
+    from app.services.wg_templates import parse_peers
+
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    mgr.add_peer(db, "alice-1")
+
+    store = WgBlobStore(db)
+    az_peers = parse_peers(store.get("/etc/wireguard/antizapret.conf").decode())
+    vpn_peers = parse_peers(store.get("/etc/wireguard/vpn.conf").decode())
+
+    az_peer = next(p for p in az_peers if p.name == "alice-1")
+    vpn_peer = next(p for p in vpn_peers if p.name == "alice-1")
+
+    az_ip = az_peer.allowed_ips.split("/")[0]
+    vpn_ip = vpn_peer.allowed_ips.split("/")[0]
+
+    # AZ subnet 10.29.x.x, VPN subnet 10.28.x.x
+    assert az_ip.startswith("10.29."), f"AZ IP should be 10.29.x, got {az_ip}"
+    assert vpn_ip.startswith("10.28."), f"VPN IP should be 10.28.x, got {vpn_ip}"
+
+    # Same host part (last 2 octets)
+    assert az_ip.split(".")[2:] == vpn_ip.split(".")[2:], \
+        f"Host parts differ: {az_ip} vs {vpn_ip}"
+
+
 # ---------------------------------------------------------------------------
 # generate_client_name (standalone function)
 # ---------------------------------------------------------------------------

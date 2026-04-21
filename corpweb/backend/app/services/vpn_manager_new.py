@@ -183,25 +183,33 @@ class VpnManager:
         client_priv, client_pub = _generate_keypair()
         psk = _generate_preshared_key()
 
-        # Determine free IP from antizapret subnet (both ifaces share same IP)
+        # Determine free IP from antizapret subnet (canonical source)
+        # VPN peer gets IP with same host part in 10.28.x.x subnet
         az_cfg = _IFACE_CONFIG["antizapret"]
         az_blob = store.get(az_cfg["conf_path"])
         az_content = az_blob.decode() if az_blob else ""
         az_peers = parse_peers(az_content)
         free_ip = next_free_ip(az_peers, az_cfg["subnet"])
 
-        new_peer = Peer(
-            name=name,
-            public_key=client_pub,
-            preshared_key=psk,
-            allowed_ips=f"{free_ip}/32",
-        )
+        # Per-iface IP: antizapret = 10.29.x.x, vpn = 10.28.x.x (same host part)
+        host_parts = free_ip.split(".")[2:]  # last 2 octets
+        iface_ip = {
+            "antizapret": free_ip,  # 10.29.x.x
+            "vpn": f"10.28.{host_parts[0]}.{host_parts[1]}",  # 10.28.x.x
+        }
 
         # Update both interface configs
         for iface, cfg in _IFACE_CONFIG.items():
             blob = store.get(cfg["conf_path"])
             content = blob.decode() if blob else ""
             existing_peers = parse_peers(content)
+
+            new_peer = Peer(
+                name=name,
+                public_key=client_pub,
+                preshared_key=psk,
+                allowed_ips=f"{iface_ip[iface]}/32",
+            )
 
             server_keys = db.get(WgServerKeys, iface)
             all_peers = existing_peers + [new_peer]
