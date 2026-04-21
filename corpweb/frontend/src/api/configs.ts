@@ -7,6 +7,19 @@ export interface ClientLinks {
   apk_url: string | null
   windows_url: string | null
   wireguard_backup_enabled?: boolean
+  escape_enabled?: boolean
+}
+
+export interface DownloadOptions {
+  backup?: boolean
+  bypass?: boolean
+}
+
+function buildParams(opts: DownloadOptions): Record<string, boolean> | undefined {
+  const params: Record<string, boolean> = {}
+  if (opts.backup) params.backup = true
+  if (opts.bypass) params.bypass = true
+  return Object.keys(params).length > 0 ? params : undefined
 }
 
 export const configsApi = {
@@ -24,16 +37,16 @@ export const configsApi = {
   getDetail: (id: string) =>
     api.get<ConfigDetail>(`/configs/${id}`),
 
-  download: (id: string, backup = false) =>
+  download: (id: string, opts: DownloadOptions = {}) =>
     api.get<Blob>(`/configs/${id}/download`, {
       responseType: 'blob',
-      params: backup ? { backup: true } : undefined,
+      params: buildParams(opts),
     }),
 
-  getQR: (id: string, backup = false) =>
+  getQR: (id: string, opts: DownloadOptions = {}) =>
     api.get<Blob>(`/configs/${id}/qr`, {
       responseType: 'blob',
-      params: backup ? { backup: true } : undefined,
+      params: buildParams(opts),
     }),
 
   delete: (id: string) =>

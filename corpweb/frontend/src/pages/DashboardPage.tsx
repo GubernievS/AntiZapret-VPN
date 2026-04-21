@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
   const handleDownload = async (config: VPNConfig) => {
     try {
-      const response = await configsApi.download(config.id, useBackupPort)
+      const response = await configsApi.download(config.id, { backup: useBackupPort })
       const disposition = response.headers['content-disposition'] || ''
       const match = disposition.match(/filename="?(.+?)"?$/i)
       const filename = match?.[1] || `${config.client_name}.zip`
@@ -107,7 +107,7 @@ export default function DashboardPage() {
     setQrType(null)
     setQrLoading(true)
     try {
-      const response = await configsApi.getQR(config.id, useBackupPort)
+      const response = await configsApi.getQR(config.id, { backup: useBackupPort })
       const url = URL.createObjectURL(response.data)
       setQrUrl(url)
       setQrType(response.headers['x-qr-type'] || 'config')

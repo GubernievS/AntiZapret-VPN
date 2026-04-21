@@ -43,6 +43,7 @@ export interface AntizapretSettings {
   CLIENT_ISOLATION: string | null
   WARP_OUTBOUND: string | null
   WIREGUARD_BACKUP: string | null
+  ESCAPE_ENABLED: string | null
 }
 
 export interface DoallResponse {
@@ -64,4 +65,6 @@ export const antizapretApi = {
   updateSettings: (settings: Record<string, string>) =>
     api.patch<DoallResponse>('/antizapret/settings', { settings }).then(r => r.data),
 
+  regenerateObfuscation: () =>
+    api.post('/antizapret/obfuscation/regenerate').then(r => r.data),
 }
