@@ -46,6 +46,7 @@ async def get_client_links(
         "apk_url": sys_settings.apk_url,
         "windows_url": sys_settings.windows_url,
         "wireguard_backup_enabled": backup_enabled,
+        "escape_enabled": bool(getattr(sys_settings, "escape_enabled", False)),
     }
 
 
