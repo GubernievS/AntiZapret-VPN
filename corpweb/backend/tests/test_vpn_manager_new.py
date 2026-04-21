@@ -180,6 +180,77 @@ class TestAddPeer:
         assert b"# Client = alice-1" in az_blob
         assert b"# Client = alice-1" in vpn_blob
 
+    def test_peer_written_to_all_four_ifaces(self, db):
+        """Peer must land in every iface's server conf, including escape ifaces."""
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+        mgr.add_peer(db, "alice-1")
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+            blob = store.get(f"/etc/wireguard/{iface}.conf")
+            names = [p.name for p in parse_peers(blob.decode())]
+            assert "alice-1" in names, f"alice-1 missing in {iface}"
+
+    def test_peer_shares_host_part_across_all_four_ifaces(self, db):
+        """IPs in all 4 ifaces share the last two octets (parallel subnets)."""
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+        mgr.add_peer(db, "bob-1")
+
+        store = WgBlobStore(db)
+        ips: dict[str, str] = {}
+        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+            peers = parse_peers(
+                store.get(f"/etc/wireguard/{iface}.conf").decode()
+            )
+            ips[iface] = next(p.allowed_ips.split("/")[0]
+                              for p in peers if p.name == "bob-1")
+
+        host_parts = {ip.split(".", 2)[-1] for ip in ips.values()}
+        assert len(host_parts) == 1, f"host parts differ: {ips}"
+
+        # Subnet prefixes must match the design (10.29, 10.28, 10.27, 10.26).
+        assert ips["antizapret"].startswith("10.29.")
+        assert ips["vpn"].startswith("10.28.")
+        assert ips["antizapret_escape"].startswith("10.27.")
+        assert ips["vpn_escape"].startswith("10.26.")
+
+    def test_escape_server_confs_keep_awg_params_after_add_peer(self, db):
+        """Re-rendering escape server confs with peers must preserve awg fields."""
+        from app.services.wg_blob_store import WgBlobStore
+
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+        mgr.add_peer(db, "carol-1")
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret_escape", "vpn_escape"):
+            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            assert "Jc = " in content
+            assert "S1 = " in content
+            assert "H1 = " in content
+
+    def test_base_server_confs_have_no_awg_params_after_add_peer(self, db):
+        """Base ifaces must still not pick up any obfuscation fields."""
+        from app.services.wg_blob_store import WgBlobStore
+
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+        mgr.add_peer(db, "carol-1")
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret", "vpn"):
+            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            assert "Jc" not in content
+            assert "S1" not in content
+
 
 # ---------------------------------------------------------------------------
 # delete_peer

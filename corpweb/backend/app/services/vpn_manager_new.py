@@ -227,7 +227,7 @@ class VpnManager:
             "vpn_escape":        f"10.26.{host_parts[0]}.{host_parts[1]}",
         }
 
-        # Update both interface configs
+        # Update all four interface configs (2 base + 2 escape).
         for iface, cfg in _IFACE_CONFIG.items():
             blob = store.get(cfg["conf_path"])
             content = blob.decode() if blob else ""
@@ -242,11 +242,13 @@ class VpnManager:
 
             server_keys = db.get(WgServerKeys, iface)
             all_peers = existing_peers + [new_peer]
+            awg = get_params(db, iface) if iface in _ESCAPE_IFACES else None
             new_conf = render_server_conf(
                 iface=iface,
                 peers=all_peers,
                 server_privkey=server_keys.private_key,
                 address=cfg["address"],
+                awg_params=awg,
             )
             store.put(cfg["conf_path"], new_conf.encode(), by="add_peer")
 
@@ -263,7 +265,7 @@ class VpnManager:
     # ------------------------------------------------------------------
 
     def delete_peer(self, db: Session, name: str) -> None:
-        """Remove a peer from both antizapret and vpn server configs."""
+        """Remove a peer from all four server configs (base + escape)."""
         store = WgBlobStore(db)
 
         for iface, cfg in _IFACE_CONFIG.items():
@@ -278,11 +280,13 @@ class VpnManager:
                 continue  # peer not in this conf
 
             server_keys = db.get(WgServerKeys, iface)
+            awg = get_params(db, iface) if iface in _ESCAPE_IFACES else None
             new_conf = render_server_conf(
                 iface=iface,
                 peers=filtered,
                 server_privkey=server_keys.private_key,
                 address=cfg["address"],
+                awg_params=awg,
             )
             store.put(cfg["conf_path"], new_conf.encode(), by="delete_peer")
 
