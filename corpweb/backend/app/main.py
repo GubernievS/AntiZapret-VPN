@@ -20,23 +20,39 @@ from app.api.v1 import auth, configs, admin, monitoring, antizapret, public, age
 async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     # Startup: initialize database with default data
+    import logging
     from app.db.init_db import init_db
     from app.services.scheduler import start_scheduler, stop_scheduler
     from app.services.balancer import ensure_ports_reconciled
+    from app.services.vpn_manager_new import vpn_manager
     from app.db.session import SessionLocal
     init_db()
     start_scheduler()
 
-    # Self-heal iptables after code upgrades that extend DEFAULT_PORTS
-    # (e.g. WireGuard backup ports 540/580). No-op on fresh install.
+    # Bootstrap escape-iface keypairs + obfuscation params + server .conf
+    # blobs BEFORE the balancer reconciles iptables, so DNAT targets
+    # (ports 500 / 53443) have real listeners on each node once forwarded.
+    #
+    # vpn_manager.bootstrap() already calls obfuscation_service.ensure_initialized
+    # internally for the two escape ifaces — do not duplicate that here.
     db = SessionLocal()
     try:
-        ensure_ports_reconciled(db)
-    except Exception as exc:
-        import logging
-        logging.getLogger(__name__).warning(
-            "ensure_ports_reconciled on startup failed (non-fatal): %s", exc
-        )
+        try:
+            vpn_manager.bootstrap(db)
+        except Exception as exc:
+            logging.getLogger(__name__).warning(
+                "vpn_manager.bootstrap on startup failed (non-fatal): %s", exc
+            )
+
+        # Self-heal iptables after code upgrades that extend DEFAULT_PORTS
+        # (e.g. WireGuard backup ports 540/580, escape ports 500/53443).
+        # No-op on fresh install.
+        try:
+            ensure_ports_reconciled(db)
+        except Exception as exc:
+            logging.getLogger(__name__).warning(
+                "ensure_ports_reconciled on startup failed (non-fatal): %s", exc
+            )
     finally:
         db.close()
 
