@@ -369,13 +369,25 @@ def _rebalance_on_escape_change(db: Session, *, escape_enabled: bool) -> None:
         logger.warning("rebalance skipped: cp_ip not configured")
         return
 
-    # Default each enabled node to weight 50 — apply_rules is called only
-    # to refresh the DNAT port set on escape_enabled toggle, not to change
-    # weights. Operators use PUT /api/v1/nodes/balancer to tune weights.
-    payload = [
-        {"ip": str(n.private_ip), "weight": 50, "enabled": True}
-        for n in nodes
-    ]
+    # Preserve current weight / enabled state for each node. We read the
+    # live iptables state and fall back to a neutral weight only if a node
+    # has no existing DNAT rules. Otherwise toggling escape_enabled would
+    # silently reset the operator's tuned weights to 50/50.
+    try:
+        current = balancer.read_current_state()
+    except Exception as exc:
+        logger.warning("could not read live iptables state: %s", exc)
+        current = {}
+
+    payload = []
+    for n in nodes:
+        ip = str(n.private_ip)
+        cur = current.get(ip)
+        payload.append({
+            "ip": ip,
+            "weight": cur["weight"] if cur else 50,
+            "enabled": cur["enabled"] if cur else True,
+        })
     balancer.apply_rules(payload, cp_ip, escape_enabled=escape_enabled)
 
 
