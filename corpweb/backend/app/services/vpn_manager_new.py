@@ -17,6 +17,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db.models import WgServerKeys
+from app.services.obfuscation_service import ensure_initialized, get_params
 from app.services.wg_blob_store import WgBlobStore
 from app.services.wg_templates import (
     Peer,
@@ -26,6 +27,8 @@ from app.services.wg_templates import (
     render_server_conf,
     reverse_peer_keys,
 )
+
+_ESCAPE_IFACES = ("antizapret_escape", "vpn_escape")
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +46,16 @@ _IFACE_CONFIG = {
         "address": "10.28.8.1/21",
         "subnet": "10.28.8.0/21",
         "conf_path": "/etc/wireguard/vpn.conf",
+    },
+    "antizapret_escape": {
+        "address": "10.27.8.1/21",
+        "subnet": "10.27.8.0/21",
+        "conf_path": "/etc/wireguard/antizapret_escape.conf",
+    },
+    "vpn_escape": {
+        "address": "10.26.8.1/21",
+        "subnet": "10.26.8.0/21",
+        "conf_path": "/etc/wireguard/vpn_escape.conf",
     },
 }
 
@@ -129,8 +142,16 @@ class VpnManager:
         """
         Idempotent initialisation: create server keypairs and empty conf blobs.
 
+        For escape ifaces (``*_escape``), also ensures ``wg_obfuscation_params``
+        rows exist and bakes those params into the freshly-rendered
+        server conf.
+
         Safe to call on every startup.
         """
+        # Ensure obfuscation params exist for escape ifaces before we render
+        # their server confs.
+        ensure_initialized(db, ifaces=list(_ESCAPE_IFACES))
+
         store = WgBlobStore(db)
 
         for iface, cfg in _IFACE_CONFIG.items():
@@ -147,11 +168,13 @@ class VpnManager:
 
             # Create empty server conf blob if it doesn't exist
             if store.get(cfg["conf_path"]) is None:
+                awg = get_params(db, iface) if iface in _ESCAPE_IFACES else None
                 conf = render_server_conf(
                     iface=iface,
                     peers=[],
                     server_privkey=priv,
                     address=cfg["address"],
+                    awg_params=awg,
                 )
                 store.put(cfg["conf_path"], conf.encode(), by="bootstrap")
                 logger.info("Created initial conf blob for %s", iface)
@@ -191,11 +214,17 @@ class VpnManager:
         az_peers = parse_peers(az_content)
         free_ip = next_free_ip(az_peers, az_cfg["subnet"])
 
-        # Per-iface IP: antizapret = 10.29.x.x, vpn = 10.28.x.x (same host part)
+        # Per-iface IP: each iface gets the same host part in its own /21:
+        #   antizapret        = 10.29.x.x
+        #   vpn               = 10.28.x.x
+        #   antizapret_escape = 10.27.x.x
+        #   vpn_escape        = 10.26.x.x
         host_parts = free_ip.split(".")[2:]  # last 2 octets
         iface_ip = {
-            "antizapret": free_ip,  # 10.29.x.x
-            "vpn": f"10.28.{host_parts[0]}.{host_parts[1]}",  # 10.28.x.x
+            "antizapret":        free_ip,
+            "vpn":               f"10.28.{host_parts[0]}.{host_parts[1]}",
+            "antizapret_escape": f"10.27.{host_parts[0]}.{host_parts[1]}",
+            "vpn_escape":        f"10.26.{host_parts[0]}.{host_parts[1]}",
         }
 
         # Update both interface configs

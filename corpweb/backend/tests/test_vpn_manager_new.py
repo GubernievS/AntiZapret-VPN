@@ -21,7 +21,7 @@ def _make_manager() -> VpnManager:
 # ---------------------------------------------------------------------------
 
 class TestBootstrap:
-    def test_creates_two_keypairs(self, db):
+    def test_creates_four_keypairs(self, db):
         mgr = _make_manager()
         mgr.bootstrap(db)
 
@@ -29,7 +29,7 @@ class TestBootstrap:
 
         keys = db.query(WgServerKeys).all()
         ifaces = {k.iface for k in keys}
-        assert ifaces == {"antizapret", "vpn"}
+        assert ifaces == {"antizapret", "vpn", "antizapret_escape", "vpn_escape"}
 
     def test_keypairs_are_valid_base64(self, db):
         mgr = _make_manager()
@@ -70,13 +70,44 @@ class TestBootstrap:
         from app.services.wg_blob_store import WgBlobStore
 
         store = WgBlobStore(db)
-        az_blob = store.get("/etc/wireguard/antizapret.conf")
-        vpn_blob = store.get("/etc/wireguard/vpn.conf")
-        assert az_blob is not None
-        assert vpn_blob is not None
-        # Should be valid server confs (contain [Interface])
-        assert b"[Interface]" in az_blob
-        assert b"[Interface]" in vpn_blob
+        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+            blob = store.get(f"/etc/wireguard/{iface}.conf")
+            assert blob is not None, f"missing conf blob for {iface}"
+            assert b"[Interface]" in blob
+
+    def test_iface_config_has_escape_entries(self):
+        from app.services.vpn_manager_new import _IFACE_CONFIG
+        assert "antizapret_escape" in _IFACE_CONFIG
+        assert "vpn_escape" in _IFACE_CONFIG
+        assert _IFACE_CONFIG["antizapret_escape"]["subnet"] == "10.27.8.0/21"
+        assert _IFACE_CONFIG["vpn_escape"]["subnet"] == "10.26.8.0/21"
+
+    def test_bootstrap_writes_awg_params_into_escape_server_confs(self, db):
+        """Escape server confs must contain obfuscation fields (Jc/S1/H1)."""
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+
+        from app.services.wg_blob_store import WgBlobStore
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret_escape", "vpn_escape"):
+            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            assert "Jc = " in content, f"{iface} missing Jc"
+            assert "S1 = " in content, f"{iface} missing S1"
+            assert "H1 = " in content, f"{iface} missing H1"
+
+    def test_bootstrap_base_ifaces_have_no_awg_params(self, db):
+        """Base ifaces must not get obfuscation fields in their server conf."""
+        mgr = _make_manager()
+        mgr.bootstrap(db)
+
+        from app.services.wg_blob_store import WgBlobStore
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret", "vpn"):
+            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            assert "Jc" not in content, f"{iface} should not contain Jc"
+            assert "S1" not in content, f"{iface} should not contain S1"
 
 
 # ---------------------------------------------------------------------------
