@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Save, Loader2, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react'
 import { antizapretApi, type AntizapretSettings } from '../api/antizapret'
 import Toggle from '../components/Toggle'
 
@@ -29,6 +29,8 @@ export default function AdminAntizapretPage() {
   const [error, setError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [applySuccess, setApplySuccess] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
+  const [regenSuccess, setRegenSuccess] = useState(false)
 
   useEffect(() => {
     antizapretApi
@@ -81,6 +83,24 @@ export default function AdminAntizapretPage() {
     } finally {
       setSaving(false)
       setApplying(false)
+    }
+  }
+
+  const handleRegenerateObfuscation = async () => {
+    if (!window.confirm('Это отключит всех текущих bypass-клиентов до пересоздания ими конфига. Подтвердить?')) {
+      return
+    }
+    setRegenerating(true)
+    setRegenSuccess(false)
+    setError(null)
+    try {
+      await antizapretApi.regenerateObfuscation()
+      setRegenSuccess(true)
+      setTimeout(() => setRegenSuccess(false), 5000)
+    } catch {
+      setError('Ошибка при перегенерации параметров обфускации')
+    } finally {
+      setRegenerating(false)
     }
   }
 
@@ -206,6 +226,40 @@ export default function AdminAntizapretPage() {
           В ЛК клиента появляется опция «Использовать резервный порт» при скачивании конфига/QR.
           Балансировщик DNAT всегда проксирует обе группы портов — изменение не влияет на его настройки.
         </p>
+      </Section>
+
+      {/* Escape / bypass mode */}
+      <Section title="Обход блокировки">
+        <Toggle
+          label="Включить режим обхода блокировки (ESCAPE_ENABLED)"
+          value={isY(settings.ESCAPE_ENABLED)}
+          onChange={v => setBool('ESCAPE_ENABLED', v)}
+        />
+        <p className="py-2 text-xs text-gray-500 leading-relaxed">
+          При включении на нодах поднимаются отдельные AmneziaWG-интерфейсы
+          <code className="bg-gray-100 px-1 rounded mx-1">antizapret_escape</code>
+          (UDP 53443) и
+          <code className="bg-gray-100 px-1 rounded mx-1">vpn_escape</code>
+          (UDP 500) с усиленной обфускацией (S1/S2, custom H1–H4).
+          В ЛК клиента появляется опция «Обход блокировки» при скачивании конфига/QR.
+          Перегенерация параметров ниже отключит всех текущих bypass-клиентов до пересоздания ими конфига.
+        </p>
+        <div className="py-3 flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            onClick={handleRegenerateObfuscation}
+            disabled={regenerating}
+            className="flex items-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {regenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Перегенерировать параметры обфускации
+          </button>
+          {regenSuccess && (
+            <span className="flex items-center gap-1.5 text-sm text-green-600">
+              <CheckCircle2 className="w-4 h-4" /> Параметры обновлены
+            </span>
+          )}
+        </div>
       </Section>
 
       {/* DNS */}
