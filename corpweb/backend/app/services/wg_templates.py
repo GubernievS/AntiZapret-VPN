@@ -33,11 +33,20 @@ _PORT_MAP = {
     ("antizapret", "awg"): 52443,
     ("vpn", "wg"):         51080,
     ("vpn", "awg"):        52080,
+    # Escape ifaces — awg-only, single port each.
+    ("antizapret_escape", "awg"): 53443,
+    ("vpn_escape", "awg"):        500,
 }
 
 _BACKUP_PORT_MAP = {
     "antizapret": 540,
     "vpn": 580,
+}
+
+# Escape port map (convenience lookup, same values as _PORT_MAP for "awg").
+_ESCAPE_PORT_MAP = {
+    "antizapret_escape": 53443,
+    "vpn_escape": 500,
 }
 
 
@@ -255,23 +264,47 @@ def render_server_conf(
     peers: List[Peer],
     server_privkey: str,
     address: str,
+    *,
+    awg_params: dict | None = None,
 ) -> str:
     """
     Render a full WireGuard server config file.
 
     Args:
-        iface: interface name ("antizapret" or "vpn").
+        iface: interface name ("antizapret", "vpn", "antizapret_escape", "vpn_escape").
         peers: list of Peer objects.
         server_privkey: server private key.
         address: server address with CIDR (e.g. "10.29.8.1/21").
+        awg_params: optional dict with AmneziaWG obfuscation params
+            (keys: jc, jmin, jmax, s1, s2, h1..h4, i1). When provided,
+            an obfuscation block is appended to [Interface].
     """
-    port = _PORT_MAP[(iface, "wg")]
+    # Escape ifaces are awg-only; base ifaces use the legacy "wg" port in
+    # the server config (the port that wg-quick actually binds).
+    if iface in _ESCAPE_PORT_MAP:
+        port = _ESCAPE_PORT_MAP[iface]
+    else:
+        port = _PORT_MAP[(iface, "wg")]
+
     lines = [
         "[Interface]",
         f"PrivateKey = {server_privkey}",
         f"Address = {address}",
         f"ListenPort = {port}",
     ]
+
+    if awg_params:
+        lines.append(f"Jc = {awg_params['jc']}")
+        lines.append(f"Jmin = {awg_params['jmin']}")
+        lines.append(f"Jmax = {awg_params['jmax']}")
+        lines.append(f"S1 = {awg_params['s1']}")
+        lines.append(f"S2 = {awg_params['s2']}")
+        lines.append(f"H1 = {awg_params['h1']}")
+        lines.append(f"H2 = {awg_params['h2']}")
+        lines.append(f"H3 = {awg_params['h3']}")
+        lines.append(f"H4 = {awg_params['h4']}")
+        if awg_params.get("i1"):
+            lines.append(f"I1 = {awg_params['i1']}")
 
     for peer in peers:
         lines.append("")
@@ -295,20 +328,33 @@ def render_client_conf(
     allowed_ips: str | None = None,
     client_private_key: str | None = None,
     use_backup_port: bool = False,
+    awg_params: dict | None = None,
 ) -> str:
     """
     Render a WireGuard / AmneziaWG client config.
 
     Args:
         peer: Peer dataclass with client info.
-        iface: "antizapret" or "vpn".
+        iface: "antizapret", "vpn", "antizapret_escape", or "vpn_escape".
         server_pubkey: server public key.
         endpoint_host: server hostname or IP.
-        flavor: "wg" or "awg".
+        flavor: "wg" or "awg". Escape ifaces are always awg.
         allowed_ips: override AllowedIPs for antizapret (default: "10.29.8.0/24").
         client_private_key: if provided, embed the real key; otherwise use placeholder.
+        use_backup_port: route via UDP 540/580 — only valid for base ifaces.
+        awg_params: per-iface obfuscation dict (jc/jmin/jmax/s1/s2/h1..h4/i1).
+            When provided, replaces the hardcoded legacy _AWG_OBFUSCATION /
+            _AWG_I1 block with values rendered from the dict. Required in
+            practice for escape ifaces (where they must match the server).
     """
-    port = _BACKUP_PORT_MAP[iface] if use_backup_port else _PORT_MAP[(iface, flavor)]
+    # Port lookup: escape ifaces have dedicated single ports, base ifaces
+    # pick between flavored primary port and backup port.
+    if iface in _ESCAPE_PORT_MAP:
+        port = _ESCAPE_PORT_MAP[iface]
+    elif use_backup_port:
+        port = _BACKUP_PORT_MAP[iface]
+    else:
+        port = _PORT_MAP[(iface, flavor)]
 
     # Extract bare IP from allowed_ips (e.g. "10.29.8.2/32" -> "10.29.8.2")
     client_ip = peer.allowed_ips.split("/")[0]
@@ -330,8 +376,21 @@ def render_client_conf(
 
     # AWG obfuscation fields
     if flavor == "awg":
-        lines.append(_AWG_OBFUSCATION)
-        lines.append(f"I1 = {_AWG_I1}")
+        if awg_params is not None:
+            lines.append(f"Jc = {awg_params['jc']}")
+            lines.append(f"Jmin = {awg_params['jmin']}")
+            lines.append(f"Jmax = {awg_params['jmax']}")
+            lines.append(f"S1 = {awg_params['s1']}")
+            lines.append(f"S2 = {awg_params['s2']}")
+            lines.append(f"H1 = {awg_params['h1']}")
+            lines.append(f"H2 = {awg_params['h2']}")
+            lines.append(f"H3 = {awg_params['h3']}")
+            lines.append(f"H4 = {awg_params['h4']}")
+            if awg_params.get("i1"):
+                lines.append(f"I1 = {awg_params['i1']}")
+        else:
+            lines.append(_AWG_OBFUSCATION)
+            lines.append(f"I1 = {_AWG_I1}")
 
     # [Peer] section
     lines.append("")
@@ -340,10 +399,11 @@ def render_client_conf(
     lines.append(f"PresharedKey = {peer.preshared_key}")
     lines.append(f"Endpoint = {endpoint_host}:{port}")
 
-    if iface == "vpn":
+    # AllowedIPs: full-VPN for vpn/vpn_escape; split-tunnel for antizapret/antizapret_escape.
+    if iface in ("vpn", "vpn_escape"):
         lines.append("AllowedIPs = 0.0.0.0/0, ::/0")
     else:
-        # antizapret: subnet-based split routing
+        # antizapret / antizapret_escape: subnet-based split routing
         effective_allowed_ips = allowed_ips if allowed_ips is not None else "10.29.8.0/24"
         lines.append(f"AllowedIPs = {effective_allowed_ips}")
 

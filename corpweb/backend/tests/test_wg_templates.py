@@ -509,3 +509,69 @@ def test_render_client_conf_no_backup_uses_primary():
     peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.29.8.2/32")
     out = render_client_conf(peer, "antizapret", "spub==", "host.test", "awg")
     assert "Endpoint = host.test:52443" in out
+
+
+# ---------------------------------------------------------------------------
+# Escape ports + AWG obfuscation params (Task 4)
+# ---------------------------------------------------------------------------
+
+def test_escape_port_map_has_two_entries():
+    from app.services.wg_templates import _ESCAPE_PORT_MAP
+    assert _ESCAPE_PORT_MAP["antizapret_escape"] == 53443
+    assert _ESCAPE_PORT_MAP["vpn_escape"] == 500
+
+
+def test_port_map_covers_all_four_ifaces():
+    from app.services.wg_templates import _PORT_MAP
+    assert _PORT_MAP[("antizapret_escape", "awg")] == 53443
+    assert _PORT_MAP[("vpn_escape", "awg")] == 500
+
+
+def test_render_server_conf_with_awg_params_adds_block():
+    from app.services.wg_templates import render_server_conf
+    conf = render_server_conf(
+        iface="vpn_escape",
+        peers=[],
+        server_privkey="FAKE_PRIV",
+        address="10.26.8.1/21",
+        awg_params={
+            "jc": 4, "jmin": 50, "jmax": 1000,
+            "s1": 88, "s2": 136,
+            "h1": 111, "h2": 222, "h3": 333, "h4": 444,
+            "i1": "",
+        },
+    )
+    for line in ["Jc = 4", "Jmin = 50", "Jmax = 1000", "S1 = 88", "S2 = 136",
+                 "H1 = 111", "H2 = 222", "H3 = 333", "H4 = 444"]:
+        assert line in conf, f"missing {line!r} in\n{conf}"
+    assert "ListenPort = 500" in conf
+
+
+def test_render_server_conf_without_awg_params_is_unchanged():
+    """Existing antizapret/vpn configs must not get AWG params."""
+    from app.services.wg_templates import render_server_conf
+    conf = render_server_conf(
+        iface="antizapret", peers=[], server_privkey="X", address="10.29.8.1/21",
+    )
+    for key in ["Jc", "S1", "H1"]:
+        assert key not in conf
+
+
+def test_render_client_conf_bypass_uses_escape_port_and_params():
+    from app.services.wg_templates import render_client_conf, Peer
+    peer = Peer(name="c1", public_key="PK", preshared_key="PSK", allowed_ips="10.26.8.10/32")
+    awg = {
+        "jc": 4, "jmin": 50, "jmax": 1000, "s1": 88, "s2": 136,
+        "h1": 111, "h2": 222, "h3": 333, "h4": 444, "i1": "",
+    }
+    conf = render_client_conf(
+        peer=peer,
+        iface="vpn_escape",
+        server_pubkey="SPK",
+        endpoint_host="cp.example.com",
+        flavor="awg",
+        awg_params=awg,
+    )
+    assert "Endpoint = cp.example.com:500" in conf
+    assert "H1 = 111" in conf
+    assert "S1 = 88" in conf
