@@ -56,18 +56,17 @@ if [[ "$ANTIZAPRET_WARP" == 'y' || "$VPN_WARP" == 'y' ]]; then
 	echo "Starting $WARP_INTERFACE..."
 	PRIVATE_KEY=$(wg genkey)
 	KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
-
-	REG=$(curl -sfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0i1909051800/reg" \
+	REG=$(curl -sfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
 		-H 'Content-Type: application/json' \
-		-d "{\"key\":\"$KEY\",\"warp_enabled\":true}")
+		-d "{\"key\": \"$KEY\"}")
 
-	PUBLIC_KEY=$(echo "$REG" | jq -r '.result.config.peers[0].public_key')
-	ENDPOINT=$(echo "$REG" | jq -r '.result.config.peers[0].endpoint.host')
-	ADDRESS=$(echo "$REG" | jq -r '.result.config.interface.addresses.v4')
+	WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
+	WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+	WARP_ADDRESS=$(echo "$REG" | jq -r '.config.interface.addresses.v4')
 
 	echo "[Interface]
 PrivateKey = $PRIVATE_KEY
-Address = $ADDRESS
+Address = $WARP_ADDRESS/32
 MTU = $MTU
 Table = 13335
 PostUp = ip rule add from $WARP_RULE to $IP.28.0.0/15 lookup main priority 5000 || true
@@ -78,22 +77,22 @@ PostDown = ip rule del from $WARP_RULE to $FAKE_IP.0.0/15 priority 5000
 PostDown = ip rule del from $WARP_RULE lookup 13335 priority 10000
 
 [Peer]
-PublicKey = $PUBLIC_KEY
+PublicKey = $WARP_PUBLIC_KEY
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
-Endpoint = $ENDPOINT" > $WARP_PATH
+Endpoint = $WARP_ENDPOINT" > $WARP_PATH
 
 	wg-quick up $WARP_PATH 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
-		echo "Started $WARP_INTERFACE: $ENDPOINT connected"
+		echo "Started $WARP_INTERFACE: $WARP_ENDPOINT connected"
 		if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
 			ANTIZAPRET_OUT_INTERFACE=$WARP_INTERFACE
-			ANTIZAPRET_OUT_IP=$ADDRESS
+			ANTIZAPRET_OUT_IP=$WARP_ADDRESS
 		fi
 		if [[ "$VPN_WARP" == 'y' ]]; then
 			VPN_OUT_INTERFACE=$WARP_INTERFACE
-			VPN_OUT_IP=$ADDRESS
+			VPN_OUT_IP=$WARP_ADDRESS
 		fi
 	else
 		echo "Starting $WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
