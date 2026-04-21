@@ -40,6 +40,72 @@ fi
 CORPWEB_HOSTNAME="${CORPWEB_HOSTNAME:-$(hostname -f)}"
 
 # ---------------------------------------------------------------------------
+# Helper: install amneziawg (idempotent)
+# ---------------------------------------------------------------------------
+
+install_amneziawg() {
+    if command -v awg >/dev/null 2>&1; then
+        echo "[agent] amneziawg already installed — skipping"
+        return 0
+    fi
+
+    echo "[agent] installing amneziawg…"
+    install -d /etc/apt/keyrings
+    apt-get update -qq
+
+    # Primary path: amnezia official apt repo
+    if curl -fsSL --max-time 10 https://apt.amnezia.org/amnezia-archive-keyring.gpg \
+          -o /etc/apt/keyrings/amnezia-archive-keyring.gpg 2>/dev/null; then
+        local codename
+        codename=$(lsb_release -cs 2>/dev/null || awk -F= '/^VERSION_CODENAME=/ {print $2}' /etc/os-release)
+        echo "deb [signed-by=/etc/apt/keyrings/amnezia-archive-keyring.gpg] https://apt.amnezia.org/ ${codename} main" \
+            > /etc/apt/sources.list.d/amnezia.list
+        apt-get update -qq
+        if apt-get install -y amneziawg amneziawg-tools; then
+            echo "[agent] amneziawg installed via apt"
+            return 0
+        fi
+        echo "[agent] apt install failed — falling back to GitHub releases"
+    else
+        echo "[agent] amnezia apt repo unreachable — using GitHub releases"
+    fi
+
+    # Fallback: download .deb artefacts from GitHub releases
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    local arch
+    arch=$(dpkg --print-architecture)
+
+    curl -fsSL "https://api.github.com/repos/amnezia-vpn/amneziawg-linux-kernel-module/releases/latest" \
+        | grep -oE 'https://[^"]+amneziawg-dkms[^"]+\.deb' | head -1 \
+        | xargs -r curl -fsSL -o "$tmpdir/amneziawg-dkms.deb"
+    curl -fsSL "https://api.github.com/repos/amnezia-vpn/amneziawg-tools/releases/latest" \
+        | grep -oE "https://[^\"]+amneziawg-tools[^\"]+${arch}\\.deb" | head -1 \
+        | xargs -r curl -fsSL -o "$tmpdir/amneziawg-tools.deb"
+
+    if [[ -s "$tmpdir/amneziawg-dkms.deb" && -s "$tmpdir/amneziawg-tools.deb" ]]; then
+        apt-get install -y dkms linux-headers-"$(uname -r)" || true
+        dpkg -i "$tmpdir/amneziawg-dkms.deb" "$tmpdir/amneziawg-tools.deb" || apt-get install -f -y
+        rm -rf "$tmpdir"
+        if command -v awg >/dev/null 2>&1; then
+            echo "[agent] amneziawg installed via GitHub .deb"
+            return 0
+        fi
+    fi
+
+    rm -rf "$tmpdir"
+    echo "[agent] ERROR: could not install amneziawg automatically." >&2
+    echo "[agent] Install it manually, then re-run this script." >&2
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Step 0: Install amneziawg kernel module + userspace tools
+# ---------------------------------------------------------------------------
+
+install_amneziawg
+
+# ---------------------------------------------------------------------------
 # Step 1: Install requests via pip if missing
 # ---------------------------------------------------------------------------
 
