@@ -15,7 +15,7 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_PORTS = [51443, 51080, 52443, 52080]
+DEFAULT_PORTS = [51443, 51080, 52443, 52080, 540, 580]
 
 
 # ── Pure functions ────────────────────────────────────────────────────────────

@@ -322,6 +322,7 @@ class VpnManager:
         *,
         client_private_key: str | None = None,
         allowed_ips: str | None = None,
+        use_backup_port: bool = False,
     ) -> str:
         """
         Render a client config in-memory from the server conf blob.
@@ -366,6 +367,7 @@ class VpnManager:
             flavor=flavor,
             client_private_key=client_private_key,
             allowed_ips=allowed_ips,
+            use_backup_port=use_backup_port,
         )
 
     # ------------------------------------------------------------------

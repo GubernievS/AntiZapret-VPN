@@ -50,6 +50,7 @@ BOOLEAN_SETTINGS = [
     "ALTERNATIVE_CLIENT_IP",
     "ALTERNATIVE_FAKE_IP",
     "CLIENT_ISOLATION",
+    "WIREGUARD_BACKUP",
 ]
 
 # Settings stored as 1/0 (shown as toggle in UI)

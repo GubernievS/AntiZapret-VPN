@@ -81,11 +81,11 @@ def test_generate_rules_single_node_no_probability():
 
 
 def test_generate_rules_default_ports():
-    """Without explicit ports= argument, all four default ports are used."""
+    """Without explicit ports= argument, all six default ports are used."""
     nodes = [{"ip": "10.0.0.1", "weight": 100, "enabled": True}]
     rules = generate_iptables_rules(nodes)
-    assert len(rules) == 4  # one per default port
-    ports_in_rules = {"51443", "51080", "52443", "52080"}
+    assert len(rules) == 6  # one per default port (4 primary + 2 backup)
+    ports_in_rules = {"51443", "51080", "52443", "52080", "540", "580"}
     for port in ports_in_rules:
         assert any(f"--dport {port}" in r for r in rules)
 
@@ -171,6 +171,13 @@ DNAT       17   --  0.0.0.0/0            0.0.0.0/0            udp dpt:51443 to:3
 
 
 # ── Safety checks ────────────────────────────────────────────────────────────
+
+
+def test_default_ports_includes_backup():
+    from app.services.balancer import DEFAULT_PORTS
+    assert 540 in DEFAULT_PORTS
+    assert 580 in DEFAULT_PORTS
+    assert len(DEFAULT_PORTS) == 6
 
 
 class TestRuleSafety:

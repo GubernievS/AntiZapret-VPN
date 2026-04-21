@@ -35,6 +35,11 @@ _PORT_MAP = {
     ("vpn", "awg"):        52080,
 }
 
+_BACKUP_PORT_MAP = {
+    "antizapret": 540,
+    "vpn": 580,
+}
+
 
 # ---------------------------------------------------------------------------
 # AWG obfuscation constants
@@ -289,6 +294,7 @@ def render_client_conf(
     *,
     allowed_ips: str | None = None,
     client_private_key: str | None = None,
+    use_backup_port: bool = False,
 ) -> str:
     """
     Render a WireGuard / AmneziaWG client config.
@@ -302,7 +308,7 @@ def render_client_conf(
         allowed_ips: override AllowedIPs for antizapret (default: "10.29.8.0/24").
         client_private_key: if provided, embed the real key; otherwise use placeholder.
     """
-    port = _PORT_MAP[(iface, flavor)]
+    port = _BACKUP_PORT_MAP[iface] if use_backup_port else _PORT_MAP[(iface, flavor)]
 
     # Extract bare IP from allowed_ips (e.g. "10.29.8.2/32" -> "10.29.8.2")
     client_ip = peer.allowed_ips.split("/")[0]

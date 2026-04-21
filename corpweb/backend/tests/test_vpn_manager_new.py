@@ -398,6 +398,20 @@ def test_add_peer_uses_correct_subnet_per_iface(db):
 # generate_client_name (standalone function)
 # ---------------------------------------------------------------------------
 
+def test_get_client_conf_backup_port(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    info = mgr.add_peer(db, "backup-test")
+    conf = mgr.get_client_conf(
+        db, "backup-test", "awg", "host.test",
+        client_private_key=info["private_key"],
+        use_backup_port=True,
+    )
+    assert ":540" in conf
+    assert ":52443" not in conf
+
+
 class TestGenerateClientName:
     def test_first_config(self):
         name = generate_client_name("alice", [])

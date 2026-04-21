@@ -490,3 +490,22 @@ def test_render_client_conf_with_private_key():
                              client_private_key="REAL_PRIV_KEY==")
     assert "PrivateKey = REAL_PRIV_KEY==" in out
     assert "${CLIENT_PRIVATE_KEY}" not in out
+
+
+def test_render_client_conf_backup_port_antizapret():
+    peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.29.8.2/32")
+    out = render_client_conf(peer, "antizapret", "spub==", "host.test", "awg", use_backup_port=True)
+    assert "Endpoint = host.test:540" in out
+    assert ":52443" not in out
+
+
+def test_render_client_conf_backup_port_vpn():
+    peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.28.8.2/32")
+    out = render_client_conf(peer, "vpn", "spub==", "host.test", "awg", use_backup_port=True)
+    assert "Endpoint = host.test:580" in out
+
+
+def test_render_client_conf_no_backup_uses_primary():
+    peer = Peer(name="a-1", public_key="pub==", preshared_key="psk==", allowed_ips="10.29.8.2/32")
+    out = render_client_conf(peer, "antizapret", "spub==", "host.test", "awg")
+    assert "Endpoint = host.test:52443" in out

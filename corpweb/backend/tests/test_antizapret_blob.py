@@ -99,6 +99,17 @@ def test_client_isolation_setting(db):
     assert b"CLIENT_ISOLATION=n" in store.get("/root/antizapret/setup")
 
 
+def test_wireguard_backup_setting(db):
+    from app.services.wg_blob_store import WgBlobStore
+    from app.services.antizapret import AntizapretService
+    store = WgBlobStore(db)
+    store.put("/root/antizapret/setup", b"WIREGUARD_BACKUP=n\n", by="test")
+    svc = AntizapretService(db)
+    assert svc.get_settings()["WIREGUARD_BACKUP"] == "n"
+    svc.update_settings({"WIREGUARD_BACKUP": "y"})
+    assert b"WIREGUARD_BACKUP=y" in store.get("/root/antizapret/setup")
+
+
 def test_warp_outbound_string_setting(db):
     store = WgBlobStore(db)
     store.put("/root/antizapret/setup", b"WARP_OUTBOUND=\n", by="test")

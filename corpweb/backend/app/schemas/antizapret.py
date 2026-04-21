@@ -49,6 +49,8 @@ class AntizapretSettingsResponse(BaseModel):
     CLIENT_ISOLATION: Optional[str] = None
     # WARP
     WARP_OUTBOUND: Optional[str] = None
+    # WireGuard backup ports
+    WIREGUARD_BACKUP: Optional[str] = None
 
 
 class AntizapretSettingsUpdate(BaseModel):

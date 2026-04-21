@@ -7,7 +7,7 @@ import logging
 import zipfile
 import qrcode
 import qrcode.constants
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
@@ -37,11 +37,15 @@ async def get_client_links(
     sys_settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
     if not sys_settings:
         return {}
+    from app.services.antizapret import AntizapretService
+    svc = AntizapretService(db)
+    backup_enabled = svc.get_settings().get("WIREGUARD_BACKUP") == "y"
     return {
         "google_play_url": sys_settings.google_play_url,
         "app_store_url": sys_settings.app_store_url,
         "apk_url": sys_settings.apk_url,
         "windows_url": sys_settings.windows_url,
+        "wireguard_backup_enabled": backup_enabled,
     }
 
 
@@ -153,6 +157,7 @@ async def get_config(
 @router.get("/{config_id}/download")
 async def download_config(
     config_id: uuid.UUID,
+    backup: bool = Query(False),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -194,11 +199,19 @@ async def download_config(
             detail="Config missing private key (pre-migration config). Please recreate.",
         )
 
+    # Safety check: backup port only works if globally enabled
+    if backup:
+        from app.services.antizapret import AntizapretService
+        svc = AntizapretService(db)
+        if svc.get_settings().get("WIREGUARD_BACKUP") != "y":
+            backup = False
+
     try:
         content = vpn_manager.get_client_conf(
             db, config.client_name, flavor, endpoint_host, iface,
             client_private_key=private_key,
             allowed_ips=allowed_ips,
+            use_backup_port=backup,
         )
     except ValueError as e:
         raise HTTPException(
@@ -230,6 +243,7 @@ async def download_config(
 @router.get("/{config_id}/qr")
 async def get_config_qr(
     config_id: uuid.UUID,
+    backup: bool = Query(False),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -269,11 +283,19 @@ async def get_config_qr(
             detail="Config missing private key (pre-migration config). Please recreate.",
         )
 
+    # Safety check: backup port only works if globally enabled
+    if backup:
+        from app.services.antizapret import AntizapretService
+        svc_qr = AntizapretService(db)
+        if svc_qr.get_settings().get("WIREGUARD_BACKUP") != "y":
+            backup = False
+
     try:
         content = vpn_manager.get_client_conf(
             db, config.client_name, flavor_qr, endpoint_host_qr, iface_qr,
             client_private_key=private_key_qr,
             allowed_ips=allowed_ips_qr,
+            use_backup_port=backup,
         )
     except ValueError as e:
         raise HTTPException(
