@@ -153,6 +153,21 @@ def parse_iptables_output(output: str) -> dict[str, dict]:
     return result
 
 
+def needs_reconcile(live_ports: set[int], has_nodes: bool) -> bool:
+    """
+    Return True if live iptables is missing any of ``DEFAULT_PORTS``
+    and there are nodes to balance across.
+
+    Used on backend startup to self-heal after a code upgrade that
+    extended ``DEFAULT_PORTS`` (e.g. adding 540/580). Without this the
+    operator has to manually hit "Save" in the UI for the new ports to
+    appear in iptables.
+    """
+    if not has_nodes:
+        return False
+    return not set(DEFAULT_PORTS).issubset(live_ports)
+
+
 # ── Subprocess helpers (not unit-tested) ─────────────────────────────────────
 
 def _run(cmd: list[str], input_data: str | None = None) -> subprocess.CompletedProcess:
@@ -226,3 +241,62 @@ def apply_rules(nodes: list[dict], cp_ip: str) -> dict:
         logger.warning("netfilter-persistent save failed (non-fatal): %s", exc)
 
     return read_current_state()
+
+
+def ensure_ports_reconciled(db) -> bool:
+    """
+    Self-heal entry point called from app startup.
+
+    If live iptables is missing any ``DEFAULT_PORTS`` and the DB has at
+    least one node, re-apply all DNAT/SNAT rules. Returns True if a
+    reconcile was performed, False if no-op.
+
+    This covers the case where ``DEFAULT_PORTS`` was extended in a code
+    upgrade (e.g. adding WireGuard backup ports 540/580) — without it,
+    the operator would have to click "Save" in the UI for the new ports
+    to appear in iptables.
+    """
+    from app.db.models import Node, SystemSettings
+
+    try:
+        current = read_current_state()
+    except Exception as exc:
+        logger.warning("ensure_ports_reconciled: read_current_state failed: %s", exc)
+        return False
+
+    nodes = db.query(Node).all()
+    if not needs_reconcile(live_ports=_live_ports_from_state(current), has_nodes=bool(nodes)):
+        return False
+
+    settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    cp_ip = settings.cp_ip if settings else None
+    if not cp_ip:
+        logger.warning("ensure_ports_reconciled: cp_ip not set, skipping")
+        return False
+
+    payload = []
+    for n in nodes:
+        live = current.get(str(n.private_ip))
+        payload.append({
+            "ip": str(n.private_ip),
+            "weight": live["weight"] if live else 50,
+            "enabled": live["enabled"] if live else True,
+        })
+
+    logger.info("ensure_ports_reconciled: reapplying DNAT with DEFAULT_PORTS=%s", DEFAULT_PORTS)
+    apply_rules(payload, cp_ip)
+    return True
+
+
+def _live_ports_from_state(state: dict) -> set[int]:
+    """Re-read iptables just to collect the set of dports currently in use."""
+    try:
+        result = _run(["iptables", "-t", "nat", "-L", "PREROUTING", "-n"])
+    except Exception:
+        return set()
+    ports: set[int] = set()
+    for line in result.stdout.splitlines():
+        m = re.search(r"udp\s+dpt:(\d+)", line)
+        if m:
+            ports.add(int(m.group(1)))
+    return ports

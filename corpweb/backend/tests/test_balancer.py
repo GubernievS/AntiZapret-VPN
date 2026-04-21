@@ -7,6 +7,8 @@ from app.services.balancer import (
     weights_to_probabilities,
     generate_iptables_rules,
     parse_iptables_output,
+    needs_reconcile,
+    DEFAULT_PORTS,
 )
 
 
@@ -178,6 +180,37 @@ def test_default_ports_includes_backup():
     assert 540 in DEFAULT_PORTS
     assert 580 in DEFAULT_PORTS
     assert len(DEFAULT_PORTS) == 6
+
+
+# ── needs_reconcile ──────────────────────────────────────────────────────────
+
+class TestNeedsReconcile:
+    """Decide whether live iptables is missing any DEFAULT_PORTS."""
+
+    def test_returns_true_when_no_live_rules(self):
+        """Empty iptables → a reconcile is needed if DB has nodes."""
+        assert needs_reconcile(live_ports=set(), has_nodes=True) is True
+
+    def test_returns_false_when_all_default_ports_present(self):
+        assert needs_reconcile(live_ports=set(DEFAULT_PORTS), has_nodes=True) is False
+
+    def test_returns_true_when_backup_ports_missing(self):
+        """Old-style 4-port setup — needs reconcile to add 540/580."""
+        old_ports = {51443, 51080, 52443, 52080}
+        assert needs_reconcile(live_ports=old_ports, has_nodes=True) is True
+
+    def test_returns_true_when_one_port_missing(self):
+        missing_one = set(DEFAULT_PORTS) - {580}
+        assert needs_reconcile(live_ports=missing_one, has_nodes=True) is True
+
+    def test_returns_false_when_no_nodes_in_db(self):
+        """Nothing to reconcile if DB has no nodes (fresh install)."""
+        assert needs_reconcile(live_ports=set(), has_nodes=False) is False
+
+    def test_extra_ports_in_live_do_not_trigger(self):
+        """Presence of unrelated ports does not force a reconcile."""
+        live = set(DEFAULT_PORTS) | {12345}
+        assert needs_reconcile(live_ports=live, has_nodes=True) is False
 
 
 class TestRuleSafety:

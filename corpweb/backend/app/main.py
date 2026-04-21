@@ -22,8 +22,24 @@ async def lifespan(app: FastAPI):
     # Startup: initialize database with default data
     from app.db.init_db import init_db
     from app.services.scheduler import start_scheduler, stop_scheduler
+    from app.services.balancer import ensure_ports_reconciled
+    from app.db.session import SessionLocal
     init_db()
     start_scheduler()
+
+    # Self-heal iptables after code upgrades that extend DEFAULT_PORTS
+    # (e.g. WireGuard backup ports 540/580). No-op on fresh install.
+    db = SessionLocal()
+    try:
+        ensure_ports_reconciled(db)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning(
+            "ensure_ports_reconciled on startup failed (non-fatal): %s", exc
+        )
+    finally:
+        db.close()
+
     yield
     # Shutdown: stop background tasks
     stop_scheduler()

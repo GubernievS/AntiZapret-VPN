@@ -69,11 +69,11 @@ HOSTNAME: str = CFG.get("AGENT_HOSTNAME", "") or os.uname().nodename
 # ---------------------------------------------------------------------------
 
 # Each entry: (path, hook_type)
-# hook_type: None | "wg_antizapret" | "wg_vpn" | "doall"
+# hook_type: None | "wg_antizapret" | "wg_vpn" | "doall" | "restart_antizapret"
 MANAGED_FILES: list[tuple[str, str | None]] = [
     ("/etc/wireguard/antizapret.conf", "wg_antizapret"),
     ("/etc/wireguard/vpn.conf", "wg_vpn"),
-    ("/root/antizapret/setup", None),
+    ("/root/antizapret/setup", "restart_antizapret"),
     ("/root/antizapret/config/include-hosts.txt", "doall"),
     ("/root/antizapret/config/exclude-hosts.txt", "doall"),
     ("/root/antizapret/config/include-ips.txt", "doall"),
@@ -120,6 +120,51 @@ def schedule_doall() -> None:
         _doall_timer = threading.Timer(DOALL_DEBOUNCE_SECS, _run_doall)
         _doall_timer.daemon = True
         _doall_timer.start()
+
+
+# ---------------------------------------------------------------------------
+# Debounce helper for antizapret.service restart
+# ---------------------------------------------------------------------------
+# Settings in /root/antizapret/setup (WIREGUARD_BACKUP, SSH_PROTECTION,
+# ATTACK_PROTECTION, ALTERNATIVE_CLIENT_IP, RESTRICT_FORWARD, CLIENT_ISOLATION,
+# VPN_DNS, …) only take effect when up.sh re-runs — which happens at
+# antizapret.service startup. Just writing the file is not enough.
+
+_restart_antizapret_lock = threading.Lock()
+_restart_antizapret_timer: threading.Timer | None = None
+RESTART_ANTIZAPRET_DEBOUNCE_SECS = 5.0
+
+
+def _run_restart_antizapret() -> None:
+    log.info("Restarting antizapret.service")
+    try:
+        subprocess.run(
+            ["systemctl", "restart", "antizapret.service"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        log.error(
+            "systemctl restart antizapret.service failed (rc=%d): %s",
+            exc.returncode,
+            exc.stderr.strip(),
+        )
+    except FileNotFoundError:
+        log.error("systemctl not found")
+
+
+def schedule_restart_antizapret() -> None:
+    """Debounce: cancel any pending restart timer, start a fresh 5-second one."""
+    global _restart_antizapret_timer
+    with _restart_antizapret_lock:
+        if _restart_antizapret_timer is not None:
+            _restart_antizapret_timer.cancel()
+        _restart_antizapret_timer = threading.Timer(
+            RESTART_ANTIZAPRET_DEBOUNCE_SECS, _run_restart_antizapret
+        )
+        _restart_antizapret_timer.daemon = True
+        _restart_antizapret_timer.start()
 
 
 # ---------------------------------------------------------------------------
@@ -195,6 +240,8 @@ def apply_path(path: str, content: bytes, hook: str | None) -> bool:
         apply_wg_syncconf("vpn")
     elif hook == "doall":
         schedule_doall()
+    elif hook == "restart_antizapret":
+        schedule_restart_antizapret()
 
     return True
 
