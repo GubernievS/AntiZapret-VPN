@@ -236,9 +236,14 @@ async def download_config(
             detail=str(e),
         )
 
-    # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ)
+    # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ).
+    # Bypass conf gets a "B" suffix so AmneziaWG treats it as a separate
+    # tunnel from the baseline one and actually re-imports it rather than
+    # silently keeping the existing entry.
     server = app_settings.get_short_server_name()
     suffix = "az" if config.config_type == "awg_antizapret" else "vpn"
+    if bypass:
+        suffix = f"{suffix}B"
     short_name = f"{server}-{suffix}"
     conf_filename = f"{short_name}.conf"
     zip_filename = f"{short_name}.zip"

@@ -134,7 +134,7 @@ def create_config_share_token(
     *,
     bypass: bool = False,
     backup: bool = False,
-    expires_minutes: int = 10,
+    expires_minutes: int = 3,
 ) -> str:
     """
     Create a short-lived JWT token for public config file download.

@@ -96,9 +96,13 @@ async def download_shared_config(
             detail=str(e),
         )
 
-    # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ)
+    # Short filename for AmneziaWG (tunnel name <= 15 chars / IFNAMSIZ).
+    # Must match /configs/{id}/download naming so QR-link and direct
+    # download produce the same filename (and don't collide in the client).
     server = app_settings.get_short_server_name()
     suffix = "az" if config.config_type == "awg_antizapret" else "vpn"
+    if bypass:
+        suffix = f"{suffix}B"
     short_name = f"{server}-{suffix}"
     conf_filename = f"{short_name}.conf"
     zip_filename = f"{short_name}.zip"

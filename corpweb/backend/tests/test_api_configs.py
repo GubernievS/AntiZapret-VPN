@@ -129,3 +129,32 @@ class TestClientLinksEscapeFlag:
         )
         assert resp.status_code == 200
         assert resp.json()["escape_enabled"] is False
+
+
+class TestDownloadFilenameSuffix:
+    """Bypass downloads must get a distinct filename so AmneziaWG on
+    Android treats them as a separate tunnel from the baseline conf."""
+
+    def test_download_without_bypass_has_plain_suffix(
+        self, client, admin_token, config_id, set_escape
+    ):
+        set_escape(True)
+        resp = client.get(
+            f"/api/v1/configs/{config_id}/download",
+            headers=auth_header(admin_token),
+        )
+        assert resp.status_code == 200
+        cd = resp.headers.get("content-disposition", "")
+        assert "-vpn.zip" in cd and "-vpnB.zip" not in cd, cd
+
+    def test_download_with_bypass_has_B_suffix(
+        self, client, admin_token, config_id, set_escape
+    ):
+        set_escape(True)
+        resp = client.get(
+            f"/api/v1/configs/{config_id}/download?bypass=true",
+            headers=auth_header(admin_token),
+        )
+        assert resp.status_code == 200
+        cd = resp.headers.get("content-disposition", "")
+        assert "-vpnB.zip" in cd, cd
