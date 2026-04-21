@@ -403,21 +403,7 @@ def register_if_needed() -> None:
                 os.chmod(priv_path, 0o600)
             except OSError:
                 pass
-            log.info("Keys changed for %s — restarting wg-quick@%s", iface, iface)
-            for action in ("stop", "start"):
-                try:
-                    subprocess.run(
-                        ["systemctl", action, f"wg-quick@{iface}.service"],
-                        check=True,
-                        capture_output=True,
-                    )
-                except subprocess.CalledProcessError as exc:
-                    log.error(
-                        "systemctl %s wg-quick@%s failed: %s",
-                        action,
-                        iface,
-                        exc.stderr,
-                    )
+            log.info("Keys changed for %s — iface will be (re)started on next conf apply", iface)
 
     # Apply wg_config if provided (patch Interface section in WG confs)
     wg_config = data.get("wg_config")

@@ -322,3 +322,43 @@ class TestIfaceIsUp:
         with patch("corpweb_sync_agent.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(returncode=1)
             assert agent._iface_is_up("antizapret") is False
+
+
+class TestRegisterIfNeededNoStart:
+    """After the race fix, register_if_needed must not start wg-quick units."""
+
+    def test_register_does_not_call_systemctl_start_when_keys_change(self, tmp_path):
+        fake_response = MagicMock()
+        fake_response.json.return_value = {
+            "wg_server_keys": {
+                "antizapret": {"private_key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=",
+                               "public_key":  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb="},
+            },
+            "wg_config": {},
+        }
+        with patch("corpweb_sync_agent.WG_KEY_DIR", str(tmp_path)), \
+             patch("corpweb_sync_agent.api_post", return_value=fake_response), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            agent.register_if_needed()
+            starts = [c for c in mock_run.call_args_list
+                      if len(c.args) > 0 and isinstance(c.args[0], list)
+                      and "systemctl" in c.args[0] and "start" in c.args[0]]
+            assert starts == [], f"register_if_needed called systemctl start: {starts}"
+
+    def test_register_does_not_call_systemctl_stop_when_keys_change(self, tmp_path):
+        fake_response = MagicMock()
+        fake_response.json.return_value = {
+            "wg_server_keys": {
+                "antizapret": {"private_key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa=",
+                               "public_key":  "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb="},
+            },
+            "wg_config": {},
+        }
+        with patch("corpweb_sync_agent.WG_KEY_DIR", str(tmp_path)), \
+             patch("corpweb_sync_agent.api_post", return_value=fake_response), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            agent.register_if_needed()
+            stops = [c for c in mock_run.call_args_list
+                     if len(c.args) > 0 and isinstance(c.args[0], list)
+                     and "systemctl" in c.args[0] and "stop" in c.args[0]]
+            assert stops == []
