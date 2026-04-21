@@ -193,7 +193,7 @@ class TestApplyWgConfigEscapeIfaces:
     def test_patches_antizapret_escape_address_and_port(self, tmp_path):
         conf = tmp_path / "antizapret_escape.conf"
         conf.write_text(self._INITIAL_CONF)
-        path_map = {"/etc/wireguard/antizapret_escape.conf": str(conf)}
+        path_map = {"/etc/amnezia/amneziawg/antizapret_escape.conf": str(conf)}
         real_open = open
         fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
 
@@ -212,7 +212,7 @@ class TestApplyWgConfigEscapeIfaces:
     def test_patches_vpn_escape_address_and_port(self, tmp_path):
         conf = tmp_path / "vpn_escape.conf"
         conf.write_text(self._INITIAL_CONF)
-        path_map = {"/etc/wireguard/vpn_escape.conf": str(conf)}
+        path_map = {"/etc/amnezia/amneziawg/vpn_escape.conf": str(conf)}
         real_open = open
         fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
 

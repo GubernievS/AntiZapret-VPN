@@ -50,12 +50,12 @@ _IFACE_CONFIG = {
     "antizapret_escape": {
         "address": "10.27.8.1/21",
         "subnet": "10.27.8.0/21",
-        "conf_path": "/etc/wireguard/antizapret_escape.conf",
+        "conf_path": "/etc/amnezia/amneziawg/antizapret_escape.conf",
     },
     "vpn_escape": {
         "address": "10.26.8.1/21",
         "subnet": "10.26.8.0/21",
-        "conf_path": "/etc/wireguard/vpn_escape.conf",
+        "conf_path": "/etc/amnezia/amneziawg/vpn_escape.conf",
     },
 }
 

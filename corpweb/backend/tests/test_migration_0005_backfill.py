@@ -30,7 +30,8 @@ class TestMigration0005:
         # All four conf blobs exist.
         store = WgBlobStore(db)
         for iface in ifaces:
-            assert store.get(f"/etc/wireguard/{iface}.conf") is not None
+            dir_ = "/etc/amnezia/amneziawg" if iface.endswith("_escape") else "/etc/wireguard"
+            assert store.get(f"{dir_}/{iface}.conf") is not None
 
     def test_upgrade_backfills_preexisting_peers(self, db):
         """
@@ -74,7 +75,7 @@ class TestMigration0005:
 
         for iface in ("antizapret_escape", "vpn_escape"):
             peers = parse_peers(
-                store.get(f"/etc/wireguard/{iface}.conf").decode()
+                store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
             names = sorted(p.name for p in peers)
             assert names == ["legacy-1", "legacy-2"]

@@ -56,7 +56,7 @@ class TestObfuscationRegenerate:
         store = WgBlobStore(db)
         for iface in ("antizapret_escape", "vpn_escape"):
             params = get_params(db, iface)
-            blob = store.get(f"/etc/wireguard/{iface}.conf")
+            blob = store.get(f"/etc/amnezia/amneziawg/{iface}.conf")
             assert blob is not None
             text = blob.decode()
             assert f"H1 = {params['h1']}" in text

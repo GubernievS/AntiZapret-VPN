@@ -16,6 +16,13 @@ def _make_manager() -> VpnManager:
     return VpnManager()
 
 
+def _conf_path_for(iface: str) -> str:
+    """Mirror _IFACE_CONFIG[iface]["conf_path"] without importing the dict."""
+    if iface.endswith("_escape"):
+        return f"/etc/amnezia/amneziawg/{iface}.conf"
+    return f"/etc/wireguard/{iface}.conf"
+
+
 # ---------------------------------------------------------------------------
 # bootstrap
 # ---------------------------------------------------------------------------
@@ -71,7 +78,7 @@ class TestBootstrap:
 
         store = WgBlobStore(db)
         for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
-            blob = store.get(f"/etc/wireguard/{iface}.conf")
+            blob = store.get(_conf_path_for(iface))
             assert blob is not None, f"missing conf blob for {iface}"
             assert b"[Interface]" in blob
 
@@ -91,7 +98,7 @@ class TestBootstrap:
 
         store = WgBlobStore(db)
         for iface in ("antizapret_escape", "vpn_escape"):
-            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            content = store.get(_conf_path_for(iface)).decode()
             assert "Jc = " in content, f"{iface} missing Jc"
             assert "S1 = " in content, f"{iface} missing S1"
             assert "H1 = " in content, f"{iface} missing H1"
@@ -195,7 +202,7 @@ class TestAddPeer:
 
         store = WgBlobStore(db)
         for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
-            blob = store.get(f"/etc/wireguard/{iface}.conf")
+            blob = store.get(_conf_path_for(iface))
             names = [p.name for p in parse_peers(blob.decode())]
             assert "alice-1" in names, f"alice-1 missing in {iface}"
 
@@ -212,7 +219,7 @@ class TestAddPeer:
         ips: dict[str, str] = {}
         for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
             peers = parse_peers(
-                store.get(f"/etc/wireguard/{iface}.conf").decode()
+                store.get(_conf_path_for(iface)).decode()
             )
             ips[iface] = next(p.allowed_ips.split("/")[0]
                               for p in peers if p.name == "bob-1")
@@ -236,7 +243,7 @@ class TestAddPeer:
 
         store = WgBlobStore(db)
         for iface in ("antizapret_escape", "vpn_escape"):
-            content = store.get(f"/etc/wireguard/{iface}.conf").decode()
+            content = store.get(_conf_path_for(iface)).decode()
             assert "Jc = " in content
             assert "S1 = " in content
             assert "H1 = " in content
@@ -588,6 +595,14 @@ def test_get_client_conf_backup_port(db):
     assert ":52443" not in conf
 
 
+def test_iface_config_escape_paths_moved_to_amneziawg_dir():
+    from app.services.vpn_manager_new import _IFACE_CONFIG
+    assert _IFACE_CONFIG["antizapret_escape"]["conf_path"] == \
+        "/etc/amnezia/amneziawg/antizapret_escape.conf"
+    assert _IFACE_CONFIG["vpn_escape"]["conf_path"] == \
+        "/etc/amnezia/amneziawg/vpn_escape.conf"
+
+
 class TestGenerateClientName:
     def test_first_config(self):
         name = generate_client_name("alice", [])
@@ -663,7 +678,7 @@ class TestBackfillEscapePeers:
         store = WgBlobStore(db)
         for iface in ("antizapret_escape", "vpn_escape"):
             peers = parse_peers(
-                store.get(f"/etc/wireguard/{iface}.conf").decode()
+                store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
             assert peers == [], f"setup: {iface} should be empty"
 
@@ -672,7 +687,7 @@ class TestBackfillEscapePeers:
 
         for iface in ("antizapret_escape", "vpn_escape"):
             peers = parse_peers(
-                store.get(f"/etc/wireguard/{iface}.conf").decode()
+                store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
             names = sorted(p.name for p in peers)
             assert names == ["alice-1", "bob-1"], (
@@ -700,10 +715,10 @@ class TestBackfillEscapePeers:
 
         # Verify subnet prefixes + shared host-part.
         az_escape_peers = parse_peers(
-            store.get("/etc/wireguard/antizapret_escape.conf").decode()
+            store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
         )
         vpn_escape_peers = parse_peers(
-            store.get("/etc/wireguard/vpn_escape.conf").decode()
+            store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
         )
         az_esc_ip = next(
             p.allowed_ips for p in az_escape_peers if p.name == "carol-1"
@@ -736,7 +751,7 @@ class TestBackfillEscapePeers:
         for iface in ("antizapret_escape", "vpn_escape"):
             peer = next(
                 p for p in parse_peers(
-                    store.get(f"/etc/wireguard/{iface}.conf").decode()
+                    store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
                 ) if p.name == "dave-1"
             )
             assert peer.public_key == az_peer.public_key
@@ -759,7 +774,7 @@ class TestBackfillEscapePeers:
         store = WgBlobStore(db)
         for iface in ("antizapret_escape", "vpn_escape"):
             peers = parse_peers(
-                store.get(f"/etc/wireguard/{iface}.conf").decode()
+                store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
             names = sorted(p.name for p in peers)
             assert names == ["eve-1", "frank-1"], (
@@ -800,7 +815,7 @@ class TestBackfillEscapePeers:
 
         az_esc_peer_before = next(
             p for p in parse_peers(
-                store.get("/etc/wireguard/antizapret_escape.conf").decode()
+                store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
             ) if p.name == "gina-1"
         )
 
@@ -808,7 +823,7 @@ class TestBackfillEscapePeers:
 
         az_esc_peer_after = next(
             p for p in parse_peers(
-                store.get("/etc/wireguard/antizapret_escape.conf").decode()
+                store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
             ) if p.name == "gina-1"
         )
         assert az_esc_peer_before == az_esc_peer_after, (
@@ -817,6 +832,6 @@ class TestBackfillEscapePeers:
 
         # And the wiped vpn_escape got the peer back.
         vpn_esc_peers = parse_peers(
-            store.get("/etc/wireguard/vpn_escape.conf").decode()
+            store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
         )
         assert [p.name for p in vpn_esc_peers] == ["gina-1"]
