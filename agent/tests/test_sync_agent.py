@@ -121,31 +121,31 @@ class TestApplyPathDispatch:
 
     def test_apply_path_dispatches_awg_antizapret_escape(self, tmp_path):
         target = tmp_path / "antizapret_escape.conf"
-        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+        with patch("corpweb_sync_agent.apply_iface_conf") as m:
             changed = agent.apply_path(
                 str(target),
                 b"[Interface]\n",
                 "awg_antizapret_escape",
             )
         assert changed is True
-        m.assert_called_once_with("antizapret_escape")
+        m.assert_called_once_with("antizapret_escape", "awg")
 
     def test_apply_path_dispatches_awg_vpn_escape(self, tmp_path):
         target = tmp_path / "vpn_escape.conf"
-        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+        with patch("corpweb_sync_agent.apply_iface_conf") as m:
             changed = agent.apply_path(
                 str(target),
                 b"[Interface]\n",
                 "awg_vpn_escape",
             )
         assert changed is True
-        m.assert_called_once_with("vpn_escape")
+        m.assert_called_once_with("vpn_escape", "awg")
 
     def test_unchanged_content_does_not_sync_awg_antizapret_escape(self, tmp_path):
         target = tmp_path / "antizapret_escape.conf"
         content = b"[Interface]\n"
         target.write_bytes(content)
-        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+        with patch("corpweb_sync_agent.apply_iface_conf") as m:
             changed = agent.apply_path(str(target), content, "awg_antizapret_escape")
         assert changed is False
         m.assert_not_called()
@@ -154,7 +154,7 @@ class TestApplyPathDispatch:
         target = tmp_path / "vpn_escape.conf"
         content = b"[Interface]\n"
         target.write_bytes(content)
-        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+        with patch("corpweb_sync_agent.apply_iface_conf") as m:
             changed = agent.apply_path(str(target), content, "awg_vpn_escape")
         assert changed is False
         m.assert_not_called()
@@ -261,3 +261,64 @@ class TestApplyWgConfigEscapeIfaces:
         assert "ListenPort = 51443" in az.read_text()
         assert "Address = 10.28.8.1/21" in vpn.read_text()
         assert "ListenPort = 51080" in vpn.read_text()
+
+
+class TestApplyIfaceConfBranching:
+    """apply_iface_conf(iface, flavor) brings iface up if down, syncs if up."""
+
+    def test_up_branch_called_when_iface_down_wg(self):
+        with patch("corpweb_sync_agent._iface_is_up", return_value=False), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stderr="")
+            agent.apply_iface_conf("antizapret", "wg")
+            # must call systemctl start wg-quick@antizapret.service
+            assert any(
+                "systemctl" in " ".join(call.args[0]) and "wg-quick@antizapret.service" in " ".join(call.args[0])
+                for call in mock_run.call_args_list
+            ), f"expected systemctl start wg-quick@antizapret.service, got {mock_run.call_args_list}"
+
+    def test_sync_branch_called_when_iface_up_wg(self):
+        with patch("corpweb_sync_agent._iface_is_up", return_value=True), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stderr="")
+            agent.apply_iface_conf("antizapret", "wg")
+            joined = " ".join(
+                " ".join(c.args[0]) if isinstance(c.args[0], list) else str(c.args[0])
+                for c in mock_run.call_args_list
+            )
+            assert "syncconf" in joined or "wg syncconf antizapret" in joined
+
+    def test_up_branch_uses_awg_quick_for_awg_flavor(self):
+        with patch("corpweb_sync_agent._iface_is_up", return_value=False), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stderr="")
+            agent.apply_iface_conf("vpn_escape", "awg")
+            assert any(
+                "awg-quick@vpn_escape.service" in " ".join(call.args[0])
+                for call in mock_run.call_args_list
+            )
+
+    def test_sync_branch_uses_awg_binary_for_awg_flavor(self):
+        with patch("corpweb_sync_agent._iface_is_up", return_value=True), \
+             patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stderr="")
+            agent.apply_iface_conf("vpn_escape", "awg")
+            # The bash -c invocation should reference awg, not wg
+            calls_text = " ".join(
+                " ".join(c.args[0]) if isinstance(c.args[0], list) else str(c.args[0])
+                for c in mock_run.call_args_list
+            )
+            assert "awg syncconf vpn_escape" in calls_text
+            assert "awg-quick strip vpn_escape" in calls_text
+
+
+class TestIfaceIsUp:
+    def test_returns_true_when_ip_link_show_succeeds(self):
+        with patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0)
+            assert agent._iface_is_up("antizapret") is True
+
+    def test_returns_false_when_ip_link_show_fails(self):
+        with patch("corpweb_sync_agent.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=1)
+            assert agent._iface_is_up("antizapret") is False

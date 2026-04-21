@@ -223,6 +223,61 @@ def apply_wg_syncconf(iface: str) -> None:
         )
 
 
+def _iface_is_up(iface: str) -> bool:
+    """Return True if the network iface currently exists in the kernel."""
+    try:
+        result = subprocess.run(
+            ["ip", "link", "show", iface],
+            capture_output=True,
+            text=True,
+        )
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
+
+
+def apply_iface_conf(iface: str, flavor: str) -> None:
+    """
+    Bring iface up (if it doesn't exist yet) or syncconf it (if it already
+    runs). ``flavor`` selects the tool pair:
+        "wg"  → wg-quick / wg
+        "awg" → awg-quick / awg
+    """
+    if flavor == "awg":
+        tool, quick = "awg", "awg-quick"
+    else:
+        tool, quick = "wg", "wg-quick"
+
+    unit = f"{quick}@{iface}.service"
+
+    if not _iface_is_up(iface):
+        log.info("Starting %s", unit)
+        try:
+            subprocess.run(
+                ["systemctl", "start", unit],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            log.error("systemctl start %s failed (rc=%d): %s",
+                      unit, exc.returncode, exc.stderr.strip())
+        return
+
+    cmd = f"{tool} syncconf {iface} <({quick} strip {iface})"
+    log.info("Running: bash -c %r", cmd)
+    try:
+        subprocess.run(
+            ["bash", "-c", cmd],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        log.error("%s syncconf %s failed (rc=%d): %s",
+                  tool, iface, exc.returncode, exc.stderr.strip())
+
+
 def apply_path(path: str, content: bytes, hook: str | None) -> bool:
     """
     Write content to path if sha256 differs, then run the hook.
@@ -238,13 +293,13 @@ def apply_path(path: str, content: bytes, hook: str | None) -> bool:
     write_atomic(path, content)
 
     if hook == "wg_antizapret":
-        apply_wg_syncconf("antizapret")
+        apply_iface_conf("antizapret", "wg")
     elif hook == "wg_vpn":
-        apply_wg_syncconf("vpn")
+        apply_iface_conf("vpn", "wg")
     elif hook == "awg_antizapret_escape":
-        apply_wg_syncconf("antizapret_escape")
+        apply_iface_conf("antizapret_escape", "awg")
     elif hook == "awg_vpn_escape":
-        apply_wg_syncconf("vpn_escape")
+        apply_iface_conf("vpn_escape", "awg")
     elif hook == "doall":
         schedule_doall()
     elif hook == "restart_antizapret":
