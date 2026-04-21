@@ -463,6 +463,100 @@ class VpnManager:
             store.put(cfg["conf_path"], new_conf.encode(), by="regenerate")
 
     # ------------------------------------------------------------------
+    # backfill_escape_peers
+    # ------------------------------------------------------------------
+
+    def backfill_escape_peers(self, db: Session) -> None:
+        """
+        Copy peers from the antizapret server conf into the two escape server
+        confs, preserving ``public_key`` + ``preshared_key`` and rewriting
+        ``allowed_ips`` to the corresponding escape subnet.
+
+        Meaningful for deployments upgraded across the Phase-2 cutover:
+        peers added BEFORE Phase 2 only exist in antizapret/vpn confs,
+        so the escape ifaces lack them. New peers (added after Phase 2)
+        already land in all four ifaces via :meth:`add_peer`, so this
+        helper is a no-op for them.
+
+        Idempotent — peers already present in an escape conf (matched by
+        name OR public_key) are left untouched.
+
+        Requires :meth:`bootstrap` to have run (keypairs + obfuscation
+        params must exist for escape ifaces).
+        """
+        store = WgBlobStore(db)
+
+        az_cfg = _IFACE_CONFIG["antizapret"]
+        az_blob = store.get(az_cfg["conf_path"])
+        if az_blob is None:
+            return  # no base peers to backfill from
+        az_peers = parse_peers(az_blob.decode())
+        if not az_peers:
+            return
+
+        # Mapping: iface -> subnet prefix for escape IP rewrite.
+        _ESCAPE_PREFIX = {
+            "antizapret_escape": "10.27",
+            "vpn_escape": "10.26",
+        }
+
+        for iface in _ESCAPE_IFACES:
+            cfg = _IFACE_CONFIG[iface]
+            blob = store.get(cfg["conf_path"])
+            existing_peers = parse_peers(blob.decode()) if blob else []
+            existing_names = {p.name for p in existing_peers}
+            existing_pubkeys = {p.public_key for p in existing_peers}
+
+            added_any = False
+            for az_peer in az_peers:
+                if az_peer.name in existing_names:
+                    continue
+                if az_peer.public_key in existing_pubkeys:
+                    continue
+
+                # Rewrite host part into the escape subnet, preserving
+                # the last two octets (matches _add_peer_impl convention).
+                az_ip = az_peer.allowed_ips.split("/", 1)[0]
+                host_parts = az_ip.split(".")[2:]  # ["x", "y"]
+                new_ip = f"{_ESCAPE_PREFIX[iface]}.{host_parts[0]}.{host_parts[1]}"
+
+                existing_peers.append(
+                    Peer(
+                        name=az_peer.name,
+                        public_key=az_peer.public_key,
+                        preshared_key=az_peer.preshared_key,
+                        allowed_ips=f"{new_ip}/32",
+                    )
+                )
+                existing_names.add(az_peer.name)
+                existing_pubkeys.add(az_peer.public_key)
+                added_any = True
+
+            if not added_any:
+                continue  # nothing changed — skip re-render for idempotency
+
+            server_keys = db.get(WgServerKeys, iface)
+            if server_keys is None:
+                # bootstrap() must run first; bail quietly rather than crash
+                # (migration wraps this in try/except anyway).
+                logger.warning(
+                    "backfill_escape_peers: no server keys for %s — skipping",
+                    iface,
+                )
+                continue
+
+            awg = get_params(db, iface)
+            new_conf = render_server_conf(
+                iface=iface,
+                peers=existing_peers,
+                server_privkey=server_keys.private_key,
+                address=cfg["address"],
+                awg_params=awg,
+            )
+            store.put(cfg["conf_path"], new_conf.encode(), by="backfill_escape_peers")
+            logger.info("backfill_escape_peers: re-rendered %s", iface)
+
+    # ------------------------------------------------------------------
     # get_antizapret_allowed_ips
     # ------------------------------------------------------------------
 

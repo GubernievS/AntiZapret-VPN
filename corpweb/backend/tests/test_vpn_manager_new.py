@@ -609,3 +609,214 @@ class TestGenerateClientName:
         """generate_client_name always increments max, doesn't fill gaps."""
         name = generate_client_name("alice", ["alice-1", "alice-3"])
         assert name == "alice-4"
+
+
+# ---------------------------------------------------------------------------
+# backfill_escape_peers
+# ---------------------------------------------------------------------------
+
+class TestBackfillEscapePeers:
+    """
+    Data-migration helper: ensures peers present in base ifaces
+    (antizapret / vpn) also appear in escape ifaces with parallel
+    host-parts in 10.27.x.x and 10.26.x.x subnets.
+
+    Meaningful for deployments that added peers BEFORE Phase 2 (when
+    add_peer started writing to all four ifaces). Idempotent: safe to
+    run multiple times.
+    """
+
+    def _reset_escape_blobs_to_empty_server_conf(self, db):
+        """Simulate pre-Phase-2 state: escape .conf blobs exist but have no peers."""
+        from app.db.models import WgServerKeys
+        from app.services.obfuscation_service import get_params
+        from app.services.vpn_manager_new import _IFACE_CONFIG
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import render_server_conf
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret_escape", "vpn_escape"):
+            cfg = _IFACE_CONFIG[iface]
+            keys = db.get(WgServerKeys, iface)
+            awg = get_params(db, iface)
+            conf = render_server_conf(
+                iface=iface,
+                peers=[],
+                server_privkey=keys.private_key,
+                address=cfg["address"],
+                awg_params=awg,
+            )
+            store.put(cfg["conf_path"], conf.encode(), by="test-reset")
+
+    def test_backfill_restores_peers_to_both_escape_ifaces(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "alice-1")
+        vpn_manager.add_peer(db, "bob-1")
+
+        # Simulate a pre-Phase-2 deployment: escape blobs empty.
+        self._reset_escape_blobs_to_empty_server_conf(db)
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret_escape", "vpn_escape"):
+            peers = parse_peers(
+                store.get(f"/etc/wireguard/{iface}.conf").decode()
+            )
+            assert peers == [], f"setup: {iface} should be empty"
+
+        # Run backfill.
+        vpn_manager.backfill_escape_peers(db)
+
+        for iface in ("antizapret_escape", "vpn_escape"):
+            peers = parse_peers(
+                store.get(f"/etc/wireguard/{iface}.conf").decode()
+            )
+            names = sorted(p.name for p in peers)
+            assert names == ["alice-1", "bob-1"], (
+                f"{iface}: expected both peers restored, got {names}"
+            )
+
+    def test_backfill_uses_escape_subnets_with_parallel_host_parts(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "carol-1")
+
+        # Capture host part from antizapret BEFORE we wipe escape blobs.
+        store = WgBlobStore(db)
+        az_peers = parse_peers(
+            store.get("/etc/wireguard/antizapret.conf").decode()
+        )
+        az_ip = next(p.allowed_ips for p in az_peers if p.name == "carol-1")
+        host_part = az_ip.split("/", 1)[0].split(".", 2)[-1]  # "x.y"
+
+        self._reset_escape_blobs_to_empty_server_conf(db)
+        vpn_manager.backfill_escape_peers(db)
+
+        # Verify subnet prefixes + shared host-part.
+        az_escape_peers = parse_peers(
+            store.get("/etc/wireguard/antizapret_escape.conf").decode()
+        )
+        vpn_escape_peers = parse_peers(
+            store.get("/etc/wireguard/vpn_escape.conf").decode()
+        )
+        az_esc_ip = next(
+            p.allowed_ips for p in az_escape_peers if p.name == "carol-1"
+        ).split("/", 1)[0]
+        vpn_esc_ip = next(
+            p.allowed_ips for p in vpn_escape_peers if p.name == "carol-1"
+        ).split("/", 1)[0]
+
+        assert az_esc_ip == f"10.27.{host_part}"
+        assert vpn_esc_ip == f"10.26.{host_part}"
+
+    def test_backfill_preserves_public_and_preshared_keys(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "dave-1")
+
+        store = WgBlobStore(db)
+        az_peer = next(
+            p for p in parse_peers(
+                store.get("/etc/wireguard/antizapret.conf").decode()
+            ) if p.name == "dave-1"
+        )
+
+        self._reset_escape_blobs_to_empty_server_conf(db)
+        vpn_manager.backfill_escape_peers(db)
+
+        for iface in ("antizapret_escape", "vpn_escape"):
+            peer = next(
+                p for p in parse_peers(
+                    store.get(f"/etc/wireguard/{iface}.conf").decode()
+                ) if p.name == "dave-1"
+            )
+            assert peer.public_key == az_peer.public_key
+            assert peer.preshared_key == az_peer.preshared_key
+
+    def test_backfill_idempotent(self, db):
+        """Running backfill twice must not duplicate peers."""
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "eve-1")
+        vpn_manager.add_peer(db, "frank-1")
+        self._reset_escape_blobs_to_empty_server_conf(db)
+
+        vpn_manager.backfill_escape_peers(db)
+        vpn_manager.backfill_escape_peers(db)
+
+        store = WgBlobStore(db)
+        for iface in ("antizapret_escape", "vpn_escape"):
+            peers = parse_peers(
+                store.get(f"/etc/wireguard/{iface}.conf").decode()
+            )
+            names = sorted(p.name for p in peers)
+            assert names == ["eve-1", "frank-1"], (
+                f"{iface}: expected no duplicates, got {names}"
+            )
+
+    def test_backfill_skips_peers_already_present(self, db):
+        """Peers already in escape conf must not be re-added or mutated."""
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "gina-1")
+
+        # Partially-rolled-out: the peer is already in antizapret_escape
+        # (no-op expected), but we pretend vpn_escape was wiped.
+        from app.db.models import WgServerKeys
+        from app.services.obfuscation_service import get_params
+        from app.services.vpn_manager_new import _IFACE_CONFIG
+        from app.services.wg_templates import render_server_conf
+
+        store = WgBlobStore(db)
+        cfg = _IFACE_CONFIG["vpn_escape"]
+        keys = db.get(WgServerKeys, "vpn_escape")
+        awg = get_params(db, "vpn_escape")
+        store.put(
+            cfg["conf_path"],
+            render_server_conf(
+                iface="vpn_escape",
+                peers=[],
+                server_privkey=keys.private_key,
+                address=cfg["address"],
+                awg_params=awg,
+            ).encode(),
+            by="test-reset",
+        )
+
+        az_esc_peer_before = next(
+            p for p in parse_peers(
+                store.get("/etc/wireguard/antizapret_escape.conf").decode()
+            ) if p.name == "gina-1"
+        )
+
+        vpn_manager.backfill_escape_peers(db)
+
+        az_esc_peer_after = next(
+            p for p in parse_peers(
+                store.get("/etc/wireguard/antizapret_escape.conf").decode()
+            ) if p.name == "gina-1"
+        )
+        assert az_esc_peer_before == az_esc_peer_after, (
+            "already-present peer must not be mutated"
+        )
+
+        # And the wiped vpn_escape got the peer back.
+        vpn_esc_peers = parse_peers(
+            store.get("/etc/wireguard/vpn_escape.conf").decode()
+        )
+        assert [p.name for p in vpn_esc_peers] == ["gina-1"]
