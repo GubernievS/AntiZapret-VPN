@@ -8,6 +8,9 @@ from app.services.balancer import (
     generate_iptables_rules,
     parse_iptables_output,
     needs_reconcile,
+    get_active_ports,
+    BASE_PORTS,
+    ESCAPE_PORTS,
     DEFAULT_PORTS,
 )
 
@@ -182,35 +185,107 @@ def test_default_ports_includes_backup():
     assert len(DEFAULT_PORTS) == 6
 
 
+# ── get_active_ports ─────────────────────────────────────────────────────────
+
+class TestActivePorts:
+    """``get_active_ports(escape_enabled)`` decides which ports to DNAT."""
+
+    def test_escape_disabled_returns_base_ports(self):
+        assert get_active_ports(escape_enabled=False) == [
+            51443, 51080, 52443, 52080, 540, 580,
+        ]
+
+    def test_escape_enabled_appends_escape_ports(self):
+        got = get_active_ports(escape_enabled=True)
+        assert 500 in got
+        assert 53443 in got
+        assert len(got) == 8
+
+    def test_escape_enabled_preserves_base_ports(self):
+        got = get_active_ports(escape_enabled=True)
+        for port in (51443, 51080, 52443, 52080, 540, 580):
+            assert port in got
+
+    def test_default_ports_alias_equals_base_ports(self):
+        """DEFAULT_PORTS kept as alias for BASE_PORTS (legacy callers)."""
+        assert DEFAULT_PORTS == BASE_PORTS
+
+    def test_escape_ports_constant(self):
+        assert set(ESCAPE_PORTS) == {500, 53443}
+
+
 # ── needs_reconcile ──────────────────────────────────────────────────────────
 
 class TestNeedsReconcile:
-    """Decide whether live iptables is missing any DEFAULT_PORTS."""
+    """Decide whether live iptables is missing any required ports."""
 
     def test_returns_true_when_no_live_rules(self):
         """Empty iptables → a reconcile is needed if DB has nodes."""
-        assert needs_reconcile(live_ports=set(), has_nodes=True) is True
+        assert needs_reconcile(
+            live_ports=set(), has_nodes=True, escape_enabled=False,
+        ) is True
 
-    def test_returns_false_when_all_default_ports_present(self):
-        assert needs_reconcile(live_ports=set(DEFAULT_PORTS), has_nodes=True) is False
+    def test_returns_false_when_all_base_ports_present(self):
+        assert needs_reconcile(
+            live_ports=set(BASE_PORTS), has_nodes=True, escape_enabled=False,
+        ) is False
 
     def test_returns_true_when_backup_ports_missing(self):
         """Old-style 4-port setup — needs reconcile to add 540/580."""
         old_ports = {51443, 51080, 52443, 52080}
-        assert needs_reconcile(live_ports=old_ports, has_nodes=True) is True
+        assert needs_reconcile(
+            live_ports=old_ports, has_nodes=True, escape_enabled=False,
+        ) is True
 
     def test_returns_true_when_one_port_missing(self):
-        missing_one = set(DEFAULT_PORTS) - {580}
-        assert needs_reconcile(live_ports=missing_one, has_nodes=True) is True
+        missing_one = set(BASE_PORTS) - {580}
+        assert needs_reconcile(
+            live_ports=missing_one, has_nodes=True, escape_enabled=False,
+        ) is True
 
     def test_returns_false_when_no_nodes_in_db(self):
         """Nothing to reconcile if DB has no nodes (fresh install)."""
-        assert needs_reconcile(live_ports=set(), has_nodes=False) is False
+        assert needs_reconcile(
+            live_ports=set(), has_nodes=False, escape_enabled=False,
+        ) is False
 
     def test_extra_ports_in_live_do_not_trigger(self):
         """Presence of unrelated ports does not force a reconcile."""
-        live = set(DEFAULT_PORTS) | {12345}
-        assert needs_reconcile(live_ports=live, has_nodes=True) is False
+        live = set(BASE_PORTS) | {12345}
+        assert needs_reconcile(
+            live_ports=live, has_nodes=True, escape_enabled=False,
+        ) is False
+
+    def test_default_escape_enabled_false(self):
+        """Legacy callers (no escape_enabled kwarg) still work."""
+        assert needs_reconcile(live_ports=set(BASE_PORTS), has_nodes=True) is False
+
+    # ---- escape_enabled=True variants ----
+
+    def test_returns_true_when_escape_ports_missing(self):
+        """Escape on but 500/53443 missing → must reconcile."""
+        assert needs_reconcile(
+            live_ports=set(BASE_PORTS), has_nodes=True, escape_enabled=True,
+        ) is True
+
+    def test_returns_false_when_all_active_ports_present_with_escape(self):
+        live = set(BASE_PORTS) | set(ESCAPE_PORTS)
+        assert needs_reconcile(
+            live_ports=live, has_nodes=True, escape_enabled=True,
+        ) is False
+
+    def test_returns_true_when_only_one_escape_port_present(self):
+        live = set(BASE_PORTS) | {500}  # missing 53443
+        assert needs_reconcile(
+            live_ports=live, has_nodes=True, escape_enabled=True,
+        ) is True
+
+    def test_escape_disabled_ignores_extra_escape_ports(self):
+        """Escape off: leftover 500/53443 entries don't force a reconcile."""
+        live = set(BASE_PORTS) | set(ESCAPE_PORTS)
+        assert needs_reconcile(
+            live_ports=live, has_nodes=True, escape_enabled=False,
+        ) is False
 
 
 class TestRuleSafety:

@@ -15,7 +15,26 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_PORTS = [51443, 51080, 52443, 52080, 540, 580]
+#: Ports always active — 4 primary (awg/wg × antizapret/vpn) + 2 backup (540/580).
+BASE_PORTS = [51443, 51080, 52443, 52080, 540, 580]
+
+#: Extra escape-mode ports, appended only when ``escape_enabled=True``:
+#:   500    → vpn_escape (IKE mimicry)
+#:   53443  → antizapret_escape
+ESCAPE_PORTS = [500, 53443]
+
+#: Legacy alias kept for callers that predate the escape feature.
+DEFAULT_PORTS = BASE_PORTS
+
+
+def get_active_ports(escape_enabled: bool) -> list[int]:
+    """
+    Return the list of UDP ports that must currently carry DNAT rules.
+
+    Always includes :data:`BASE_PORTS`. When *escape_enabled* is True,
+    :data:`ESCAPE_PORTS` are appended (500 and 53443).
+    """
+    return BASE_PORTS + (ESCAPE_PORTS if escape_enabled else [])
 
 
 # ── Pure functions ────────────────────────────────────────────────────────────
@@ -153,19 +172,23 @@ def parse_iptables_output(output: str) -> dict[str, dict]:
     return result
 
 
-def needs_reconcile(live_ports: set[int], has_nodes: bool) -> bool:
+def needs_reconcile(
+    live_ports: set[int],
+    has_nodes: bool,
+    escape_enabled: bool = False,
+) -> bool:
     """
-    Return True if live iptables is missing any of ``DEFAULT_PORTS``
-    and there are nodes to balance across.
+    Return True if live iptables is missing any required port
+    (:func:`get_active_ports`) and there are nodes to balance across.
 
-    Used on backend startup to self-heal after a code upgrade that
-    extended ``DEFAULT_PORTS`` (e.g. adding 540/580). Without this the
-    operator has to manually hit "Save" in the UI for the new ports to
-    appear in iptables.
+    Used on backend startup to self-heal after a code upgrade or after an
+    admin toggles ``escape_enabled``: without this the operator has to
+    manually click "Save" in the UI for new ports to appear in iptables.
     """
     if not has_nodes:
         return False
-    return not set(DEFAULT_PORTS).issubset(live_ports)
+    required = set(get_active_ports(escape_enabled))
+    return not required.issubset(live_ports)
 
 
 # ── Subprocess helpers (not unit-tested) ─────────────────────────────────────
@@ -191,7 +214,11 @@ def read_current_state() -> dict:
     return parse_iptables_output(result.stdout)
 
 
-def apply_rules(nodes: list[dict], cp_ip: str) -> dict:
+def apply_rules(
+    nodes: list[dict],
+    cp_ip: str,
+    escape_enabled: bool = False,
+) -> dict:
     """
     Apply DNAT + SNAT rules safely using flush + add (NOT iptables-restore).
 
@@ -208,8 +235,10 @@ def apply_rules(nodes: list[dict], cp_ip: str) -> dict:
     6. Return current state.
 
     ``cp_ip`` is the control-plane's own IP for SNAT source.
+    ``escape_enabled`` toggles the two escape-mode ports (500 / 53443).
     """
-    dnat_rules = generate_iptables_rules(nodes)
+    ports = get_active_ports(escape_enabled)
+    dnat_rules = generate_iptables_rules(nodes, ports=ports)
     enabled_ips = {n["ip"] for n in nodes if n.get("enabled")}
 
     # 1. Flush PREROUTING
@@ -265,10 +294,16 @@ def ensure_ports_reconciled(db) -> bool:
         return False
 
     nodes = db.query(Node).all()
-    if not needs_reconcile(live_ports=_live_ports_from_state(current), has_nodes=bool(nodes)):
+    settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    escape_enabled = bool(settings and getattr(settings, "escape_enabled", False))
+
+    if not needs_reconcile(
+        live_ports=_live_ports_from_state(current),
+        has_nodes=bool(nodes),
+        escape_enabled=escape_enabled,
+    ):
         return False
 
-    settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
     cp_ip = settings.cp_ip if settings else None
     if not cp_ip:
         logger.warning("ensure_ports_reconciled: cp_ip not set, skipping")
@@ -283,8 +318,12 @@ def ensure_ports_reconciled(db) -> bool:
             "enabled": live["enabled"] if live else True,
         })
 
-    logger.info("ensure_ports_reconciled: reapplying DNAT with DEFAULT_PORTS=%s", DEFAULT_PORTS)
-    apply_rules(payload, cp_ip)
+    active = get_active_ports(escape_enabled)
+    logger.info(
+        "ensure_ports_reconciled: reapplying DNAT (escape_enabled=%s, ports=%s)",
+        escape_enabled, active,
+    )
+    apply_rules(payload, cp_ip, escape_enabled=escape_enabled)
     return True
 
 
