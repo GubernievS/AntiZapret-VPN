@@ -36,6 +36,11 @@ class TestManagedFilesWiring:
         mapping = dict(agent.MANAGED_FILES)
         assert mapping["/root/antizapret/setup"] == "restart_antizapret"
 
+    def test_managed_files_includes_escape_ifaces(self):
+        mapping = dict(agent.MANAGED_FILES)
+        assert mapping["/etc/wireguard/antizapret_escape.conf"] == "wg_antizapret_escape"
+        assert mapping["/etc/wireguard/vpn_escape.conf"] == "wg_vpn_escape"
+
 
 class TestRunRestartAntizapret:
     def test_invokes_systemctl_restart(self):
@@ -100,3 +105,43 @@ class TestApplyPathDispatch:
             changed = agent.apply_path(str(target), content, "restart_antizapret")
         assert changed is False
         sched.assert_not_called()
+
+    def test_apply_path_dispatches_wg_antizapret_escape(self, tmp_path):
+        target = tmp_path / "antizapret_escape.conf"
+        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+            changed = agent.apply_path(
+                str(target),
+                b"[Interface]\n",
+                "wg_antizapret_escape",
+            )
+        assert changed is True
+        m.assert_called_once_with("antizapret_escape")
+
+    def test_apply_path_dispatches_wg_vpn_escape(self, tmp_path):
+        target = tmp_path / "vpn_escape.conf"
+        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+            changed = agent.apply_path(
+                str(target),
+                b"[Interface]\n",
+                "wg_vpn_escape",
+            )
+        assert changed is True
+        m.assert_called_once_with("vpn_escape")
+
+    def test_unchanged_content_does_not_sync_wg_antizapret_escape(self, tmp_path):
+        target = tmp_path / "antizapret_escape.conf"
+        content = b"[Interface]\n"
+        target.write_bytes(content)
+        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+            changed = agent.apply_path(str(target), content, "wg_antizapret_escape")
+        assert changed is False
+        m.assert_not_called()
+
+    def test_unchanged_content_does_not_sync_wg_vpn_escape(self, tmp_path):
+        target = tmp_path / "vpn_escape.conf"
+        content = b"[Interface]\n"
+        target.write_bytes(content)
+        with patch("corpweb_sync_agent.apply_wg_syncconf") as m:
+            changed = agent.apply_path(str(target), content, "wg_vpn_escape")
+        assert changed is False
+        m.assert_not_called()
