@@ -102,3 +102,25 @@ async def update_settings(
     except AntizapretServiceError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     return DoallResponse(status="saved", output="", changed=changed)
+
+
+# ── Obfuscation (escape mode) ─────────────────────────────────────────────────
+
+@router.post("/obfuscation/regenerate")
+async def regenerate_obfuscation(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+):
+    """
+    Regenerate AmneziaWG obfuscation parameters for escape ifaces.
+
+    Invalidates existing bypass client configs — users must re-download.
+    Re-renders the server ``*_escape.conf`` blobs so agents pick up the
+    new params via SSE.
+    """
+    from app.services.obfuscation_service import regenerate
+    from app.services.vpn_manager_new import vpn_manager
+
+    regenerate(db, ifaces=["antizapret_escape", "vpn_escape"])
+    vpn_manager.rerender_escape_server_confs(db)
+    return {"status": "ok"}

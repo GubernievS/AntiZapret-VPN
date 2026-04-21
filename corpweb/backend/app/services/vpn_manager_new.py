@@ -433,6 +433,36 @@ class VpnManager:
         )
 
     # ------------------------------------------------------------------
+    # rerender_escape_server_confs
+    # ------------------------------------------------------------------
+
+    def rerender_escape_server_confs(self, db: Session) -> None:
+        """
+        Re-render the two escape server .conf blobs with whatever obfuscation
+        params are currently stored in the DB.
+
+        Preserves existing peers. Used after ``obfuscation_service.regenerate``
+        so agents pick up the new params via the wg_file_state SSE stream.
+        """
+        store = WgBlobStore(db)
+        for iface in _ESCAPE_IFACES:
+            cfg = _IFACE_CONFIG[iface]
+            blob = store.get(cfg["conf_path"])
+            peers = parse_peers(blob.decode()) if blob else []
+            server_keys = db.get(WgServerKeys, iface)
+            if server_keys is None:
+                continue  # bootstrap hasn't run yet — skip quietly
+            awg = get_params(db, iface)
+            new_conf = render_server_conf(
+                iface=iface,
+                peers=peers,
+                server_privkey=server_keys.private_key,
+                address=cfg["address"],
+                awg_params=awg,
+            )
+            store.put(cfg["conf_path"], new_conf.encode(), by="regenerate")
+
+    # ------------------------------------------------------------------
     # get_antizapret_allowed_ips
     # ------------------------------------------------------------------
 
