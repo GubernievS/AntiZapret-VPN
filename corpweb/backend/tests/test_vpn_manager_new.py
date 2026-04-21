@@ -835,3 +835,53 @@ class TestBackfillEscapePeers:
             store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
         )
         assert [p.name for p in vpn_esc_peers] == ["gina-1"]
+
+
+# ---------------------------------------------------------------------------
+# Regression: delete_peer on escape ifaces preserves AWG [Interface] block
+# ---------------------------------------------------------------------------
+
+class TestDeletePeerEscapeRegression:
+    """delete_peer on escape ifaces must not strip the [Interface] AWG block."""
+
+    def test_delete_peer_preserves_awg_block_in_vpn_escape(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "erin")
+
+        store = WgBlobStore(db)
+        before = store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
+        # sanity: peer is there
+        assert "# Client = erin" in before
+        # sanity: AWG fields present in Interface section
+        for key in ("Jc", "Jmin", "Jmax", "S1", "S2", "H1", "H2", "H3", "H4"):
+            assert f"{key} = " in before, f"AWG field {key} missing before delete"
+
+        vpn_manager.delete_peer(db, "erin")
+
+        after = store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
+        assert "# Client = erin" not in after
+        for key in ("Jc", "Jmin", "Jmax", "S1", "S2", "H1", "H2", "H3", "H4"):
+            assert f"{key} = " in after, f"AWG field {key} lost after delete"
+
+    def test_delete_peer_removes_from_all_four_ifaces(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "frank")
+        vpn_manager.delete_peer(db, "frank")
+
+        store = WgBlobStore(db)
+        for path in (
+            "/etc/wireguard/antizapret.conf",
+            "/etc/wireguard/vpn.conf",
+            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/vpn_escape.conf",
+        ):
+            blob = store.get(path)
+            assert blob is not None, f"{path} missing"
+            assert "# Client = frank" not in blob.decode(), \
+                f"peer still present in {path}"
