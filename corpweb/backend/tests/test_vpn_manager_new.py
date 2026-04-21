@@ -885,3 +885,96 @@ class TestDeletePeerEscapeRegression:
             assert blob is not None, f"{path} missing"
             assert "# Client = frank" not in blob.decode(), \
                 f"peer still present in {path}"
+
+
+# ---------------------------------------------------------------------------
+# Regression: disable/enable on escape ifaces — keys reverse, AWG block intact
+# ---------------------------------------------------------------------------
+
+class TestTogglePeerEscapeRegression:
+    """Disable/enable must reverse [Peer] keys across all four ifaces without
+    touching the AWG [Interface] block of escape ifaces."""
+
+    def test_disable_reverses_keys_in_all_four_ifaces(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "george")
+
+        store = WgBlobStore(db)
+        paths = [
+            "/etc/wireguard/antizapret.conf",
+            "/etc/wireguard/vpn.conf",
+            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/vpn_escape.conf",
+        ]
+        before = {}
+        for p in paths:
+            peers = parse_peers(store.get(p).decode())
+            mine = next(pr for pr in peers if pr.name == "george")
+            before[p] = (mine.public_key, mine.preshared_key)
+
+        vpn_manager.disable_peer(db, "george")
+
+        for p in paths:
+            peers = parse_peers(store.get(p).decode())
+            mine = next(pr for pr in peers if pr.name == "george")
+            assert mine.public_key != before[p][0], f"pubkey not reversed in {p}"
+            assert mine.preshared_key != before[p][1], f"psk not reversed in {p}"
+
+    def test_disable_preserves_awg_block_in_escape_confs(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "helen")
+
+        awg_keys = ("Jc", "Jmin", "Jmax", "S1", "S2", "H1", "H2", "H3", "H4")
+        store = WgBlobStore(db)
+        for path in (
+            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/vpn_escape.conf",
+        ):
+            before = store.get(path).decode()
+            awg_before = [
+                ln for ln in before.splitlines()
+                if any(ln.strip().startswith(f"{k} = ") for k in awg_keys)
+            ]
+
+            vpn_manager.disable_peer(db, "helen")
+
+            after = store.get(path).decode()
+            awg_after = [
+                ln for ln in after.splitlines()
+                if any(ln.strip().startswith(f"{k} = ") for k in awg_keys)
+            ]
+
+            assert awg_before == awg_after, (
+                f"AWG fields mutated in {path}\nbefore: {awg_before}\nafter: {awg_after}"
+            )
+
+            vpn_manager.enable_peer(db, "helen")  # reset state for next iter
+
+    def test_enable_is_self_inverse_of_disable(self, db):
+        from app.services.vpn_manager_new import vpn_manager
+        from app.services.wg_blob_store import WgBlobStore
+        from app.services.wg_templates import parse_peers
+
+        vpn_manager.bootstrap(db)
+        vpn_manager.add_peer(db, "ivan")
+
+        store = WgBlobStore(db)
+        path = "/etc/amnezia/amneziawg/vpn_escape.conf"
+        peers = parse_peers(store.get(path).decode())
+        orig = next(p for p in peers if p.name == "ivan")
+        orig_pub, orig_psk = orig.public_key, orig.preshared_key
+
+        vpn_manager.disable_peer(db, "ivan")
+        vpn_manager.enable_peer(db, "ivan")
+
+        peers = parse_peers(store.get(path).decode())
+        after = next(p for p in peers if p.name == "ivan")
+        assert after.public_key == orig_pub
+        assert after.preshared_key == orig_psk
