@@ -106,8 +106,12 @@ class TestBootstrap:
         store = WgBlobStore(db)
         for iface in ("antizapret", "vpn"):
             content = store.get(f"/etc/wireguard/{iface}.conf").decode()
-            assert "Jc" not in content, f"{iface} should not contain Jc"
-            assert "S1" not in content, f"{iface} should not contain S1"
+            # Match the exact "Field = " pattern at line-start — substrings like
+            # "Jc" can appear inside random base64 keys otherwise.
+            for line in content.splitlines():
+                assert not line.startswith("Jc = "), f"{iface} has Jc line"
+                assert not line.startswith("S1 = "), f"{iface} has S1 line"
+                assert not line.startswith("H1 = "), f"{iface} has H1 line"
 
 
 # ---------------------------------------------------------------------------
@@ -248,8 +252,12 @@ class TestAddPeer:
         store = WgBlobStore(db)
         for iface in ("antizapret", "vpn"):
             content = store.get(f"/etc/wireguard/{iface}.conf").decode()
-            assert "Jc" not in content
-            assert "S1" not in content
+            # Use line-start match to avoid false positives from random base64
+            # substrings inside PublicKey / PresharedKey.
+            for line in content.splitlines():
+                assert not line.startswith("Jc = "), f"{iface}: {line!r}"
+                assert not line.startswith("S1 = "), f"{iface}: {line!r}"
+                assert not line.startswith("H1 = "), f"{iface}: {line!r}"
 
 
 # ---------------------------------------------------------------------------
