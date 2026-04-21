@@ -346,7 +346,11 @@ async def get_config_qr(
         qr_data = content
         qr_type = "config"
     else:
-        token = create_config_share_token(str(config_id))
+        # Preserve bypass/backup through the QR download-link so the public
+        # endpoint serves the same conf as the authenticated download.
+        token = create_config_share_token(
+            str(config_id), bypass=bypass, backup=backup,
+        )
         download_url = f"{app_settings.FRONTEND_URL}/api/v1/public/config/{token}"
         qr_data = download_url
         qr_type = "download-link"

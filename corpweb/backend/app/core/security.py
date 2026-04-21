@@ -129,26 +129,48 @@ def decode_token(token: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def create_config_share_token(config_id: str, expires_minutes: int = 10) -> str:
+def create_config_share_token(
+    config_id: str,
+    *,
+    bypass: bool = False,
+    backup: bool = False,
+    expires_minutes: int = 10,
+) -> str:
     """
     Create a short-lived JWT token for public config file download.
     Used when config is too large for a QR code.
+
+    The token carries the per-download flags (bypass / backup) so the
+    public endpoint can render the same conf the authenticated user
+    would have received from ``/configs/{id}/download``.
     """
     expire = datetime.utcnow() + timedelta(minutes=expires_minutes)
     payload = {
         "sub": config_id,
         "type": "config_share",
+        "bypass": bool(bypass),
+        "backup": bool(backup),
         "exp": expire,
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def verify_config_share_token(token: str) -> Optional[str]:
+def verify_config_share_token(token: str) -> Optional[dict]:
     """
-    Verify a config share token and return the config_id.
-    Returns None if the token is invalid or expired.
+    Verify a config share token and return its payload fields.
+
+    Returns ``None`` if the token is invalid or expired; otherwise a dict
+    with ``config_id``, ``bypass``, and ``backup``. Legacy tokens that
+    predate the flags default both to ``False``.
     """
     payload = decode_token(token)
     if payload is None or payload.get("type") != "config_share":
         return None
-    return payload.get("sub")
+    config_id = payload.get("sub")
+    if not config_id:
+        return None
+    return {
+        "config_id": config_id,
+        "bypass": bool(payload.get("bypass", False)),
+        "backup": bool(payload.get("backup", False)),
+    }

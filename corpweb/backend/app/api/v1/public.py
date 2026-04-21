@@ -38,20 +38,23 @@ async def download_shared_config(
     plain .conf downloads to .conf.txt, breaking import into AmneziaWG.
     AmneziaWG natively supports importing .zip archives with .conf files inside.
     """
-    config_id_str = verify_config_share_token(token)
-    if config_id_str is None:
+    payload = verify_config_share_token(token)
+    if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired download link",
         )
 
     try:
-        config_id = uuid.UUID(config_id_str)
+        config_id = uuid.UUID(payload["config_id"])
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid download link",
         )
+
+    bypass = payload["bypass"]
+    backup = payload["backup"]
 
     config = crud_config.get_by_id(db, config_id)
     if not config:
@@ -84,6 +87,8 @@ async def download_shared_config(
             db, config.client_name, flavor, endpoint_host, iface,
             client_private_key=private_key,
             allowed_ips=allowed_ips,
+            use_backup_port=backup,
+            bypass=bypass,
         )
     except ValueError as e:
         raise HTTPException(
