@@ -158,6 +158,7 @@ async def get_config(
 async def download_config(
     config_id: uuid.UUID,
     backup: bool = Query(False),
+    bypass: bool = Query(False),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -167,6 +168,20 @@ async def download_config(
     plain .conf downloads to .conf.txt, breaking import into AmneziaWG.
     AmneziaWG natively supports importing .zip archives.
     """
+    if bypass and backup:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="bypass and backup are mutually exclusive",
+        )
+
+    if bypass:
+        sys_settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+        if not (sys_settings and sys_settings.escape_enabled):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="escape mode is disabled",
+            )
+
     config = crud_config.get_by_id(db, config_id)
     if not config:
         raise HTTPException(
@@ -212,6 +227,7 @@ async def download_config(
             client_private_key=private_key,
             allowed_ips=allowed_ips,
             use_backup_port=backup,
+            bypass=bypass,
         )
     except ValueError as e:
         raise HTTPException(
@@ -244,6 +260,7 @@ async def download_config(
 async def get_config_qr(
     config_id: uuid.UUID,
     backup: bool = Query(False),
+    bypass: bool = Query(False),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -251,6 +268,20 @@ async def get_config_qr(
     Generate QR code PNG image for a config.
     The QR contains the raw awg-quick config text — compatible with AmneziaWG mobile clients.
     """
+    if bypass and backup:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="bypass and backup are mutually exclusive",
+        )
+
+    if bypass:
+        sys_settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+        if not (sys_settings and sys_settings.escape_enabled):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="escape mode is disabled",
+            )
+
     config = crud_config.get_by_id(db, config_id)
     if not config:
         raise HTTPException(
@@ -296,6 +327,7 @@ async def get_config_qr(
             client_private_key=private_key_qr,
             allowed_ips=allowed_ips_qr,
             use_backup_port=backup,
+            bypass=bypass,
         )
     except ValueError as e:
         raise HTTPException(
