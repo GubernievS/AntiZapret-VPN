@@ -89,16 +89,18 @@ export interface SystemSettings {
   app_store_url: string | null
   apk_url: string | null
   windows_url: string | null
+  escape_enabled: boolean
   updated_at: string
   updated_by: string | null
 }
 
 export interface SystemSettingsUpdate {
-  max_configs_per_user: number
-  google_play_url: string | null
-  app_store_url: string | null
-  apk_url: string | null
-  windows_url: string | null
+  max_configs_per_user?: number
+  google_play_url?: string | null
+  app_store_url?: string | null
+  apk_url?: string | null
+  windows_url?: string | null
+  escape_enabled?: boolean
 }
 
 // === Dashboard types ===

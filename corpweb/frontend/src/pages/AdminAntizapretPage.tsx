@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Save, Loader2, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react'
 import { antizapretApi, type AntizapretSettings } from '../api/antizapret'
+import { adminApi } from '../api/admin'
 import Toggle from '../components/Toggle'
 
 // ── Helper components ──────────────────────────────────────────────────────
@@ -31,14 +32,39 @@ export default function AdminAntizapretPage() {
   const [applySuccess, setApplySuccess] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
   const [regenSuccess, setRegenSuccess] = useState(false)
+  const [escapeEnabled, setEscapeEnabled] = useState(false)
+  const [escapeSaving, setEscapeSaving] = useState(false)
+  const [escapeSaved, setEscapeSaved] = useState(false)
 
   useEffect(() => {
-    antizapretApi
-      .getSettings()
-      .then(data => setSettings(data))
+    Promise.all([
+      antizapretApi.getSettings(),
+      adminApi.getSettings().then(r => r.data).catch(() => null),
+    ])
+      .then(([azSettings, sysSettings]) => {
+        setSettings(azSettings)
+        if (sysSettings) setEscapeEnabled(Boolean(sysSettings.escape_enabled))
+      })
       .catch(() => setError('Не удалось загрузить настройки'))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleEscapeToggle = async (value: boolean) => {
+    setEscapeEnabled(value)  // optimistic
+    setEscapeSaving(true)
+    setEscapeSaved(false)
+    setError(null)
+    try {
+      await adminApi.updateSettings({ escape_enabled: value })
+      setEscapeSaved(true)
+      setTimeout(() => setEscapeSaved(false), 3000)
+    } catch {
+      setEscapeEnabled(!value)  // rollback
+      setError('Не удалось сохранить режим обхода блокировки')
+    } finally {
+      setEscapeSaving(false)
+    }
+  }
 
   const setBool = (key: keyof AntizapretSettings, value: boolean) => {
     setSettings(prev => prev ? { ...prev, [key]: value ? 'y' : 'n' } : prev)
@@ -231,10 +257,16 @@ export default function AdminAntizapretPage() {
       {/* Escape / bypass mode */}
       <Section title="Обход блокировки">
         <Toggle
-          label="Включить режим обхода блокировки (ESCAPE_ENABLED)"
-          value={isY(settings.ESCAPE_ENABLED)}
-          onChange={v => setBool('ESCAPE_ENABLED', v)}
+          label="Включить режим обхода блокировки"
+          value={escapeEnabled}
+          onChange={handleEscapeToggle}
+          disabled={escapeSaving}
         />
+        {escapeSaved && (
+          <p className="py-1 text-xs text-green-600 flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Сохранено — балансировщик обновлён.
+          </p>
+        )}
         <p className="py-2 text-xs text-gray-500 leading-relaxed">
           При включении на нодах поднимаются отдельные AmneziaWG-интерфейсы
           <code className="bg-gray-100 px-1 rounded mx-1">antizapret_escape</code>

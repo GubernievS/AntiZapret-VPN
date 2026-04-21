@@ -43,7 +43,6 @@ export interface AntizapretSettings {
   CLIENT_ISOLATION: string | null
   WARP_OUTBOUND: string | null
   WIREGUARD_BACKUP: string | null
-  ESCAPE_ENABLED: string | null
 }
 
 export interface DoallResponse {
