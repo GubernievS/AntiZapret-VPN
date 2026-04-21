@@ -65,6 +65,41 @@ class TestAgentRegister:
         )
         assert resp.status_code == 401
 
+    def test_register_response_includes_all_four_ifaces(self, client, db):
+        """After vpn_manager.bootstrap runs, /register exposes keys + wg_config
+        for antizapret, vpn, antizapret_escape and vpn_escape so the agent can
+        bring up all four interfaces."""
+        from app.services.vpn_manager_new import vpn_manager
+        vpn_manager.bootstrap(db)
+        node = _make_node(db)
+        resp = client.post(
+            "/api/v1/agent/register",
+            headers=_agent_auth(node.enroll_token),
+            json={"hostname": "wgfi2", "private_ip": "10.0.0.2"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+
+        keys = data["wg_server_keys"]
+        assert set(keys) == {
+            "antizapret", "vpn", "antizapret_escape", "vpn_escape",
+        }
+        for iface, key_data in keys.items():
+            assert key_data["private_key"], f"missing priv key for {iface}"
+            assert key_data["public_key"], f"missing pub key for {iface}"
+
+        cfg = data["wg_config"]
+        # Base ifaces
+        assert cfg["antizapret_address"] == "10.29.8.1/21"
+        assert cfg["antizapret_listen_port"] == 51443
+        assert cfg["vpn_address"] == "10.28.8.1/21"
+        assert cfg["vpn_listen_port"] == 51080
+        # Escape ifaces (address from _IFACE_CONFIG, port from _PORT_MAP[(iface,"awg")])
+        assert cfg["antizapret_escape_address"] == "10.27.8.1/21"
+        assert cfg["antizapret_escape_listen_port"] == 53443
+        assert cfg["vpn_escape_address"] == "10.26.8.1/21"
+        assert cfg["vpn_escape_listen_port"] == 500
+
 
 class TestAgentFile:
     def test_file_exists(self, client, db):

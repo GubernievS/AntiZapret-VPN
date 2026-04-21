@@ -385,6 +385,16 @@ def _apply_wg_config(cfg: dict) -> None:
             "address": cfg.get("vpn_address"),
             "port": cfg.get("vpn_listen_port"),
         },
+        "antizapret_escape": {
+            "conf": "/etc/wireguard/antizapret_escape.conf",
+            "address": cfg.get("antizapret_escape_address"),
+            "port": cfg.get("antizapret_escape_listen_port"),
+        },
+        "vpn_escape": {
+            "conf": "/etc/wireguard/vpn_escape.conf",
+            "address": cfg.get("vpn_escape_address"),
+            "port": cfg.get("vpn_escape_listen_port"),
+        },
     }
     mtu = cfg.get("mtu")
 

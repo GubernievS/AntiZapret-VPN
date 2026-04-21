@@ -63,20 +63,34 @@ def register(
     node.last_seen = datetime.utcnow()
     db.commit()
 
+    # Return keys for every iface present in wg_server_keys (base + escape).
+    # vpn_manager.bootstrap populates all four (antizapret, vpn,
+    # antizapret_escape, vpn_escape).
     keys = {
         row.iface: {"private_key": row.private_key, "public_key": row.public_key}
         for row in db.query(WgServerKeys).all()
     }
+
+    # Derive wg_config from the SSOT: _IFACE_CONFIG (addresses) and _PORT_MAP
+    # (listen ports). Escape ifaces are awg-only — use the awg flavor.
+    from app.services.vpn_manager_new import _IFACE_CONFIG
+    from app.services.wg_templates import _PORT_MAP
+
+    _LISTEN_FLAVOR = {
+        "antizapret": "wg",
+        "vpn": "wg",
+        "antizapret_escape": "awg",
+        "vpn_escape": "awg",
+    }
+    wg_config: dict = {"mtu": 1420}
+    for iface, cfg in _IFACE_CONFIG.items():
+        wg_config[f"{iface}_address"] = cfg["address"]
+        wg_config[f"{iface}_listen_port"] = _PORT_MAP[(iface, _LISTEN_FLAVOR[iface])]
+
     return {
         "node_id": node.id,
         "wg_server_keys": keys,
-        "wg_config": {
-            "antizapret_address": "10.29.8.1/21",
-            "antizapret_listen_port": 51443,
-            "vpn_address": "10.28.8.1/21",
-            "vpn_listen_port": 51080,
-            "mtu": 1420,
-        },
+        "wg_config": wg_config,
     }
 
 

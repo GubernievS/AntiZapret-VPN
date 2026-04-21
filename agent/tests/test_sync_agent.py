@@ -145,3 +145,106 @@ class TestApplyPathDispatch:
             changed = agent.apply_path(str(target), content, "wg_vpn_escape")
         assert changed is False
         m.assert_not_called()
+
+
+class TestApplyWgConfigEscapeIfaces:
+    """_apply_wg_config patches [Interface] Address/ListenPort in escape confs.
+
+    The agent hardcodes /etc/wireguard/* paths. To exercise the helper in a
+    unit test we redirect every relevant filesystem call through a tmpdir
+    using a small "path mapping" patcher.
+    """
+
+    _INITIAL_CONF = (
+        "[Interface]\n"
+        "PrivateKey = FAKE\n"
+        "Address = 0.0.0.0/32\n"
+        "ListenPort = 0\n"
+    )
+
+    @staticmethod
+    def _redirect(path_map: dict, real_open):
+        """Build (fake_open, fake_exists, fake_write_atomic) tuple."""
+        def fake_open(path, *a, **kw):
+            return real_open(path_map.get(path, path), *a, **kw)
+
+        def fake_exists(path):
+            return path in path_map
+
+        def fake_write_atomic(path, content):
+            with real_open(path_map.get(path, path), "wb") as fh:
+                fh.write(content)
+
+        return fake_open, fake_exists, fake_write_atomic
+
+    def test_patches_antizapret_escape_address_and_port(self, tmp_path):
+        conf = tmp_path / "antizapret_escape.conf"
+        conf.write_text(self._INITIAL_CONF)
+        path_map = {"/etc/wireguard/antizapret_escape.conf": str(conf)}
+        real_open = open
+        fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
+
+        with patch("corpweb_sync_agent.os.path.exists", side_effect=fake_exists), \
+             patch("builtins.open", side_effect=fake_open), \
+             patch("corpweb_sync_agent.write_atomic", side_effect=fake_write_atomic):
+            agent._apply_wg_config({
+                "antizapret_escape_address": "10.27.8.1/21",
+                "antizapret_escape_listen_port": 53443,
+            })
+
+        updated = conf.read_text()
+        assert "Address = 10.27.8.1/21" in updated
+        assert "ListenPort = 53443" in updated
+
+    def test_patches_vpn_escape_address_and_port(self, tmp_path):
+        conf = tmp_path / "vpn_escape.conf"
+        conf.write_text(self._INITIAL_CONF)
+        path_map = {"/etc/wireguard/vpn_escape.conf": str(conf)}
+        real_open = open
+        fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
+
+        with patch("corpweb_sync_agent.os.path.exists", side_effect=fake_exists), \
+             patch("builtins.open", side_effect=fake_open), \
+             patch("corpweb_sync_agent.write_atomic", side_effect=fake_write_atomic):
+            agent._apply_wg_config({
+                "vpn_escape_address": "10.26.8.1/21",
+                "vpn_escape_listen_port": 500,
+            })
+
+        updated = conf.read_text()
+        assert "Address = 10.26.8.1/21" in updated
+        assert "ListenPort = 500" in updated
+
+    def test_patches_all_four_ifaces_when_all_present(self, tmp_path):
+        """Regression: the existing antizapret/vpn patching still works with
+        the extended iface_map, and the escape entries are no-ops when the
+        conf files don't exist (simulating a node mid-rollout)."""
+        az = tmp_path / "antizapret.conf"
+        vpn = tmp_path / "vpn.conf"
+        az.write_text(self._INITIAL_CONF)
+        vpn.write_text(self._INITIAL_CONF)
+        path_map = {
+            "/etc/wireguard/antizapret.conf": str(az),
+            "/etc/wireguard/vpn.conf": str(vpn),
+        }
+        real_open = open
+        fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
+
+        with patch("corpweb_sync_agent.os.path.exists", side_effect=fake_exists), \
+             patch("builtins.open", side_effect=fake_open), \
+             patch("corpweb_sync_agent.write_atomic", side_effect=fake_write_atomic):
+            agent._apply_wg_config({
+                "antizapret_address": "10.29.8.1/21",
+                "antizapret_listen_port": 51443,
+                "vpn_address": "10.28.8.1/21",
+                "vpn_listen_port": 51080,
+                "antizapret_escape_address": "10.27.8.1/21",
+                "antizapret_escape_listen_port": 53443,
+                "vpn_escape_address": "10.26.8.1/21",
+                "vpn_escape_listen_port": 500,
+            })
+
+        assert "Address = 10.29.8.1/21" in az.read_text()
+        assert "ListenPort = 51443" in az.read_text()
+        assert "Address = 10.28.8.1/21" in vpn.read_text()
+        assert "ListenPort = 51080" in vpn.read_text()
