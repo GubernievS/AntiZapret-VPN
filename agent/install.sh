@@ -44,58 +44,50 @@ CORPWEB_HOSTNAME="${CORPWEB_HOSTNAME:-$(hostname -f)}"
 # ---------------------------------------------------------------------------
 
 install_amneziawg() {
+    # Idempotent: install amneziawg kernel module + userspace tools from the
+    # official amnezia Launchpad PPA (the path the upstream README recommends
+    # for Debian/Ubuntu). The PPA ships DKMS sources that compile on whatever
+    # kernel the node is running; no pre-built .deb matching is required.
     if command -v awg >/dev/null 2>&1; then
         echo "[agent] amneziawg already installed — skipping"
         return 0
     fi
 
-    echo "[agent] installing amneziawg…"
+    echo "[agent] installing amneziawg via amnezia Launchpad PPA…"
     install -d /etc/apt/keyrings
+
     apt-get update -qq
+    apt-get install -y \
+        gnupg2 \
+        software-properties-common \
+        dkms \
+        "linux-headers-$(uname -r)"
 
-    # Primary path: amnezia official apt repo
-    if curl -fsSL --max-time 10 https://apt.amnezia.org/amnezia-archive-keyring.gpg \
-          -o /etc/apt/keyrings/amnezia-archive-keyring.gpg 2>/dev/null; then
-        local codename
-        codename=$(lsb_release -cs 2>/dev/null || awk -F= '/^VERSION_CODENAME=/ {print $2}' /etc/os-release)
-        echo "deb [signed-by=/etc/apt/keyrings/amnezia-archive-keyring.gpg] https://apt.amnezia.org/ ${codename} main" \
-            > /etc/apt/sources.list.d/amnezia.list
-        apt-get update -qq
-        if apt-get install -y amneziawg amneziawg-tools; then
-            echo "[agent] amneziawg installed via apt"
-            return 0
-        fi
-        echo "[agent] apt install failed — falling back to GitHub releases"
-    else
-        echo "[agent] amnezia apt repo unreachable — using GitHub releases"
+    # Import Launchpad PPA GPG key (amnezia/ppa signing key 57290828).
+    # Fetch directly from keyserver's HKP HTTP endpoint and dearmor into a
+    # keyring file — avoids dirmngr / ~/.gnupg setup issues in minimal root
+    # environments.
+    if ! [[ -s /etc/apt/keyrings/amnezia-ppa.gpg ]]; then
+        curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x4166F2C257290828" \
+            | gpg --dearmor -o /etc/apt/keyrings/amnezia-ppa.gpg
+        chmod 0644 /etc/apt/keyrings/amnezia-ppa.gpg
     fi
 
-    # Fallback: download .deb artefacts from GitHub releases
-    local tmpdir
-    tmpdir=$(mktemp -d)
-    local arch
-    arch=$(dpkg --print-architecture)
+    # Point APT at the amnezia PPA. Launchpad serves Ubuntu focal packages;
+    # DKMS rebuilds the module against the host kernel regardless of suite.
+    cat > /etc/apt/sources.list.d/amnezia.list <<'EOF'
+deb [signed-by=/etc/apt/keyrings/amnezia-ppa.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main
+deb-src [signed-by=/etc/apt/keyrings/amnezia-ppa.gpg] https://ppa.launchpadcontent.net/amnezia/ppa/ubuntu focal main
+EOF
 
-    curl -fsSL "https://api.github.com/repos/amnezia-vpn/amneziawg-linux-kernel-module/releases/latest" \
-        | grep -oE 'https://[^"]+amneziawg-dkms[^"]+\.deb' | head -1 \
-        | xargs -r curl -fsSL -o "$tmpdir/amneziawg-dkms.deb"
-    curl -fsSL "https://api.github.com/repos/amnezia-vpn/amneziawg-tools/releases/latest" \
-        | grep -oE "https://[^\"]+amneziawg-tools[^\"]+${arch}\\.deb" | head -1 \
-        | xargs -r curl -fsSL -o "$tmpdir/amneziawg-tools.deb"
-
-    if [[ -s "$tmpdir/amneziawg-dkms.deb" && -s "$tmpdir/amneziawg-tools.deb" ]]; then
-        apt-get install -y dkms linux-headers-"$(uname -r)" || true
-        dpkg -i "$tmpdir/amneziawg-dkms.deb" "$tmpdir/amneziawg-tools.deb" || apt-get install -f -y
-        rm -rf "$tmpdir"
-        if command -v awg >/dev/null 2>&1; then
-            echo "[agent] amneziawg installed via GitHub .deb"
-            return 0
-        fi
+    apt-get update -qq
+    if apt-get install -y amneziawg; then
+        echo "[agent] amneziawg installed"
+        return 0
     fi
 
-    rm -rf "$tmpdir"
     echo "[agent] ERROR: could not install amneziawg automatically." >&2
-    echo "[agent] Install it manually, then re-run this script." >&2
+    echo "[agent] Check PPA reachability and kernel headers for $(uname -r)." >&2
     return 1
 }
 
