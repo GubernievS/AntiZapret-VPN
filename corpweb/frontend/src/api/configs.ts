@@ -6,6 +6,7 @@ export interface ClientLinks {
   app_store_url: string | null
   apk_url: string | null
   windows_url: string | null
+  wireguard_backup_enabled?: boolean
 }
 
 export const configsApi = {
@@ -23,11 +24,17 @@ export const configsApi = {
   getDetail: (id: string) =>
     api.get<ConfigDetail>(`/configs/${id}`),
 
-  download: (id: string) =>
-    api.get<Blob>(`/configs/${id}/download`, { responseType: 'blob' }),
+  download: (id: string, backup = false) =>
+    api.get<Blob>(`/configs/${id}/download`, {
+      responseType: 'blob',
+      params: backup ? { backup: true } : undefined,
+    }),
 
-  getQR: (id: string) =>
-    api.get<Blob>(`/configs/${id}/qr`, { responseType: 'blob' }),
+  getQR: (id: string, backup = false) =>
+    api.get<Blob>(`/configs/${id}/qr`, {
+      responseType: 'blob',
+      params: backup ? { backup: true } : undefined,
+    }),
 
   delete: (id: string) =>
     api.delete(`/configs/${id}`),

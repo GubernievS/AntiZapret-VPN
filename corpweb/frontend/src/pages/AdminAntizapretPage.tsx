@@ -224,6 +224,20 @@ export default function AdminAntizapretPage() {
         </div>
       </Section>
 
+      {/* Backup ports */}
+      <Section title="Резервные порты">
+        <Toggle
+          label="Открыть резервные порты UDP 540/580 для обхода блокировок (WIREGUARD_BACKUP)"
+          value={isY(settings.WIREGUARD_BACKUP)}
+          onChange={v => setBool('WIREGUARD_BACKUP', v)}
+        />
+        <p className="py-2 text-xs text-gray-500 leading-relaxed">
+          При включении на нодах дополнительно слушаются UDP 540 → 51443 (antizapret) и UDP 580 → 51080 (vpn).
+          В ЛК клиента появляется опция «Использовать резервный порт» при скачивании конфига/QR.
+          Балансировщик DNAT всегда проксирует обе группы портов — изменение не влияет на его настройки.
+        </p>
+      </Section>
+
       {/* DNS */}
       <Section title="DNS">
         <Toggle

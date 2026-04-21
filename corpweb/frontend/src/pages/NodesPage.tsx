@@ -299,6 +299,18 @@ export default function NodesPage() {
           )}
         </div>
 
+        {/* DNAT ports info */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+          <p className="font-medium mb-1">DNAT-порты балансировщика (UDP → нода)</p>
+          <p className="leading-relaxed">
+            Основные: <span className="font-mono">51443</span>, <span className="font-mono">51080</span>,{' '}
+            <span className="font-mono">52443</span>, <span className="font-mono">52080</span>. Резервные:{' '}
+            <span className="font-mono">540</span>, <span className="font-mono">580</span>. Балансировщик проксирует
+            все 6 портов на ноды с весами ниже. На нодах резервные порты активируются настройкой{' '}
+            <span className="font-mono">WIREGUARD_BACKUP</span> в «Настройках AntiZapret».
+          </p>
+        </div>
+
         {balancerError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />

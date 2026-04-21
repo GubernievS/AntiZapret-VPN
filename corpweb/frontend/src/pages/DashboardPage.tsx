@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [qrLoading, setQrLoading] = useState(false)
   const [qrError, setQrError] = useState<string | null>(null)
   const [qrType, setQrType] = useState<string | null>(null)
+  const [useBackupPort, setUseBackupPort] = useState(false)
 
   // Pagination (admin only)
   const [page, setPage] = useState(0)
@@ -84,7 +85,7 @@ export default function DashboardPage() {
 
   const handleDownload = async (config: VPNConfig) => {
     try {
-      const response = await configsApi.download(config.id)
+      const response = await configsApi.download(config.id, useBackupPort)
       const disposition = response.headers['content-disposition'] || ''
       const match = disposition.match(/filename="?(.+?)"?$/i)
       const filename = match?.[1] || `${config.client_name}.zip`
@@ -106,7 +107,7 @@ export default function DashboardPage() {
     setQrType(null)
     setQrLoading(true)
     try {
-      const response = await configsApi.getQR(config.id)
+      const response = await configsApi.getQR(config.id, useBackupPort)
       const url = URL.createObjectURL(response.data)
       setQrUrl(url)
       setQrType(response.headers['x-qr-type'] || 'config')
@@ -204,6 +205,21 @@ export default function DashboardPage() {
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 flex-shrink-0" />
           Применяю конфигурацию...
         </div>
+      )}
+
+      {clientLinks?.wireguard_backup_enabled && configs.length > 0 && (
+        <label className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={useBackupPort}
+            onChange={e => setUseBackupPort(e.target.checked)}
+            className="w-4 h-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
+          />
+          <span className="text-amber-900">
+            <span className="font-medium">Использовать резервный порт</span>
+            {' '}— если основные порты блокируются провайдером. Действует на последующие «Скачать» и QR.
+          </span>
+        </label>
       )}
 
       {configs.length === 0 ? (

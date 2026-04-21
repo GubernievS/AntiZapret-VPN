@@ -42,6 +42,7 @@ export interface AntizapretSettings {
   ALTERNATIVE_FAKE_IP: string | null
   CLIENT_ISOLATION: string | null
   WARP_OUTBOUND: string | null
+  WIREGUARD_BACKUP: string | null
 }
 
 export interface DoallResponse {
