@@ -28,7 +28,15 @@ from app.services.wg_templates import (
     reverse_peer_keys,
 )
 
-_ESCAPE_IFACES = ("antizapret_escape", "vpn_escape")
+_ESCAPE_IFACES = ("az_escape", "vpn_escape")
+
+# Map base iface -> escape iface used for bypass. Needed because the
+# antizapret escape iface is renamed to az_escape (IFNAMSIZ limit), so
+# the historical f"{iface}_escape" convention no longer holds for it.
+_ESCAPE_IFACE_OF = {
+    "antizapret": "az_escape",
+    "vpn": "vpn_escape",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -47,10 +55,10 @@ _IFACE_CONFIG = {
         "subnet": "10.28.8.0/21",
         "conf_path": "/etc/wireguard/vpn.conf",
     },
-    "antizapret_escape": {
+    "az_escape": {
         "address": "10.27.8.1/21",
         "subnet": "10.27.8.0/21",
-        "conf_path": "/etc/amnezia/amneziawg/antizapret_escape.conf",
+        "conf_path": "/etc/amnezia/amneziawg/az_escape.conf",
     },
     "vpn_escape": {
         "address": "10.26.8.1/21",
@@ -215,16 +223,16 @@ class VpnManager:
         free_ip = next_free_ip(az_peers, az_cfg["subnet"])
 
         # Per-iface IP: each iface gets the same host part in its own /21:
-        #   antizapret        = 10.29.x.x
-        #   vpn               = 10.28.x.x
-        #   antizapret_escape = 10.27.x.x
-        #   vpn_escape        = 10.26.x.x
+        #   antizapret = 10.29.x.x
+        #   vpn        = 10.28.x.x
+        #   az_escape  = 10.27.x.x
+        #   vpn_escape = 10.26.x.x
         host_parts = free_ip.split(".")[2:]  # last 2 octets
         iface_ip = {
-            "antizapret":        free_ip,
-            "vpn":               f"10.28.{host_parts[0]}.{host_parts[1]}",
-            "antizapret_escape": f"10.27.{host_parts[0]}.{host_parts[1]}",
-            "vpn_escape":        f"10.26.{host_parts[0]}.{host_parts[1]}",
+            "antizapret": free_ip,
+            "vpn":        f"10.28.{host_parts[0]}.{host_parts[1]}",
+            "az_escape":  f"10.27.{host_parts[0]}.{host_parts[1]}",
+            "vpn_escape": f"10.26.{host_parts[0]}.{host_parts[1]}",
         }
 
         # Update all four interface configs (2 base + 2 escape).
@@ -386,7 +394,7 @@ class VpnManager:
                 "bypass and backup_port are mutually exclusive"
             )
 
-        effective_iface = f"{iface}_escape" if bypass else iface
+        effective_iface = _ESCAPE_IFACE_OF[iface] if bypass else iface
 
         store = WgBlobStore(db)
         cfg = _IFACE_CONFIG[effective_iface]
@@ -496,7 +504,7 @@ class VpnManager:
 
         # Mapping: iface -> subnet prefix for escape IP rewrite.
         _ESCAPE_PREFIX = {
-            "antizapret_escape": "10.27",
+            "az_escape": "10.27",
             "vpn_escape": "10.26",
         }
 

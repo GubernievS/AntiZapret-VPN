@@ -517,13 +517,13 @@ def test_render_client_conf_no_backup_uses_primary():
 
 def test_escape_port_map_has_two_entries():
     from app.services.wg_templates import _ESCAPE_PORT_MAP
-    assert _ESCAPE_PORT_MAP["antizapret_escape"] == 53443
+    assert _ESCAPE_PORT_MAP["az_escape"] == 53443
     assert _ESCAPE_PORT_MAP["vpn_escape"] == 500
 
 
 def test_port_map_covers_all_four_ifaces():
     from app.services.wg_templates import _PORT_MAP
-    assert _PORT_MAP[("antizapret_escape", "awg")] == 53443
+    assert _PORT_MAP[("az_escape", "awg")] == 53443
     assert _PORT_MAP[("vpn_escape", "awg")] == 500
 
 

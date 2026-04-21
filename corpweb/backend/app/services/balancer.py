@@ -20,7 +20,7 @@ BASE_PORTS = [51443, 51080, 52443, 52080, 540, 580]
 
 #: Extra escape-mode ports, appended only when ``escape_enabled=True``:
 #:   500    → vpn_escape (IKE mimicry)
-#:   53443  → antizapret_escape
+#:   53443  → az_escape
 ESCAPE_PORTS = [500, 53443]
 
 #: Legacy alias kept for callers that predate the escape feature.

@@ -69,12 +69,12 @@ HOSTNAME: str = CFG.get("AGENT_HOSTNAME", "") or os.uname().nodename
 # ---------------------------------------------------------------------------
 
 # Each entry: (path, hook_type)
-# hook_type: None | "wg_antizapret" | "wg_vpn" | "awg_antizapret_escape"
+# hook_type: None | "wg_antizapret" | "wg_vpn" | "awg_az_escape"
 #          | "awg_vpn_escape" | "doall" | "restart_antizapret"
 MANAGED_FILES: list[tuple[str, str | None]] = [
     ("/etc/wireguard/antizapret.conf", "wg_antizapret"),
     ("/etc/wireguard/vpn.conf", "wg_vpn"),
-    ("/etc/amnezia/amneziawg/antizapret_escape.conf", "awg_antizapret_escape"),
+    ("/etc/amnezia/amneziawg/az_escape.conf", "awg_az_escape"),
     ("/etc/amnezia/amneziawg/vpn_escape.conf", "awg_vpn_escape"),
     ("/root/antizapret/setup", "restart_antizapret"),
     ("/root/antizapret/config/include-hosts.txt", "doall"),
@@ -296,8 +296,8 @@ def apply_path(path: str, content: bytes, hook: str | None) -> bool:
         apply_iface_conf("antizapret", "wg")
     elif hook == "wg_vpn":
         apply_iface_conf("vpn", "wg")
-    elif hook == "awg_antizapret_escape":
-        apply_iface_conf("antizapret_escape", "awg")
+    elif hook == "awg_az_escape":
+        apply_iface_conf("az_escape", "awg")
     elif hook == "awg_vpn_escape":
         apply_iface_conf("vpn_escape", "awg")
     elif hook == "doall":
@@ -426,10 +426,10 @@ def _apply_wg_config(cfg: dict) -> None:
             "address": cfg.get("vpn_address"),
             "port": cfg.get("vpn_listen_port"),
         },
-        "antizapret_escape": {
-            "conf": "/etc/amnezia/amneziawg/antizapret_escape.conf",
-            "address": cfg.get("antizapret_escape_address"),
-            "port": cfg.get("antizapret_escape_listen_port"),
+        "az_escape": {
+            "conf": "/etc/amnezia/amneziawg/az_escape.conf",
+            "address": cfg.get("az_escape_address"),
+            "port": cfg.get("az_escape_listen_port"),
         },
         "vpn_escape": {
             "conf": "/etc/amnezia/amneziawg/vpn_escape.conf",

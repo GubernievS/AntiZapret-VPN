@@ -121,6 +121,6 @@ async def regenerate_obfuscation(
     from app.services.obfuscation_service import regenerate
     from app.services.vpn_manager_new import vpn_manager
 
-    regenerate(db, ifaces=["antizapret_escape", "vpn_escape"])
+    regenerate(db, ifaces=["az_escape", "vpn_escape"])
     vpn_manager.rerender_escape_server_confs(db)
     return {"status": "ok"}

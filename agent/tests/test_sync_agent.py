@@ -38,20 +38,20 @@ class TestManagedFilesWiring:
 
     def test_managed_files_includes_escape_ifaces(self):
         mapping = dict(agent.MANAGED_FILES)
-        assert mapping["/etc/amnezia/amneziawg/antizapret_escape.conf"] == "awg_antizapret_escape"
+        assert mapping["/etc/amnezia/amneziawg/az_escape.conf"] == "awg_az_escape"
         assert mapping["/etc/amnezia/amneziawg/vpn_escape.conf"] == "awg_vpn_escape"
 
     def test_escape_paths_moved_to_amneziawg_dir(self):
         mapping = dict(agent.MANAGED_FILES)
-        assert "/etc/amnezia/amneziawg/antizapret_escape.conf" in mapping
+        assert "/etc/amnezia/amneziawg/az_escape.conf" in mapping
         assert "/etc/amnezia/amneziawg/vpn_escape.conf" in mapping
         # old /etc/wireguard/*_escape.conf paths must be gone
-        assert "/etc/wireguard/antizapret_escape.conf" not in mapping
+        assert "/etc/wireguard/az_escape.conf" not in mapping
         assert "/etc/wireguard/vpn_escape.conf" not in mapping
 
     def test_escape_hooks_renamed_to_awg_prefix(self):
         mapping = dict(agent.MANAGED_FILES)
-        assert mapping["/etc/amnezia/amneziawg/antizapret_escape.conf"] == "awg_antizapret_escape"
+        assert mapping["/etc/amnezia/amneziawg/az_escape.conf"] == "awg_az_escape"
         assert mapping["/etc/amnezia/amneziawg/vpn_escape.conf"] == "awg_vpn_escape"
 
 
@@ -119,16 +119,16 @@ class TestApplyPathDispatch:
         assert changed is False
         sched.assert_not_called()
 
-    def test_apply_path_dispatches_awg_antizapret_escape(self, tmp_path):
-        target = tmp_path / "antizapret_escape.conf"
+    def test_apply_path_dispatches_awg_az_escape(self, tmp_path):
+        target = tmp_path / "az_escape.conf"
         with patch("corpweb_sync_agent.apply_iface_conf") as m:
             changed = agent.apply_path(
                 str(target),
                 b"[Interface]\n",
-                "awg_antizapret_escape",
+                "awg_az_escape",
             )
         assert changed is True
-        m.assert_called_once_with("antizapret_escape", "awg")
+        m.assert_called_once_with("az_escape", "awg")
 
     def test_apply_path_dispatches_awg_vpn_escape(self, tmp_path):
         target = tmp_path / "vpn_escape.conf"
@@ -141,12 +141,12 @@ class TestApplyPathDispatch:
         assert changed is True
         m.assert_called_once_with("vpn_escape", "awg")
 
-    def test_unchanged_content_does_not_sync_awg_antizapret_escape(self, tmp_path):
-        target = tmp_path / "antizapret_escape.conf"
+    def test_unchanged_content_does_not_sync_awg_az_escape(self, tmp_path):
+        target = tmp_path / "az_escape.conf"
         content = b"[Interface]\n"
         target.write_bytes(content)
         with patch("corpweb_sync_agent.apply_iface_conf") as m:
-            changed = agent.apply_path(str(target), content, "awg_antizapret_escape")
+            changed = agent.apply_path(str(target), content, "awg_az_escape")
         assert changed is False
         m.assert_not_called()
 
@@ -190,10 +190,10 @@ class TestApplyWgConfigEscapeIfaces:
 
         return fake_open, fake_exists, fake_write_atomic
 
-    def test_patches_antizapret_escape_address_and_port(self, tmp_path):
-        conf = tmp_path / "antizapret_escape.conf"
+    def test_patches_az_escape_address_and_port(self, tmp_path):
+        conf = tmp_path / "az_escape.conf"
         conf.write_text(self._INITIAL_CONF)
-        path_map = {"/etc/amnezia/amneziawg/antizapret_escape.conf": str(conf)}
+        path_map = {"/etc/amnezia/amneziawg/az_escape.conf": str(conf)}
         real_open = open
         fake_open, fake_exists, fake_write_atomic = self._redirect(path_map, real_open)
 
@@ -201,8 +201,8 @@ class TestApplyWgConfigEscapeIfaces:
              patch("builtins.open", side_effect=fake_open), \
              patch("corpweb_sync_agent.write_atomic", side_effect=fake_write_atomic):
             agent._apply_wg_config({
-                "antizapret_escape_address": "10.27.8.1/21",
-                "antizapret_escape_listen_port": 53443,
+                "az_escape_address": "10.27.8.1/21",
+                "az_escape_listen_port": 53443,
             })
 
         updated = conf.read_text()
@@ -251,8 +251,8 @@ class TestApplyWgConfigEscapeIfaces:
                 "antizapret_listen_port": 51443,
                 "vpn_address": "10.28.8.1/21",
                 "vpn_listen_port": 51080,
-                "antizapret_escape_address": "10.27.8.1/21",
-                "antizapret_escape_listen_port": 53443,
+                "az_escape_address": "10.27.8.1/21",
+                "az_escape_listen_port": 53443,
                 "vpn_escape_address": "10.26.8.1/21",
                 "vpn_escape_listen_port": 500,
             })

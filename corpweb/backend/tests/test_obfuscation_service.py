@@ -12,12 +12,12 @@ from app.services.obfuscation_service import (
 
 
 def test_get_params_returns_none_when_missing(db):
-    assert get_params(db, "antizapret_escape") is None
+    assert get_params(db, "az_escape") is None
 
 
 def test_ensure_initialized_creates_missing_rows(db):
-    ensure_initialized(db, ifaces=["antizapret_escape", "vpn_escape"])
-    a = get_params(db, "antizapret_escape")
+    ensure_initialized(db, ifaces=["az_escape", "vpn_escape"])
+    a = get_params(db, "az_escape")
     v = get_params(db, "vpn_escape")
     assert a is not None and v is not None
     # Independent random generation → h1 must differ between ifaces.
@@ -34,10 +34,10 @@ def test_ensure_initialized_idempotent(db):
 
 def test_ensure_initialized_only_fills_missing(db):
     """Second call with extra iface must keep the first iface's values."""
-    ensure_initialized(db, ifaces=["antizapret_escape"])
-    az_before = get_params(db, "antizapret_escape")
-    ensure_initialized(db, ifaces=["antizapret_escape", "vpn_escape"])
-    az_after = get_params(db, "antizapret_escape")
+    ensure_initialized(db, ifaces=["az_escape"])
+    az_before = get_params(db, "az_escape")
+    ensure_initialized(db, ifaces=["az_escape", "vpn_escape"])
+    az_after = get_params(db, "az_escape")
     assert az_before == az_after
     assert get_params(db, "vpn_escape") is not None
 
@@ -52,9 +52,9 @@ def test_regenerate_overwrites_existing(db):
 
 def test_regenerate_creates_row_if_missing(db):
     """Calling regenerate on a missing iface should create the row."""
-    assert get_params(db, "antizapret_escape") is None
-    regenerate(db, ifaces=["antizapret_escape"])
-    assert get_params(db, "antizapret_escape") is not None
+    assert get_params(db, "az_escape") is None
+    regenerate(db, ifaces=["az_escape"])
+    assert get_params(db, "az_escape") is not None
 
 
 def test_get_params_returns_dict_with_all_keys(db):

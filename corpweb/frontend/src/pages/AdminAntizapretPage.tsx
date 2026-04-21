@@ -269,7 +269,7 @@ export default function AdminAntizapretPage() {
         )}
         <p className="py-2 text-xs text-gray-500 leading-relaxed">
           При включении на нодах поднимаются отдельные AmneziaWG-интерфейсы
-          <code className="bg-gray-100 px-1 rounded mx-1">antizapret_escape</code>
+          <code className="bg-gray-100 px-1 rounded mx-1">az_escape</code>
           (UDP 53443) и
           <code className="bg-gray-100 px-1 rounded mx-1">vpn_escape</code>
           (UDP 500) с усиленной обфускацией (S1/S2, custom H1–H4).

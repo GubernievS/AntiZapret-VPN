@@ -34,7 +34,7 @@ _PORT_MAP = {
     ("vpn", "wg"):         51080,
     ("vpn", "awg"):        52080,
     # Escape ifaces — awg-only, single port each.
-    ("antizapret_escape", "awg"): 53443,
+    ("az_escape", "awg"): 53443,
     ("vpn_escape", "awg"):        500,
 }
 
@@ -45,7 +45,7 @@ _BACKUP_PORT_MAP = {
 
 # Escape port map (convenience lookup, same values as _PORT_MAP for "awg").
 _ESCAPE_PORT_MAP = {
-    "antizapret_escape": 53443,
+    "az_escape": 53443,
     "vpn_escape": 500,
 }
 
@@ -271,7 +271,7 @@ def render_server_conf(
     Render a full WireGuard server config file.
 
     Args:
-        iface: interface name ("antizapret", "vpn", "antizapret_escape", "vpn_escape").
+        iface: interface name ("antizapret", "vpn", "az_escape", "vpn_escape").
         peers: list of Peer objects.
         server_privkey: server private key.
         address: server address with CIDR (e.g. "10.29.8.1/21").
@@ -335,7 +335,7 @@ def render_client_conf(
 
     Args:
         peer: Peer dataclass with client info.
-        iface: "antizapret", "vpn", "antizapret_escape", or "vpn_escape".
+        iface: "antizapret", "vpn", "az_escape", or "vpn_escape".
         server_pubkey: server public key.
         endpoint_host: server hostname or IP.
         flavor: "wg" or "awg". Escape ifaces are always awg.
@@ -399,11 +399,11 @@ def render_client_conf(
     lines.append(f"PresharedKey = {peer.preshared_key}")
     lines.append(f"Endpoint = {endpoint_host}:{port}")
 
-    # AllowedIPs: full-VPN for vpn/vpn_escape; split-tunnel for antizapret/antizapret_escape.
+    # AllowedIPs: full-VPN for vpn/vpn_escape; split-tunnel for antizapret/az_escape.
     if iface in ("vpn", "vpn_escape"):
         lines.append("AllowedIPs = 0.0.0.0/0, ::/0")
     else:
-        # antizapret / antizapret_escape: subnet-based split routing
+        # antizapret / az_escape: subnet-based split routing
         effective_allowed_ips = allowed_ips if allowed_ips is not None else "10.29.8.0/24"
         lines.append(f"AllowedIPs = {effective_allowed_ips}")
 

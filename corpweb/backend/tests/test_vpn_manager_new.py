@@ -36,7 +36,7 @@ class TestBootstrap:
 
         keys = db.query(WgServerKeys).all()
         ifaces = {k.iface for k in keys}
-        assert ifaces == {"antizapret", "vpn", "antizapret_escape", "vpn_escape"}
+        assert ifaces == {"antizapret", "vpn", "az_escape", "vpn_escape"}
 
     def test_keypairs_are_valid_base64(self, db):
         mgr = _make_manager()
@@ -77,16 +77,16 @@ class TestBootstrap:
         from app.services.wg_blob_store import WgBlobStore
 
         store = WgBlobStore(db)
-        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+        for iface in ("antizapret", "vpn", "az_escape", "vpn_escape"):
             blob = store.get(_conf_path_for(iface))
             assert blob is not None, f"missing conf blob for {iface}"
             assert b"[Interface]" in blob
 
     def test_iface_config_has_escape_entries(self):
         from app.services.vpn_manager_new import _IFACE_CONFIG
-        assert "antizapret_escape" in _IFACE_CONFIG
+        assert "az_escape" in _IFACE_CONFIG
         assert "vpn_escape" in _IFACE_CONFIG
-        assert _IFACE_CONFIG["antizapret_escape"]["subnet"] == "10.27.8.0/21"
+        assert _IFACE_CONFIG["az_escape"]["subnet"] == "10.27.8.0/21"
         assert _IFACE_CONFIG["vpn_escape"]["subnet"] == "10.26.8.0/21"
 
     def test_bootstrap_writes_awg_params_into_escape_server_confs(self, db):
@@ -97,7 +97,7 @@ class TestBootstrap:
         from app.services.wg_blob_store import WgBlobStore
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             content = store.get(_conf_path_for(iface)).decode()
             assert "Jc = " in content, f"{iface} missing Jc"
             assert "S1 = " in content, f"{iface} missing S1"
@@ -201,7 +201,7 @@ class TestAddPeer:
         mgr.add_peer(db, "alice-1")
 
         store = WgBlobStore(db)
-        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+        for iface in ("antizapret", "vpn", "az_escape", "vpn_escape"):
             blob = store.get(_conf_path_for(iface))
             names = [p.name for p in parse_peers(blob.decode())]
             assert "alice-1" in names, f"alice-1 missing in {iface}"
@@ -217,7 +217,7 @@ class TestAddPeer:
 
         store = WgBlobStore(db)
         ips: dict[str, str] = {}
-        for iface in ("antizapret", "vpn", "antizapret_escape", "vpn_escape"):
+        for iface in ("antizapret", "vpn", "az_escape", "vpn_escape"):
             peers = parse_peers(
                 store.get(_conf_path_for(iface)).decode()
             )
@@ -230,7 +230,7 @@ class TestAddPeer:
         # Subnet prefixes must match the design (10.29, 10.28, 10.27, 10.26).
         assert ips["antizapret"].startswith("10.29.")
         assert ips["vpn"].startswith("10.28.")
-        assert ips["antizapret_escape"].startswith("10.27.")
+        assert ips["az_escape"].startswith("10.27.")
         assert ips["vpn_escape"].startswith("10.26.")
 
     def test_escape_server_confs_keep_awg_params_after_add_peer(self, db):
@@ -242,7 +242,7 @@ class TestAddPeer:
         mgr.add_peer(db, "carol-1")
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             content = store.get(_conf_path_for(iface)).decode()
             assert "Jc = " in content
             assert "S1 = " in content
@@ -597,8 +597,8 @@ def test_get_client_conf_backup_port(db):
 
 def test_iface_config_escape_paths_moved_to_amneziawg_dir():
     from app.services.vpn_manager_new import _IFACE_CONFIG
-    assert _IFACE_CONFIG["antizapret_escape"]["conf_path"] == \
-        "/etc/amnezia/amneziawg/antizapret_escape.conf"
+    assert _IFACE_CONFIG["az_escape"]["conf_path"] == \
+        "/etc/amnezia/amneziawg/az_escape.conf"
     assert _IFACE_CONFIG["vpn_escape"]["conf_path"] == \
         "/etc/amnezia/amneziawg/vpn_escape.conf"
 
@@ -650,7 +650,7 @@ class TestBackfillEscapePeers:
         from app.services.wg_templates import render_server_conf
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             cfg = _IFACE_CONFIG[iface]
             keys = db.get(WgServerKeys, iface)
             awg = get_params(db, iface)
@@ -676,7 +676,7 @@ class TestBackfillEscapePeers:
         self._reset_escape_blobs_to_empty_server_conf(db)
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             peers = parse_peers(
                 store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
@@ -685,7 +685,7 @@ class TestBackfillEscapePeers:
         # Run backfill.
         vpn_manager.backfill_escape_peers(db)
 
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             peers = parse_peers(
                 store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
@@ -715,7 +715,7 @@ class TestBackfillEscapePeers:
 
         # Verify subnet prefixes + shared host-part.
         az_escape_peers = parse_peers(
-            store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
+            store.get("/etc/amnezia/amneziawg/az_escape.conf").decode()
         )
         vpn_escape_peers = parse_peers(
             store.get("/etc/amnezia/amneziawg/vpn_escape.conf").decode()
@@ -748,7 +748,7 @@ class TestBackfillEscapePeers:
         self._reset_escape_blobs_to_empty_server_conf(db)
         vpn_manager.backfill_escape_peers(db)
 
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             peer = next(
                 p for p in parse_peers(
                     store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
@@ -772,7 +772,7 @@ class TestBackfillEscapePeers:
         vpn_manager.backfill_escape_peers(db)
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             peers = parse_peers(
                 store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )
@@ -790,7 +790,7 @@ class TestBackfillEscapePeers:
         vpn_manager.bootstrap(db)
         vpn_manager.add_peer(db, "gina-1")
 
-        # Partially-rolled-out: the peer is already in antizapret_escape
+        # Partially-rolled-out: the peer is already in az_escape
         # (no-op expected), but we pretend vpn_escape was wiped.
         from app.db.models import WgServerKeys
         from app.services.obfuscation_service import get_params
@@ -815,7 +815,7 @@ class TestBackfillEscapePeers:
 
         az_esc_peer_before = next(
             p for p in parse_peers(
-                store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
+                store.get("/etc/amnezia/amneziawg/az_escape.conf").decode()
             ) if p.name == "gina-1"
         )
 
@@ -823,7 +823,7 @@ class TestBackfillEscapePeers:
 
         az_esc_peer_after = next(
             p for p in parse_peers(
-                store.get("/etc/amnezia/amneziawg/antizapret_escape.conf").decode()
+                store.get("/etc/amnezia/amneziawg/az_escape.conf").decode()
             ) if p.name == "gina-1"
         )
         assert az_esc_peer_before == az_esc_peer_after, (
@@ -878,7 +878,7 @@ class TestDeletePeerEscapeRegression:
         for path in (
             "/etc/wireguard/antizapret.conf",
             "/etc/wireguard/vpn.conf",
-            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/az_escape.conf",
             "/etc/amnezia/amneziawg/vpn_escape.conf",
         ):
             blob = store.get(path)
@@ -907,7 +907,7 @@ class TestTogglePeerEscapeRegression:
         paths = [
             "/etc/wireguard/antizapret.conf",
             "/etc/wireguard/vpn.conf",
-            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/az_escape.conf",
             "/etc/amnezia/amneziawg/vpn_escape.conf",
         ]
         before = {}
@@ -934,7 +934,7 @@ class TestTogglePeerEscapeRegression:
         awg_keys = ("Jc", "Jmin", "Jmax", "S1", "S2", "H1", "H2", "H3", "H4")
         store = WgBlobStore(db)
         for path in (
-            "/etc/amnezia/amneziawg/antizapret_escape.conf",
+            "/etc/amnezia/amneziawg/az_escape.conf",
             "/etc/amnezia/amneziawg/vpn_escape.conf",
         ):
             before = store.get(path).decode()

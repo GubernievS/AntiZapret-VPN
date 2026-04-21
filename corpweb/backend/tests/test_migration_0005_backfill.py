@@ -25,7 +25,7 @@ class TestMigration0005:
 
         # Four server keypairs.
         ifaces = {r.iface for r in db.query(WgServerKeys).all()}
-        assert ifaces == {"antizapret", "vpn", "antizapret_escape", "vpn_escape"}
+        assert ifaces == {"antizapret", "vpn", "az_escape", "vpn_escape"}
 
         # All four conf blobs exist.
         store = WgBlobStore(db)
@@ -55,7 +55,7 @@ class TestMigration0005:
         from app.services.wg_templates import render_server_conf
 
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             cfg = _IFACE_CONFIG[iface]
             keys = db.get(WgServerKeys, iface)
             awg = get_params(db, iface)
@@ -73,7 +73,7 @@ class TestMigration0005:
         vpn_manager.backfill_escape_peers(db)
         db.commit()
 
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             peers = parse_peers(
                 store.get(f"/etc/amnezia/amneziawg/{iface}.conf").decode()
             )

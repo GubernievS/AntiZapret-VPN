@@ -19,7 +19,7 @@ class TestObfuscationRegenerate:
         vpn_manager.bootstrap(db)
 
         from app.services.obfuscation_service import get_params
-        before_az = get_params(db, "antizapret_escape")
+        before_az = get_params(db, "az_escape")
         before_vpn = get_params(db, "vpn_escape")
 
         resp = client.post(
@@ -31,7 +31,7 @@ class TestObfuscationRegenerate:
 
         # Params must have changed
         db.expire_all()
-        after_az = get_params(db, "antizapret_escape")
+        after_az = get_params(db, "az_escape")
         after_vpn = get_params(db, "vpn_escape")
         assert before_az != after_az
         assert before_vpn != after_vpn
@@ -54,7 +54,7 @@ class TestObfuscationRegenerate:
         from app.services.obfuscation_service import get_params
         db.expire_all()
         store = WgBlobStore(db)
-        for iface in ("antizapret_escape", "vpn_escape"):
+        for iface in ("az_escape", "vpn_escape"):
             params = get_params(db, iface)
             blob = store.get(f"/etc/amnezia/amneziawg/{iface}.conf")
             assert blob is not None

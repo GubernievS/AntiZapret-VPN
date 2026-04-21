@@ -146,7 +146,7 @@ class WgObfuscationParams(Base):
     """
     Per-iface AmneziaWG obfuscation parameters (S1/S2/H1-H4/Jc/Jmin/Jmax/I1).
 
-    One row per escape iface (antizapret_escape, vpn_escape). Values are
+    One row per escape iface (az_escape, vpn_escape). Values are
     generated randomly per-installation and only regenerated manually via
     an admin button — regeneration invalidates all existing escape clients.
     """

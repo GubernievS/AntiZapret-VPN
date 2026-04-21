@@ -65,7 +65,7 @@ def register(
 
     # Return keys for every iface present in wg_server_keys (base + escape).
     # vpn_manager.bootstrap populates all four (antizapret, vpn,
-    # antizapret_escape, vpn_escape).
+    # az_escape, vpn_escape).
     keys = {
         row.iface: {"private_key": row.private_key, "public_key": row.public_key}
         for row in db.query(WgServerKeys).all()
@@ -79,7 +79,7 @@ def register(
     _LISTEN_FLAVOR = {
         "antizapret": "wg",
         "vpn": "wg",
-        "antizapret_escape": "awg",
+        "az_escape": "awg",
         "vpn_escape": "awg",
     }
     wg_config: dict = {"mtu": 1420}
