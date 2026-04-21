@@ -356,6 +356,7 @@ class VpnManager:
         client_private_key: str | None = None,
         allowed_ips: str | None = None,
         use_backup_port: bool = False,
+        bypass: bool = False,
     ) -> str:
         """
         Render a client config in-memory from the server conf blob.
@@ -364,21 +365,36 @@ class VpnManager:
             name: client name (must exist in the conf).
             flavor: "wg" or "awg".
             endpoint_host: server hostname or IP.
-            iface: "antizapret" or "vpn".
+            iface: "antizapret" or "vpn" — the *logical* iface choice.
             client_private_key: if provided, embed the real key instead of placeholder.
             allowed_ips: override AllowedIPs for antizapret.
+            use_backup_port: route through UDP 540/580 (base ifaces only).
+            bypass: if True, serve the peer from the corresponding
+                ``{iface}_escape`` interface and inject per-iface obfuscation
+                params. Mutually exclusive with ``use_backup_port``.
 
         Returns:
             Rendered client config string.
 
         Raises:
-            ValueError: if the peer is not found.
+            ValueError: if the peer is not found, or if ``bypass`` is combined
+                with ``use_backup_port``, or if bypass obfuscation params are
+                missing from the DB.
         """
+        if bypass and use_backup_port:
+            raise ValueError(
+                "bypass and backup_port are mutually exclusive"
+            )
+
+        effective_iface = f"{iface}_escape" if bypass else iface
+
         store = WgBlobStore(db)
-        cfg = _IFACE_CONFIG[iface]
+        cfg = _IFACE_CONFIG[effective_iface]
         blob = store.get(cfg["conf_path"])
         if blob is None:
-            raise ValueError(f"Peer '{name}' not found: no conf for {iface}")
+            raise ValueError(
+                f"Peer '{name}' not found: no conf for {effective_iface}"
+            )
 
         content = blob.decode()
         peers = parse_peers(content)
@@ -389,18 +405,31 @@ class VpnManager:
                 break
 
         if target is None:
-            raise ValueError(f"Peer '{name}' not found in {iface} config")
+            raise ValueError(
+                f"Peer '{name}' not found in {effective_iface} config"
+            )
 
-        server_keys = db.get(WgServerKeys, iface)
+        server_keys = db.get(WgServerKeys, effective_iface)
+
+        awg = None
+        if bypass:
+            awg = get_params(db, effective_iface)
+            if awg is None:
+                raise ValueError(
+                    f"bypass requested for '{effective_iface}' but no "
+                    "obfuscation params exist; run bootstrap() first"
+                )
+
         return render_client_conf(
             peer=target,
-            iface=iface,
+            iface=effective_iface,
             server_pubkey=server_keys.public_key,
             endpoint_host=endpoint_host,
             flavor=flavor,
             client_private_key=client_private_key,
             allowed_ips=allowed_ips,
             use_backup_port=use_backup_port,
+            awg_params=awg,
         )
 
     # ------------------------------------------------------------------

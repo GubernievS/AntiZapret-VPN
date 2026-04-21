@@ -500,6 +500,72 @@ def test_add_peer_uses_correct_subnet_per_iface(db):
 # generate_client_name (standalone function)
 # ---------------------------------------------------------------------------
 
+def test_get_client_conf_bypass_uses_escape_iface_and_params(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    mgr.add_peer(db, "carol-1")
+    conf = mgr.get_client_conf(
+        db, "carol-1", flavor="awg",
+        endpoint_host="cp.example.com", iface="vpn",
+        bypass=True, client_private_key="PRV",
+    )
+    # vpn_escape uses port 500
+    assert "Endpoint = cp.example.com:500" in conf
+    # awg_params injected (not the hardcoded H1 = 1 / S1 = 0)
+    assert "S1 = " in conf
+    assert "H1 = " in conf
+    assert "S1 = 0" not in conf
+    assert "H1 = 1\n" not in conf
+    # AllowedIPs for vpn_escape = full VPN
+    assert "AllowedIPs = 0.0.0.0/0" in conf
+
+
+def test_get_client_conf_bypass_antizapret_uses_escape_port_53443(db):
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    mgr.add_peer(db, "carol-1")
+    conf = mgr.get_client_conf(
+        db, "carol-1", flavor="awg",
+        endpoint_host="cp.example.com", iface="antizapret",
+        bypass=True, client_private_key="PRV",
+    )
+    assert "Endpoint = cp.example.com:53443" in conf
+    assert "S1 = " in conf
+
+
+def test_get_client_conf_bypass_forbidden_with_backup(db):
+    import pytest as _pytest
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    mgr.add_peer(db, "dave-1")
+    with _pytest.raises(ValueError, match="bypass.*backup"):
+        mgr.get_client_conf(
+            db, "dave-1", flavor="awg",
+            endpoint_host="cp", iface="vpn",
+            bypass=True, use_backup_port=True,
+            client_private_key="PRV",
+        )
+
+
+def test_get_client_conf_bypass_false_behaves_as_before(db):
+    """Default bypass=False must keep the legacy behaviour intact."""
+    from app.services.vpn_manager_new import VpnManager
+    mgr = VpnManager()
+    mgr.bootstrap(db)
+    mgr.add_peer(db, "eve-1")
+    conf = mgr.get_client_conf(
+        db, "eve-1", flavor="awg",
+        endpoint_host="cp.example.com", iface="antizapret",
+    )
+    # Base antizapret awg port
+    assert ":52443" in conf
+    # Legacy hardcoded obfuscation (S1 = 0)
+    assert "S1 = 0" in conf
+
+
 def test_get_client_conf_backup_port(db):
     from app.services.vpn_manager_new import VpnManager
     mgr = VpnManager()
