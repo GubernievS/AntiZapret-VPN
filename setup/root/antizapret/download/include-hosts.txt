@@ -1080,6 +1080,7 @@ images.salsify.com
 spacecowboys-games.com
 corel.com
 tvtime.com
+blueprint.am
 
 # Блокирует DNS
 library.hydra.wiki
