@@ -1079,6 +1079,7 @@ kef.com
 images.salsify.com
 spacecowboys-games.com
 corel.com
+tvtime.com
 
 # Блокирует DNS
 library.hydra.wiki
