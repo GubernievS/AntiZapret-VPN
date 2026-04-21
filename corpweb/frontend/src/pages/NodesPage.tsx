@@ -303,11 +303,18 @@ export default function NodesPage() {
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
           <p className="font-medium mb-1">DNAT-порты балансировщика (UDP → нода)</p>
           <p className="leading-relaxed">
-            Основные: <span className="font-mono">51443</span>, <span className="font-mono">51080</span>,{' '}
-            <span className="font-mono">52443</span>, <span className="font-mono">52080</span>. Резервные:{' '}
-            <span className="font-mono">540</span>, <span className="font-mono">580</span>. Балансировщик проксирует
-            все 6 портов на ноды с весами ниже. На нодах резервные порты активируются настройкой{' '}
-            <span className="font-mono">WIREGUARD_BACKUP</span> в «Настройках AntiZapret».
+            <span className="font-semibold">WireGuard/AmneziaWG основные:</span>{' '}
+            <span className="font-mono">51443</span>, <span className="font-mono">51080</span>,{' '}
+            <span className="font-mono">52443</span>, <span className="font-mono">52080</span>.
+            {' '}<span className="font-semibold">Резервные:</span>{' '}
+            <span className="font-mono">540</span>, <span className="font-mono">580</span>{' '}
+            (активируются на нодах настройкой{' '}
+            <span className="font-mono">WIREGUARD_BACKUP</span>).
+            {' '}<span className="font-semibold">Обход блокировки ТСПУ (AmneziaWG с сильной обфускацией):</span>{' '}
+            <span className="font-mono">500</span> (vpn_escape),{' '}
+            <span className="font-mono">53443</span> (az_escape) — добавляются на балансировщик только при включённом{' '}
+            <span className="font-mono">ESCAPE_ENABLED</span> в «Настройках AntiZapret».
+            Балансировщик проксирует все активные порты на ноды с весами ниже.
           </p>
         </div>
 
