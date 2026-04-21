@@ -4,6 +4,7 @@ import { configsApi } from '../api/configs'
 import type { ClientLinks } from '../api/configs'
 import { waitForApply } from '../api/applyStatus'
 import { useAuthStore } from '../store/authStore'
+import Toggle from '../components/Toggle'
 import type { VPNConfig } from '../types'
 
 const CONFIG_TYPE_LABELS: Record<string, { label: string; desc: string; icon: typeof Shield }> = {
@@ -37,6 +38,7 @@ export default function DashboardPage() {
   const [qrError, setQrError] = useState<string | null>(null)
   const [qrType, setQrType] = useState<string | null>(null)
   const [useBackupPort, setUseBackupPort] = useState(false)
+  const [useEscape, setUseEscape] = useState(false)
 
   // Pagination (admin only)
   const [page, setPage] = useState(0)
@@ -85,7 +87,7 @@ export default function DashboardPage() {
 
   const handleDownload = async (config: VPNConfig) => {
     try {
-      const response = await configsApi.download(config.id, { backup: useBackupPort })
+      const response = await configsApi.download(config.id, { backup: useBackupPort, bypass: useEscape })
       const disposition = response.headers['content-disposition'] || ''
       const match = disposition.match(/filename="?(.+?)"?$/i)
       const filename = match?.[1] || `${config.client_name}.zip`
@@ -107,7 +109,7 @@ export default function DashboardPage() {
     setQrType(null)
     setQrLoading(true)
     try {
-      const response = await configsApi.getQR(config.id, { backup: useBackupPort })
+      const response = await configsApi.getQR(config.id, { backup: useBackupPort, bypass: useEscape })
       const url = URL.createObjectURL(response.data)
       setQrUrl(url)
       setQrType(response.headers['x-qr-type'] || 'config')
@@ -207,19 +209,54 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {clientLinks?.wireguard_backup_enabled && configs.length > 0 && (
-        <label className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm flex items-center gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={useBackupPort}
-            onChange={e => setUseBackupPort(e.target.checked)}
-            className="w-4 h-4 text-amber-600 border-amber-300 rounded focus:ring-amber-500"
-          />
-          <span className="text-amber-900">
-            <span className="font-medium">Использовать резервный порт</span>
-            {' '}— если основные порты блокируются провайдером. Действует на последующие «Скачать» и QR.
-          </span>
-        </label>
+      {configs.length > 0 && (clientLinks?.wireguard_backup_enabled || clientLinks?.escape_enabled) && (
+        <section className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">Опции скачивания</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {clientLinks?.wireguard_backup_enabled && (
+              <article
+                className={`bg-white border rounded-xl p-4 transition-colors ${
+                  useEscape ? 'border-gray-100 opacity-60' : 'border-gray-200'
+                }`}
+                title={useEscape ? 'Недоступно вместе с «Обход блокировки»' : undefined}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900">Резервный порт</h3>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                      Использовать UDP 540/580 вместо стандартных 5144x/5208x. Помогает при блокировке провайдером стандартных портов.
+                    </p>
+                  </div>
+                  <Toggle value={useBackupPort} onChange={setUseBackupPort} disabled={useEscape} />
+                </div>
+                {useEscape && (
+                  <p className="mt-2 text-xs text-gray-400">Недоступно вместе с «Обход блокировки»</p>
+                )}
+              </article>
+            )}
+            {clientLinks?.escape_enabled && (
+              <article
+                className={`bg-white border rounded-xl p-4 transition-colors ${
+                  useBackupPort ? 'border-gray-100 opacity-60' : 'border-gray-200'
+                }`}
+                title={useBackupPort ? 'Недоступно вместе с «Резервный порт»' : undefined}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900">Обход блокировки</h3>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                      Усиленная обфускация + отдельный канал на порту 500/53443. Включайте только если обычный режим не коннектится.
+                    </p>
+                  </div>
+                  <Toggle value={useEscape} onChange={setUseEscape} disabled={useBackupPort} />
+                </div>
+                {useBackupPort && (
+                  <p className="mt-2 text-xs text-gray-400">Недоступно вместе с «Резервный порт»</p>
+                )}
+              </article>
+            )}
+          </div>
+        </section>
       )}
 
       {configs.length === 0 ? (
