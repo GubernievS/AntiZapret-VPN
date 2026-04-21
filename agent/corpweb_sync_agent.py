@@ -69,13 +69,13 @@ HOSTNAME: str = CFG.get("AGENT_HOSTNAME", "") or os.uname().nodename
 # ---------------------------------------------------------------------------
 
 # Each entry: (path, hook_type)
-# hook_type: None | "wg_antizapret" | "wg_vpn" | "wg_antizapret_escape"
-#          | "wg_vpn_escape" | "doall" | "restart_antizapret"
+# hook_type: None | "wg_antizapret" | "wg_vpn" | "awg_antizapret_escape"
+#          | "awg_vpn_escape" | "doall" | "restart_antizapret"
 MANAGED_FILES: list[tuple[str, str | None]] = [
     ("/etc/wireguard/antizapret.conf", "wg_antizapret"),
     ("/etc/wireguard/vpn.conf", "wg_vpn"),
-    ("/etc/wireguard/antizapret_escape.conf", "wg_antizapret_escape"),
-    ("/etc/wireguard/vpn_escape.conf", "wg_vpn_escape"),
+    ("/etc/amnezia/amneziawg/antizapret_escape.conf", "awg_antizapret_escape"),
+    ("/etc/amnezia/amneziawg/vpn_escape.conf", "awg_vpn_escape"),
     ("/root/antizapret/setup", "restart_antizapret"),
     ("/root/antizapret/config/include-hosts.txt", "doall"),
     ("/root/antizapret/config/exclude-hosts.txt", "doall"),
@@ -241,9 +241,9 @@ def apply_path(path: str, content: bytes, hook: str | None) -> bool:
         apply_wg_syncconf("antizapret")
     elif hook == "wg_vpn":
         apply_wg_syncconf("vpn")
-    elif hook == "wg_antizapret_escape":
+    elif hook == "awg_antizapret_escape":
         apply_wg_syncconf("antizapret_escape")
-    elif hook == "wg_vpn_escape":
+    elif hook == "awg_vpn_escape":
         apply_wg_syncconf("vpn_escape")
     elif hook == "doall":
         schedule_doall()
