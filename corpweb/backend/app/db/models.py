@@ -3,7 +3,7 @@ SQLAlchemy database models
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, BigInteger, Text, Integer, LargeBinary
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, BigInteger, Text, Integer, LargeBinary, func
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -103,6 +103,10 @@ class SystemSettings(Base):
     # Control-plane IP for DNAT balancer SNAT rules
     cp_ip = Column(String(50), nullable=True)
 
+    # When True, escape-mode (obfuscation) DNAT rules are applied on CP and
+    # "Обход блокировки" toggle becomes visible in LK.
+    escape_enabled = Column(Boolean, nullable=False, default=False, server_default="false")
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     updated_by = Column(String(50), nullable=True)  # Username who made the change
 
@@ -136,6 +140,34 @@ class WgServerKeys(Base):
 
     def __repr__(self):
         return f"<WgServerKeys {self.iface}>"
+
+
+class WgObfuscationParams(Base):
+    """
+    Per-iface AmneziaWG obfuscation parameters (S1/S2/H1-H4/Jc/Jmin/Jmax/I1).
+
+    One row per escape iface (antizapret_escape, vpn_escape). Values are
+    generated randomly per-installation and only regenerated manually via
+    an admin button — regeneration invalidates all existing escape clients.
+    """
+    __tablename__ = "wg_obfuscation_params"
+
+    iface = Column(String(64), primary_key=True)
+    jc = Column(Integer, nullable=False)
+    jmin = Column(Integer, nullable=False)
+    jmax = Column(Integer, nullable=False)
+    s1 = Column(Integer, nullable=False)
+    s2 = Column(Integer, nullable=False)
+    h1 = Column(BigInteger, nullable=False)
+    h2 = Column(BigInteger, nullable=False)
+    h3 = Column(BigInteger, nullable=False)
+    h4 = Column(BigInteger, nullable=False)
+    i1 = Column(Text, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    def __repr__(self):
+        return f"<WgObfuscationParams {self.iface}>"
 
 
 class Node(Base):
