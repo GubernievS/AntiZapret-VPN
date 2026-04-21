@@ -1,39 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { antizapretApi, type AntizapretSettings } from '../api/antizapret'
+import Toggle from '../components/Toggle'
 
 // ── Helper components ──────────────────────────────────────────────────────
-
-function Toggle({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <label className="flex items-center justify-between py-2 cursor-pointer group">
-      <span className="text-sm text-gray-700 group-hover:text-gray-900">{label}</span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={value}
-        onClick={() => onChange(!value)}
-        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
-          value ? 'bg-blue-600' : 'bg-gray-300'
-        }`}
-      >
-        <span
-          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-            value ? 'translate-x-4' : 'translate-x-0.5'
-          }`}
-        />
-      </button>
-    </label>
-  )
-}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
