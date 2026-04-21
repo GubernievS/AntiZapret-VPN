@@ -593,3 +593,30 @@ class VpnManager:
 
 # Module-level singleton (mirrors old vpn_manager pattern)
 vpn_manager = VpnManager()
+
+
+def relocate_escape_conf_paths(db: Session) -> None:
+    """
+    Rename wg_file_state rows for escape ifaces from the /etc/wireguard/
+    path to the /etc/amnezia/amneziawg/ path. Idempotent: if the target
+    row already exists, delete the old (stale) source row without
+    touching the target.
+    """
+    from app.db.models import WgFileState
+
+    moves = [
+        ("/etc/wireguard/antizapret_escape.conf",
+         "/etc/amnezia/amneziawg/antizapret_escape.conf"),
+        ("/etc/wireguard/vpn_escape.conf",
+         "/etc/amnezia/amneziawg/vpn_escape.conf"),
+    ]
+    for old, new in moves:
+        old_row = db.query(WgFileState).filter_by(path=old).one_or_none()
+        if old_row is None:
+            continue
+        existing_new = db.query(WgFileState).filter_by(path=new).one_or_none()
+        if existing_new is None:
+            old_row.path = new
+        else:
+            db.delete(old_row)
+    db.commit()
