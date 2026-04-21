@@ -20,7 +20,8 @@ from app.schemas.settings import SystemSettingsResponse, SystemSettingsUpdate
 from app.api.deps import require_admin
 from app.services.vpn_manager_new import vpn_manager
 from app.services.wg_blob_store import WgBlobStore
-from app.db.models import WgServerKeys
+from app.services import balancer
+from app.db.models import WgServerKeys, Node
 
 logger = logging.getLogger(__name__)
 
@@ -321,7 +322,14 @@ async def update_settings(
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
-    """Update system settings (admin only)"""
+    """
+    Update system settings (admin only).
+
+    Partial PATCH: fields that aren't present in the request body are left
+    untouched. When ``escape_enabled`` changes, iptables DNAT rules are
+    re-applied via :func:`app.services.balancer.apply_rules` so the new
+    port set (500/53443) takes effect immediately.
+    """
     settings = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
     if not settings:
         raise HTTPException(
@@ -329,15 +337,46 @@ async def update_settings(
             detail="System settings not initialized"
         )
 
-    settings.max_configs_per_user = data.max_configs_per_user
-    settings.google_play_url = data.google_play_url
-    settings.app_store_url = data.app_store_url
-    settings.apk_url = data.apk_url
-    settings.windows_url = data.windows_url
+    payload = data.model_dump(exclude_unset=True)
+    previous_escape = bool(getattr(settings, "escape_enabled", False))
+
+    for field, value in payload.items():
+        setattr(settings, field, value)
     settings.updated_by = admin.username
     db.commit()
     db.refresh(settings)
+
+    # If escape_enabled actually changed, kick the balancer so iptables
+    # picks up (or drops) the escape-mode ports immediately.
+    if "escape_enabled" in payload and bool(payload["escape_enabled"]) != previous_escape:
+        try:
+            _rebalance_on_escape_change(db, escape_enabled=bool(settings.escape_enabled))
+        except Exception as exc:
+            logger.warning("rebalance after escape_enabled change failed: %s", exc)
+
     return settings
+
+
+def _rebalance_on_escape_change(db: Session, *, escape_enabled: bool) -> None:
+    """Re-apply iptables DNAT rules so the escape-mode ports match DB state."""
+    nodes = db.query(Node).order_by(Node.created_at).all()
+    if not nodes:
+        return  # nothing to balance against
+
+    ss = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
+    cp_ip = ss.cp_ip if ss and ss.cp_ip else None
+    if not cp_ip:
+        logger.warning("rebalance skipped: cp_ip not configured")
+        return
+
+    # Default each enabled node to weight 50 — apply_rules is called only
+    # to refresh the DNAT port set on escape_enabled toggle, not to change
+    # weights. Operators use PUT /api/v1/nodes/balancer to tune weights.
+    payload = [
+        {"ip": str(n.private_ip), "weight": 50, "enabled": True}
+        for n in nodes
+    ]
+    balancer.apply_rules(payload, cp_ip, escape_enabled=escape_enabled)
 
 
 # ============================================
