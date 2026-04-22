@@ -266,3 +266,57 @@ class TestSyncCustomScript:
         agent.sync_custom_script(str(target), expected)  # first write
         changed = agent.sync_custom_script(str(target), expected)  # second call
         assert changed is False
+
+    def test_user_content_before_markers_preserved(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        expected = agent.render_custom_up_sh()
+        # simulate user who wrote their own rule, then our agent adds the block
+        target.write_text("#!/bin/bash\n# user rule\niptables -A INPUT -j ACCEPT\n")
+        agent.sync_custom_script(str(target), expected)
+        content = target.read_text()
+        assert "# user rule" in content
+        assert "iptables -A INPUT -j ACCEPT" in content
+        assert agent.ESCAPE_MARKER_BEGIN in content
+        # user's rule must appear before our block
+        assert content.index("# user rule") < content.index(agent.ESCAPE_MARKER_BEGIN)
+
+    def test_user_content_outside_markers_preserved_on_update(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        stale_block = (
+            agent.ESCAPE_MARKER_BEGIN
+            + "\n# old content\n"
+            + agent.ESCAPE_MARKER_END
+            + "\n"
+        )
+        target.write_text(
+            "#!/bin/bash\n# user prefix\n" + stale_block + "# user suffix\n"
+        )
+        expected = agent.render_custom_up_sh()
+        changed = agent.sync_custom_script(str(target), expected)
+        assert changed is True
+        content = target.read_text()
+        assert "# user prefix" in content
+        assert "# user suffix" in content
+        assert "# old content" not in content  # replaced
+        # new body present
+        assert "10.27.0.0/16" in content
+
+    def test_malformed_markers_begin_only_raises(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        target.write_text(agent.ESCAPE_MARKER_BEGIN + "\n# stuck\n")
+        with pytest.raises(ValueError, match="malformed"):
+            agent.sync_custom_script(str(target), agent.render_custom_up_sh())
+
+    def test_malformed_markers_end_only_raises(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        target.write_text("# stuck\n" + agent.ESCAPE_MARKER_END + "\n")
+        with pytest.raises(ValueError, match="malformed"):
+            agent.sync_custom_script(str(target), agent.render_custom_up_sh())
+
+    def test_malformed_markers_reversed_order_raises(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        target.write_text(
+            agent.ESCAPE_MARKER_END + "\nstuff\n" + agent.ESCAPE_MARKER_BEGIN + "\n"
+        )
+        with pytest.raises(ValueError, match="malformed"):
+            agent.sync_custom_script(str(target), agent.render_custom_up_sh())
