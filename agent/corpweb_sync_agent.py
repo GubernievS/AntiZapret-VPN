@@ -868,10 +868,18 @@ def _applied_shas() -> dict:
 
 
 def send_heartbeat() -> None:
+    metrics = collect_metrics()
+    try:
+        escape_metrics = sync_escape_rules()
+    except Exception as exc:  # defensive
+        log.error("sync_escape_rules unexpectedly raised: %s", exc)
+        escape_metrics = {"escape_error": f"unexpected: {exc.__class__.__name__}"}
+    metrics.update(escape_metrics)
+
     payload = {
         "applied_sha": _applied_shas(),
         "health": "ok",
-        "metrics": collect_metrics(),
+        "metrics": metrics,
         "peers": collect_peers(),
     }
     try:

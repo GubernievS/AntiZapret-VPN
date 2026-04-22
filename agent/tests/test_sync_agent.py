@@ -379,3 +379,37 @@ class TestRegisterTriggersEscapeSync:
             mock_sync.return_value = {"escape_drift_detected": False}
             agent.register_if_needed()
         mock_sync.assert_called_once()
+
+
+class TestHeartbeatIncludesEscapeMetrics:
+    def test_send_heartbeat_merges_sync_escape_rules_metrics(self):
+        fake_resp = MagicMock()
+        with patch.object(agent, "api_post", return_value=fake_resp) as mock_post, \
+             patch.object(agent, "sync_escape_rules") as mock_sync, \
+             patch.object(agent, "collect_metrics", return_value={"active_peers_antizapret": 3}), \
+             patch.object(agent, "collect_peers", return_value=[]), \
+             patch.object(agent, "_applied_shas", return_value={}):
+            mock_sync.return_value = {
+                "escape_drift_detected": True,
+                "escape_drift_applied_count": 2,
+            }
+            agent.send_heartbeat()
+
+        mock_sync.assert_called_once()
+        payload = mock_post.call_args[0][1]
+        assert payload["metrics"]["active_peers_antizapret"] == 3
+        assert payload["metrics"]["escape_drift_detected"] is True
+        assert payload["metrics"]["escape_drift_applied_count"] == 2
+
+    def test_heartbeat_still_sends_when_sync_escape_rules_returns_error(self):
+        fake_resp = MagicMock()
+        with patch.object(agent, "api_post", return_value=fake_resp) as mock_post, \
+             patch.object(agent, "sync_escape_rules") as mock_sync, \
+             patch.object(agent, "collect_metrics", return_value={}), \
+             patch.object(agent, "collect_peers", return_value=[]), \
+             patch.object(agent, "_applied_shas", return_value={}):
+            mock_sync.return_value = {"escape_error": "setup_missing"}
+            agent.send_heartbeat()
+        assert mock_post.called
+        payload = mock_post.call_args[0][1]
+        assert payload["metrics"]["escape_error"] == "setup_missing"
