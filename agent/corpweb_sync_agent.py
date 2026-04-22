@@ -222,6 +222,24 @@ def parse_setup_env(text: str) -> dict[str, str]:
     return out
 
 
+class EscapeEnvError(Exception):
+    """Raised when /root/antizapret/setup is incompatible with escape rules."""
+
+
+def validate_setup_env(env: dict[str, str]) -> None:
+    """
+    Ensure the upstream setup uses the default IP=10 scheme that our
+    escape subnets (10.26/10.27) depend on. Raises :class:`EscapeEnvError`
+    when ALTERNATIVE_CLIENT_IP is affirmative — our hardcoded subnets would
+    silently mis-route otherwise.
+    """
+    alt = env.get("ALTERNATIVE_CLIENT_IP", "").strip().lower()
+    if alt == "y":
+        raise EscapeEnvError(
+            "ALTERNATIVE_CLIENT_IP=y in setup — escape rules require IP=10 scheme"
+        )
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------

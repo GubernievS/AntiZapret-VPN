@@ -211,3 +211,23 @@ class TestParseSetupEnv:
 
     def test_empty_returns_empty_dict(self):
         assert agent.parse_setup_env("") == {}
+
+
+class TestValidateSetupEnv:
+    def test_accepts_empty_env(self):
+        # Absence of ALTERNATIVE_CLIENT_IP means default IP=10 scheme.
+        agent.validate_setup_env({})
+
+    def test_accepts_alternative_client_ip_n(self):
+        agent.validate_setup_env({"ALTERNATIVE_CLIENT_IP": "n"})
+
+    def test_accepts_alternative_client_ip_empty(self):
+        agent.validate_setup_env({"ALTERNATIVE_CLIENT_IP": ""})
+
+    def test_rejects_alternative_client_ip_y(self):
+        with pytest.raises(agent.EscapeEnvError, match="ALTERNATIVE_CLIENT_IP"):
+            agent.validate_setup_env({"ALTERNATIVE_CLIENT_IP": "y"})
+
+    def test_rejects_alternative_client_ip_yes_upper(self):
+        with pytest.raises(agent.EscapeEnvError):
+            agent.validate_setup_env({"ALTERNATIVE_CLIENT_IP": "Y"})
