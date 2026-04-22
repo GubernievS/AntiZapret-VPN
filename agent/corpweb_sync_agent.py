@@ -290,6 +290,55 @@ def sync_custom_script(path: str, expected: str) -> bool:
     return True
 
 
+_escape_drift_total = 0
+
+
+def sync_escape_rules() -> dict:
+    """
+    Reconcile /root/antizapret/custom-up.sh and custom-down.sh against the
+    agent's canonical rule set. Triggers ``systemctl restart antizapret.service``
+    at most once when either file changed. Returns heartbeat-shaped metrics.
+
+    Errors (malformed markers, incompatible setup, missing setup) are captured
+    in the returned dict under ``escape_error``; they do NOT raise, because
+    this runs on every heartbeat cycle and must not break the loop.
+    """
+    global _escape_drift_total
+
+    metrics: dict = {
+        "escape_drift_detected": False,
+        "escape_drift_applied_count": 0,
+    }
+
+    try:
+        setup_text = open(ANTIZAPRET_SETUP_PATH).read()
+    except FileNotFoundError:
+        metrics["escape_error"] = "setup_missing"
+        return metrics
+
+    env = parse_setup_env(setup_text)
+    try:
+        validate_setup_env(env)
+    except EscapeEnvError as exc:
+        metrics["escape_error"] = str(exc)
+        return metrics
+
+    try:
+        changed_up = sync_custom_script(CUSTOM_UP_PATH, render_custom_up_sh())
+        changed_down = sync_custom_script(CUSTOM_DOWN_PATH, render_custom_down_sh())
+    except ValueError as exc:
+        metrics["escape_error"] = str(exc)
+        return metrics
+
+    if changed_up or changed_down:
+        _run_restart_antizapret()
+        _escape_drift_total += 1
+        metrics["escape_drift_detected"] = True
+        metrics["escape_drift_applied_count"] = _escape_drift_total
+
+    return metrics
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------

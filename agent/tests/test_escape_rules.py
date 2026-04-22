@@ -3,12 +3,20 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from unittest.mock import patch
 
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import corpweb_sync_agent as agent  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _reset_escape_counter():
+    agent._escape_drift_total = 0
+    yield
+    agent._escape_drift_total = 0
 
 
 class TestConstants:
@@ -320,3 +328,43 @@ class TestSyncCustomScript:
         )
         with pytest.raises(ValueError, match="malformed"):
             agent.sync_custom_script(str(target), agent.render_custom_up_sh())
+
+
+class TestSyncEscapeRules:
+    def _write_setup(self, tmp_path, text="ALTERNATIVE_CLIENT_IP=n\nRESTRICT_FORWARD=y\n"):
+        setup = tmp_path / "setup"
+        setup.write_text(text)
+        return setup
+
+    def _patch_paths(self, tmp_path):
+        """Monkeypatch the three agent path constants to point into tmp_path."""
+        return patch.multiple(
+            agent,
+            ANTIZAPRET_SETUP_PATH=str(tmp_path / "setup"),
+            CUSTOM_UP_PATH=str(tmp_path / "custom-up.sh"),
+            CUSTOM_DOWN_PATH=str(tmp_path / "custom-down.sh"),
+        )
+
+    def test_happy_path_writes_both_files_and_restarts(self, tmp_path):
+        self._write_setup(tmp_path)
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            metrics = agent.sync_escape_rules()
+        assert (tmp_path / "custom-up.sh").exists()
+        assert (tmp_path / "custom-down.sh").exists()
+        assert agent.ESCAPE_MARKER_BEGIN in (tmp_path / "custom-up.sh").read_text()
+        assert agent.ESCAPE_MARKER_BEGIN in (tmp_path / "custom-down.sh").read_text()
+        assert mock_restart.call_count == 1
+        assert metrics["escape_drift_detected"] is True
+        assert metrics["escape_drift_applied_count"] == 1
+
+    def test_no_op_when_files_match_does_not_restart(self, tmp_path):
+        self._write_setup(tmp_path)
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            agent.sync_escape_rules()  # first call writes
+            mock_restart.reset_mock()
+            metrics = agent.sync_escape_rules()  # second call no-op
+        assert mock_restart.call_count == 0
+        assert metrics["escape_drift_detected"] is False
+        assert metrics["escape_drift_applied_count"] == 0
