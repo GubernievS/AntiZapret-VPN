@@ -191,6 +191,16 @@ class TestRenderCustomDownSh:
         out = agent.render_custom_down_sh()
         assert "set -e" not in out
 
+    def test_exit_0_is_outside_managed_block(self):
+        """`exit 0` is a script-level terminator — it must not live inside the
+        markers, otherwise operator content added after our block won't run."""
+        out = agent.render_custom_down_sh()
+        end_idx = out.index(agent.ESCAPE_MARKER_END)
+        exit_idx = out.rindex("exit 0")
+        assert exit_idx > end_idx, (
+            f"exit 0 at offset {exit_idx} must come after END marker at {end_idx}"
+        )
+
 
 class TestParseSetupEnv:
     def test_parses_simple_keys(self):

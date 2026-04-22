@@ -196,9 +196,8 @@ if [[ "$VPN_DNS" == '1' ]]; then
 fi
 iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"
-exit 0
 """
-    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
+    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\nexit 0\n"
 
 
 def parse_setup_env(text: str) -> dict[str, str]:
@@ -256,6 +255,16 @@ def _extract_managed_block(content: str) -> tuple[str, str, str]:
     if begin == -1 or end == -1 or end < begin:
         raise ValueError("custom-up.sh has malformed CorpAdmin markers")
     managed_end = end + len(ESCAPE_MARKER_END)
+    # Consume the newline that follows the END marker so the managed block
+    # always carries its own terminating newline; suffix starts after it.
+    tail = content[managed_end:]
+    if tail.startswith("\n"):
+        managed_end += 1
+        tail = content[managed_end:]
+    # If the rendered block places `exit 0` after the END marker, include it
+    # in the managed extent so idempotency checks converge correctly.
+    if tail.startswith("exit 0\n"):
+        managed_end += len("exit 0\n")
     return content[:begin], content[begin:managed_end], content[managed_end:]
 
 
@@ -275,13 +284,16 @@ def sync_custom_script(path: str, expected: str) -> bool:
         current = ""
 
     prefix, managed, suffix = _extract_managed_block(current)
-    expected_stripped = expected.rstrip("\n")
+    # Normalise expected to exactly one trailing newline so it matches the
+    # form stored in managed (which _extract_managed_block always terminates
+    # with \n) and the form written on a fresh file creation.
+    expected_normalised = expected.rstrip("\n") + "\n"
 
     if managed:
-        new_content = prefix + expected_stripped + suffix
+        new_content = prefix + expected_normalised + suffix
     else:
         sep = "" if (not prefix or prefix.endswith("\n")) else "\n"
-        new_content = prefix + sep + expected_stripped + "\n"
+        new_content = prefix + sep + expected_normalised
 
     if new_content == current:
         return False
