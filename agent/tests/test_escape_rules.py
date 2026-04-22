@@ -231,3 +231,38 @@ class TestValidateSetupEnv:
     def test_rejects_alternative_client_ip_yes_upper(self):
         with pytest.raises(agent.EscapeEnvError):
             agent.validate_setup_env({"ALTERNATIVE_CLIENT_IP": "Y"})
+
+
+class TestSyncCustomScript:
+    def test_missing_file_creates_it(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        expected = agent.render_custom_up_sh()
+        changed = agent.sync_custom_script(str(target), expected)
+        assert changed is True
+        assert target.exists()
+        assert agent.ESCAPE_MARKER_BEGIN in target.read_text()
+        assert agent.ESCAPE_MARKER_END in target.read_text()
+
+    def test_empty_file_gets_managed_block_appended(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        target.write_text("")
+        expected = agent.render_custom_up_sh()
+        changed = agent.sync_custom_script(str(target), expected)
+        assert changed is True
+        assert agent.ESCAPE_MARKER_BEGIN in target.read_text()
+
+    def test_file_with_only_shebang_preserves_shebang(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        target.write_text("#!/bin/bash\n\n")
+        expected = agent.render_custom_up_sh()
+        agent.sync_custom_script(str(target), expected)
+        content = target.read_text()
+        assert content.startswith("#!/bin/bash\n\n")
+        assert agent.ESCAPE_MARKER_BEGIN in content
+
+    def test_no_op_when_already_in_sync(self, tmp_path):
+        target = tmp_path / "custom-up.sh"
+        expected = agent.render_custom_up_sh()
+        agent.sync_custom_script(str(target), expected)  # first write
+        changed = agent.sync_custom_script(str(target), expected)  # second call
+        assert changed is False

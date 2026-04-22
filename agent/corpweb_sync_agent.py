@@ -240,6 +240,56 @@ def validate_setup_env(env: dict[str, str]) -> None:
         )
 
 
+def _extract_managed_block(content: str) -> tuple[str, str, str]:
+    """
+    Split *content* into (prefix, managed, suffix) at marker boundaries.
+
+    Returns ``(prefix, managed, suffix)``. If neither marker is present,
+    returns ``(content, "", "")`` — managed block is absent and caller will
+    append one. If only one marker is present (or markers are in reverse
+    order), raises :class:`ValueError`.
+    """
+    begin = content.find(ESCAPE_MARKER_BEGIN)
+    end = content.find(ESCAPE_MARKER_END)
+    if begin == -1 and end == -1:
+        return content, "", ""
+    if begin == -1 or end == -1 or end < begin:
+        raise ValueError("custom-up.sh has malformed CorpAdmin markers")
+    managed_end = end + len(ESCAPE_MARKER_END)
+    return content[:begin], content[begin:managed_end], content[managed_end:]
+
+
+def sync_custom_script(path: str, expected: str) -> bool:
+    """
+    Ensure the managed block in *path* equals *expected*.
+
+    *expected* is the full managed block including BEGIN/END markers
+    (as returned by :func:`render_custom_up_sh` / :func:`render_custom_down_sh`).
+
+    Preserves any content outside the markers. Creates the file if absent,
+    appending the managed block. Returns ``True`` iff the file changed on disk.
+    """
+    try:
+        current = open(path).read()
+    except FileNotFoundError:
+        current = ""
+
+    prefix, managed, suffix = _extract_managed_block(current)
+    expected_stripped = expected.rstrip("\n")
+
+    if managed:
+        new_content = prefix + expected_stripped + suffix
+    else:
+        sep = "" if (not prefix or prefix.endswith("\n")) else "\n"
+        new_content = prefix + sep + expected_stripped + "\n"
+
+    if new_content == current:
+        return False
+
+    write_atomic(path, new_content.encode())
+    return True
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------
