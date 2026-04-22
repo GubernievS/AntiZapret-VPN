@@ -112,3 +112,18 @@ class TestRenderCustomUpSh:
     def test_az_escape_postrouting_snat_branch(self):
         out = agent.render_custom_up_sh()
         assert 'iptables -w -t nat -A POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"' in out
+
+    def test_vpn_escape_dns_dnat_is_conditional_on_vpn_dns(self):
+        out = agent.render_custom_up_sh()
+        assert 'if [[ "$VPN_DNS" == \'1\' ]]; then' in out
+        assert 'iptables -w -t nat -A PREROUTING -s 10.26.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2' in out
+        assert 'iptables -w -t nat -A PREROUTING -s 10.26.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2' in out
+
+    def test_vpn_escape_postrouting_masquerade_branch(self):
+        out = agent.render_custom_up_sh()
+        assert 'if [[ -z "$VPN_OUT_IP" ]]; then' in out
+        assert 'iptables -w -t nat -A POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE' in out
+
+    def test_vpn_escape_postrouting_snat_branch(self):
+        out = agent.render_custom_up_sh()
+        assert 'iptables -w -t nat -A POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"' in out
