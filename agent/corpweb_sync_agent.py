@@ -91,6 +91,267 @@ MANAGED_FILES: list[tuple[str, str | None]] = [
 MANAGED_PATHS: set[str] = {p for p, _ in MANAGED_FILES}
 
 # ---------------------------------------------------------------------------
+# Escape-rules extension (via upstream custom-up.sh / custom-down.sh hooks)
+# ---------------------------------------------------------------------------
+
+ESCAPE_MARKER_BEGIN = "# === BEGIN CorpAdmin escape rules (managed by corpweb-sync-agent) ==="
+ESCAPE_MARKER_END = "# === END CorpAdmin escape rules ==="
+
+CUSTOM_UP_PATH = "/root/antizapret/custom-up.sh"
+CUSTOM_DOWN_PATH = "/root/antizapret/custom-down.sh"
+ANTIZAPRET_SETUP_PATH = "/root/antizapret/setup"
+
+
+def render_custom_up_sh() -> str:
+    """
+    Return content for /root/antizapret/custom-up.sh (with markers, shell
+    preamble, and IP/OUT-iface derivation). Defers all conditional logic
+    (RESTRICT_FORWARD, VPN_DNS, MASQUERADE vs SNAT) to bash at runtime.
+    """
+    body = """\
+set -e
+cd /root/antizapret
+source setup
+
+[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
+[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+    DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \\K\\S+')"
+    DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \\K\\S+')"
+fi
+ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"
+VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"
+
+# az_escape (10.27) — mirror antizapret (10.29) split-tunnel semantics
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -d "$FAKE_IP.0.0/15" -j ANTIZAPRET-MAPPING
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+    iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 ! -d "$FAKE_IP.0.0/15" -j CONNMARK --set-mark 0x1
+    iptables -w -I FORWARD 2 -s 10.27.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
+    iptables -w -t nat -A POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j MASQUERADE
+else
+    iptables -w -t nat -A POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"
+fi
+# vpn_escape (10.26) — mirror vpn (10.28) full-VPN semantics
+if [[ "$VPN_DNS" == '1' ]]; then
+    iptables -w -t nat -A PREROUTING -s 10.26.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2
+    iptables -w -t nat -A PREROUTING -s 10.26.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2
+fi
+if [[ -z "$VPN_OUT_IP" ]]; then
+    iptables -w -t nat -A POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE
+else
+    iptables -w -t nat -A POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"
+fi
+"""
+    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
+
+
+def render_custom_down_sh() -> str:
+    """
+    Return content for /root/antizapret/custom-down.sh (with markers).
+
+    Symmetric counterpart to render_custom_up_sh: every ``-A``/``-I`` in the
+    up-rules has a matching ``-D`` here, under the same conditional. No
+    ``set -e`` because rules may legitimately be absent on a partial teardown
+    and `iptables -D` returns non-zero in that case.
+    """
+    body = """\
+exec 2>/dev/null
+cd /root/antizapret
+source setup
+
+[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
+[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+    DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \\K\\S+')"
+    DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \\K\\S+')"
+fi
+ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"
+VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"
+
+# az_escape (10.27) — mirror antizapret removal
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -d "$FAKE_IP.0.0/15" -j ANTIZAPRET-MAPPING
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+    iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 ! -d "$FAKE_IP.0.0/15" -j CONNMARK --set-mark 0x1
+    iptables -w -D FORWARD -s 10.27.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"
+
+# vpn_escape (10.26) — mirror vpn removal
+if [[ "$VPN_DNS" == '1' ]]; then
+    iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2
+    iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2
+fi
+iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"
+"""
+    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\nexit 0\n"
+
+
+def parse_setup_env(text: str) -> dict[str, str]:
+    """
+    Parse /root/antizapret/setup — a flat KEY=VALUE file (no shell quoting
+    semantics beyond trivial surrounding quotes). Blank lines, comment lines
+    (leading ``#``), and lines without ``=`` are ignored. Surrounding single
+    or double quotes around the value are stripped.
+    """
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, _, value = stripped.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+            value = value[1:-1]
+        out[key] = value
+    return out
+
+
+class EscapeEnvError(Exception):
+    """Raised when /root/antizapret/setup is incompatible with escape rules."""
+
+
+def validate_setup_env(env: dict[str, str]) -> None:
+    """
+    Ensure the upstream setup uses the default IP=10 scheme that our
+    escape subnets (10.26/10.27) depend on. Raises :class:`EscapeEnvError`
+    when ALTERNATIVE_CLIENT_IP is affirmative — our hardcoded subnets would
+    silently mis-route otherwise.
+    """
+    alt = env.get("ALTERNATIVE_CLIENT_IP", "").strip().lower()
+    if alt == "y":
+        raise EscapeEnvError(
+            "ALTERNATIVE_CLIENT_IP=y in setup — escape rules require IP=10 scheme"
+        )
+
+
+def _extract_managed_block(content: str) -> tuple[str, str, str]:
+    """
+    Split *content* into (prefix, managed, suffix) at marker boundaries.
+
+    Returns ``(prefix, managed, suffix)``. If neither marker is present,
+    returns ``(content, "", "")`` — managed block is absent and caller will
+    append one. If only one marker is present (or markers are in reverse
+    order), raises :class:`ValueError`.
+    """
+    begin = content.find(ESCAPE_MARKER_BEGIN)
+    end = content.find(ESCAPE_MARKER_END)
+    if begin == -1 and end == -1:
+        return content, "", ""
+    if begin == -1 or end == -1 or end < begin:
+        raise ValueError("custom-up.sh has malformed CorpAdmin markers")
+    managed_end = end + len(ESCAPE_MARKER_END)
+    # Consume the newline that follows the END marker so the managed block
+    # always carries its own terminating newline; suffix starts after it.
+    tail = content[managed_end:]
+    if tail.startswith("\n"):
+        managed_end += 1
+        tail = content[managed_end:]
+    # If the rendered block places `exit 0` after the END marker, include it
+    # in the managed extent so idempotency checks converge correctly.
+    if tail.startswith("exit 0\n"):
+        managed_end += len("exit 0\n")
+    return content[:begin], content[begin:managed_end], content[managed_end:]
+
+
+def sync_custom_script(path: str, expected: str) -> bool:
+    """
+    Ensure the managed block in *path* equals *expected*.
+
+    *expected* is the full managed block including BEGIN/END markers
+    (as returned by :func:`render_custom_up_sh` / :func:`render_custom_down_sh`).
+
+    Preserves any content outside the markers. Creates the file if absent,
+    appending the managed block. Returns ``True`` iff the file changed on disk.
+    """
+    try:
+        current = open(path).read()
+    except FileNotFoundError:
+        current = ""
+
+    prefix, managed, suffix = _extract_managed_block(current)
+    # Normalise expected to exactly one trailing newline so it matches the
+    # form stored in managed (which _extract_managed_block always terminates
+    # with \n) and the form written on a fresh file creation.
+    expected_normalised = expected.rstrip("\n") + "\n"
+
+    if managed:
+        new_content = prefix + expected_normalised + suffix
+    else:
+        sep = "" if (not prefix or prefix.endswith("\n")) else "\n"
+        new_content = prefix + sep + expected_normalised
+
+    if new_content == current:
+        return False
+
+    write_atomic(path, new_content.encode())
+    return True
+
+
+_escape_drift_total = 0
+
+
+def sync_escape_rules() -> dict:
+    """
+    Reconcile /root/antizapret/custom-up.sh and custom-down.sh against the
+    agent's canonical rule set. Triggers ``systemctl restart antizapret.service``
+    at most once when either file changed. Returns heartbeat-shaped metrics.
+
+    Errors (malformed markers, incompatible setup, missing setup) are captured
+    in the returned dict under ``escape_error``; they do NOT raise, because
+    this runs on every heartbeat cycle and must not break the loop.
+    """
+    global _escape_drift_total
+
+    metrics: dict = {
+        "escape_drift_detected": False,
+        "escape_drift_applied_count": 0,
+    }
+
+    try:
+        setup_text = open(ANTIZAPRET_SETUP_PATH).read()
+    except FileNotFoundError:
+        metrics["escape_error"] = "setup_missing"
+        return metrics
+
+    env = parse_setup_env(setup_text)
+    try:
+        validate_setup_env(env)
+    except EscapeEnvError as exc:
+        metrics["escape_error"] = str(exc)
+        return metrics
+
+    try:
+        changed_up = sync_custom_script(CUSTOM_UP_PATH, render_custom_up_sh())
+        changed_down = sync_custom_script(CUSTOM_DOWN_PATH, render_custom_down_sh())
+    except ValueError as exc:
+        metrics["escape_error"] = str(exc)
+        return metrics
+
+    if changed_up or changed_down:
+        _run_restart_antizapret()
+        _escape_drift_total += 1
+        metrics["escape_drift_detected"] = True
+        metrics["escape_drift_applied_count"] = _escape_drift_total
+
+    return metrics
+
+
+# ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------
 
@@ -410,6 +671,13 @@ def register_if_needed() -> None:
     if wg_config:
         _apply_wg_config(wg_config)
 
+    # Reconcile escape-rules hooks (custom-up.sh / custom-down.sh).
+    # Errors are captured in metrics and do not break registration.
+    try:
+        sync_escape_rules()
+    except Exception as exc:  # defensive — sync_escape_rules itself swallows
+        log.error("sync_escape_rules unexpectedly raised: %s", exc)
+
     log.info("Registration complete")
 
 
@@ -612,10 +880,18 @@ def _applied_shas() -> dict:
 
 
 def send_heartbeat() -> None:
+    metrics = collect_metrics()
+    try:
+        escape_metrics = sync_escape_rules()
+    except Exception as exc:  # defensive
+        log.error("sync_escape_rules unexpectedly raised: %s", exc)
+        escape_metrics = {"escape_error": f"unexpected: {exc.__class__.__name__}"}
+    metrics.update(escape_metrics)
+
     payload = {
         "applied_sha": _applied_shas(),
         "health": "ok",
-        "metrics": collect_metrics(),
+        "metrics": metrics,
         "peers": collect_peers(),
     }
     try:
