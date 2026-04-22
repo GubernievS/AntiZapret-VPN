@@ -339,6 +339,30 @@ class TestSyncCustomScript:
         with pytest.raises(ValueError, match="malformed"):
             agent.sync_custom_script(str(target), agent.render_custom_up_sh())
 
+    def test_written_file_is_executable(self, tmp_path):
+        """Upstream up.sh invokes ./custom-up.sh directly — requires mode 0755."""
+        import stat
+        target = tmp_path / "custom-up.sh"
+        expected = agent.render_custom_up_sh()
+        agent.sync_custom_script(str(target), expected)
+        mode = target.stat().st_mode & 0o777
+        assert mode == 0o755, f"expected mode 0o755, got 0o{mode:o}"
+
+    def test_executable_mode_applied_even_on_preexisting_file(self, tmp_path):
+        """If the file already exists with 0600 (from a prior buggy write),
+        re-sync must restore 0755."""
+        import os
+        target = tmp_path / "custom-up.sh"
+        # Write a stale-managed file at 0600 first, simulating the production bug.
+        target.write_text(
+            agent.ESCAPE_MARKER_BEGIN + "\n# old\n" + agent.ESCAPE_MARKER_END + "\nexit 0\n"
+        )
+        os.chmod(str(target), 0o600)
+        expected = agent.render_custom_up_sh()
+        changed = agent.sync_custom_script(str(target), expected)
+        assert changed is True
+        assert (target.stat().st_mode & 0o777) == 0o755
+
 
 class TestSyncEscapeRules:
     def _write_setup(self, tmp_path, text="ALTERNATIVE_CLIENT_IP=n\nRESTRICT_FORWARD=y\n"):

@@ -299,6 +299,7 @@ def sync_custom_script(path: str, expected: str) -> bool:
         return False
 
     write_atomic(path, new_content.encode())
+    os.chmod(path, 0o755)
     return True
 
 
