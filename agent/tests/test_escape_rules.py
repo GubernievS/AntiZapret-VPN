@@ -368,3 +368,39 @@ class TestSyncEscapeRules:
         assert mock_restart.call_count == 0
         assert metrics["escape_drift_detected"] is False
         assert metrics["escape_drift_applied_count"] == 0
+
+    def test_missing_setup_reports_and_skips(self, tmp_path):
+        # Do NOT write setup file.
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            metrics = agent.sync_escape_rules()
+        assert mock_restart.call_count == 0
+        assert metrics["escape_error"] == "setup_missing"
+        assert not (tmp_path / "custom-up.sh").exists()
+
+    def test_alternative_client_ip_reports_and_skips(self, tmp_path):
+        self._write_setup(tmp_path, text="ALTERNATIVE_CLIENT_IP=y\n")
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            metrics = agent.sync_escape_rules()
+        assert mock_restart.call_count == 0
+        assert "ALTERNATIVE_CLIENT_IP" in metrics["escape_error"]
+        assert not (tmp_path / "custom-up.sh").exists()
+
+    def test_malformed_up_sh_reports_and_skips(self, tmp_path):
+        self._write_setup(tmp_path)
+        (tmp_path / "custom-up.sh").write_text(
+            agent.ESCAPE_MARKER_BEGIN + "\n# stuck — no end marker\n"
+        )
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            metrics = agent.sync_escape_rules()
+        assert mock_restart.call_count == 0
+        assert "malformed" in metrics["escape_error"]
+
+    def test_one_restart_per_cycle_even_if_both_files_changed(self, tmp_path):
+        self._write_setup(tmp_path)
+        with self._patch_paths(tmp_path), \
+             patch.object(agent, "_run_restart_antizapret") as mock_restart:
+            agent.sync_escape_rules()
+        assert mock_restart.call_count == 1
