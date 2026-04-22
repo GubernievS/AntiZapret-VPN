@@ -201,6 +201,27 @@ exit 0
     return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
 
 
+def parse_setup_env(text: str) -> dict[str, str]:
+    """
+    Parse /root/antizapret/setup — a flat KEY=VALUE file (no shell quoting
+    semantics beyond trivial surrounding quotes). Blank lines, comment lines
+    (leading ``#``), and lines without ``=`` are ignored. Surrounding single
+    or double quotes around the value are stripped.
+    """
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, _, value = stripped.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+            value = value[1:-1]
+        out[key] = value
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------

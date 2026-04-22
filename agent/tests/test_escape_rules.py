@@ -182,3 +182,32 @@ class TestRenderCustomDownSh:
         already removed (e.g. manual intervention). No `set -e` in the body."""
         out = agent.render_custom_down_sh()
         assert "set -e" not in out
+
+
+class TestParseSetupEnv:
+    def test_parses_simple_keys(self):
+        text = "RESTRICT_FORWARD=y\nVPN_DNS=1\nCLIENT_ISOLATION=n\n"
+        assert agent.parse_setup_env(text) == {
+            "RESTRICT_FORWARD": "y",
+            "VPN_DNS": "1",
+            "CLIENT_ISOLATION": "n",
+        }
+
+    def test_ignores_blank_and_comment_lines(self):
+        text = "# comment\nKEY=value\n\n  \n"
+        assert agent.parse_setup_env(text) == {"KEY": "value"}
+
+    def test_strips_quotes(self):
+        text = 'KEY1="value1"\nKEY2=\'value2\'\n'
+        assert agent.parse_setup_env(text) == {"KEY1": "value1", "KEY2": "value2"}
+
+    def test_strips_whitespace(self):
+        text = "  KEY = value  \n"
+        assert agent.parse_setup_env(text) == {"KEY": "value"}
+
+    def test_ignores_lines_without_equals(self):
+        text = "FOO\nKEY=value\n"
+        assert agent.parse_setup_env(text) == {"KEY": "value"}
+
+    def test_empty_returns_empty_dict(self):
+        assert agent.parse_setup_env("") == {}
