@@ -91,6 +91,17 @@ MANAGED_FILES: list[tuple[str, str | None]] = [
 MANAGED_PATHS: set[str] = {p for p, _ in MANAGED_FILES}
 
 # ---------------------------------------------------------------------------
+# Escape-rules extension (via upstream custom-up.sh / custom-down.sh hooks)
+# ---------------------------------------------------------------------------
+
+ESCAPE_MARKER_BEGIN = "# === BEGIN CorpAdmin escape rules (managed by corpweb-sync-agent) ==="
+ESCAPE_MARKER_END = "# === END CorpAdmin escape rules ==="
+
+CUSTOM_UP_PATH = "/root/antizapret/custom-up.sh"
+CUSTOM_DOWN_PATH = "/root/antizapret/custom-down.sh"
+ANTIZAPRET_SETUP_PATH = "/root/antizapret/setup"
+
+# ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------
 
