@@ -59,3 +59,29 @@ class TestRenderCustomUpSh:
         a = agent.render_custom_up_sh()
         b = agent.render_custom_up_sh()
         assert a == b
+
+    def test_derives_ip_from_alternative_client_ip(self):
+        out = agent.render_custom_up_sh()
+        # mirror up.sh line 38
+        assert '[[ "$ALTERNATIVE_CLIENT_IP" == \'y\' ]] && IP="${CLIENT_IP:-172}" || IP=10' in out
+
+    def test_derives_fake_ip(self):
+        out = agent.render_custom_up_sh()
+        # mirror up.sh line 39
+        assert 'FAKE_IP="${FAKE_IP:-198.18}"' in out
+        assert 'FAKE_IP="$IP.30"' in out
+
+    def test_resolves_default_interface_if_missing(self):
+        out = agent.render_custom_up_sh()
+        assert 'ip route get 1.2.3.4' in out
+        assert 'DEFAULT_INTERFACE=' in out
+
+    def test_resolves_antizapret_out_iface_defaults(self):
+        out = agent.render_custom_up_sh()
+        assert 'ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"' in out
+        assert 'ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"' in out
+
+    def test_resolves_vpn_out_iface_defaults(self):
+        out = agent.render_custom_up_sh()
+        assert 'VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"' in out
+        assert 'VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"' in out

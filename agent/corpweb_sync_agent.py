@@ -104,22 +104,28 @@ ANTIZAPRET_SETUP_PATH = "/root/antizapret/setup"
 
 def render_custom_up_sh() -> str:
     """
-    Return the content to write between the markers in /root/antizapret/custom-up.sh.
-    The returned string includes the markers themselves and is safe to drop into
-    an empty file or between existing markers.
-
-    The script itself defers conditional logic (RESTRICT_FORWARD, VPN_DNS,
-    MASQUERADE vs SNAT) to bash at runtime, so this function takes no args
-    and always returns the same content.
+    Return content for /root/antizapret/custom-up.sh (with markers, shell
+    preamble, and IP/OUT-iface derivation). Defers all conditional logic
+    (RESTRICT_FORWARD, VPN_DNS, MASQUERADE vs SNAT) to bash at runtime.
     """
-    lines = [
-        ESCAPE_MARKER_BEGIN,
-        "set -e",
-        "cd /root/antizapret",
-        "source setup",
-        ESCAPE_MARKER_END,
-    ]
-    return "\n".join(lines) + "\n"
+    body = """\
+set -e
+cd /root/antizapret
+source setup
+
+[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
+[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+    DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \\K\\S+')"
+    DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \\K\\S+')"
+fi
+ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"
+VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"
+"""
+    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
 
 
 # ---------------------------------------------------------------------------
