@@ -362,3 +362,20 @@ class TestRegisterIfNeededNoStart:
                      if len(c.args) > 0 and isinstance(c.args[0], list)
                      and "systemctl" in c.args[0] and "stop" in c.args[0]]
             assert stops == []
+
+
+class TestRegisterTriggersEscapeSync:
+    def test_register_if_needed_calls_sync_escape_rules(self):
+        fake_response = MagicMock()
+        fake_response.json.return_value = {
+            "node_id": "n1",
+            "wg_server_keys": {},
+            "wg_config": {},
+        }
+        with patch.object(agent, "api_post", return_value=fake_response), \
+             patch.object(agent, "_local_ip", return_value="10.0.0.1"), \
+             patch.object(agent, "_apply_wg_config"), \
+             patch.object(agent, "sync_escape_rules") as mock_sync:
+            mock_sync.return_value = {"escape_drift_detected": False}
+            agent.register_if_needed()
+        mock_sync.assert_called_once()

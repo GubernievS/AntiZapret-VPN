@@ -659,6 +659,13 @@ def register_if_needed() -> None:
     if wg_config:
         _apply_wg_config(wg_config)
 
+    # Reconcile escape-rules hooks (custom-up.sh / custom-down.sh).
+    # Errors are captured in metrics and do not break registration.
+    try:
+        sync_escape_rules()
+    except Exception as exc:  # defensive — sync_escape_rules itself swallows
+        log.error("sync_escape_rules unexpectedly raised: %s", exc)
+
     log.info("Registration complete")
 
 
