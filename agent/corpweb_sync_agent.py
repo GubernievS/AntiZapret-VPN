@@ -152,6 +152,55 @@ fi
     return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
 
 
+def render_custom_down_sh() -> str:
+    """
+    Return content for /root/antizapret/custom-down.sh (with markers).
+
+    Symmetric counterpart to render_custom_up_sh: every ``-A``/``-I`` in the
+    up-rules has a matching ``-D`` here, under the same conditional. No
+    ``set -e`` because rules may legitimately be absent on a partial teardown
+    and `iptables -D` returns non-zero in that case.
+    """
+    body = """\
+exec 2>/dev/null
+cd /root/antizapret
+source setup
+
+[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
+[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
+
+if [[ -z "$DEFAULT_INTERFACE" ]]; then
+    DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \\K\\S+')"
+    DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \\K\\S+')"
+fi
+ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"
+VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
+VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"
+
+# az_escape (10.27) — mirror antizapret removal
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -d "$FAKE_IP.0.0/15" -j ANTIZAPRET-MAPPING
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+    iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 ! -d "$FAKE_IP.0.0/15" -j CONNMARK --set-mark 0x1
+    iptables -w -D FORWARD -s 10.27.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"
+
+# vpn_escape (10.26) — mirror vpn removal
+if [[ "$VPN_DNS" == '1' ]]; then
+    iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2
+    iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2
+fi
+iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"
+exit 0
+"""
+    return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------

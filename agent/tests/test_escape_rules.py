@@ -127,3 +127,58 @@ class TestRenderCustomUpSh:
     def test_vpn_escape_postrouting_snat_branch(self):
         out = agent.render_custom_up_sh()
         assert 'iptables -w -t nat -A POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"' in out
+
+
+class TestRenderCustomDownSh:
+    def test_markers_present(self):
+        out = agent.render_custom_down_sh()
+        assert agent.ESCAPE_MARKER_BEGIN in out
+        assert agent.ESCAPE_MARKER_END in out
+
+    def test_sources_setup_and_derives_ip(self):
+        out = agent.render_custom_down_sh()
+        assert "source setup" in out
+        assert 'IP=10' in out
+        assert 'FAKE_IP="$IP.30"' in out
+
+    def test_az_escape_dns_dnat_deletes(self):
+        out = agent.render_custom_down_sh()
+        assert 'iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1' in out
+        assert 'iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1' in out
+
+    def test_az_escape_mapping_deletes(self):
+        out = agent.render_custom_down_sh()
+        assert 'iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 -d "$FAKE_IP.0.0/15" -j ANTIZAPRET-MAPPING' in out
+
+    def test_az_escape_restrict_forward_deletes_conditional(self):
+        out = agent.render_custom_down_sh()
+        assert 'if [[ "$RESTRICT_FORWARD" == \'y\' ]]; then' in out
+        assert 'iptables -w -t nat -D PREROUTING -s 10.27.0.0/16 ! -d "$FAKE_IP.0.0/15" -j CONNMARK --set-mark 0x1' in out
+        assert 'iptables -w -D FORWARD -s 10.27.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP' in out
+
+    def test_az_escape_postrouting_deletes_both_branches(self):
+        out = agent.render_custom_down_sh()
+        assert 'iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j MASQUERADE' in out
+        assert 'iptables -w -t nat -D POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"' in out
+
+    def test_vpn_escape_dns_deletes_conditional(self):
+        out = agent.render_custom_down_sh()
+        assert 'if [[ "$VPN_DNS" == \'1\' ]]; then' in out
+        assert 'iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2' in out
+        assert 'iptables -w -t nat -D PREROUTING -s 10.26.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2' in out
+
+    def test_vpn_escape_postrouting_deletes_both_branches(self):
+        out = agent.render_custom_down_sh()
+        assert 'iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j MASQUERADE' in out
+        assert 'iptables -w -t nat -D POSTROUTING -s 10.26.0.0/16 -o "$VPN_OUT_INTERFACE" -j SNAT --to-source "$VPN_OUT_IP"' in out
+
+    def test_idempotent(self):
+        a = agent.render_custom_down_sh()
+        b = agent.render_custom_down_sh()
+        assert a == b
+
+    def test_down_is_tolerant_of_missing_rules(self):
+        """Unlike up.sh, our down.sh must not abort mid-way if a rule was
+        already removed (e.g. manual intervention). No `set -e` in the body."""
+        out = agent.render_custom_down_sh()
+        assert "set -e" not in out
