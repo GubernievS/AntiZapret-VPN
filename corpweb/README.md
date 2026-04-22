@@ -421,6 +421,40 @@ handshake блокируется ТСПУ.
 - Параметры обфускации не меняются автоматически по расписанию — только через
   «Перегенерировать» в админке.
 
+### Smoke-check escape-rules на ноде (после обновления агента)
+
+После `systemctl restart corpweb-sync-agent` на ноде проверить:
+
+1. Файлы сгенерированы агентом:
+   ```
+   grep "CorpAdmin escape rules" /root/antizapret/custom-up.sh /root/antizapret/custom-down.sh
+   ```
+   Оба файла должны содержать блок между `=== BEGIN CorpAdmin escape rules ===` и `=== END CorpAdmin escape rules ===`.
+
+2. antizapret.service перезапущен агентом:
+   ```
+   journalctl -u antizapret.service --since "5 minutes ago" | tail
+   ```
+
+3. Правила в iptables:
+   ```
+   iptables -t nat -nvL POSTROUTING | grep -E '10\.2[67]\.0\.0/16'
+   iptables -t nat -nvL PREROUTING | grep -E '10\.2[67]\.0\.0/16'
+   ```
+   Должно быть 2 POSTROUTING-правила (MASQUERADE/SNAT по 10.26 и 10.27) и ≥ 3 PREROUTING-правила (DNS DNAT × 2 + ANTIZAPRET-MAPPING для 10.27; при VPN_DNS=1 — ещё 2 для 10.26).
+
+4. End-to-end:
+   - клиент импортирует `*-azB.conf` → коннектится → открывает заблокированный сайт
+   - клиент импортирует `*-vpnB.conf` → коннектится → открывает произвольный публичный сайт
+
+5. Drift-recovery проверка (опционально):
+   ```
+   : > /root/antizapret/custom-up.sh    # очистить managed-блок вручную
+   # подождать HEARTBEAT_INTERVAL (30s)
+   grep -c "CorpAdmin escape rules" /root/antizapret/custom-up.sh   # ожидаем 2 (BEGIN + END)
+   ```
+   Heartbeat на CP должен показать `escape_drift_applied_count` > 0.
+
 ## Лицензия
 
 Наследует лицензию AntiZapret-VPN (GubernievS/AntiZapret-VPN).
