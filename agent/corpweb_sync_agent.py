@@ -101,6 +101,27 @@ CUSTOM_UP_PATH = "/root/antizapret/custom-up.sh"
 CUSTOM_DOWN_PATH = "/root/antizapret/custom-down.sh"
 ANTIZAPRET_SETUP_PATH = "/root/antizapret/setup"
 
+
+def render_custom_up_sh() -> str:
+    """
+    Return the content to write between the markers in /root/antizapret/custom-up.sh.
+    The returned string includes the markers themselves and is safe to drop into
+    an empty file or between existing markers.
+
+    The script itself defers conditional logic (RESTRICT_FORWARD, VPN_DNS,
+    MASQUERADE vs SNAT) to bash at runtime, so this function takes no args
+    and always returns the same content.
+    """
+    lines = [
+        ESCAPE_MARKER_BEGIN,
+        "set -e",
+        "cd /root/antizapret",
+        "source setup",
+        ESCAPE_MARKER_END,
+    ]
+    return "\n".join(lines) + "\n"
+
+
 # ---------------------------------------------------------------------------
 # Debounce helper for doall.sh
 # ---------------------------------------------------------------------------
