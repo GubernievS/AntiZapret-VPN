@@ -124,6 +124,20 @@ ANTIZAPRET_OUT_INTERFACE="${ANTIZAPRET_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
 ANTIZAPRET_OUT_IP="${ANTIZAPRET_OUT_IP:-$DEFAULT_IP}"
 VPN_OUT_INTERFACE="${VPN_OUT_INTERFACE:-$DEFAULT_INTERFACE}"
 VPN_OUT_IP="${VPN_OUT_IP:-$DEFAULT_IP}"
+
+# az_escape (10.27) — mirror antizapret (10.29) split-tunnel semantics
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 -d "$FAKE_IP.0.0/15" -j ANTIZAPRET-MAPPING
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+    iptables -w -t nat -A PREROUTING -s 10.27.0.0/16 ! -d "$FAKE_IP.0.0/15" -j CONNMARK --set-mark 0x1
+    iptables -w -I FORWARD 2 -s 10.27.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
+    iptables -w -t nat -A POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j MASQUERADE
+else
+    iptables -w -t nat -A POSTROUTING -s 10.27.0.0/16 -o "$ANTIZAPRET_OUT_INTERFACE" -j SNAT --to-source "$ANTIZAPRET_OUT_IP"
+fi
 """
     return ESCAPE_MARKER_BEGIN + "\n" + body + ESCAPE_MARKER_END + "\n"
 
