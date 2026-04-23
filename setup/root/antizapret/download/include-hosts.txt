@@ -1082,6 +1082,8 @@ corel.com
 tvtime.com
 blueprint.am
 developer.android.com
+cloudns.net
+birdflop.com
 
 # Блокирует DNS
 library.hydra.wiki
