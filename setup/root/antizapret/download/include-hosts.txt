@@ -1081,6 +1081,7 @@ spacecowboys-games.com
 corel.com
 tvtime.com
 blueprint.am
+developer.android.com
 
 # Блокирует DNS
 library.hydra.wiki
