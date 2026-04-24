@@ -297,15 +297,25 @@ export default function AdminAntizapretPage() {
       {/* DNS */}
       <Section title="DNS">
         <Toggle
-          label="DNS для AntiZapret-режима через knot-resolver на ноде. При Выкл клиент должен сам указать публичный DNS (напр. 1.1.1.1) в настройках VPN-адаптера — DNS из скачанного .conf в этом режиме не резолвит (ANTIZAPRET_DNS)"
+          label="DNS для AntiZapret-режима (ANTIZAPRET_DNS)"
           value={is1(settings.ANTIZAPRET_DNS)}
           onChange={v => set1('ANTIZAPRET_DNS', v)}
         />
+        <p className="py-2 text-xs text-gray-500 leading-relaxed">
+          Вкл — резолв через knot-resolver на ноде. Выкл — клиент должен сам указать публичный DNS
+          (напр. <code className="bg-gray-100 px-1 rounded">1.1.1.1</code>) в настройках VPN-адаптера;
+          DNS из скачанного .conf в этом режиме не резолвит.
+        </p>
         <Toggle
-          label="DNS для VPN-режима через knot-resolver на ноде. При Выкл клиент должен сам указать публичный DNS (напр. 1.1.1.1) в настройках VPN-адаптера — DNS из скачанного .conf в этом режиме не резолвит (VPN_DNS)"
+          label="DNS для VPN-режима (VPN_DNS)"
           value={is1(settings.VPN_DNS)}
           onChange={v => set1('VPN_DNS', v)}
         />
+        <p className="py-2 text-xs text-gray-500 leading-relaxed">
+          Вкл — резолв через knot-resolver на ноде. Выкл — клиент должен сам указать публичный DNS
+          (напр. <code className="bg-gray-100 px-1 rounded">1.1.1.1</code>) в настройках VPN-адаптера;
+          DNS из скачанного .conf в этом режиме не резолвит.
+        </p>
       </Section>
 
       {/* Clients */}
