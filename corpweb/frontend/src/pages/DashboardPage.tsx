@@ -280,8 +280,13 @@ export default function DashboardPage() {
             {configs.map((config) => {
               const typeInfo = CONFIG_TYPE_LABELS[config.config_type]
               const Icon = typeInfo?.icon ?? Shield
+              const cardAccent = useBackupPort
+                ? 'border-blue-400 bg-blue-50/30'
+                : useEscape
+                ? 'border-orange-400 bg-orange-50/30'
+                : 'border-gray-200 bg-white'
               return (
-                <div key={config.id} className="bg-white rounded-xl border border-gray-200 p-5">
+                <div key={config.id} className={`rounded-xl border p-5 transition-colors ${cardAccent}`}>
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
