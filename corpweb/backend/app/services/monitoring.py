@@ -68,6 +68,7 @@ class MonitoringService:
         result = {}
         for cfg in configs:
             az_ip = (cfg.config_metadata or {}).get("vpn_ip", "")
+            az_ip = az_ip.split("/")[0]  # strip any CIDR suffix defensively
             if not az_ip:
                 continue
             parts = az_ip.split(".")
