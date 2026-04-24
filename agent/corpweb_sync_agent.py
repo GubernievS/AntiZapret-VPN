@@ -782,6 +782,13 @@ def startup_reconcile() -> None:
 # Metrics
 # ---------------------------------------------------------------------------
 
+# Ordered tuple of WireGuard / AmneziaWG ifaces the agent monitors for peer
+# activity. The first two are the baseline; the last two host escape-mode
+# (bypass) tunnels. collect_metrics() emits one active_peers_<iface> key per
+# entry; collect_peers() iterates this tuple when dumping peer state.
+_IFACES: tuple[str, ...] = ("antizapret", "vpn", "az_escape", "vpn_escape")
+
+
 def _active_peers(iface: str) -> int:
     """Count WireGuard peers with a handshake in the last 3 minutes."""
     try:
@@ -814,10 +821,7 @@ _prev_net: dict = {"rx": 0, "tx": 0, "ts": 0.0}
 
 def collect_metrics() -> dict:
     global _prev_net
-    metrics = {
-        "active_peers_antizapret": _active_peers("antizapret"),
-        "active_peers_vpn": _active_peers("vpn"),
-    }
+    metrics = {f"active_peers_{iface}": _active_peers(iface) for iface in _IFACES}
     try:
         with open("/proc/net/dev") as f:
             for line in f:
@@ -839,7 +843,7 @@ def collect_metrics() -> dict:
 def collect_peers() -> list[dict]:
     """Collect full peer list from all WG interfaces via wg show dump."""
     peers = []
-    for iface in ("antizapret", "vpn"):
+    for iface in _IFACES:
         try:
             result = subprocess.run(
                 ["wg", "show", iface, "dump"],

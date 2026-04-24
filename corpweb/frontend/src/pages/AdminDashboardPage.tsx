@@ -52,8 +52,17 @@ const SEGMENT_COLORS = [
   'bg-pink-500', 'bg-cyan-500', 'bg-yellow-500', 'bg-red-500',
 ]
 
+function totalPeers(node: DashboardNode): number {
+  return (
+    node.active_peers_antizapret +
+    node.active_peers_vpn +
+    node.active_peers_az_escape +
+    node.active_peers_vpn_escape
+  )
+}
+
 function LoadDistributionBar({ nodes }: { nodes: DashboardNode[] }) {
-  const total = nodes.reduce((sum, n) => sum + n.active_peers_antizapret + n.active_peers_vpn, 0)
+  const total = nodes.reduce((sum, n) => sum + totalPeers(n), 0)
   if (total === 0) {
     return <p className="text-sm text-gray-400 py-2">Нет активных клиентов</p>
   }
@@ -62,7 +71,7 @@ function LoadDistributionBar({ nodes }: { nodes: DashboardNode[] }) {
     <div className="space-y-3">
       <div className="flex h-4 rounded-full overflow-hidden gap-px">
         {nodes.map((node, i) => {
-          const peers = node.active_peers_antizapret + node.active_peers_vpn
+          const peers = totalPeers(node)
           const pct = (peers / total) * 100
           if (pct === 0) return null
           return (
@@ -77,7 +86,7 @@ function LoadDistributionBar({ nodes }: { nodes: DashboardNode[] }) {
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {nodes.map((node, i) => {
-          const peers = node.active_peers_antizapret + node.active_peers_vpn
+          const peers = totalPeers(node)
           const pct = ((peers / total) * 100).toFixed(1)
           return (
             <div key={node.id} className="flex items-center gap-1.5 text-xs text-gray-600">
@@ -109,6 +118,22 @@ function NodeCard({ node }: { node: DashboardNode }) {
             {node.active_peers_antizapret} / {node.active_peers_vpn}
           </span>
         </div>
+        {node.active_peers_az_escape > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Пиры AZ-esc</span>
+            <span className="font-medium text-orange-700">
+              {node.active_peers_az_escape}
+            </span>
+          </div>
+        )}
+        {node.active_peers_vpn_escape > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Пиры VPN-esc</span>
+            <span className="font-medium text-amber-700">
+              {node.active_peers_vpn_escape}
+            </span>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <span className="text-gray-400 flex items-center gap-1">
             <ArrowDownToLine className="w-3 h-3" /> Входящий

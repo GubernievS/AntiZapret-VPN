@@ -8,6 +8,7 @@ Previously the agent wrote the file but did not trigger a restart.
 from __future__ import annotations
 
 import pathlib
+import subprocess
 import sys
 from unittest.mock import MagicMock, patch
 
@@ -413,3 +414,69 @@ class TestHeartbeatIncludesEscapeMetrics:
         assert mock_post.called
         payload = mock_post.call_args[0][1]
         assert payload["metrics"]["escape_error"] == "setup_missing"
+
+
+class TestCollectMetricsEscapeAware:
+    """collect_metrics() must report peer counts for all four ifaces
+    (antizapret, vpn, az_escape, vpn_escape)."""
+
+    def test_collect_metrics_includes_four_active_peer_keys(self):
+        def fake_active_peers(iface: str) -> int:
+            return {
+                "antizapret": 1,
+                "vpn": 2,
+                "az_escape": 3,
+                "vpn_escape": 4,
+            }[iface]
+
+        with patch.object(agent, "_active_peers", side_effect=fake_active_peers):
+            metrics = agent.collect_metrics()
+
+        assert metrics["active_peers_antizapret"] == 1
+        assert metrics["active_peers_vpn"] == 2
+        assert metrics["active_peers_az_escape"] == 3
+        assert metrics["active_peers_vpn_escape"] == 4
+
+
+class TestCollectPeersEscapeAware:
+    """collect_peers() must enumerate peers from all four ifaces, tagging each
+    entry with its iface. Missing iface (e.g. az_escape not up yet on a fresh
+    node) must be gracefully skipped, matching existing behaviour for base
+    ifaces."""
+
+    def test_collect_peers_enumerates_all_four_ifaces(self):
+        def fake_run(cmd, **kwargs):
+            iface = cmd[2]  # ["wg", "show", <iface>, "dump"]
+            dump = (
+                "HEADER\n"
+                f"pub_{iface}\tpriv\t1.2.3.4:51820\t10.1.1.1/32\t1700000000\t100\t200\toff\n"
+            )
+            result = MagicMock()
+            result.stdout = dump
+            result.returncode = 0
+            return result
+
+        with patch.object(subprocess, "run", side_effect=fake_run):
+            peers = agent.collect_peers()
+
+        ifaces_seen = {p["interface"] for p in peers}
+        assert ifaces_seen == {"antizapret", "vpn", "az_escape", "vpn_escape"}
+
+    def test_collect_peers_skips_missing_escape_iface(self):
+        def fake_run(cmd, **kwargs):
+            iface = cmd[2]
+            if iface == "az_escape":
+                raise subprocess.CalledProcessError(1, cmd)
+            result = MagicMock()
+            result.stdout = (
+                "HEADER\n"
+                f"pub_{iface}\tpriv\t1.2.3.4:51820\t10.1.1.1/32\t1700000000\t100\t200\toff\n"
+            )
+            result.returncode = 0
+            return result
+
+        with patch.object(subprocess, "run", side_effect=fake_run):
+            peers = agent.collect_peers()
+
+        ifaces_seen = {p["interface"] for p in peers}
+        assert ifaces_seen == {"antizapret", "vpn", "vpn_escape"}

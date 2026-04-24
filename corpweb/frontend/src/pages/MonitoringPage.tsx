@@ -25,9 +25,23 @@ function formatHandshakeAge(seconds: number): string {
 }
 
 function interfaceLabel(iface: string): string {
-  if (iface.includes('az') || iface.includes('antizapret')) return 'AZ'
-  if (iface.includes('vpn')) return 'VPN'
-  return iface
+  switch (iface) {
+    case 'antizapret': return 'AZ'
+    case 'vpn':        return 'VPN'
+    case 'az_escape':  return 'AZ-esc'
+    case 'vpn_escape': return 'VPN-esc'
+    default:           return iface
+  }
+}
+
+function interfaceBadgeClasses(iface: string): string {
+  switch (iface) {
+    case 'antizapret': return 'bg-blue-100 text-blue-700'
+    case 'vpn':        return 'bg-green-100 text-green-700'
+    case 'az_escape':  return 'bg-orange-100 text-orange-700'
+    case 'vpn_escape': return 'bg-amber-100 text-amber-700'
+    default:           return 'bg-gray-100 text-gray-600'
+  }
 }
 
 type SortField = 'client_name' | 'node' | 'interface' | 'handshake_age' | 'rx_bytes' | 'tx_bytes'
@@ -215,7 +229,7 @@ export default function MonitoringPage() {
                     </td>
                     <td className="px-4 py-3 text-sm font-mono text-gray-600">{conn.node}</td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${interfaceBadgeClasses(conn.interface)}`}>
                         {interfaceLabel(conn.interface)}
                       </span>
                     </td>

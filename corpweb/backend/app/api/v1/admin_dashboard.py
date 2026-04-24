@@ -25,7 +25,9 @@ def get_dashboard(
         m = n.metrics or {}
         az = m.get("active_peers_antizapret", 0)
         vpn = m.get("active_peers_vpn", 0)
-        total_active += az + vpn
+        az_esc = m.get("active_peers_az_escape", 0)
+        vpn_esc = m.get("active_peers_vpn_escape", 0)
+        total_active += az + vpn + az_esc + vpn_esc
 
         applied = n.applied_sha or {}
         synced = all(
@@ -40,6 +42,8 @@ def get_dashboard(
             "health": n.health,
             "active_peers_antizapret": az,
             "active_peers_vpn": vpn,
+            "active_peers_az_escape": az_esc,
+            "active_peers_vpn_escape": vpn_esc,
             "rx_bytes_per_sec": m.get("rx_bytes_per_sec", 0),
             "tx_bytes_per_sec": m.get("tx_bytes_per_sec", 0),
             "synced": synced,
