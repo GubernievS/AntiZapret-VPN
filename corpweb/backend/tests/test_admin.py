@@ -136,3 +136,36 @@ class TestAdminDashboard:
     def test_dashboard_requires_admin(self, client, regular_user, user_token):
         response = client.get("/api/v1/admin/dashboard", headers=auth_header(user_token))
         assert response.status_code == 403
+
+    def test_dashboard_exposes_escape_peer_counts(
+        self, client, admin_user, admin_token, system_settings, db
+    ):
+        from app.db.models import Node
+        node = Node(
+            hostname="kvn-esc",
+            private_ip="10.0.0.99",
+            enroll_token="tok-kvn-esc",
+            health="ok",
+            last_seen=None,
+            metrics={
+                "active_peers_antizapret": 1,
+                "active_peers_vpn": 2,
+                "active_peers_az_escape": 3,
+                "active_peers_vpn_escape": 4,
+            },
+            applied_sha={},
+            peers_snapshot=[],
+        )
+        db.add(node)
+        db.commit()
+
+        response = client.get("/api/v1/admin/dashboard", headers=auth_header(admin_token))
+        assert response.status_code == 200
+        body = response.json()
+        entry = next(n for n in body["nodes"] if n["hostname"] == "kvn-esc")
+        assert entry["active_peers_antizapret"] == 1
+        assert entry["active_peers_vpn"] == 2
+        assert entry["active_peers_az_escape"] == 3
+        assert entry["active_peers_vpn_escape"] == 4
+        # All four counted in the grand total.
+        assert body["totals"]["active_clients"] >= 1 + 2 + 3 + 4
