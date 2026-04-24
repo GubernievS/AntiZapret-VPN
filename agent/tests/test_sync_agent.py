@@ -8,6 +8,7 @@ Previously the agent wrote the file but did not trigger a restart.
 from __future__ import annotations
 
 import pathlib
+import subprocess
 import sys
 from unittest.mock import MagicMock, patch
 
@@ -420,9 +421,6 @@ class TestCollectMetricsEscapeAware:
     (antizapret, vpn, az_escape, vpn_escape)."""
 
     def test_collect_metrics_includes_four_active_peer_keys(self):
-        from unittest.mock import patch
-        import agent.corpweb_sync_agent as agent
-
         def fake_active_peers(iface: str) -> int:
             return {
                 "antizapret": 1,
@@ -447,10 +445,6 @@ class TestCollectPeersEscapeAware:
     ifaces."""
 
     def test_collect_peers_enumerates_all_four_ifaces(self):
-        from unittest.mock import patch, MagicMock
-        import subprocess
-        import agent.corpweb_sync_agent as agent
-
         def fake_run(cmd, **kwargs):
             iface = cmd[2]  # ["wg", "show", <iface>, "dump"]
             dump = (
@@ -469,10 +463,6 @@ class TestCollectPeersEscapeAware:
         assert ifaces_seen == {"antizapret", "vpn", "az_escape", "vpn_escape"}
 
     def test_collect_peers_skips_missing_escape_iface(self):
-        from unittest.mock import patch, MagicMock
-        import subprocess
-        import agent.corpweb_sync_agent as agent
-
         def fake_run(cmd, **kwargs):
             iface = cmd[2]
             if iface == "az_escape":
