@@ -437,6 +437,31 @@ class TestCollectMetricsEscapeAware:
         assert metrics["active_peers_az_escape"] == 3
         assert metrics["active_peers_vpn_escape"] == 4
 
+    def test_active_peers_dispatches_awg_for_escape_ifaces(self):
+        """_active_peers must shell out to 'awg' for AmneziaWG ifaces
+        (az_escape, vpn_escape) and 'wg' for baseline ifaces."""
+        from unittest.mock import patch, MagicMock
+        observed_commands: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            observed_commands.append(list(cmd))
+            result = MagicMock()
+            result.stdout = ""  # zero peers — we don't care, we only check cmd
+            result.returncode = 0
+            return result
+
+        with patch.object(subprocess, "run", side_effect=fake_run):
+            for iface in ("antizapret", "vpn", "az_escape", "vpn_escape"):
+                agent._active_peers(iface)
+
+        cli_by_iface = {cmd[2]: cmd[0] for cmd in observed_commands}
+        assert cli_by_iface == {
+            "antizapret": "wg",
+            "vpn": "wg",
+            "az_escape": "awg",
+            "vpn_escape": "awg",
+        }
+
 
 class TestCollectPeersEscapeAware:
     """collect_peers() must enumerate peers from all four ifaces, tagging each
@@ -446,7 +471,11 @@ class TestCollectPeersEscapeAware:
 
     def test_collect_peers_enumerates_all_four_ifaces(self):
         def fake_run(cmd, **kwargs):
-            iface = cmd[2]  # ["wg", "show", <iface>, "dump"]
+            iface = cmd[2]  # [<cli>, "show", <iface>, "dump"]
+            expected_cli = "awg" if iface in ("az_escape", "vpn_escape") else "wg"
+            assert cmd[0] == expected_cli, (
+                f"expected {expected_cli} for {iface}, got {cmd[0]}"
+            )
             dump = (
                 "HEADER\n"
                 f"pub_{iface}\tpriv\t1.2.3.4:51820\t10.1.1.1/32\t1700000000\t100\t200\toff\n"
@@ -465,6 +494,10 @@ class TestCollectPeersEscapeAware:
     def test_collect_peers_skips_missing_escape_iface(self):
         def fake_run(cmd, **kwargs):
             iface = cmd[2]
+            expected_cli = "awg" if iface in ("az_escape", "vpn_escape") else "wg"
+            assert cmd[0] == expected_cli, (
+                f"expected {expected_cli} for {iface}, got {cmd[0]}"
+            )
             if iface == "az_escape":
                 raise subprocess.CalledProcessError(1, cmd)
             result = MagicMock()

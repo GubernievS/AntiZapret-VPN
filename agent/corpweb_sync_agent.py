@@ -788,12 +788,21 @@ def startup_reconcile() -> None:
 # entry; collect_peers() iterates this tuple when dumping peer state.
 _IFACES: tuple[str, ...] = ("antizapret", "vpn", "az_escape", "vpn_escape")
 
+# AmneziaWG ifaces require the 'awg' CLI; WireGuard ifaces use 'wg'. They are
+# otherwise drop-in compatible (same dump/latest-handshakes format).
+_AWG_IFACES: frozenset[str] = frozenset({"az_escape", "vpn_escape"})
+
+
+def _wg_cli(iface: str) -> str:
+    """Return 'awg' for AmneziaWG ifaces, 'wg' for baseline WireGuard ifaces."""
+    return "awg" if iface in _AWG_IFACES else "wg"
+
 
 def _active_peers(iface: str) -> int:
     """Count WireGuard peers with a handshake in the last 3 minutes."""
     try:
         result = subprocess.run(
-            ["wg", "show", iface, "latest-handshakes"],
+            [_wg_cli(iface), "show", iface, "latest-handshakes"],
             capture_output=True,
             text=True,
             check=True,
@@ -846,7 +855,7 @@ def collect_peers() -> list[dict]:
     for iface in _IFACES:
         try:
             result = subprocess.run(
-                ["wg", "show", iface, "dump"],
+                [_wg_cli(iface), "show", iface, "dump"],
                 capture_output=True, text=True, check=True,
             )
         except (subprocess.CalledProcessError, FileNotFoundError):
