@@ -56,9 +56,13 @@ class MonitoringService:
     def _build_ip_map(self) -> dict[str, str]:
         """
         Map VPN IP → client_name.
-        Each client has an antizapret IP (10.29.x.x) and a vpn IP (10.28.x.x)
-        with the same host part. config_metadata stores only the antizapret IP,
-        so we derive the vpn IP by replacing the subnet prefix.
+        Each client has up to four IPs sharing the same host part:
+          10.29.x.x  (antizapret, baseline)
+          10.28.x.x  (vpn, baseline)
+          10.27.x.x  (az_escape, bypass)
+          10.26.x.x  (vpn_escape, bypass)
+        config_metadata stores only the antizapret IP, so we derive the other
+        three by replacing the subnet prefix.
         """
         configs = self._db.query(VPNConfig).filter(VPNConfig.is_active == True).all()
         result = {}
@@ -66,11 +70,14 @@ class MonitoringService:
             az_ip = (cfg.config_metadata or {}).get("vpn_ip", "")
             if not az_ip:
                 continue
-            # antizapret IP: 10.29.x.x
-            result[az_ip] = cfg.client_name
-            # vpn IP: 10.28.x.x (same host part, different subnet)
             parts = az_ip.split(".")
             if len(parts) == 4 and parts[0] == "10" and parts[1] == "29":
-                vpn_ip = f"10.28.{parts[2]}.{parts[3]}"
-                result[vpn_ip] = cfg.client_name
+                host = f"{parts[2]}.{parts[3]}"
+                result[az_ip] = cfg.client_name
+                result[f"10.28.{host}"] = cfg.client_name
+                result[f"10.27.{host}"] = cfg.client_name
+                result[f"10.26.{host}"] = cfg.client_name
+            else:
+                # Legacy entry — preserve at its raw IP.
+                result[az_ip] = cfg.client_name
         return result
