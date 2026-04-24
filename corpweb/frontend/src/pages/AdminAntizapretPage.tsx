@@ -297,12 +297,12 @@ export default function AdminAntizapretPage() {
       {/* DNS */}
       <Section title="DNS">
         <Toggle
-          label="DNS-сервер для AntiZapret-режима. Вкл = knot-resolver на ноде, Выкл = системный DNS (ANTIZAPRET_DNS)"
+          label="DNS для AntiZapret-режима через knot-resolver на ноде. При Выкл клиент должен сам указать публичный DNS (напр. 1.1.1.1) в настройках VPN-адаптера — DNS из скачанного .conf в этом режиме не резолвит (ANTIZAPRET_DNS)"
           value={is1(settings.ANTIZAPRET_DNS)}
           onChange={v => set1('ANTIZAPRET_DNS', v)}
         />
         <Toggle
-          label="DNS-сервер для VPN-режима. Вкл = knot-resolver, Выкл = системный DNS (VPN_DNS)"
+          label="DNS для VPN-режима через knot-resolver на ноде. При Выкл клиент должен сам указать публичный DNS (напр. 1.1.1.1) в настройках VPN-адаптера — DNS из скачанного .conf в этом режиме не резолвит (VPN_DNS)"
           value={is1(settings.VPN_DNS)}
           onChange={v => set1('VPN_DNS', v)}
         />
