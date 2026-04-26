@@ -1,8 +1,8 @@
 #!/bin/bash
 
-###
-sed -i 's/^ALTERNATIVE_IP=/ALTERNATIVE_CLIENT_IP=/' /root/antizapret/setup
-###
+if [[ ! -f /root/antizapret/config/drop-ips.txt ]]; then
+	> /root/antizapret/config/drop-ips.txt
+fi
 
 set -e
 shopt -s nullglob
@@ -50,6 +50,22 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 
 	# Выводим результат
 	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
+
+	# Обрабатываем список запрещенных сетей для форвардинга
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*drop-ips.txt | sort -u \
+	| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/drop-ips.txt
+
+	# Выводим результат
+	echo "$(wc -l < result/drop-ips.txt) - drop-ips.txt"
+
+	# Обновляем ipset antizapret-drop
+	{
+		echo 'create antizapret-drop hash:net -exist'
+		echo 'flush antizapret-drop'
+		while read -r cidr; do
+			echo "add antizapret-drop $cidr -exist"
+		done < result/drop-ips.txt
+	} | ipset restore
 
 	[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
 	[[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
