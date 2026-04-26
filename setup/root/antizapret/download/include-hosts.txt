@@ -1084,6 +1084,7 @@ blueprint.am
 developer.android.com
 cloudns.net
 birdflop.com
+virtualhere.com
 
 # Блокирует DNS
 library.hydra.wiki
