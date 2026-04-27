@@ -1085,6 +1085,7 @@ developer.android.com
 cloudns.net
 birdflop.com
 virtualhere.com
+socialchess.com
 
 # Блокирует DNS
 library.hydra.wiki
