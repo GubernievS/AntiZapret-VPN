@@ -103,6 +103,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений и Telegram-бот
 	- [AdminAntizapret](https://github.com/Kirito0098/AdminAntizapret) - управление и конфигурация
 	- [TG-Bot-OpenVPN-Antizapret](https://github.com/VATAKATru61/TG-Bot-OpenVPN-Antizapret) - Telegram-бот (только OpenVPN)
+	- [AZ-WARP](https://github.com/Liafanx/AZ-WARP) - расширенная маршрутизация через WARP
 
 ***
 
