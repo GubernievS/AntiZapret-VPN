@@ -140,6 +140,17 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
+# Drop forwarding
+{
+	echo 'create antizapret-drop hash:net -exist'
+	echo 'flush antizapret-drop'
+	if [[ -f result/drop-ips.txt ]]; then
+		while read -r cidr; do
+			echo "add antizapret-drop $cidr"
+		done < result/drop-ips.txt
+	fi
+} | ipset restore
+iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 # Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	if [[ "$ANTIZAPRET_OUT_INTERFACE" == "$VPN_OUT_INTERFACE" ]]; then
