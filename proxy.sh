@@ -164,7 +164,7 @@ net.ipv4.tcp_wmem=16384 131072 6291456
 net.ipv4.tcp_no_metrics_save=0
 net.core.netdev_budget=600
 net.ipv4.tcp_fastopen=3
-net.ipv4.ip_local_port_range=10000 50000
+net.ipv4.ip_local_port_range=10000 65535
 net.netfilter.nf_conntrack_max=131072
 net.core.netdev_budget_usecs=8000
 net.core.dev_weight=64
@@ -179,9 +179,9 @@ net.ipv4.udp_rmem_min=16384
 net.ipv4.udp_wmem_min=16384
 net.core.optmem_max=20480
 net.ipv4.tcp_timestamps=1
-net.ipv4.tcp_tw_reuse=0
+net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_slow_start_after_idle=0
-net.netfilter.nf_conntrack_tcp_timeout_established=86400
+net.netfilter.nf_conntrack_tcp_timeout_established=7200
 net.core.rmem_default=262144
 net.core.wmem_default=262144
 net.ipv4.tcp_base_mss=1024
@@ -192,7 +192,11 @@ net.ipv4.conf.default.send_redirects=0
 net.ipv4.conf.all.secure_redirects=0
 net.ipv4.conf.default.secure_redirects=0
 net.ipv4.conf.all.accept_source_route=0
-net.ipv4.conf.default.accept_source_route=0" > /etc/sysctl.d/99-proxy.conf
+net.ipv4.conf.default.accept_source_route=0
+net.ipv4.ip_local_reserved_ports=50080,50443,51080,51443,52080,52443
+net.ipv4.tcp_keepalive_time=300
+net.ipv4.tcp_keepalive_intvl=30
+net.ipv4.tcp_keepalive_probes=3" > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
 echo "# Disable IPv6
