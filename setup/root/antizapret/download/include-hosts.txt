@@ -1086,6 +1086,7 @@ cloudns.net
 birdflop.com
 virtualhere.com
 socialchess.com
+esri.com
 
 # Блокирует DNS
 library.hydra.wiki
