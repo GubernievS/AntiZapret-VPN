@@ -71,12 +71,14 @@ do
 	break
 done
 echo
+echo 'Warning! SSH protection may block your IP after 5 logins/minute!'
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
+echo 'Warning! Scan protection blocks ping and closed-port replies!'
 until [[ "$SCAN_PROTECTION" =~ (y|n) ]]; do
-	read -rp 'Enable scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
+	read -rp 'Enable network scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
 done
 echo
 echo 'Installation, please wait...'
