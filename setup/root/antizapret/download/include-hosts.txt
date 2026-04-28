@@ -1087,6 +1087,7 @@ birdflop.com
 virtualhere.com
 socialchess.com
 esri.com
+printhelp.info
 
 # Блокирует DNS
 library.hydra.wiki
