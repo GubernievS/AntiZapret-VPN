@@ -173,13 +173,19 @@ until [[ "$OPENVPN_LOG" =~ (y|n) ]]; do
 	read -rp 'Enable detailed logs in OpenVPN? [y/n]: ' -e -i n OPENVPN_LOG
 done
 echo
+echo 'Warning! SSH protection may block your IP after 5 logins/minute!'
 until [[ "$SSH_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable SSH brute-force protection? [y/n]: ' -e -i y SSH_PROTECTION
 done
 echo
-echo 'Warning! Network attack and scan protection may block VPN or third-party applications!'
+echo 'Warning! Attack protection may block VPN or third-party applications!'
 until [[ "$ATTACK_PROTECTION" =~ (y|n) ]]; do
-	read -rp 'Enable network attack and scan protection? [y/n]: ' -e -i y ATTACK_PROTECTION
+	read -rp 'Enable network attack protection? [y/n]: ' -e -i y ATTACK_PROTECTION
+done
+echo
+echo 'Warning! Scan protection blocks ping and closed-port replies!'
+until [[ "$SCAN_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable network scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
 done
 echo
 echo 'Warning! Torrent guard blocks VPN traffic for 1 minute on torrent detection!'
@@ -427,6 +433,7 @@ OPENVPN_DUPLICATE=$OPENVPN_DUPLICATE
 OPENVPN_LOG=$OPENVPN_LOG
 SSH_PROTECTION=$SSH_PROTECTION
 ATTACK_PROTECTION=$ATTACK_PROTECTION
+SCAN_PROTECTION=$SCAN_PROTECTION
 TORRENT_GUARD=$TORRENT_GUARD
 RESTRICT_FORWARD=$RESTRICT_FORWARD
 CLIENT_ISOLATION=$CLIENT_ISOLATION
