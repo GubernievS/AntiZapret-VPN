@@ -1088,6 +1088,7 @@ virtualhere.com
 socialchess.com
 esri.com
 printhelp.info
+leatherman.com
 
 # Блокирует DNS
 library.hydra.wiki
