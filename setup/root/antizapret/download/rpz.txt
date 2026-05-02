@@ -72,12 +72,19 @@ tracker.openbittorrent.com A 52.223.13.41
 redirector.googlevideo.com CNAME .
 checkip.amazonaws.com CNAME .
 icanhazip.com CNAME .
+*.icanhazip.com CNAME .
 ifconfig.co CNAME .
+*.ifconfig.co CNAME .
 ipify.org CNAME .
+*.ipify.org CNAME .
 myip.com CNAME .
+*.myip.com CNAME .
 ipapi.co CNAME .
+*.ipapi.co CNAME .
 eth0.me CNAME .
+*.eth0.me CNAME .
 ip.sb CNAME .
+*.ip.sb CNAME .
 
 ; https://habr.com/ru/articles/1000792
 telega.info CNAME .
