@@ -1089,6 +1089,7 @@ socialchess.com
 esri.com
 printhelp.info
 leatherman.com
+shop.eminem.com
 
 # Блокирует DNS
 library.hydra.wiki
