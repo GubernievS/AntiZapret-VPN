@@ -256,26 +256,26 @@ ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --cla
 
 # nat
 # OpenVPN TCP
-iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
-iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
-iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
-iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
+iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
+iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
 iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
 iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
 # OpenVPN UDP
-iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:80
-iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:443
-iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:504
-iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:508
+iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
+iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
+iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
+iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
 iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
 iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
 # WireGuard/AmneziaWG
-iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:540
-iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:580
+iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:51443
+iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:51080
 iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination $DESTINATION_IP:51080
 iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination $DESTINATION_IP:51443
-iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:52080
-iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:52443
+iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:51080
+iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:51443
 # SNAT
 iptables -w -t nat -A POSTROUTING -d $DESTINATION_IP -j SNAT --to-source $DEFAULT_IP
 
