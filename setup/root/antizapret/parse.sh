@@ -30,6 +30,36 @@ if [[ ! -s /root/antizapret/config/drop-ips.txt ]]; then
 EOF
 fi
 
+if [[ ! -s /root/antizapret/config/deny-ips.txt ]]; then
+	cat > /root/antizapret/config/deny-ips.txt <<'EOF'
+# Добавление IPv4-адресов заблокированных для входящих подключений к серверу
+#
+# Формат записи: A.B.C.D/M
+# Где:
+#   A.B.C.D - IPv4-адрес
+#   M       - размер маски подсети (1–32)
+#
+# Примеры записи:
+#   1.1.1.1/32        - блокировка одного IPv4-адреса-источника
+#   162.159.192.0/24  - блокировка подсети с маской 24 (254 IPv4-адреса)
+#   66.22.192.0/18    - блокировка подсети с маской 18 (16382 IPv4-адреса)
+#   104.24.0.0/14     - блокировка подсети с маской 14 (262142 IPv4-адреса)
+#
+# Строки начинающиеся с # это комментарии и они не обрабатываются
+#
+
+
+
+
+
+
+
+
+
+
+EOF
+fi
+
 set -e
 shopt -s nullglob
 
@@ -91,6 +121,22 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 		while read -r cidr; do
 			echo "add antizapret-drop $cidr -exist"
 		done < result/drop-ips.txt
+	} | ipset restore
+
+	# Обрабатываем список IP-источников, которым запрещены входящие подключения к серверу (INPUT)
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*deny-ips.txt | sort -u \
+	| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/deny-ips.txt
+
+	# Выводим результат
+	echo "$(wc -l < result/deny-ips.txt) - deny-ips.txt"
+
+	# Обновляем ipset antizapret-deny
+	{
+		echo 'create antizapret-deny hash:net -exist'
+		echo 'flush antizapret-deny'
+		while read -r cidr; do
+			echo "add antizapret-deny $cidr -exist"
+		done < result/deny-ips.txt
 	} | ipset restore
 
 	[[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10

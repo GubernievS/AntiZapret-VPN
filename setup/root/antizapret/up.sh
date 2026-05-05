@@ -56,7 +56,7 @@ if [[ "$ANTIZAPRET_WARP" == 'y' || "$VPN_WARP" == 'y' ]]; then
 	echo "Starting $WARP_INTERFACE..."
 	PRIVATE_KEY=$(wg genkey)
 	KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
-	REG=$(curl -sfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+	REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
 		-H 'Content-Type: application/json' \
 		-d "{\"key\": \"$KEY\"}")
 
@@ -196,7 +196,6 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 fi
-
 # Scan protection
 if [[ "$SCAN_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
@@ -206,6 +205,17 @@ if [[ "$SCAN_PROTECTION" == 'y' ]]; then
 	ip6tables -w -I OUTPUT 2 -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
 	ip6tables -w -I OUTPUT 3 -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
 fi
+# Deny input
+{
+	echo 'create antizapret-deny hash:net -exist'
+	echo 'flush antizapret-deny'
+	if [[ -f result/deny-ips.txt ]]; then
+		while read -r cidr; do
+			echo "add antizapret-deny $cidr"
+		done < result/deny-ips.txt
+	fi
+} | ipset restore
+iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -m set --match-set antizapret-deny src -j DROP
 
 # mangle
 # Clamp TCP MSS
