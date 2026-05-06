@@ -3,7 +3,7 @@
 if [[ ! -v duplicate_cn ]]; then
 	for srv in antizapret-udp antizapret-tcp vpn-udp vpn-tcp; do
 		[[ "$dev" == "$srv" ]] && continue
-		echo "kill $common_name" | socat -T 1 -t 0 -u - "UNIX-CONNECT:/run/openvpn-server/${srv}.sock" >/dev/null 2>&1 || true
+		echo "kill $common_name" | socat -T 1 - "UNIX-CONNECT:/run/openvpn-server/${srv}.sock" >/dev/null 2>&1 || true
 	done
 fi
 
