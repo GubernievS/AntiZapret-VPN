@@ -1091,6 +1091,7 @@ printhelp.info
 leatherman.com
 shop.eminem.com
 yootheme.com
+webull.com
 
 # Блокирует DNS
 library.hydra.wiki
