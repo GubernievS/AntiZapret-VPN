@@ -87,31 +87,28 @@ link_socket_write_udp(struct link_socket *sock,\
 		usleep(100000);\
 #endif\
 		int buffer_len = BLEN(buf);\
-		struct timespec ts;\
-		clock_gettime(CLOCK_REALTIME, &ts);\
-		srand((unsigned)(ts.tv_nsec ^ ts.tv_sec));\
 		for (int i = 0; i < 2; i++) {\
-			int data_len = rand() % 101 + buffer_len;\
+			int data_len = (int)(random() % 101 + buffer_len);\
 			uint8_t data[data_len];\
 #ifdef ERROR_FREE\
 			memcpy(data, BPTR(buf), buffer_len);\
 			data[0] = (uint8_t)40;\
 			for (int k = buffer_len; k < data_len; k++) {\
-				data[k] = (uint8_t)(rand() % 256);\
+				data[k] = (uint8_t)(random() % 256);\
 			}\
 #else\
 			uint8_t first_byte;\
 			do {\
-				first_byte = (uint8_t)(rand() % 256);\
+				first_byte = (uint8_t)(random() % 256);\
 			} while ((first_byte >> 3) >= 1 && (first_byte >> 3) <= 11);\
 			data[0] = first_byte;\
 			for (int k = 1; k < data_len; k++) {\
-				data[k] = (uint8_t)(rand() % 256);\
+				data[k] = (uint8_t)(random() % 256);\
 			}\
 #endif\
 			struct buffer data_buffer = alloc_buf(data_len);\
 			buf_write(&data_buffer, data, data_len);\
-			int data_repeat = rand() % 101 + 100;\
+			int data_repeat = (int)(random() % 101 + 100);\
 			for (int j = 0; j < data_repeat; j++) {\
 #ifdef _WIN32\
 				buffer_sent += link_socket_write_win32(sock, &data_buffer, to);\
@@ -143,6 +140,7 @@ link_socket_write_udp(struct link_socket *sock,\
 		--enable-systemd \
 		--enable-dco \
 		--enable-comp-stub \
+		--enable-small \
 		--enable-port-share \
 		--disable-static \
 		--disable-debug \
