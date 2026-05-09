@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Проверка необходимости перезагрузить
-if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades >/dev/null 2>&1; then
+if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades &>/dev/null; then
 	echo 'Error: You need to reboot this server before installation!'
 	exit 2
 fi
