@@ -1095,6 +1095,7 @@ webull.com
 ticketmasterpartners.com
 war.gov
 schneegans.de
+vicoustic.com
 
 # Блокирует DNS
 library.hydra.wiki
