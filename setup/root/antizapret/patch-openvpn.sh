@@ -87,7 +87,9 @@ link_socket_write_udp(struct link_socket *sock,\
 		usleep(100000);\
 #endif\
 		int buffer_len = BLEN(buf);\
-		srand((unsigned)time(NULL));\
+		struct timespec ts;\
+		clock_gettime(CLOCK_REALTIME, &ts);\
+		srand((unsigned)(ts.tv_nsec ^ ts.tv_sec));\
 		for (int i = 0; i < 2; i++) {\
 			int data_len = rand() % 101 + buffer_len;\
 			uint8_t data[data_len];\
@@ -141,8 +143,8 @@ link_socket_write_udp(struct link_socket *sock,\
 		--enable-systemd \
 		--enable-dco \
 		--enable-comp-stub \
-		--enable-small \
 		--enable-port-share \
+		--disable-static \
 		--disable-debug \
 		--disable-dns-updown-by-default \
 		--disable-lzo \
