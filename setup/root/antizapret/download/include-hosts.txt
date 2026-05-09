@@ -1093,6 +1093,7 @@ shop.eminem.com
 yootheme.com
 webull.com
 ticketmasterpartners.com
+war.gov
 
 # Блокирует DNS
 library.hydra.wiki
