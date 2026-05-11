@@ -1096,6 +1096,7 @@ ticketmasterpartners.com
 war.gov
 schneegans.de
 vicoustic.com
+aaro.mil
 
 # Блокирует DNS
 library.hydra.wiki
