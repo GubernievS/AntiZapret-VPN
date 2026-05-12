@@ -4,8 +4,8 @@ if [[ ! -v duplicate_cn ]]; then
 	for srv in antizapret-udp antizapret-tcp vpn-udp vpn-tcp; do
 		[[ "$dev" == "$srv" ]] && continue
 		lock=/dev/shm/${srv}.sock.lock
-		echo "kill $common_name" | timeout -k 1 1 socat -W "$lock" - "UNIX-CONNECT:/run/openvpn-server/${srv}.sock" | sed "/^>/d; s/^/${srv} /" || true
-		rm -f "$lock"
+		echo "kill $common_name" | timeout -k 2 2 socat -W "$lock" - "UNIX-CONNECT:/run/openvpn-server/${srv}.sock" | sed "/^>/d; s/^/${srv} /" || true
+		rm -f "$lock" "${lock}".*
 	done
 fi
 
