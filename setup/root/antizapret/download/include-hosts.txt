@@ -1098,6 +1098,7 @@ schneegans.de
 vicoustic.com
 aaro.mil
 titanos.tv
+neowin.com
 
 # Блокирует DNS
 library.hydra.wiki
