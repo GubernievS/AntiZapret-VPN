@@ -105,4 +105,12 @@ max.ru CNAME .
 ; https://habr.com/ru/articles/1000792
 telega.info CNAME .
 *.telega.info CNAME .
+
+; https://habr.com/ru/articles/1036222
+vk-analytics.ru CNAME .
+*.vk-analytics.ru CNAME .
+trace-flow.ru CNAME .
+*.trace-flow.ru CNAME .
+apptracer.ru CNAME .
+*.apptracer.ru CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
