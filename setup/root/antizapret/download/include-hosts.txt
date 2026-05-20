@@ -1099,6 +1099,7 @@ vicoustic.com
 aaro.mil
 titanos.tv
 neowin.com
+walbi.com
 
 # Блокирует DNS
 library.hydra.wiki
