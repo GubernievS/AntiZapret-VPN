@@ -1,65 +1,4 @@
 #!/bin/bash
-
-if [[ ! -s /root/antizapret/config/drop-ips.txt ]]; then
-	cat > /root/antizapret/config/drop-ips.txt <<'EOF'
-# Добавление IPv4-адресов запрещённых для форвардинга через AntiZapret VPN и полный VPN
-#
-# Формат записи: A.B.C.D/M
-# Где:
-#   A.B.C.D - IPv4-адрес
-#   M       - размер маски подсети (1–32)
-#
-# Примеры записи:
-#   1.1.1.1/32        - запрет одного IPv4-адреса
-#   162.159.192.0/24  - запрет подсети с маской 24 (254 IPv4-адреса)
-#   66.22.192.0/18    - запрет подсети с маской 18 (16382 IPv4-адреса)
-#   104.24.0.0/14     - запрет подсети с маской 14 (262142 IPv4-адреса)
-#
-# Строки начинающиеся с # это комментарии и они не обрабатываются
-#
-
-
-
-
-
-
-
-
-
-
-EOF
-fi
-
-if [[ ! -s /root/antizapret/config/deny-ips.txt ]]; then
-	cat > /root/antizapret/config/deny-ips.txt <<'EOF'
-# Добавление IPv4-адресов заблокированных для входящих подключений к серверу
-#
-# Формат записи: A.B.C.D/M
-# Где:
-#   A.B.C.D - IPv4-адрес
-#   M       - размер маски подсети (1–32)
-#
-# Примеры записи:
-#   1.1.1.1/32        - блокировка одного IPv4-адреса-источника
-#   162.159.192.0/24  - блокировка подсети с маской 24 (254 IPv4-адреса)
-#   66.22.192.0/18    - блокировка подсети с маской 18 (16382 IPv4-адреса)
-#   104.24.0.0/14     - блокировка подсети с маской 14 (262142 IPv4-адреса)
-#
-# Строки начинающиеся с # это комментарии и они не обрабатываются
-#
-
-
-
-
-
-
-
-
-
-
-EOF
-fi
-
 set -e
 shopt -s nullglob
 
@@ -217,10 +156,10 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-adblock-hosts.txt config/*exclude-adblock-hosts.txt > temp/exclude-adblock-hosts.txt
 
 	# Обрабатываем список с рекламными доменами для блокировки от AdGuard
-	sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/*adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/include-adblock-hosts.txt
+	[[ -f download/adguard.txt ]] && sed -n '/\*/!s/^||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/include-adblock-hosts.txt
 
 	# Обрабатываем список с исключениями из блокировки от AdGuard
-	sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/*adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/exclude-adblock-hosts.txt
+	[[ -f download/adguard.txt ]] && sed -n '/\*/!s/^@@||\([^ ]*\)\^.*$/\1/p' download/adguard.txt | sed -E 's/.*/\L&/; /^[0-9.]+$/d' >> temp/exclude-adblock-hosts.txt
 
 	# Удаляем дубли и сортируем
 	sort -u temp/include-adblock-hosts.txt > result/include-adblock-hosts.txt
@@ -259,7 +198,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
-	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{s/.*/\L&/; /^[а-яa-z0-9.-]\+$/p}' download/*domain.txt \
+	[[ -f download/domain.txt ]] && sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{s/.*/\L&/; /^[а-яa-z0-9.-]\+$/p}' download/domain.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
 	# Удаляем домены казино и букмекеров
@@ -275,10 +214,10 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 
 	# Удаляем избыточные поддомены
 	if [[ "$ROUTE_ALL" = 'y' ]]; then
-		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt > temp/include-hosts4.txt
+		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[0-9]+)\.//' temp/include-hosts3.txt > temp/include-hosts4.txt
 	else
 		# Добавляем исключённые домены для дальнейшего удаления избыточных доменов
-		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[A-Za-z]|[0-9]+)\.//' temp/include-hosts3.txt result/exclude-hosts.txt > temp/include-hosts4.txt
+		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[0-9]+)\.//' temp/include-hosts3.txt result/exclude-hosts.txt > temp/include-hosts4.txt
 	fi
 
 	# Удаляем избыточные домены
