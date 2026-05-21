@@ -52,8 +52,11 @@ dnsbl.manitu.net CNAME .
 *.rarbg.me CNAME .
 *.rarbg.com CNAME .
 tracker.publicbt.com CNAME .
-tracker.trackerfix.comCNAME .
-public.publictracker.xyz
+tracker.trackerfix.com CNAME .
+public.publictracker.xyz CNAME .
+tracker.lelux.fi CNAME .
+tracker.imgoingto.icu CNAME .
+tracker.openbittorrent.com A 52.223.13.41
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28

@@ -53,8 +53,11 @@ mcc255.pub.3gppnetwork.org CNAME .
 *.rarbg.me CNAME .
 *.rarbg.com CNAME .
 tracker.publicbt.com CNAME .
-tracker.trackerfix.comCNAME .
-public.publictracker.xyz
+tracker.trackerfix.com CNAME .
+public.publictracker.xyz CNAME .
+tracker.lelux.fi CNAME .
+tracker.imgoingto.icu CNAME .
+tracker.openbittorrent.com A 52.223.13.41
 
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
@@ -64,8 +67,6 @@ usmall.ru A 18.64.119.98
 *.usmall.ru A 18.64.119.98
 usmall.ru A 18.66.192.97
 *.usmall.ru A 18.66.192.97
-
-tracker.openbittorrent.com A 52.223.13.41
 
 ; https://habr.com/ru/articles/1006666
 redirector.googlevideo.com CNAME .
