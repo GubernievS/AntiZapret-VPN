@@ -1100,6 +1100,8 @@ aaro.mil
 titanos.tv
 neowin.com
 walbi.com
+ugreen.com
+unknownworlds.com
 
 # Блокирует DNS
 library.hydra.wiki
