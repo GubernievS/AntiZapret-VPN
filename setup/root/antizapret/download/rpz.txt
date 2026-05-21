@@ -44,21 +44,17 @@ dns.alidns.com CNAME .
 doh.skydns.ru CNAME .
 *.doh.skydns.ru CNAME .
 
-rarbg.me CNAME .
-*.rarbg.me CNAME .
-rarbg.com CNAME .
-*.rarbg.com CNAME .
-publicbt.com CNAME .
-*.publicbt.com CNAME .
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
-opentor.org CNAME .
-*.opentor.org CNAME .
-trackerfix.com CNAME .
-*.trackerfix.com CNAME .
 
 mcc255.pub.3gppnetwork.org CNAME .
 *.mcc255.pub.3gppnetwork.org CNAME .
+
+*.rarbg.me CNAME .
+*.rarbg.com CNAME .
+tracker.publicbt.com CNAME .
+tracker.trackerfix.comCNAME .
+public.publictracker.xyz
 
 usmall.ru A 3.161.82.8
 *.usmall.ru A 3.161.82.8
