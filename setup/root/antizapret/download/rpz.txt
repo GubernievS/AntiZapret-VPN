@@ -54,6 +54,9 @@ dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
 opentor.org CNAME .
 *.opentor.org CNAME .
+trackerfix.com CNAME .
+*.trackerfix.com CNAME .
+
 mcc255.pub.3gppnetwork.org CNAME .
 *.mcc255.pub.3gppnetwork.org CNAME .
 
