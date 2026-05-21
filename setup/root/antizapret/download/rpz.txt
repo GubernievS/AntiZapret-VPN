@@ -57,6 +57,11 @@ tracker.trackerfix.com CNAME .
 public.publictracker.xyz CNAME .
 tracker.lelux.fi CNAME .
 tracker.imgoingto.icu CNAME .
+opentracker.i2p.rocks CNAME .
+retracker.lanta.me CNAME .
+tracker.token.ro CNAME .
+retracker.lanta-net.ru CNAME .
+tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
 usmall.ru A 3.161.82.8
