@@ -1102,6 +1102,7 @@ neowin.com
 walbi.com
 ugreen.com
 unknownworlds.com
+worldofballpythons.com
 
 # Блокирует DNS
 library.hydra.wiki
