@@ -1103,6 +1103,7 @@ walbi.com
 ugreen.com
 unknownworlds.com
 worldofballpythons.com
+dailymail.com
 
 # Блокирует DNS
 library.hydra.wiki
