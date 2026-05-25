@@ -1104,6 +1104,7 @@ ugreen.com
 unknownworlds.com
 worldofballpythons.com
 dailymail.com
+sera.to
 
 # Блокирует DNS
 library.hydra.wiki
