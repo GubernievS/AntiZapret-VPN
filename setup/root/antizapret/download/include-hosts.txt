@@ -18,6 +18,7 @@ digitalocean.com
 #adguard-vpn.com
 signal.org
 hetzner.com
+hetzner.cloud
 lostfilm.tv
 licdn.com
 rutrk.org
