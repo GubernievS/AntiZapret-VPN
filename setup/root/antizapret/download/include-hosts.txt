@@ -1107,6 +1107,8 @@ worldofballpythons.com
 dailymail.com
 sera.to
 mobatek.net
+arstechnica.com
+maven.neoforged.net
 
 # Блокирует DNS
 library.hydra.wiki
