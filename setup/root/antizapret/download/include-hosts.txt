@@ -1109,6 +1109,7 @@ sera.to
 mobatek.net
 arstechnica.com
 maven.neoforged.net
+liquipedia.net
 
 # Блокирует DNS
 library.hydra.wiki
