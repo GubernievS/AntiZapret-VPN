@@ -1110,6 +1110,7 @@ mobatek.net
 arstechnica.com
 maven.neoforged.net
 liquipedia.net
+insidelvmh.com
 
 # Блокирует DNS
 library.hydra.wiki
