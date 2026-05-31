@@ -1,4 +1,4 @@
--- Fallback on non-NOERROR or timeout from the default resolver
+-- Fallback on non-NOERROR response from the default resolver
 
 local ffi = require('ffi')
 local kres = require('kres')
@@ -50,33 +50,10 @@ local function do_fallback(state, req, qry)
 	return true
 end
 
--- Produce this request before sending to upstream
-function M.layer.produce(state, req, pkt)
-	local qry = check_query(req)
-	if not qry then
-		return state
-	end
-
-	if not req.count_fail_row or req.count_fail_row == 0 then
-		return state
-	end
-
-	do_fallback(state, req, qry)
-	return state
-end
-
 -- Consume reply from upstream or from cache
 function M.layer.consume(state, req, pkt)
 	local qry = check_query(req)
 	if not qry then
-		return state
-	end
-
-	-- Timeout/transport errors
-	if not pkt then
-		if do_fallback(state, req, qry) then
-			return kres.FAIL
-		end
 		return state
 	end
 
