@@ -1111,6 +1111,7 @@ arstechnica.com
 maven.neoforged.net
 liquipedia.net
 insidelvmh.com
+tomshardware.com
 
 # Блокирует DNS
 library.hydra.wiki
