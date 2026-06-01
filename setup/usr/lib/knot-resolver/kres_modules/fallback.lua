@@ -6,7 +6,7 @@ ffi.cdef("void kr_server_selection_init(struct kr_query *qry);")
 
 local M = {
 	layer = {},
-	action = policy.FORWARD({'1.1.1.1', '9.9.9.10', '77.88.8.8', '193.58.251.251'})
+	action = policy.FORWARD({'1.1.1.1', '9.9.9.10', '76.76.2.0', '193.58.251.251'})
 }
 
 local fallback = {}
