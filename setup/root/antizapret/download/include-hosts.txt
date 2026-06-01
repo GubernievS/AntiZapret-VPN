@@ -1112,6 +1112,7 @@ maven.neoforged.net
 liquipedia.net
 insidelvmh.com
 tomshardware.com
+sponsor.ajay.app
 
 # Блокирует DNS
 library.hydra.wiki
