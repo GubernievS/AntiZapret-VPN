@@ -11,14 +11,6 @@ local M = {
 
 local fallback = {}
 
-local function check_query(req)
-	local qry = req:current()
-	if not qry or qry.flags.CACHED then
-		return nil
-	end
-	return qry
-end
-
 local function do_fallback(state, req, qry)
 	local key = tostring(req)
 	if fallback[key] then
@@ -52,8 +44,8 @@ end
 
 -- Consume reply from upstream or from cache
 function M.layer.consume(state, req, pkt)
-	local qry = check_query(req)
-	if not qry then
+	local qry = req:current()
+	if not qry or qry.flags.CACHED then
 		return state
 	end
 
