@@ -1113,6 +1113,7 @@ liquipedia.net
 insidelvmh.com
 tomshardware.com
 sponsor.ajay.app
+whathifi.com
 
 # Блокирует DNS
 library.hydra.wiki
