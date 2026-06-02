@@ -1114,6 +1114,7 @@ insidelvmh.com
 tomshardware.com
 sponsor.ajay.app
 whathifi.com
+fie.futurecdn.net
 swiftapps.org
 
 # Блокирует DNS
