@@ -81,6 +81,18 @@ if (( MTU < 1500 )); then
 fi
 
 # Спрашиваем о настройках
+until [[ "$OPENVPN_UDP_ENABLE" =~ (y|n) ]]; do
+	read -rp 'Enable OpenVPN UDP? [y/n]: ' -e -i y OPENVPN_UDP_ENABLE
+done
+echo
+until [[ "$OPENVPN_TCP_ENABLE" =~ (y|n) ]]; do
+	read -rp 'Enable OpenVPN TCP? [y/n]: ' -e -i n OPENVPN_TCP_ENABLE
+done
+echo
+until [[ "$WIREGUARD_ENABLE" =~ (y|n) ]]; do
+	read -rp 'Enable WireGuard/AmneziaWG? [y/n]: ' -e -i y WIREGUARD_ENABLE
+done
+echo
 echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
 echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
 echo '    1) Strong      - Recommended by default'
@@ -275,12 +287,11 @@ systemctl disable --now antizapret
 systemctl disable --now antizapret-update.timer
 systemctl disable --now antizapret-update
 systemctl disable --now openvpn-server@antizapret-udp
-systemctl disable --now openvpn-server@antizapret-tcp
 systemctl disable --now openvpn-server@vpn-udp
+systemctl disable --now openvpn-server@antizapret-tcp
 systemctl disable --now openvpn-server@vpn-tcp
 systemctl disable --now wg-quick@antizapret
 systemctl disable --now wg-quick@vpn
-systemctl disable --now kres-cache-gc
 
 # Удалим ненужные службы
 apt-get purge -y ufw
@@ -417,6 +428,9 @@ rm -rf /root/custom
 
 # Сохраняем настройки
 echo "SETUP_DATE=$(date --iso-8601=seconds)
+OPENVPN_UDP_ENABLE=$OPENVPN_UDP_ENABLE
+OPENVPN_TCP_ENABLE=$OPENVPN_TCP_ENABLE
+WIREGUARD_ENABLE=$WIREGUARD_ENABLE
 OPENVPN_PATCH=$OPENVPN_PATCH
 OPENVPN_DCO=$OPENVPN_DCO
 ANTIZAPRET_WARP=$ANTIZAPRET_WARP
@@ -576,14 +590,20 @@ systemctl enable kresd@2
 systemctl enable antizapret
 systemctl enable antizapret-update.timer
 systemctl enable antizapret-update
-systemctl enable openvpn-server@antizapret-udp
-systemctl enable openvpn-server@antizapret-tcp
-systemctl enable openvpn-server@vpn-udp
-systemctl enable openvpn-server@vpn-tcp
-systemctl enable wg-quick@antizapret
-systemctl enable wg-quick@vpn
 systemctl mask kres-cache-gc
 systemctl disable kres-cache-gc
+if [[ "$OPENVPN_UDP_ENABLE" == 'y' ]]; then
+	systemctl enable openvpn-server@antizapret-udp
+	systemctl enable openvpn-server@vpn-udp
+fi
+if [[ "$OPENVPN_TCP_ENABLE" == 'y' ]]; then
+	systemctl enable openvpn-server@antizapret-tcp
+	systemctl enable openvpn-server@vpn-tcp
+fi
+if [[ "$WIREGUARD_ENABLE" == 'y' ]]; then
+	systemctl enable wg-quick@antizapret
+	systemctl enable wg-quick@vpn
+fi
 
 ERRORS=
 
