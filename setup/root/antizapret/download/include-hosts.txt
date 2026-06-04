@@ -1117,6 +1117,7 @@ whathifi.com
 fie.futurecdn.net
 swiftapps.org
 minisforum.uk
+zillowstatic.com
 
 # Блокирует DNS
 library.hydra.wiki
