@@ -1116,6 +1116,7 @@ sponsor.ajay.app
 whathifi.com
 fie.futurecdn.net
 swiftapps.org
+minisforum.uk
 
 # Блокирует DNS
 library.hydra.wiki
