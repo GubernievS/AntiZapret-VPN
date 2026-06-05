@@ -1118,6 +1118,7 @@ fie.futurecdn.net
 swiftapps.org
 minisforum.uk
 zillowstatic.com
+cursor.com
 
 # Блокирует DNS
 library.hydra.wiki
