@@ -145,12 +145,12 @@ if __name__ == "__main__":
     p.add_argument("--port",type=int,default=53,
                     metavar="<port>",
                     help="Local proxy port (default:53)")
-    p.add_argument("--address",default="127.0.0.3",
+    p.add_argument("--address",default="127.3.3.3",
                     metavar="<address>",
-                    help="Local proxy listen address (default:127.0.0.3)")
-    p.add_argument("--upstream",default="127.0.0.2:53",
+                    help="Local proxy listen address (default:127.3.3.3)")
+    p.add_argument("--upstream",default="127.2.2.2:53",
                     metavar="<dns server:port>",
-                    help="Upstream DNS server:port (default:127.0.0.2:53)")
+                    help="Upstream DNS server:port (default:127.2.2.2:53)")
     p.add_argument("--timeout",type=float,default=5,
                     metavar="<timeout>",
                     help="Upstream timeout (default: 5s)")

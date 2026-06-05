@@ -124,11 +124,11 @@ iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 580 -j RED
 iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52080 -j REDIRECT --to-ports 51080
 iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52443 -j REDIRECT --to-ports 51443
 # AntiZapret DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.1
-iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.1.1.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.1.1.1
 # VPN DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.0.0.2
-iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.0.0.2
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.2.2.2
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.2.2.2
 # Restrict forwarding
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 # Mapping fake IP to real IP
