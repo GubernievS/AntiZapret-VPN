@@ -206,7 +206,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 
 	# Удаляем домены казино и букмекеров
 	if [[ "$CLEAR_HOSTS" == 'y' ]]; then
-		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|official|slottica|sykaaa|admiral-*x|x-*admiral|pinup-*bet|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|newretro|platinum|igrat|flagman|arkada' temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
+		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|zerkalo|slottica|sykaaa|admiral-*x|x-*admiral|pinup-*bet|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|newretro|platinum|igrat|flagman|arkada' temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
 	else
 		sort -u temp/include-hosts.txt > temp/include-hosts2.txt
 	fi
@@ -216,7 +216,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	comm -13 temp/remove-hosts.txt temp/exclude-hosts.txt > result/exclude-hosts.txt
 
 	# Удаляем избыточные поддомены
-	if [[ "$ROUTE_ALL" = 'y' ]]; then
+	if [[ "$ROUTE_ALL" == 'y' ]]; then
 		sed -E '/\..*\./ s/^([0-9]*www[0-9]*|hd[0-9]*|[0-9]+)\.//' temp/include-hosts3.txt > temp/include-hosts4.txt
 	else
 		# Добавляем исключённые домены для дальнейшего удаления избыточных доменов
@@ -235,7 +235,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		print $0
 	}' | rev | sort -u > temp/include-hosts5.txt
 
-	if [[ "$ROUTE_ALL" = 'y' ]]; then
+	if [[ "$ROUTE_ALL" == 'y' ]]; then
 		# Пустим все домены через AntiZapret VPN
 		sed '1i.' temp/include-hosts5.txt > result/include-hosts.txt
 	else
