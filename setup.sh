@@ -48,6 +48,14 @@ else
 	exit 7
 fi
 
+# Очистка диска
+journalctl --vacuum-size=1B -q
+find /var/log -name "*.gz" -delete
+find /var/log -name "*.1" -delete
+find /var/log -type f -exec truncate -s 0 {} +
+apt-get clean
+apt-get autoremove --purge -y &>/dev/null
+
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
 	echo 'Error: Low disk space! You need 2GB of free space!'
@@ -359,7 +367,6 @@ rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 rm -rf /etc/apt/sources.list.d/backports.list
 export DEBIAN_FRONTEND=noninteractive
-apt-get clean
 apt-get update
 dpkg --configure -a
 apt-get install --fix-broken -y
