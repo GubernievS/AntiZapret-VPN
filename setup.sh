@@ -54,7 +54,7 @@ find /var/log -name "*.gz" -delete
 find /var/log -name "*.1" -delete
 find /var/log -type f -exec truncate -s 0 {} +
 apt-get clean
-apt-get autoremove --purge -y &>/dev/null
+apt-get autoremove --purge -y >/dev/null
 
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
