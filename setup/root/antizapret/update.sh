@@ -139,13 +139,13 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 	download $REMOVE_HOSTS_PATH $REMOVE_HOSTS_LINK
 
-	if [[ "$ROUTE_ALL" = 'y' ]]; then
+	if [[ "$ROUTE_ALL" == 'y' ]]; then
 		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 	else
 		printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > $EXCLUDE_HOSTS_PATH
 	fi
 
-	if [[ "$BLOCK_ADS" = 'y' ]]; then
+	if [[ "$BLOCK_ADS" == 'y' ]]; then
 		download $INCLUDE_ADBLOCK_HOSTS_PATH $INCLUDE_ADBLOCK_HOSTS_LINK
 		download $EXCLUDE_ADBLOCK_HOSTS_PATH $EXCLUDE_ADBLOCK_HOSTS_LINK
 		download $ADGUARD_PATH $ADGUARD_LINK
@@ -159,47 +159,47 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 fi
 
 if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
-	if [[ "$DISCORD_INCLUDE" = "y" ]]; then
+	if [[ "$DISCORD_INCLUDE" == 'y']]; then
 		download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
 	fi
 
-	if [[ "$CLOUDFLARE_INCLUDE" = "y" ]]; then
+	if [[ "$CLOUDFLARE_INCLUDE" == 'y']]; then
 		download $CLOUDFLARE_IPS_PATH $CLOUDFLARE_IPS_LINK
 	fi
 
-	if [[ "$AMAZON_INCLUDE" = "y" ]]; then
+	if [[ "$AMAZON_INCLUDE" == 'y']]; then
 		download $AMAZON_IPS_PATH $AMAZON_IPS_LINK
 	fi
 
-	if [[ "$HETZNER_INCLUDE" = "y" ]]; then
+	if [[ "$HETZNER_INCLUDE" == 'y']]; then
 		download $HETZNER_IPS_PATH $HETZNER_IPS_LINK
 	fi
 
-	if [[ "$DIGITALOCEAN_INCLUDE" = "y" ]]; then
+	if [[ "$DIGITALOCEAN_INCLUDE" == 'y']]; then
 		download $DIGITALOCEAN_IPS_PATH $DIGITALOCEAN_IPS_LINK
 	fi
 
-	if [[ "$OVH_INCLUDE" = "y" ]]; then
+	if [[ "$OVH_INCLUDE" == 'y']]; then
 		download $OVH_IPS_PATH $OVH_IPS_LINK
 	fi
 
-	if [[ "$TELEGRAM_INCLUDE" = "y" ]]; then
+	if [[ "$TELEGRAM_INCLUDE" == 'y']]; then
 		download $TELEGRAM_IPS_PATH $TELEGRAM_IPS_LINK
 	fi
 
-	if [[ "$GOOGLE_INCLUDE" = "y" ]]; then
+	if [[ "$GOOGLE_INCLUDE" == 'y']]; then
 		download $GOOGLE_IPS_PATH $GOOGLE_IPS_LINK
 	fi
 
-	if [[ "$AKAMAI_INCLUDE" = "y" ]]; then
+	if [[ "$AKAMAI_INCLUDE" == 'y']]; then
 		download $AKAMAI_IPS_PATH $AKAMAI_IPS_LINK
 	fi
 
-	if [[ "$WHATSAPP_INCLUDE" = "y" ]]; then
+	if [[ "$WHATSAPP_INCLUDE" == 'y']]; then
 		download $WHATSAPP_IPS_PATH $WHATSAPP_IPS_LINK
 	fi
 
-	if [[ "$ROBLOX_INCLUDE" = "y" ]]; then
+	if [[ "$ROBLOX_INCLUDE" == 'y']]; then
 		download $ROBLOX_IPS_PATH $ROBLOX_IPS_LINK
 	fi
 fi
