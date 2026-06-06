@@ -1121,6 +1121,7 @@ zillowstatic.com
 cursor.com
 shimaofficial.com
 svsound.com
+edhrec.com
 
 # Блокирует DNS
 library.hydra.wiki
