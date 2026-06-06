@@ -1123,6 +1123,7 @@ cursor.sh
 shimaofficial.com
 svsound.com
 edhrec.com
+maps.me
 
 # Блокирует DNS
 library.hydra.wiki
