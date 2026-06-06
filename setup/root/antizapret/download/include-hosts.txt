@@ -1119,6 +1119,7 @@ swiftapps.org
 minisforum.uk
 zillowstatic.com
 cursor.com
+cursor.sh
 shimaofficial.com
 svsound.com
 edhrec.com
