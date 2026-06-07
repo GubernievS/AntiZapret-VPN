@@ -1124,6 +1124,7 @@ shimaofficial.com
 svsound.com
 edhrec.com
 maps.me
+freecaster.com
 
 # Блокирует DNS
 library.hydra.wiki
