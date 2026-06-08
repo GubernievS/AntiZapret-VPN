@@ -1125,6 +1125,7 @@ svsound.com
 edhrec.com
 maps.me
 freecaster.com
+pencil.dev
 
 # Блокирует DNS
 library.hydra.wiki
