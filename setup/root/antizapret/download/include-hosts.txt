@@ -1127,6 +1127,7 @@ maps.me
 freecaster.com
 pencil.dev
 barix.com
+niceincontact.com
 
 # Блокирует DNS
 library.hydra.wiki
