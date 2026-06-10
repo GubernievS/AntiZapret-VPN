@@ -254,7 +254,7 @@ until [[ "$WHATSAPP_INCLUDE" =~ (y|n) ]]; do
 done
 echo
 until [[ "$ROBLOX_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n ROBLOX_INCLUDE
+	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y ROBLOX_INCLUDE
 done
 echo
 #until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
