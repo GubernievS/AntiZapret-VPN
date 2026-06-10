@@ -1126,6 +1126,7 @@ edhrec.com
 maps.me
 freecaster.com
 pencil.dev
+barix.com
 
 # Блокирует DNS
 library.hydra.wiki
