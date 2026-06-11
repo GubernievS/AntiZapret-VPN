@@ -1130,6 +1130,8 @@ barix.com
 niceincontact.com
 apps.apple.com
 martrust.com
+totalcsgo.com
+dantoo.net
 
 # Блокирует DNS
 library.hydra.wiki
