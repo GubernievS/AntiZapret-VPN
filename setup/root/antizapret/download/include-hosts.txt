@@ -1128,6 +1128,7 @@ freecaster.com
 pencil.dev
 barix.com
 niceincontact.com
+apps.apple.com
 
 # Блокирует DNS
 library.hydra.wiki
