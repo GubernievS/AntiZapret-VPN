@@ -1129,6 +1129,7 @@ pencil.dev
 barix.com
 niceincontact.com
 apps.apple.com
+martrust.com
 
 # Блокирует DNS
 library.hydra.wiki
