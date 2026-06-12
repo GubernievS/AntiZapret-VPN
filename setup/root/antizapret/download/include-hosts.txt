@@ -1128,10 +1128,11 @@ freecaster.com
 pencil.dev
 barix.com
 niceincontact.com
-apps.apple.com
 martrust.com
 totalcsgo.com
 dantoo.net
+apple.com
+mzstatic.com
 
 # Блокирует DNS
 library.hydra.wiki
