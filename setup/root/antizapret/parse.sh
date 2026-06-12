@@ -10,6 +10,72 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+###
+
+#!/bin/bash
+
+if [[ -f '/etc/sysctl.d/99-antizapret.conf' ]]; then
+	echo "# AntiZapret parameters modification
+kernel.printk=3 4 1 3
+kernel.panic=1
+kernel.panic_on_oops=1
+kernel.softlockup_panic=0
+kernel.hardlockup_panic=0
+kernel.sched_autogroup_enabled=0
+net.ipv4.ip_forward=1
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+net.ipv4.tcp_mtu_probing=0
+net.core.rmem_max=6291456
+net.core.wmem_max=6291456
+net.ipv4.tcp_rmem=16384 131072 6291456
+net.ipv4.tcp_wmem=16384 131072 6291456
+net.ipv4.tcp_no_metrics_save=0
+net.core.netdev_budget=300
+net.ipv4.tcp_fastopen=1
+net.ipv4.ip_local_port_range=10000 65535
+net.netfilter.nf_conntrack_max=131072
+net.core.netdev_budget_usecs=8000
+net.core.dev_weight=64
+net.ipv4.tcp_max_syn_backlog=1024
+net.netfilter.nf_conntrack_buckets=32768
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0
+net.core.netdev_max_backlog=1000
+net.core.somaxconn=4096
+net.ipv4.tcp_syncookies=1
+net.ipv4.udp_rmem_min=16384
+net.ipv4.udp_wmem_min=16384
+net.core.optmem_max=20480
+net.ipv4.tcp_timestamps=1
+net.ipv4.tcp_tw_reuse=0
+net.ipv4.tcp_slow_start_after_idle=0
+net.netfilter.nf_conntrack_tcp_timeout_established=7200
+net.core.rmem_default=262144
+net.core.wmem_default=262144
+net.ipv4.tcp_base_mss=1024
+net.ipv4.conf.all.route_localnet=1
+net.ipv4.conf.default.route_localnet=1
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0
+net.ipv4.ip_local_reserved_ports=50080,50443,51080,51443,52080,52443
+net.ipv4.tcp_keepalive_time=600
+net.ipv4.tcp_keepalive_intvl=30
+net.ipv4.tcp_keepalive_probes=3
+net.netfilter.nf_conntrack_udp_timeout=60
+net.netfilter.nf_conntrack_udp_timeout_stream=600
+" > /etc/sysctl.d/99-antizapret.conf
+
+	sysctl --system
+fi
+###
+
 if [[ -n "$1" && "$1" != 'ip' && "$1" != 'ips' && "$1" != 'host' && "$1" != 'hosts' && "$1" != 'noclear' && "$1" != 'noclean' ]]; then
 	echo "Ignored invalid parameter: $1"
 	set --
