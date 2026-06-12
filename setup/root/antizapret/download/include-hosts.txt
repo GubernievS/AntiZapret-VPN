@@ -1133,6 +1133,8 @@ totalcsgo.com
 dantoo.net
 apple.com
 mzstatic.com
+survev.io
+openpgpkey.archlinux.org
 
 # Блокирует DNS
 library.hydra.wiki
