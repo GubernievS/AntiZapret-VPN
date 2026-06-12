@@ -121,4 +121,12 @@ trace-flow.ru CNAME .
 *.trace-flow.ru CNAME .
 apptracer.ru CNAME .
 *.apptracer.ru CNAME .
+
+; https://habr.com/ru/articles/1046710
+reef.vk-cdn.net CNAME .
+*.reef.vk-cdn.net CNAME .
+oneme.app CNAME .
+*.oneme.app CNAME .
+rustore.ru CNAME .
+*.rustore.ru CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
