@@ -30,7 +30,7 @@ net.core.rmem_max=6291456
 net.core.wmem_max=6291456
 net.ipv4.tcp_rmem=16384 131072 6291456
 net.ipv4.tcp_wmem=16384 131072 6291456
-net.ipv4.tcp_no_metrics_save=0
+net.ipv4.tcp_no_metrics_save=1
 net.core.netdev_budget=300
 net.ipv4.tcp_fastopen=1
 net.ipv4.ip_local_port_range=10000 65535
@@ -73,6 +73,7 @@ net.netfilter.nf_conntrack_udp_timeout_stream=600
 " > /etc/sysctl.d/99-antizapret.conf
 
 	sysctl --system
+	ip tcp_metrics flush
 fi
 ###
 
