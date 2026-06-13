@@ -53,6 +53,8 @@ journalctl --vacuum-size=1B -q
 find /var/log -name "*.gz" -delete
 find /var/log -name "*.1" -delete
 find /var/log -type f -exec truncate -s 0 {} +
+dpkg --configure -a
+apt-get install -f
 apt-get clean
 apt-get autoremove --purge -y >/dev/null
 
@@ -368,8 +370,6 @@ rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 rm -rf /etc/apt/sources.list.d/backports.list
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-dpkg --configure -a
-apt-get install --fix-broken -y
 apt-get dist-upgrade -y
 apt-get install -y curl gpg
 
