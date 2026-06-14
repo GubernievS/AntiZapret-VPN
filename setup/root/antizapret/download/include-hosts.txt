@@ -1139,6 +1139,7 @@ srvkp.com
 teleos.club
 pushbr.com
 simaudio.com
+bosch.com
 
 # Блокирует DNS
 library.hydra.wiki
