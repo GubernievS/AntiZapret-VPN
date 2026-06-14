@@ -1138,6 +1138,7 @@ openpgpkey.archlinux.org
 srvkp.com
 teleos.club
 pushbr.com
+simaudio.com
 
 # Блокирует DNS
 library.hydra.wiki
