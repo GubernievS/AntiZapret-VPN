@@ -1140,6 +1140,8 @@ teleos.club
 pushbr.com
 simaudio.com
 bosch.com
+capture.se
+safereactor.cc
 
 # Блокирует DNS
 library.hydra.wiki
