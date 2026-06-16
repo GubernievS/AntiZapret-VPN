@@ -591,14 +591,12 @@ sed -i '/function policy\.PASS(state, _)/,/^end$/s/return state/return nil/' /us
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/antizapret/client.sh 7
 
-# Включим/выключим обновляемые службы
+# Включим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
 systemctl enable antizapret
 systemctl enable antizapret-update.timer
 systemctl enable antizapret-update
-systemctl mask kres-cache-gc
-systemctl disable kres-cache-gc
 if [[ "$OPENVPN_UDP_ENABLE" == 'y' ]]; then
 	systemctl enable openvpn-server@antizapret-udp
 	systemctl enable openvpn-server@vpn-udp
