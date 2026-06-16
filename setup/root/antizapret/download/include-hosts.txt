@@ -849,7 +849,7 @@ a.run.app
 appspot.com
 biz.net.ru
 sl.pt
-anydesk.com
+#anydesk.com
 thetvdb.com
 #wa.me
 #whatsapp.com
