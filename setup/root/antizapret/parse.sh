@@ -15,6 +15,8 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 systemctl unmask kres-cache-gc
 systemctl enable --now kres-cache-gc
 
+sed -i -E '/^(sndbuf|rcvbuf)/d' /etc/openvpn/server/*.conf
+
 ###
 
 if [[ -n "$1" && "$1" != 'ip' && "$1" != 'ips' && "$1" != 'host' && "$1" != 'hosts' && "$1" != 'noclear' && "$1" != 'noclean' ]]; then
