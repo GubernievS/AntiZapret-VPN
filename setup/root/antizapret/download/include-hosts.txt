@@ -1144,6 +1144,14 @@ capture.se
 safereactor.cc
 tibco.com
 docs.camunda.io
+bosch-home.co.nz
+bosch-home.co.uk
+bosch-home.com.sg
+bosch-professional.com
+home-connect.com.vn
+home-connect.de
+homeconnecthca.com
+homeconnectegw.com
 
 # Блокирует DNS
 library.hydra.wiki
