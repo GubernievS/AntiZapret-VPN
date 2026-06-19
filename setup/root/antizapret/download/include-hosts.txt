@@ -1153,6 +1153,7 @@ home-connect.de
 homeconnecthca.com
 homeconnectegw.com
 kyods.com
+delverlab.com
 
 # Блокирует DNS
 library.hydra.wiki
