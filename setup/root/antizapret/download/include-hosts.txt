@@ -1154,6 +1154,13 @@ homeconnecthca.com
 homeconnectegw.com
 kyods.com
 delverlab.com
+iqair.com
+airvisual.net
+airvisual.io
+airvisual.com
+th.gl
+modartt.com
+toloka.ai
 
 # Блокирует DNS
 library.hydra.wiki
