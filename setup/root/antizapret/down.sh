@@ -41,14 +41,14 @@ WARP_IP="${WARP_IP:-172.16.0.2}"
 
 # filter
 # INPUT connection tracking
-iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
 # FORWARD connection tracking
 iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
-iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
+iptables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p tcp -m string --string 'GET ' --algo kmp --to 100 -m string --string 'info_hash=' --algo bm -m string --string 'peer_id=' --algo bm -m string --string 'port=' --algo bm -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent protocol' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
@@ -95,9 +95,9 @@ iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-deny sr
 # mangle
 # Clamp TCP MSS
 iptables -w -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-iptables -w -t mangle -D OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+iptables -w -t mangle -D OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 ip6tables -w -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-ip6tables -w -t mangle -D OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -D OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # raw
 # NOTRACK loopback

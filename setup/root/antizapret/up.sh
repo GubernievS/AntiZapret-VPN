@@ -111,14 +111,14 @@ ip6tables -w -P INPUT ACCEPT
 ip6tables -w -P FORWARD ACCEPT
 ip6tables -w -P OUTPUT ACCEPT
 # INPUT connection tracking
-iptables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
+iptables -w -I INPUT 1 ! -i lo -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -I INPUT 1 ! -i lo -m conntrack --ctstate INVALID -j DROP
 # FORWARD connection tracking
 iptables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
-iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
+iptables -w -I OUTPUT 1 ! -o lo -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -I OUTPUT 1 ! -o lo -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	ipset create antizapret-torrent hash:ip timeout 60 -exist
@@ -220,9 +220,9 @@ iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -m set --match-set antizapret-deny 
 # mangle
 # Clamp TCP MSS
 iptables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-iptables -w -t mangle -A OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+iptables -w -t mangle -A OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-ip6tables -w -t mangle -A OUTPUT -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -A OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # raw
 # NOTRACK loopback
