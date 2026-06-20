@@ -1161,6 +1161,7 @@ airvisual.com
 th.gl
 modartt.com
 toloka.ai
+whatwg.org
 
 # Блокирует DNS
 library.hydra.wiki
