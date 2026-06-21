@@ -183,7 +183,7 @@ net.core.optmem_max=20480
 net.ipv4.tcp_timestamps=1
 net.ipv4.tcp_tw_reuse=0
 net.ipv4.tcp_slow_start_after_idle=0
-net.netfilter.nf_conntrack_tcp_timeout_established=7200
+net.netfilter.nf_conntrack_tcp_timeout_established=86400
 net.core.rmem_default=262144
 net.core.wmem_default=262144
 net.ipv4.tcp_base_mss=1024
@@ -232,9 +232,6 @@ ip6tables -w -P OUTPUT ACCEPT
 # INPUT connection tracking
 iptables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I INPUT 1 -m conntrack --ctstate INVALID -j DROP
-# FORWARD connection tracking
-iptables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP

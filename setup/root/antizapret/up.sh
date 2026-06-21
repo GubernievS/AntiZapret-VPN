@@ -113,9 +113,6 @@ ip6tables -w -P OUTPUT ACCEPT
 # INPUT connection tracking
 iptables -w -I INPUT 1 ! -i lo -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I INPUT 1 ! -i lo -m conntrack --ctstate INVALID -j DROP
-# FORWARD connection tracking
-iptables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -I FORWARD 1 -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -I OUTPUT 1 ! -o lo -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -I OUTPUT 1 ! -o lo -m conntrack --ctstate INVALID -j DROP

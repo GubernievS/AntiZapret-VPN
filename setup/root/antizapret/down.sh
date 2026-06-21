@@ -43,9 +43,6 @@ WARP_IP="${WARP_IP:-172.16.0.2}"
 # INPUT connection tracking
 iptables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
-# FORWARD connection tracking
-iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
 iptables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
 ip6tables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
