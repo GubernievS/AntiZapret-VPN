@@ -119,10 +119,10 @@ ip6tables -w -I OUTPUT 1 ! -o lo -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	ipset create antizapret-torrent hash:ip timeout 60 -exist
-	iptables -w -I FORWARD 2 -s $IP.28.0.0/16 -p tcp -m string --string 'GET ' --algo kmp --to 100 -m string --string 'info_hash=' --algo bm -m string --string 'peer_id=' --algo bm -m string --string 'port=' --algo bm -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 3 -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent protocol' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 4 -s $IP.28.0.0/16 -p udp -m string --string 'd1:ad2:id20:' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
-	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
+	iptables -w -I FORWARD 1 -s $IP.28.0.0/16 -p tcp -m string --string 'GET ' --algo kmp --to 100 -m string --string 'info_hash=' --algo bm -m string --string 'peer_id=' --algo bm -m string --string 'port=' --algo bm -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 2 -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent protocol' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 3 -s $IP.28.0.0/16 -p udp -m string --string 'd1:ad2:id20:' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
+	iptables -w -I FORWARD 4 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
@@ -135,7 +135,7 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 			done < result/forward-ips.txt
 		fi
 	} | ipset restore
-	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+	iptables -w -I FORWARD 1 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
 # Drop forwarding
 {
@@ -147,19 +147,19 @@ fi
 		done < result/drop-ips.txt
 	fi
 } | ipset restore
-iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
+iptables -w -I FORWARD 1 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 # Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	if [[ "$ANTIZAPRET_OUT_INTERFACE" == "$VPN_OUT_INTERFACE" ]]; then
-		iptables -w -I FORWARD 2 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
+		iptables -w -I FORWARD 1 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
 	else
-		iptables -w -I FORWARD 2 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.29.0.0/16 -j DROP
-		iptables -w -I FORWARD 2 ! -i $VPN_OUT_INTERFACE -d $IP.28.0.0/16 -j DROP
+		iptables -w -I FORWARD 1 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.29.0.0/16 -j DROP
+		iptables -w -I FORWARD 1 ! -i $VPN_OUT_INTERFACE -d $IP.28.0.0/16 -j DROP
 	fi
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 else
-	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
+	iptables -w -I FORWARD 1 -d $IP.28.0.0/15 -j ACCEPT
 fi
 # SSH protection
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
