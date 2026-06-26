@@ -1163,6 +1163,7 @@ modartt.com
 toloka.ai
 whatwg.org
 oraclecloud.com
+fal.ai
 
 # Блокирует DNS
 library.hydra.wiki
