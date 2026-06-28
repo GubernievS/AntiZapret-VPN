@@ -1164,6 +1164,7 @@ toloka.ai
 whatwg.org
 oraclecloud.com
 fal.ai
+fal.media
 
 # Блокирует DNS
 library.hydra.wiki
