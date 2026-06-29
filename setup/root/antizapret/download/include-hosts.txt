@@ -1169,6 +1169,7 @@ scratch.mit.edu
 deadorbit.net
 gravityshavings.net
 gdebenz.ru
+scdn.co
 
 # Блокирует DNS
 library.hydra.wiki
