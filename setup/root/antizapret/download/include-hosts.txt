@@ -1168,6 +1168,7 @@ fal.media
 scratch.mit.edu
 deadorbit.net
 gravityshavings.net
+gdebenz.ru
 
 # Блокирует DNS
 library.hydra.wiki
