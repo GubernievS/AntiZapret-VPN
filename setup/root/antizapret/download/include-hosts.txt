@@ -1165,6 +1165,7 @@ whatwg.org
 oraclecloud.com
 fal.ai
 fal.media
+scratch.mit.edu
 
 # Блокирует DNS
 library.hydra.wiki
