@@ -1171,6 +1171,8 @@ gravityshavings.net
 #gdebenz.ru
 scdn.co
 benzinradar.com
+propertyfinder.ae
+bayut.com
 
 # Блокирует DNS
 library.hydra.wiki
