@@ -41,11 +41,14 @@ WARP_IP="${WARP_IP:-172.16.0.2}"
 
 # filter
 # INPUT connection tracking
-iptables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D INPUT ! -i lo -m conntrack --ctstate INVALID -j DROP
+iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
+# FORWARD connection tracking
+iptables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D FORWARD -m conntrack --ctstate INVALID -j DROP
 # OUTPUT connection tracking
-iptables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
-ip6tables -w -D OUTPUT ! -o lo -m conntrack --ctstate INVALID -j DROP
+iptables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
+ip6tables -w -D OUTPUT -m conntrack --ctstate INVALID -j DROP
 # Torrent guard
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p tcp -m string --string 'GET ' --algo kmp --to 100 -m string --string 'info_hash=' --algo bm -m string --string 'peer_id=' --algo bm -m string --string 'port=' --algo bm -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent protocol' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
@@ -64,7 +67,6 @@ iptables -w -D FORWARD ! -i $VPN_OUT_INTERFACE -d $IP.28.0.0/16 -j DROP
 iptables -w -D FORWARD ! -i $WARP_INTERFACE -d $IP.28.0.0/16 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
-iptables -w -D FORWARD -d $IP.28.0.0/15 -j ACCEPT
 # SSH protection
 iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
 ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
