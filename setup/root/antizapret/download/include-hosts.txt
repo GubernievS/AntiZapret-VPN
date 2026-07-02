@@ -1174,6 +1174,8 @@ benzinradar.com
 propertyfinder.ae
 bayut.com
 win-rar.com
+#duolingo.com
+gr-assets.com
 
 # Блокирует DNS
 library.hydra.wiki
