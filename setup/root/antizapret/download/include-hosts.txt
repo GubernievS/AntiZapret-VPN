@@ -1173,6 +1173,7 @@ scdn.co
 benzinradar.com
 propertyfinder.ae
 bayut.com
+win-rar.com
 
 # Блокирует DNS
 library.hydra.wiki
