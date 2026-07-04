@@ -1176,6 +1176,7 @@ bayut.com
 win-rar.com
 #duolingo.com
 gr-assets.com
+sony.co.jp
 
 # Блокирует DNS
 library.hydra.wiki
