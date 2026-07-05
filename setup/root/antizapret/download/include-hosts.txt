@@ -1177,6 +1177,7 @@ win-rar.com
 #duolingo.com
 gr-assets.com
 sony.co.jp
+radio-t.com
 
 # Блокирует DNS
 library.hydra.wiki
