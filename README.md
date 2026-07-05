@@ -101,7 +101,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 4. Дождаться перезагрузки сервера и скопировать файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client (например через MobaXterm, FileZilla или WinSCP)\
 5. Установить дополнения:
 	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений и Telegram-бот
-	- [AdminAntizapret](https://github.com/Kirito0098/AdminAntizapret) - управление и конфигурация
+	- [AdminPanelAZ](https://github.com/Kirito0098/AdminPanelAZ) - управление и конфигурация
 	- [TG-Bot-OpenVPN-Antizapret](https://github.com/VATAKATru61/TG-Bot-OpenVPN-Antizapret) - Telegram-бот (только OpenVPN)
 	- [AZ-WARP](https://github.com/Liafanx/AZ-WARP) - расширенная маршрутизация через WARP
 
