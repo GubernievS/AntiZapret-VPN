@@ -1179,6 +1179,7 @@ gr-assets.com
 sony.co.jp
 radio-t.com
 kamadojoe.com
+gerrit.openvpn.net
 
 # Блокирует DNS
 library.hydra.wiki
