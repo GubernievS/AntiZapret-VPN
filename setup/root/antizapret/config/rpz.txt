@@ -1,0 +1,13 @@
+; Настройка RPZ для AntiZapret VPN
+; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
+; CNAME . возвращает А запись 0.0.0.0 а не NXDOMAIN
+;
+
+
+
+
+
+
+
+
+
