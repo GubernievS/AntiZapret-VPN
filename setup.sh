@@ -494,7 +494,6 @@ find /tmp/antizapret -type f -exec chmod 644 {} +
 find /tmp/antizapret -type d -exec chmod 755 {} +
 find /tmp/antizapret/setup/root/antizapret -type f -exec chmod +x {} +
 find /tmp/antizapret/setup/etc/openvpn/server/scripts -type f -exec chmod +x {} +
-#chown -R nobody:nogroup /etc/openvpn/server/logs
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 
