@@ -6,7 +6,8 @@ PartOf=systemd-networkd.service
 
 [Service]
 LimitNPROC=infinity
-LimitNOFILE=65535
+TasksMax=infinity
+LimitNOFILE=infinity
 WorkingDirectory=/root/antizapret
 ExecStartPre=/root/antizapret/up.sh
 ExecStart=/root/antizapret/proxy.py
