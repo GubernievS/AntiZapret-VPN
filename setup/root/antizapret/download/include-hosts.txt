@@ -1181,6 +1181,7 @@ radio-t.com
 kamadojoe.com
 gerrit.openvpn.net
 thiscould.work
+minimeis.com
 
 # Блокирует DNS
 library.hydra.wiki
