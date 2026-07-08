@@ -1184,6 +1184,8 @@ thiscould.work
 minimeis.com
 ayntec.com
 anbernic.com
+gamesir.com
+venderbys.com
 
 # Блокирует DNS
 library.hydra.wiki
