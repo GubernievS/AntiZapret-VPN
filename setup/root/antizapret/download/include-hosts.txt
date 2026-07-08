@@ -1182,6 +1182,8 @@ kamadojoe.com
 gerrit.openvpn.net
 thiscould.work
 minimeis.com
+ayntec.com
+anbernic.com
 
 # Блокирует DNS
 library.hydra.wiki
