@@ -1186,6 +1186,8 @@ ayntec.com
 anbernic.com
 gamesir.com
 venderbys.com
+slackware.uk
+1x.tech
 
 # Блокирует DNS
 library.hydra.wiki
