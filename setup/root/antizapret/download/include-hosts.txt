@@ -1189,20 +1189,6 @@ venderbys.com
 slackware.uk
 1x.tech
 
-# Блокирует DNS
-library.hydra.wiki
-help.keenetic.com
-oculus.com
-support.logi.com
-support.native-instruments.com
-support.brave.app
-support.pokemon.com
-meta.ai
-support.opendns.com
-help.ui.com
-community.pioneerdj.com
-support-us.sodastream.com
-
 # Сертификаты
 letsencrypt.org
 lencr.org
