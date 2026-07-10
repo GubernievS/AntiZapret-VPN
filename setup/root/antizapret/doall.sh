@@ -3,8 +3,8 @@ set -e
 
 SECONDS=0
 
+find /etc/openvpn/server/logs -type f -size +100M -exec truncate -s 0 {} +
 cd /root/antizapret
-
 SUM1="$(sha256sum update.sh)"
 cat update.sh | bash -s "$1"
 SUM2="$(sha256sum update.sh)"
@@ -13,8 +13,6 @@ if [[ "$SUM1" != "$SUM2" ]]; then
 	cat update.sh | bash -s "$1"
 fi
 ./parse.sh "$1"
-
-find /etc/openvpn/server/logs -type f -size +100M -exec truncate -s 0 {} +
 ./custom-doall.sh "$1" || true
 
 echo "Execution time: $SECONDS seconds"
