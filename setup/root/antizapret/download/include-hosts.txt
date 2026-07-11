@@ -1188,6 +1188,8 @@ gamesir.com
 venderbys.com
 slackware.uk
 1x.tech
+bmwusa.com
+shockabsorber.co.uk
 
 # Сертификаты
 letsencrypt.org
