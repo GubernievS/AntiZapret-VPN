@@ -1190,6 +1190,8 @@ slackware.uk
 1x.tech
 bmwusa.com
 shockabsorber.co.uk
+wubenlight.com
+wubenlight.de
 
 # Сертификаты
 letsencrypt.org
