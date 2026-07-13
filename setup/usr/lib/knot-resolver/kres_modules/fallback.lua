@@ -1,4 +1,4 @@
--- Fallback on non-NOERROR or empty A answer from the default resolver
+-- Fallback on bad answer from default upstream
 
 local ffi = require('ffi')
 local kres = require('kres')
@@ -42,7 +42,7 @@ local function do_fallback(state, req, qry)
 	return true
 end
 
--- Consume reply from upstream or from cache
+-- Switch to fallback on non-NOERROR or empty A
 function M.layer.consume(state, req, pkt)
 	local qry = req:current()
 	if not qry or qry.flags.CACHED then
@@ -57,6 +57,17 @@ function M.layer.consume(state, req, pkt)
 	if do_fallback(state, req, qry) then
 		return kres.FAIL
 	end
+	return state
+end
+
+-- Switch to fallback after upstream fail
+function M.layer.reset(state, req)
+	local qry = req:current()
+	if not qry or qry.flags.CACHED or req.count_fail_row == 0 then
+		return state
+	end
+
+	do_fallback(state, req, qry)
 	return state
 end
 
