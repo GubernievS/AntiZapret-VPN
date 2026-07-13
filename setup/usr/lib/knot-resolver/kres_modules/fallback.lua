@@ -25,8 +25,7 @@ local function do_fallback(state, req, qry)
 	-- Reset cache
 	cache.clear(qname, true)
 
-	-- Reset current DNS records
-	req.answ_selected.len = 0
+	-- Reset current AUTHORITY and ADDITIONAL records
 	req.auth_selected.len = 0
 	req.add_selected.len = 0
 
