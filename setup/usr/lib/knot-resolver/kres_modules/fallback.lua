@@ -23,7 +23,9 @@ local function do_fallback(state, req, qry)
 	log_debug(ffi.C.LOG_GRP_POLICY, '[fallback] => fallback policy applied for %s %s', qname, qtype)
 
 	-- Reset cache
-	cache.clear(qname, true)
+	event.after(0, function()
+		cache.clear(qname, true)
+	end)
 
 	-- Reset current AUTHORITY and ADDITIONAL records
 	req.auth_selected.len = 0
