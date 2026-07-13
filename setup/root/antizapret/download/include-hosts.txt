@@ -1192,6 +1192,7 @@ bmwusa.com
 shockabsorber.co.uk
 wubenlight.com
 wubenlight.de
+vigloo.com
 
 # Сертификаты
 letsencrypt.org
