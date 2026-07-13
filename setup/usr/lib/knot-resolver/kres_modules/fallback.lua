@@ -1,4 +1,4 @@
--- Fallback on non-NOERROR response from the default resolver
+-- Fallback on non-NOERROR or empty A answer from the default resolver
 
 local ffi = require('ffi')
 local kres = require('kres')
@@ -20,21 +20,21 @@ local function do_fallback(state, req, qry)
 
 	local qname = kres.dname2str(qry.sname)
 	local qtype = kres.tostring.type[qry.stype]
-	event.after(0, function()
-		cache.clear(qname, true)
-	end)
-
 	log_debug(ffi.C.LOG_GRP_POLICY, '[fallback] => fallback policy applied for %s %s', qname, qtype)
 
+	-- Reset cache
+	cache.clear(qname, true)
+
+	-- Reset current DNS records
+	req.answ_selected.len = 0
+	req.auth_selected.len = 0
+	req.add_selected.len = 0
+
 	-- Reset current forwarding
-	if req.selection_context and req.selection_context.forwarding_targets then
-		req.selection_context.forwarding_targets.len = 0
-	end
+	req.selection_context.forwarding_targets.len = 0
 
 	-- Reset failure counter
-	if req.count_fail_row ~= nil then
-		req.count_fail_row = 0
-	end
+	req.count_fail_row = 0
 
 	M.action(state, req)
 	ffi.C.kr_server_selection_init(qry)
@@ -49,7 +49,8 @@ function M.layer.consume(state, req, pkt)
 		return state
 	end
 
-	if pkt:rcode() == kres.rcode.NOERROR then
+	if pkt:rcode() == kres.rcode.NOERROR
+		and not (qry.stype == kres.type.A and pkt:ancount() == 0) then
 		return state
 	end
 
