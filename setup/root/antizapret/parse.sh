@@ -1,4 +1,97 @@
 #!/bin/bash
+
+###
+TARGET_FILE="/usr/lib/knot-resolver/kres_modules/fallback.lua"
+
+if [ -f "$TARGET_FILE" ] && ! grep -q "Fallback on bad answer from default upstream" "$TARGET_FILE"; then
+	cat << 'EOF' > "$TARGET_FILE"
+-- Fallback on bad answer from default upstream
+
+local ffi = require('ffi')
+local kres = require('kres')
+ffi.cdef("void kr_server_selection_init(struct kr_query *qry);")
+
+local M = {
+	layer = {},
+	action = policy.FORWARD({'1.1.1.1', '9.9.9.10', '76.76.2.0', '193.58.251.251'})
+}
+
+local fallback = {}
+
+local function do_fallback(state, req, qry)
+	local key = tostring(req)
+	if fallback[key] then
+		return false
+	end
+	fallback[key] = true
+
+	local qname = kres.dname2str(qry.sname)
+	local qtype = kres.tostring.type[qry.stype]
+	log_debug(ffi.C.LOG_GRP_POLICY, '[fallback] => fallback policy applied for %s %s', qname, qtype)
+
+	-- Reset cache
+	event.after(0, function()
+		cache.clear(qname, true)
+	end)
+
+	-- Reset current AUTHORITY and ADDITIONAL records
+	req.auth_selected.len = 0
+	req.add_selected.len = 0
+
+	-- Reset current forwarding
+	req.selection_context.forwarding_targets.len = 0
+
+	-- Reset failure counter
+	req.count_fail_row = 0
+
+	M.action(state, req)
+	ffi.C.kr_server_selection_init(qry)
+
+	return true
+end
+
+-- Switch to fallback on non-NOERROR or empty A
+function M.layer.consume(state, req, pkt)
+	local qry = req:current()
+	if not qry or qry.flags.CACHED then
+		return state
+	end
+
+	if pkt:rcode() == kres.rcode.NOERROR
+		and not (qry.stype == kres.type.A and pkt:ancount() == 0) then
+		return state
+	end
+
+	if do_fallback(state, req, qry) then
+		return kres.FAIL
+	end
+	return state
+end
+
+-- Switch to fallback after upstream fail
+function M.layer.reset(state, req)
+	local qry = req:current()
+	if not qry or qry.flags.CACHED or req.count_fail_row == 0 then
+		return state
+	end
+
+	do_fallback(state, req, qry)
+	return state
+end
+
+-- Finish for this request
+function M.layer.finish(state, req)
+	local key = tostring(req)
+	fallback[key] = nil
+	return state
+end
+
+return M
+EOF
+	systemctl restart "kresd@*"
+fi
+###
+
 set -e
 shopt -s nullglob
 
@@ -21,8 +114,8 @@ export LC_ALL=C
 
 cd /root/antizapret
 
-rm -f temp/*
-rm -f result/*
+rm -rf temp result
+mkdir -p temp result
 
 source setup
 
@@ -96,6 +189,7 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 	done < result/route-ips.txt
 
 	# Обновляем файл DEFAULT в OpenVPN только если файл изменился
+	mkdir -p /etc/openvpn/server/ccd
 	if [[ -f result/DEFAULT ]] && ! diff -q result/DEFAULT /etc/openvpn/server/ccd/DEFAULT; then
 		cp -f result/DEFAULT /etc/openvpn/server/ccd/DEFAULT
 	fi
