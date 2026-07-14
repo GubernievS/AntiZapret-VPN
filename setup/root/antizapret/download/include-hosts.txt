@@ -1193,6 +1193,7 @@ shockabsorber.co.uk
 wubenlight.com
 wubenlight.de
 vigloo.com
+cdn.usestoryteller.com
 
 # Сертификаты
 letsencrypt.org
