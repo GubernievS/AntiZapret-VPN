@@ -106,4 +106,8 @@ apptracer.ru CNAME .
 ; https://habr.com/ru/articles/1046710
 reef.vk-cdn.net CNAME .
 *.reef.vk-cdn.net CNAME .
+
+; https://habr.com/ru/news/1058822
+t.me A 149.154.167.99
+*.t.me A 149.154.167.99
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
