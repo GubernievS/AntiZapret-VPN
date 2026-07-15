@@ -1198,6 +1198,7 @@ ollama.com
 nc.com
 plaync.com
 playnccdn.com
+ncsoft.com
 
 # Сертификаты
 letsencrypt.org
