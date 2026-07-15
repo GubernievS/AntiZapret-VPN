@@ -1196,6 +1196,7 @@ vigloo.com
 cdn.usestoryteller.com
 ollama.com
 nc.com
+plaync.com
 playnccdn.com
 
 # Сертификаты
