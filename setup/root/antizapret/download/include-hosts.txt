@@ -1194,6 +1194,7 @@ wubenlight.com
 wubenlight.de
 vigloo.com
 cdn.usestoryteller.com
+ollama.com
 
 # Сертификаты
 letsencrypt.org
