@@ -1195,6 +1195,8 @@ wubenlight.de
 vigloo.com
 cdn.usestoryteller.com
 ollama.com
+nc.com
+playnccdn.com
 
 # Сертификаты
 letsencrypt.org
