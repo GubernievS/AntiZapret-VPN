@@ -1199,6 +1199,8 @@ nc.com
 plaync.com
 playnccdn.com
 ncsoft.com
+1001tracklists.com
+cuenation.com
 
 # Сертификаты
 letsencrypt.org
