@@ -1201,6 +1201,7 @@ playnccdn.com
 ncsoft.com
 1001tracklists.com
 cuenation.com
+paxhistoria.co
 
 # Сертификаты
 letsencrypt.org
