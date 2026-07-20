@@ -34,10 +34,15 @@ fi
 [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
-WARP_INTERFACE=warp
-WARP_PATH="/etc/wireguard/$WARP_INTERFACE.conf"
-WARP_IP=$(awk -F'= ' '/^Address/{print $2; exit}' "$WARP_PATH")
-WARP_IP="${WARP_IP:-172.16.0.2}"
+WARP_ANTIZAPRET_INTERFACE=warp-antizapret
+WARP_ANTIZAPRET_PATH="/etc/wireguard/$WARP_ANTIZAPRET_INTERFACE.conf"
+WARP_ANTIZAPRET_IP=$(awk -F'= ' '/^Address/{print $2; exit}' "$WARP_ANTIZAPRET_PATH")
+WARP_ANTIZAPRET_IP="${WARP_ANTIZAPRET_IP:-172.16.0.2}"
+
+WARP_VPN_INTERFACE=warp-vpn
+WARP_VPN_PATH="/etc/wireguard/$WARP_VPN_INTERFACE.conf"
+WARP_VPN_IP=$(awk -F'= ' '/^Address/{print $2; exit}' "$WARP_VPN_PATH")
+WARP_VPN_IP="${WARP_VPN_IP:-172.16.0.2}"
 
 # filter
 # INPUT connection tracking
@@ -60,11 +65,10 @@ iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 # Client and server isolation
 iptables -w -D FORWARD ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
-iptables -w -D FORWARD ! -i $WARP_INTERFACE -d $IP.28.0.0/15 -j DROP
 iptables -w -D FORWARD ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.29.0.0/16 -j DROP
-iptables -w -D FORWARD ! -i $WARP_INTERFACE -d $IP.29.0.0/16 -j DROP
+iptables -w -D FORWARD ! -i $WARP_ANTIZAPRET_INTERFACE -d $IP.29.0.0/16 -j DROP
 iptables -w -D FORWARD ! -i $VPN_OUT_INTERFACE -d $IP.28.0.0/16 -j DROP
-iptables -w -D FORWARD ! -i $WARP_INTERFACE -d $IP.28.0.0/16 -j DROP
+iptables -w -D FORWARD ! -i $WARP_VPN_INTERFACE -d $IP.28.0.0/16 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 # SSH protection
@@ -134,24 +138,30 @@ iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMA
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
 # SNAT/MASQUERADE VPN
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $WARP_INTERFACE -j SNAT --to-source $WARP_IP
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $WARP_INTERFACE -j SNAT --to-source $WARP_IP
+iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $WARP_ANTIZAPRET_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $WARP_ANTIZAPRET_INTERFACE -j SNAT --to-source $WARP_ANTIZAPRET_IP
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $WARP_INTERFACE -j SNAT --to-source $WARP_IP
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $WARP_VPN_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $WARP_VPN_INTERFACE -j SNAT --to-source $WARP_VPN_IP
 
-# WARP
-if [[ -f $WARP_PATH ]]; then
-	wg-quick down $WARP_PATH
+# WARP AntiZapret
+if [[ -f $WARP_ANTIZAPRET_PATH ]]; then
+	wg-quick down $WARP_ANTIZAPRET_PATH
 fi
-if ip link show dev $WARP_INTERFACE &>/dev/null; then
-	ip link delete dev $WARP_INTERFACE
+if ip link show dev $WARP_ANTIZAPRET_INTERFACE &>/dev/null; then
+	ip link delete dev $WARP_ANTIZAPRET_INTERFACE
+fi
+
+# WARP VPN
+if [[ -f $WARP_VPN_PATH ]]; then
+	wg-quick down $WARP_VPN_PATH
+fi
+if ip link show dev $WARP_VPN_INTERFACE &>/dev/null; then
+	ip link delete dev $WARP_VPN_INTERFACE
 fi
 
 ./custom-down.sh

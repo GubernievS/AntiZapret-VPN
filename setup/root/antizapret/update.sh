@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+export LC_ALL=C
 
 # Обработка ошибок
 handle_error() {
@@ -17,10 +18,8 @@ fi
 echo 'Update AntiZapret VPN files:'
 
 cd /root/antizapret
-
-export LC_ALL=C
-
-rm -f download/*
+rm -rf download
+mkdir -p download
 
 UPDATE_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/update.sh
 UPDATE_PATH=update.sh

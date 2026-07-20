@@ -6,6 +6,7 @@
 # chmod +x patch-openvpn.sh && ./patch-openvpn.sh [0-2]
 #
 set -e
+export LC_ALL=C
 
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
@@ -13,8 +14,6 @@ handle_error() {
 	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
-
-export LC_ALL=C
 
 if [[ "$1" =~ ^[0-2]$ ]]; then
 	ALGORITHM="$1"

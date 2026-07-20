@@ -2,11 +2,12 @@
 #
 # Добавление/удаление клиента
 #
-# chmod +x client.sh && ./client.sh [1-8] [имя_клиента] [срок_действия]
+# chmod +x client.sh && ./client.sh [1-9] [имя_клиента] [срок_действия_сертификата]
 #
-# Срок действия в днях - только для OpenVPN
+# Срок действия сертификата в днях - только для OpenVPN
 #
 set -e
+export LC_ALL=C
 shopt -s nullglob
 
 handle_error() {
@@ -16,8 +17,84 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-export LC_ALL=C
+if (( $# > 3 )); then
+	echo 'Too many parameters! Usage: ./client.sh [1-9] [client_name] [cert_expire_days]'
+	exit 2
+fi
+
 export EASYRSA_PKI=/etc/openvpn/easyrsa3/pki
+cd /root/antizapret
+source setup
+umask 022
+setServerIP
+OPTION="$1"
+CLIENT_NAME="$2"
+CLIENT_CERT_EXPIRE="$3"
+
+if ! [[ "$OPTION" =~ ^[1-9]$ ]]; then
+	echo
+	echo 'Please choose option:'
+	echo '    1) OpenVPN - Add client/Renew client certificate'
+	echo '    2) OpenVPN - Delete client'
+	echo '    3) OpenVPN - List clients'
+	echo '    4) WireGuard/AmneziaWG - Add client'
+	echo '    5) WireGuard/AmneziaWG - Delete client'
+	echo '    6) WireGuard/AmneziaWG - List clients'
+	echo '    7) (Re)create client profile files'
+	echo '    8) Backup configuration and clients'
+	echo '    9) Restore configuration and clients from backup'
+	until [[ "$OPTION" =~ ^[1-9]$ ]]; do
+		read -rp 'Option choice [1-9]: ' -e OPTION
+	done
+fi
+
+case "$OPTION" in
+	1)
+		echo "OpenVPN - Add client/Renew client certificate $CLIENT_NAME $CLIENT_CERT_EXPIRE"
+		askClientName
+		initOpenVPN
+		addOpenVPN
+		;;
+	2)
+		echo "OpenVPN - Delete client $CLIENT_NAME"
+		listOpenVPN
+		askClientName
+		deleteOpenVPN
+		;;
+	3)
+		echo 'OpenVPN - List clients'
+		listOpenVPN
+		;;
+	4)
+		echo "WireGuard/AmneziaWG - Add client $CLIENT_NAME"
+		askClientName
+		initWireGuard
+		addWireGuard
+		;;
+	5)
+		echo "WireGuard/AmneziaWG - Delete client $CLIENT_NAME"
+		listWireGuard
+		askClientName
+		deleteWireGuard
+		;;
+	6)
+		echo 'WireGuard/AmneziaWG - List clients'
+		listWireGuard
+		;;
+	7)
+		echo '(Re)create client profile files'
+		recreate
+		;;
+	8)
+		echo 'Backup configuration and clients'
+		backup
+		;;
+	9)
+		echo 'Restore configuration and clients from backup'
+		restore
+		;;
+esac
+exit 0
 
 askClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
@@ -55,7 +132,7 @@ setServerIP(){
 	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 	if [[ -z "$SERVER_IP" ]]; then
 		echo 'Default IPv4 address not found!'
-		exit 2
+		exit 3
 	fi
 }
 
@@ -73,28 +150,21 @@ render() {
 
 initOpenVPN(){
 	mkdir -p /etc/openvpn/easyrsa3
+	mkdir -p /etc/openvpn/server/ccd
+	mkdir -p /etc/openvpn/server/ccd2
+	mkdir -p /etc/openvpn/server/logs
 
 	if [[ ! -f /etc/openvpn/easyrsa3/pki/ca.crt ]] || \
 	   [[ ! -f /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt ]] || \
 	   [[ ! -f /etc/openvpn/easyrsa3/pki/private/antizapret-server.key ]]; then
 		rm -rf /etc/openvpn/easyrsa3/pki
-		rm -rf /etc/openvpn/server/keys
-		rm -rf /etc/openvpn/client/keys
 		/usr/share/easy-rsa/easyrsa init-pki
 		EASYRSA_CA_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch --req-cn='AntiZapret CA' build-ca nopass
 		EASYRSA_CERT_EXPIRE=3650 /usr/share/easy-rsa/easyrsa --batch build-server-full 'antizapret-server' nopass
 	fi
 
-	mkdir -p /etc/openvpn/server/keys
-	mkdir -p /etc/openvpn/client/keys
-
-	cp /etc/openvpn/easyrsa3/pki/ca.crt /etc/openvpn/server/keys/ca.crt
-	cp /etc/openvpn/easyrsa3/pki/issued/antizapret-server.crt /etc/openvpn/server/keys/antizapret-server.crt
-	cp /etc/openvpn/easyrsa3/pki/private/antizapret-server.key /etc/openvpn/server/keys/antizapret-server.key
-
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
-	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 }
 
 addOpenVPN(){
@@ -118,19 +188,15 @@ addOpenVPN(){
 			echo
 			rm -f /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt
 			/usr/share/easy-rsa/easyrsa --batch --days="$CLIENT_CERT_EXPIRE" sign client "$CLIENT_NAME"
-			rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt
 		fi
 	fi
 
-	cp /etc/openvpn/easyrsa3/pki/issued/"$CLIENT_NAME".crt /etc/openvpn/client/keys/"$CLIENT_NAME".crt
-	cp /etc/openvpn/easyrsa3/pki/private/"$CLIENT_NAME".key /etc/openvpn/client/keys/"$CLIENT_NAME".key
-
-	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/server/keys/ca.crt")"
-	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/client/keys/$CLIENT_NAME.crt")"
-	CLIENT_KEY="$(cat -- "/etc/openvpn/client/keys/$CLIENT_NAME.key")"
+	CA_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/easyrsa3/pki/ca.crt")"
+	CLIENT_CERT="$(grep -A 999 'BEGIN CERTIFICATE' -- "/etc/openvpn/easyrsa3/pki/issued/$CLIENT_NAME.crt")"
+	CLIENT_KEY="$(cat -- "/etc/openvpn/easyrsa3/pki/private/$CLIENT_NAME.key")"
 	if [[ ! "$CA_CERT" ]] || [[ ! "$CLIENT_CERT" ]] || [[ ! "$CLIENT_KEY" ]]; then
 		echo 'Cannot load client keys!'
-		exit 3
+		exit 4
 	fi
 
 	render "/etc/openvpn/client/templates/antizapret-udp.conf" > "/root/antizapret/client/openvpn/antizapret-udp/antizapret-$FILE_NAME-udp.ovpn"
@@ -150,7 +216,6 @@ deleteOpenVPN(){
 	/usr/share/easy-rsa/easyrsa --batch revoke "$CLIENT_NAME"
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
 	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
-	cp /etc/openvpn/easyrsa3/pki/crl.pem /etc/openvpn/server/keys/crl.pem
 
 	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-"$FILE_NAME".ovpn
 	rm -f /root/antizapret/client/openvpn/antizapret-udp/antizapret-"$FILE_NAME"-udp.ovpn
@@ -158,8 +223,6 @@ deleteOpenVPN(){
 	rm -f /root/antizapret/client/openvpn/vpn/vpn-"$FILE_NAME".ovpn
 	rm -f /root/antizapret/client/openvpn/vpn-udp/vpn-"$FILE_NAME"-udp.ovpn
 	rm -f /root/antizapret/client/openvpn/vpn-tcp/vpn-"$FILE_NAME"-tcp.ovpn
-	rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".crt
-	rm -f /etc/openvpn/client/keys/"$CLIENT_NAME".key
 
 	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-udp.sock &>/dev/null || true
 	echo "kill $CLIENT_NAME" | socat - UNIX-CONNECT:/run/openvpn-server/antizapret-tcp.sock &>/dev/null || true
@@ -218,7 +281,7 @@ addWireGuard(){
 			fi
 			if [[ "$i" == 255 ]]; then
 				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
-				exit 4
+				exit 5
 			fi
 		done
 		echo "# Client = ${CLIENT_NAME}
@@ -255,7 +318,7 @@ AllowedIPs = ${CLIENT_IP}/32
 			fi
 			if [[ "$i" == 255 ]]; then
 				echo 'The WireGuard/AmneziaWG subnet can support only 253 clients!'
-				exit 5
+				exit 6
 			fi
 		done
 		echo "# Client = ${CLIENT_NAME}
@@ -282,7 +345,7 @@ deleteWireGuard(){
 
 	if ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/antizapret.conf" && ! grep -q "# Client = ${CLIENT_NAME}" "/etc/wireguard/vpn.conf"; then
 		echo "Failed to delete client '$CLIENT_NAME'! Please check if client exists"
-		exit 6
+		exit 7
 	fi
 
 	sed -i "/^# Client = ${CLIENT_NAME}$/,/^AllowedIPs/d" /etc/wireguard/antizapret.conf
@@ -310,7 +373,8 @@ listWireGuard(){
 recreate(){
 	echo
 
-	find /root/antizapret/client -type f -delete
+	rm -rf /root/antizapret/client
+	mkdir -p /root/antizapret/client/{openvpn/{antizapret,antizapret-tcp,antizapret-udp,vpn,vpn-tcp,vpn-udp},wireguard/{antizapret,vpn},amneziawg/{antizapret,vpn}}
 
 	# OpenVPN
 	if [[ -d /etc/openvpn/easyrsa3/pki/issued ]]; then
@@ -376,70 +440,47 @@ backup(){
 	echo "Backup configuration and clients (re)created at $BACKUP_FILE"
 }
 
-source /root/antizapret/setup
-umask 022
-setServerIP
-
-OPTION="$1"
-CLIENT_NAME="$2"
-CLIENT_CERT_EXPIRE="$3"
-
-if ! [[ "$OPTION" =~ ^[1-8]$ ]]; then
+restore(){
 	echo
-	echo 'Please choose option:'
-	echo '    1) OpenVPN - Add client/Renew client certificate'
-	echo '    2) OpenVPN - Delete client'
-	echo '    3) OpenVPN - List clients'
-	echo '    4) WireGuard/AmneziaWG - Add client'
-	echo '    5) WireGuard/AmneziaWG - Delete client'
-	echo '    6) WireGuard/AmneziaWG - List clients'
-	echo '    7) (Re)create client profile files'
-	echo '    8) Backup configuration and clients'
-	until [[ "$OPTION" =~ ^[1-8]$ ]]; do
-		read -rp 'Option choice [1-8]: ' -e OPTION
-	done
-fi
 
-case "$OPTION" in
-	1)
-		echo "OpenVPN - Add client/Renew client certificate $CLIENT_NAME $CLIENT_CERT_EXPIRE"
-		askClientName
-		initOpenVPN
-		addOpenVPN
-		;;
-	2)
-		echo "OpenVPN - Delete client $CLIENT_NAME"
-		listOpenVPN
-		askClientName
-		deleteOpenVPN
-		;;
-	3)
-		echo 'OpenVPN - List clients'
-		listOpenVPN
-		;;
-	4)
-		echo "WireGuard/AmneziaWG - Add client $CLIENT_NAME"
-		askClientName
-		initWireGuard
-		addWireGuard
-		;;
-	5)
-		echo "WireGuard/AmneziaWG - Delete client $CLIENT_NAME"
-		listWireGuard
-		askClientName
-		deleteWireGuard
-		;;
-	6)
-		echo 'WireGuard/AmneziaWG - List clients'
-		listWireGuard
-		;;
-	7)
-		echo '(Re)create client profile files'
-		recreate
-		;;
-	8)
-		echo 'Backup configuration and clients'
-		backup
-		;;
-esac
-exit 0
+	if [[ -e /root/backup*.tar.gz ]]; then
+		rm -rf /root/easyrsa3
+		rm -rf /root/wireguard
+		rm -rf /root/config
+		rm -rf /root/knot-resolver
+		rm -rf /root/custom
+	fi
+
+	tar -xzf /root/backup*.tar.gz -C /root || true
+	rm -f /root/backup*.tar.gz || true
+
+	if [[ ! -d /root/easyrsa3 && ! -d /root/wireguard && ! -d /root/config && ! -d /root/knot-resolver && ! -d /root/custom ]]; then
+		echo 'Backup not found! Upload backup*.tar.gz to /root, or extract folders to /root: easyrsa3, wireguard, config, knot-resolver, custom'
+		exit 8
+	fi
+
+	if [[ -d /root/easyrsa3/pki ]]; then
+		rm -rf /etc/openvpn/easyrsa3/*
+	fi
+
+	cp -r /root/easyrsa3/* /etc/openvpn/easyrsa3/ || true
+	cp /root/wireguard/* /etc/wireguard/ || true
+	cp /root/config/* /root/antizapret/config/ || true
+	cp /root/knot-resolver/* /etc/knot-resolver/ || true
+	cp /root/custom/* /root/antizapret/ || true
+
+	rm -rf /root/easyrsa3
+	rm -rf /root/wireguard
+	rm -rf /root/config
+	rm -rf /root/knot-resolver
+	rm -rf /root/custom
+
+	./doall.sh ip
+	initWireGuard
+	initOpenVPN
+	recreate
+
+	echo "Configuration and clients restored from backup"
+	echo 'Rebooting...'
+	reboot -f
+}

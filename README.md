@@ -104,6 +104,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 	- [AdminPanelAZ](https://github.com/Kirito0098/AdminPanelAZ) - управление и конфигурация
 	- [TG-Bot-OpenVPN-Antizapret](https://github.com/VATAKATru61/TG-Bot-OpenVPN-Antizapret) - Telegram-бот (только OpenVPN)
 	- [AZ-WARP](https://github.com/Liafanx/AZ-WARP) - расширенная маршрутизация через WARP
+	- [vpn-control-panel](https://github.com/0009609ilya-crypto/vpn-control-panel) - управление и конфигурация
 
 ***
 
@@ -124,9 +125,9 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 
 ### 3. Добавить/удалить клиента
 ```
-/root/antizapret/client.sh [1-8] [имя_клиента] [срок_действия]
+/root/antizapret/client.sh [1-9] [имя_клиента] [срок_действия_сертификата]
 ```
-Срок действия в днях - только для OpenVPN\
+Срок действия сертификата в днях - только для OpenVPN\
 После добавления нового клиента скопируйте новые файлы подключений (*.ovpn и *.conf) с сервера из подпапок /root/antizapret/client
 
 ### 4. Добавить свои сайты в список АнтиЗапрета

@@ -299,4 +299,4 @@ echo
 echo -e '\e[1;32mProxy for AntiZapret VPN server installed successfully!\e[0m'
 echo 'Rebooting...'
 
-reboot
+reboot -f

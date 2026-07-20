@@ -4,7 +4,6 @@
 #
 # https://github.com/GubernievS/AntiZapret-VPN
 #
-
 export LC_ALL=C
 
 # Проверка необходимости перезагрузить
@@ -418,6 +417,14 @@ cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ || true
 cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ || true
 
 # Восстанавливаем из бэкапа пользовательские настройки и обработчики custom*.sh, пользователей OpenVPN и WireGuard
+if [[ -e /root/backup*.tar.gz ]]; then
+	rm -rf /root/easyrsa3
+	rm -rf /root/wireguard
+	rm -rf /root/config
+	rm -rf /root/knot-resolver
+	rm -rf /root/custom
+fi
+
 tar -xzf /root/backup*.tar.gz || true
 rm -f /root/backup*.tar.gz || true
 
@@ -498,7 +505,6 @@ chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
 
 # Копируем нужное, удаляем не нужное
-find /tmp/antizapret -name '.gitkeep' -delete
 rm -rf /root/antizapret
 cp -r /tmp/antizapret/setup/* /
 rm -rf /tmp/dnslib
@@ -646,4 +652,4 @@ echo
 echo -e '\e[1;32mAntiZapret VPN + full VPN installed successfully!\e[0m'
 echo 'Rebooting...'
 
-reboot
+reboot -f
