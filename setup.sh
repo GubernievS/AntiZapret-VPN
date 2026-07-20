@@ -48,6 +48,7 @@ else
 fi
 
 # Очистка диска
+echo 'Cleaning disk, please wait...'
 journalctl --vacuum-size=1B -q
 find /var/log -name "*.gz" -delete
 find /var/log -name "*.1" -delete
