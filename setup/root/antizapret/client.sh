@@ -22,79 +22,19 @@ if (( $# > 3 )); then
 	exit 2
 fi
 
+SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
+if [[ -z "$SERVER_IP" ]]; then
+	echo 'Default IPv4 address not found!'
+	exit 3
+fi
+
 export EASYRSA_PKI=/etc/openvpn/easyrsa3/pki
 cd /root/antizapret
 source setup
 umask 022
-setServerIP
 OPTION="$1"
 CLIENT_NAME="$2"
 CLIENT_CERT_EXPIRE="$3"
-
-if ! [[ "$OPTION" =~ ^[1-9]$ ]]; then
-	echo
-	echo 'Please choose option:'
-	echo '    1) OpenVPN - Add client/Renew client certificate'
-	echo '    2) OpenVPN - Delete client'
-	echo '    3) OpenVPN - List clients'
-	echo '    4) WireGuard/AmneziaWG - Add client'
-	echo '    5) WireGuard/AmneziaWG - Delete client'
-	echo '    6) WireGuard/AmneziaWG - List clients'
-	echo '    7) (Re)create client profile files'
-	echo '    8) Backup configuration and clients'
-	echo '    9) Restore configuration and clients from backup'
-	until [[ "$OPTION" =~ ^[1-9]$ ]]; do
-		read -rp 'Option choice [1-9]: ' -e OPTION
-	done
-fi
-
-case "$OPTION" in
-	1)
-		echo "OpenVPN - Add client/Renew client certificate $CLIENT_NAME $CLIENT_CERT_EXPIRE"
-		askClientName
-		initOpenVPN
-		addOpenVPN
-		;;
-	2)
-		echo "OpenVPN - Delete client $CLIENT_NAME"
-		listOpenVPN
-		askClientName
-		deleteOpenVPN
-		;;
-	3)
-		echo 'OpenVPN - List clients'
-		listOpenVPN
-		;;
-	4)
-		echo "WireGuard/AmneziaWG - Add client $CLIENT_NAME"
-		askClientName
-		initWireGuard
-		addWireGuard
-		;;
-	5)
-		echo "WireGuard/AmneziaWG - Delete client $CLIENT_NAME"
-		listWireGuard
-		askClientName
-		deleteWireGuard
-		;;
-	6)
-		echo 'WireGuard/AmneziaWG - List clients'
-		listWireGuard
-		;;
-	7)
-		echo '(Re)create client profile files'
-		recreate
-		;;
-	8)
-		echo 'Backup configuration and clients'
-		backup
-		;;
-	9)
-		echo 'Restore configuration and clients from backup'
-		restore
-		;;
-esac
-exit 0
 
 askClientName(){
 	if ! [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
@@ -126,14 +66,6 @@ setServerHost_FileName(){
 	FILE_NAME="${CLIENT_NAME#antizapret-}"
 	FILE_NAME="${FILE_NAME#vpn-}"
 	FILE_NAME="${FILE_NAME}-(${SERVER_HOST})"
-}
-
-setServerIP(){
-	SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
-	if [[ -z "$SERVER_IP" ]]; then
-		echo 'Default IPv4 address not found!'
-		exit 3
-	fi
 }
 
 render() {
@@ -484,3 +416,68 @@ restore(){
 	echo 'Rebooting...'
 	reboot -f
 }
+
+if ! [[ "$OPTION" =~ ^[1-9]$ ]]; then
+	echo
+	echo 'Please choose option:'
+	echo '    1) OpenVPN - Add client/Renew client certificate'
+	echo '    2) OpenVPN - Delete client'
+	echo '    3) OpenVPN - List clients'
+	echo '    4) WireGuard/AmneziaWG - Add client'
+	echo '    5) WireGuard/AmneziaWG - Delete client'
+	echo '    6) WireGuard/AmneziaWG - List clients'
+	echo '    7) (Re)create client profile files'
+	echo '    8) Backup configuration and clients'
+	echo '    9) Restore configuration and clients from backup'
+	until [[ "$OPTION" =~ ^[1-9]$ ]]; do
+		read -rp 'Option choice [1-9]: ' -e OPTION
+	done
+fi
+
+case "$OPTION" in
+	1)
+		echo "OpenVPN - Add client/Renew client certificate $CLIENT_NAME $CLIENT_CERT_EXPIRE"
+		askClientName
+		initOpenVPN
+		addOpenVPN
+		;;
+	2)
+		echo "OpenVPN - Delete client $CLIENT_NAME"
+		listOpenVPN
+		askClientName
+		deleteOpenVPN
+		;;
+	3)
+		echo 'OpenVPN - List clients'
+		listOpenVPN
+		;;
+	4)
+		echo "WireGuard/AmneziaWG - Add client $CLIENT_NAME"
+		askClientName
+		initWireGuard
+		addWireGuard
+		;;
+	5)
+		echo "WireGuard/AmneziaWG - Delete client $CLIENT_NAME"
+		listWireGuard
+		askClientName
+		deleteWireGuard
+		;;
+	6)
+		echo 'WireGuard/AmneziaWG - List clients'
+		listWireGuard
+		;;
+	7)
+		echo '(Re)create client profile files'
+		recreate
+		;;
+	8)
+		echo 'Backup configuration and clients'
+		backup
+		;;
+	9)
+		echo 'Restore configuration and clients from backup'
+		restore
+		;;
+esac
+exit 0
