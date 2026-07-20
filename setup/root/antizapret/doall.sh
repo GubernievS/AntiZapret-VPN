@@ -3,7 +3,7 @@ set -e
 
 SECONDS=0
 
-find /etc/openvpn/server/logs -type f -size +100M -exec truncate -s 0 {} +
+find /etc/openvpn/server/logs -type f -size +100M -exec truncate -s 0 {} + || true
 cd /root/antizapret
 SUM1="$(sha256sum update.sh)"
 cat update.sh | bash -s "$1"
