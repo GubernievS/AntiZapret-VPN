@@ -6,7 +6,7 @@ ffi.cdef("void kr_server_selection_init(struct kr_query *qry);")
 
 local M = {
 	layer = {},
-	action = policy.FORWARD({'1.1.1.1', '9.9.9.10', '76.76.2.0', '193.58.251.251'})
+	action = policy.FORWARD({'1.1.1.1', '9.9.9.10', '76.76.2.0', '86.54.11.100'})
 }
 
 local fallback = {}
@@ -46,7 +46,7 @@ end
 -- Switch to fallback on non-NOERROR or empty A
 function M.layer.consume(state, req, pkt)
 	local qry = req:current()
-	if not qry or qry.flags.CACHED then
+	if not qry or qry.flags.CACHED or not qry.flags.FORWARD then
 		return state
 	end
 
@@ -64,7 +64,8 @@ end
 -- Switch to fallback after upstream fail
 function M.layer.reset(state, req)
 	local qry = req:current()
-	if not qry or qry.flags.CACHED or req.count_fail_row == 0 then
+	if not qry or qry.flags.CACHED or not qry.flags.FORWARD
+		or req.count_fail_row == 0 then
 		return state
 	end
 
