@@ -53,6 +53,7 @@ journalctl --vacuum-size=1B -q
 find /var/log -name "*.gz" -delete
 find /var/log -name "*.1" -delete
 find /var/log -type f -exec truncate -s 0 {} +
+[[ -d /etc/openvpn/server/logs ]] && find /etc/openvpn/server/logs -type f -exec truncate -s 0 {} +
 dpkg --configure -a >/dev/null
 apt-get install -f -y >/dev/null
 apt-get clean >/dev/null
