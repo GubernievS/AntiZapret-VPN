@@ -560,16 +560,15 @@ elif [[ "$VPN_DNS" == '8' ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 193.23.209.189/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
-# Используем альтернативный диапазон подменных IPv4-адресов
-# 10(172).28.0.0/15 => 198.18.0.0/15
-if [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]]; then
-	sed -i 's/10\.30\./198\.18\./g' /root/antizapret/proxy.py
+# Не используем альтернативный диапазон подменных IPv4-адресов
+# 198.18.0.0/15 => 10.30.0.0/15 или 172.30.0.0/15
+if [[ "$ALTERNATIVE_FAKE_IP" == 'n' ]]; then
+	sed -i "s/198\.18\./${IP}\.30\./g" /root/antizapret/proxy.py
 fi
 
 # Используем альтернативный диапазон клиентских IPv4-адресов
 # 10.28.0.0/15 => 172.28.0.0/15
 if [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]]; then
-	sed -i 's/10\./172\./g' /root/antizapret/proxy.py
 	sed -i 's/10\./172\./g' /etc/knot-resolver/kresd.conf
 	sed -i 's/10\./172\./g' /etc/openvpn/server/*.conf
 	sed -i 's/10\./172\./g' /etc/wireguard/templates/*.conf
