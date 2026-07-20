@@ -1204,6 +1204,9 @@ cuenation.com
 paxhistoria.co
 vive.com
 meteor.com
+cirad.fr
+plantnet.org
+maono.com
 
 # Сертификаты
 letsencrypt.org
