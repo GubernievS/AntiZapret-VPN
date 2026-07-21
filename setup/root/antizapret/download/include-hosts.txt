@@ -1207,6 +1207,7 @@ meteor.com
 cirad.fr
 plantnet.org
 maono.com
+secretlab.co
 
 # Сертификаты
 letsencrypt.org
