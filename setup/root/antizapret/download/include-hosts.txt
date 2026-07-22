@@ -1208,6 +1208,7 @@ cirad.fr
 plantnet.org
 maono.com
 secretlab.co
+xteink.com
 
 # Сертификаты
 letsencrypt.org
