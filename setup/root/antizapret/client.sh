@@ -96,6 +96,7 @@ initOpenVPN(){
 	fi
 
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 755 /etc/openvpn/easyrsa3/pki
 	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
 }
 
@@ -147,6 +148,7 @@ deleteOpenVPN(){
 
 	/usr/share/easy-rsa/easyrsa --batch revoke "$CLIENT_NAME"
 	EASYRSA_CRL_DAYS=3650 /usr/share/easy-rsa/easyrsa gen-crl
+	chmod 755 /etc/openvpn/easyrsa3/pki
 	chmod 644 /etc/openvpn/easyrsa3/pki/crl.pem
 
 	rm -f /root/antizapret/client/openvpn/antizapret/antizapret-"$FILE_NAME".ovpn
