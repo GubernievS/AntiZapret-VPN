@@ -430,6 +430,7 @@ fi
 tar -xzf /root/backup*.tar.gz || true
 rm -f /root/backup*.tar.gz || true
 
+mkdir -p /tmp/antizapret/setup/etc/openvpn/easyrsa3
 cp -r /root/easyrsa3/* /tmp/antizapret/setup/etc/openvpn/easyrsa3/ || true
 cp /root/wireguard/* /tmp/antizapret/setup/etc/wireguard/ || true
 cp /root/config/* /tmp/antizapret/setup/root/antizapret/config/ || true
