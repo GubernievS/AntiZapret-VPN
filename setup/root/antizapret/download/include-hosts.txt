@@ -1209,6 +1209,8 @@ plantnet.org
 maono.com
 secretlab.co
 xteink.com
+pentestpad.com
+dnsperf.com
 
 # Сертификаты
 letsencrypt.org
