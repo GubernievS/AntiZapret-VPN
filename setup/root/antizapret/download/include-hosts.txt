@@ -1212,6 +1212,7 @@ xteink.com
 pentestpad.com
 dnsperf.com
 perfops.net
+meditlink.com
 
 # Сертификаты
 letsencrypt.org
