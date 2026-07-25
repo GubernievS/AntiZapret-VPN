@@ -5,10 +5,16 @@ dns.cloudflare.com CNAME .
 *.dns.cloudflare.com CNAME .
 dns.quad9.net CNAME .
 *.dns.quad9.net CNAME .
+dns9.quad9.net CNAME .
+*.dns9.quad9.net CNAME .
 dns10.quad9.net CNAME .
 *.dns10.quad9.net CNAME .
 dns11.quad9.net CNAME .
 *.dns11.quad9.net CNAME .
+dns.quad12.net CNAME .
+*.dns.quad12.net CNAME .
+dns.quad13.net CNAME .
+*.dns.quad13.net CNAME .
 dns.nextdns.io CNAME .
 *.dns.nextdns.io CNAME .
 dns.google.com CNAME .
@@ -43,6 +49,8 @@ dns.alidns.com CNAME .
 *.dns.alidns.com CNAME .
 doh.skydns.ru CNAME .
 *.doh.skydns.ru CNAME .
+freedns.controld.com CNAME .
+*.freedns.controld.com CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
