@@ -83,7 +83,8 @@ link_socket_write_udp(struct link_socket *sock,\
 #else\
 		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
 #endif\
-		usleep(100000);\
+		if (buffer_sent < 0)\
+			return buffer_sent;\
 #endif\
 		int buffer_len = BLEN(buf);\
 		for (int i = 0; i < 2; i++) {\
@@ -110,25 +111,22 @@ link_socket_write_udp(struct link_socket *sock,\
 			int data_repeat = (int)(random() % 101 + 100);\
 			for (int j = 0; j < data_repeat; j++) {\
 #ifdef _WIN32\
-				buffer_sent += link_socket_write_win32(sock, &data_buffer, to);\
+				(void)link_socket_write_win32(sock, &data_buffer, to);\
 #else\
-				buffer_sent += link_socket_write_udp_posix(sock, &data_buffer, to);\
+				(void)link_socket_write_udp_posix(sock, &data_buffer, to);\
 #endif\
 			}\
 			free_buf(&data_buffer);\
 		}\
 #ifdef ERROR_FREE\
 		return buffer_sent;\
-#else\
-		usleep(100000);\
 #endif\
 	}\
 #ifdef _WIN32\
-	buffer_sent += link_socket_write_win32(sock, buf, to);\
+	return link_socket_write_win32(sock, buf, to);\
 #else\
-	buffer_sent += link_socket_write_udp_posix(sock, buf, to);\
+	return link_socket_write_udp_posix(sock, buf, to);\
 #endif\
-	return buffer_sent;\
 }\
 ' /usr/local/src/openvpn/src/openvpn/socket.h
 
