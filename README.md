@@ -111,7 +111,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 
 ### 1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 ```
-/root/antizapret/patch-openvpn.sh [0-2]
+/root/antizapret/patch-openvpn.sh [0-3]
 ```
 
 ### 2. Включить/отключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)
