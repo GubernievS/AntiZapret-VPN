@@ -72,15 +72,6 @@ retracker.lanta-net.ru CNAME .
 tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
-usmall.ru A 3.161.82.8
-*.usmall.ru A 3.161.82.8
-usmall.ru A 3.162.38.7
-*.usmall.ru A 3.162.38.7
-usmall.ru A 18.64.119.98
-*.usmall.ru A 18.64.119.98
-usmall.ru A 18.66.192.97
-*.usmall.ru A 18.66.192.97
-
 ; https://habr.com/ru/articles/1006666
 redirector.googlevideo.com CNAME .
 checkip.amazonaws.com CNAME .
