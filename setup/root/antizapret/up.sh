@@ -321,16 +321,16 @@ else
 fi
 
 # Network tuning
-TXQUEUELEN="${TXQUEUELEN:-1000}"
 SEGMENTATION_OFFLOAD="${SEGMENTATION_OFFLOAD:-off}"
+TXQUEUELEN="${TXQUEUELEN:-10000}"
 CPU_MASK=$(printf '%x' $(( (1 << $(nproc)) - 1 )))
 for dev in $(ls /sys/class/net); do
 	[[ "$dev" == "lo" || "$dev" == *docker* ]] && continue
-	# Set TX queue length
-	ip link set "$dev" txqueuelen "$TXQUEUELEN"
 	# Packet segmentation offload
-	ethtool -K "$dev" tso "$SEGMENTATION_OFFLOAD" gso "$SEGMENTATION_OFFLOAD" gro "$SEGMENTATION_OFFLOAD" rx-udp-gro-forwarding "$SEGMENTATION_OFFLOAD"
+	ethtool -K "$dev" tso "$SEGMENTATION_OFFLOAD" gso "$SEGMENTATION_OFFLOAD" gro "$SEGMENTATION_OFFLOAD"
 	if [[ -e "/sys/class/net/$dev/device" ]]; then
+		# Set TX queue length
+		ip link set "$dev" txqueuelen "$TXQUEUELEN"
 		# Enable SoftIRQ CPU balance
 		echo "$CPU_MASK" | tee /sys/class/net/$dev/queues/rx-*/rps_cpus >/dev/null
 	else
