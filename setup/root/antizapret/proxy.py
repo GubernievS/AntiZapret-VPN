@@ -7,48 +7,47 @@ from dnslib import DNSRecord,RCODE,QTYPE,A
 from dnslib.server import DNSServer,DNSHandler,BaseResolver,DNSLogger,TCPServer
 
 class ProxyResolver(BaseResolver):
-    def __init__(self,address,port,timeout,ip_range,cleanup_interval,cleanup_expiry,min_ttl,max_ttl):
-        self._env = os.environ.copy()
-        self.ip_pool = {str(x) for x in IPv4Network(ip_range).hosts()}
-        self.ip_map = {}
+    def __init__(self,address,port,timeout,ip_range,ttl):
+        self._env=os.environ.copy()
+        self.ip_pool={str(x) for x in IPv4Network(ip_range).hosts()}
+        self.ip_map={}
         # Loading existing mappings
-        result = subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-S","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,check=True,env=self._env)
-        current_time = time.time()
+        result=subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-S","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,check=True,env=self._env)
+        now=time.time()
         for line in result.stdout.splitlines():
-            parts = line.split()
+            parts=line.split()
             if len(parts) < 8:
                 continue
-            fake_ip = parts[3].split("/")[0]
-            real_ip = parts[7]
-            if not self.mapping_ip(real_ip,fake_ip,current_time):
+            fake_ip=parts[3].split("/")[0]
+            real_ip=parts[7]
+            if not self.mapping_ip(real_ip,fake_ip,now):
                 print("Restarting: Invalid loaded fake IPs mappings")
                 try:
                     subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-F","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
                 finally:
                     os._exit(1)
         print(f"Loaded: {len(self.ip_map)} fake IPs")
-        self.address = address
-        self.port = port
-        self.timeout = timeout
-        self.cleanup_interval = cleanup_interval
-        self.cleanup_expiry = cleanup_expiry
-        self.min_ttl = min_ttl
-        self.max_ttl = max_ttl
-        self.lock = threading.Lock()
+        self.address=address
+        self.port=port
+        self.timeout=timeout
+        self.ttl=ttl
+        # Seconds of inactivity before fake IP is removed
+        self.expire=ttl * 2
+        self.lock=threading.Lock()
         # Start thread for cleanup fake IPs
         threading.Thread(target=self.cleanup_fake_ips_worker,daemon=True).start()
 
-    def get_fake_ip(self,real_ip,current_time):
+    def get_fake_ip(self,real_ip,now):
         with self.lock:
-            entry = self.ip_map.get(real_ip)
+            entry=self.ip_map.get(real_ip)
             if entry:
-                entry["last_access"] = current_time
+                entry["used"]=now
                 return entry["fake_ip"]
             if not self.ip_pool:
                 print("Error: No fake IP left")
                 return None
-            fake_ip = self.ip_pool.pop()
-            self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
+            fake_ip=self.ip_pool.pop()
+            self.ip_map[real_ip]={"fake_ip": fake_ip,"used": now}
         try:
             subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-A","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to-destination",real_ip],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
         except Exception as e:
@@ -60,7 +59,7 @@ class ProxyResolver(BaseResolver):
         #print(f"Mapping: {fake_ip} to {real_ip}")
         return fake_ip
 
-    def mapping_ip(self,real_ip,fake_ip,current_time):
+    def mapping_ip(self,real_ip,fake_ip,now):
         if self.ip_map.get(real_ip):
             print(f"Error: Real IP {real_ip} is already mapped")
             return False
@@ -68,13 +67,13 @@ class ProxyResolver(BaseResolver):
             print(f"Error: Fake IP {fake_ip} not in fake IP pool")
             return False
         self.ip_pool.discard(fake_ip)
-        self.ip_map[real_ip] = {"fake_ip": fake_ip,"last_access": current_time}
+        self.ip_map[real_ip]={"fake_ip": fake_ip,"used": now}
         #print(f"Mapping: {fake_ip} to {real_ip}")
         return True
 
     def cleanup_fake_ips_worker(self):
         while True:
-            time.sleep(self.cleanup_interval)
+            time.sleep(self.ttl)
             try:
                 self.cleanup_fake_ips()
             except Exception as e:
@@ -87,11 +86,11 @@ class ProxyResolver(BaseResolver):
 
     def cleanup_fake_ips(self):
         with self.lock:
-            current_time = time.time()
-            cleanup_ips = []
-            rules = ["*nat"]
+            now=time.time()
+            cleanup_ips=[]
+            rules=["*nat"]
             for real_ip,entry in self.ip_map.items():
-                if current_time - entry["last_access"] > self.cleanup_expiry:
+                if now - entry["used"] > self.expire:
                     cleanup_ips.append((real_ip,entry["fake_ip"]))
             for real_ip,fake_ip in cleanup_ips:
                 self.ip_pool.add(fake_ip)
@@ -105,43 +104,32 @@ class ProxyResolver(BaseResolver):
 
     def resolve(self,request,handler):
         try:
-            if handler.protocol == "udp":
-                data = request.send(self.address,self.port,timeout=self.timeout)
+            if handler.protocol=="udp":
+                data=request.send(self.address,self.port,timeout=self.timeout)
             else:
-                data = request.send(self.address,self.port,tcp=True,timeout=self.timeout)
-            reply = DNSRecord.parse(data)
-            if request.q.qtype == QTYPE.A:
-                new_rr = []
-                current_time = time.time()
-                qname = request.q.qname
-                is_smtp = qname.label and b'smtp' in qname.label[0]
+                data=request.send(self.address,self.port,tcp=True,timeout=self.timeout)
+            reply=DNSRecord.parse(data)
+            if request.q.qtype==QTYPE.A:
+                now=time.time()
                 for record in reply.rr:
-                    if record.rtype != QTYPE.A:
+                    record.ttl=self.ttl
+                    if record.rtype!=QTYPE.A:
                         continue
-                    record.rname = qname
-                    if record.ttl < self.min_ttl:
-                        record.ttl = self.min_ttl
-                    elif record.ttl > self.max_ttl:
-                        record.ttl = self.max_ttl
-                    if is_smtp:
-                        new_rr.append(copy.copy(record))
-                    real_ip = str(record.rdata)
-                    fake_ip = self.get_fake_ip(real_ip,current_time)
+                    real_ip=str(record.rdata)
+                    fake_ip=self.get_fake_ip(real_ip,now)
                     if not fake_ip:
-                        reply = request.reply()
-                        reply.header.rcode = RCODE.SERVFAIL
+                        reply=request.reply()
+                        reply.header.rcode=RCODE.SERVFAIL
                         return reply
-                    record.rdata = A(fake_ip)
-                    new_rr.append(record)
-                reply.rr = new_rr
+                    record.rdata=A(fake_ip)
         except Exception as e:
             print(f"Error: {e} (qname={request.q.qname} qtype={QTYPE[request.q.qtype]} protocol={handler.protocol})")
-            reply = request.reply()
-            reply.header.rcode = RCODE.SERVFAIL
+            reply=request.reply()
+            reply.header.rcode=RCODE.SERVFAIL
         return reply
 
-if __name__ == "__main__":
-    p = argparse.ArgumentParser(description="DNS Proxy")
+if __name__=="__main__":
+    p=argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--port",type=int,default=53,
                     metavar="<port>",
                     help="Local proxy port (default:53)")
@@ -161,32 +149,23 @@ if __name__ == "__main__":
     p.add_argument("--ip-range",default="198.18.0.0/15",
                     metavar="<ip/mask>",
                     help="Fake IP range (default:198.18.0.0/15)")
-    p.add_argument("--cleanup-interval",type=int,default=3600,
+    p.add_argument("--ttl",type=int,default=3600,
                     metavar="<seconds>",
-                    help="Seconds between fake IP cleanup runs (default: 3600)")
-    p.add_argument("--cleanup-expiry",type=int,default=7200,
-                    metavar="<seconds>",
-                    help="Seconds of inactivity before fake IP is removed (default: max-ttl * 2)")
-    p.add_argument("--min-ttl",type=int,default=300,
-                    metavar="<seconds>",
-                    help="Minimum TTL in seconds (default: 300)")
-    p.add_argument("--max-ttl",type=int,default=3600,
-                    metavar="<seconds>",
-                    help="Maximum TTL in seconds (default: 3600)")
-    args = p.parse_args()
-    args.dns,_,args.dns_port = args.upstream.partition(":")
-    args.dns_port = int(args.dns_port or 53)
-    TCPServer.request_queue_size = 128
+                    help="TTL in seconds for all records (default: 3600)")
+    args=p.parse_args()
+    args.dns,_,args.dns_port=args.upstream.partition(":")
+    args.dns_port=int(args.dns_port or 53)
+    TCPServer.request_queue_size=128
     print("Starting Proxy Resolver...")
-    resolver = ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.cleanup_interval,args.cleanup_expiry,args.min_ttl,args.max_ttl)
-    logger = DNSLogger(args.log,prefix=args.log_prefix)
-    udp_server = DNSServer(resolver,
+    resolver=ProxyResolver(args.dns,args.dns_port,args.timeout,args.ip_range,args.ttl)
+    logger=DNSLogger(args.log,prefix=args.log_prefix)
+    udp_server=DNSServer(resolver,
                            port=args.port,
                            address=args.address,
                            logger=logger,
                            handler=DNSHandler)
     udp_server.start_thread()
-    tcp_server = DNSServer(resolver,
+    tcp_server=DNSServer(resolver,
                            port=args.port,
                            address=args.address,
                            tcp=True,
