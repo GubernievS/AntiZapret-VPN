@@ -416,8 +416,7 @@ restore(){
 	recreate
 
 	echo "Configuration and clients restored from backup"
-	echo 'Rebooting...'
-	reboot -f
+	reboot
 }
 
 if ! [[ "$OPTION" =~ ^[1-9]$ ]]; then
