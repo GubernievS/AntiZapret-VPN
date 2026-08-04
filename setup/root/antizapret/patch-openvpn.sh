@@ -3,7 +3,7 @@
 # Патч для обхода блокировки протокола OpenVPN
 # Работает только для UDP соединений
 #
-# chmod +x patch-openvpn.sh && ./patch-openvpn.sh [0-2]
+# chmod +x patch-openvpn.sh && ./patch-openvpn.sh [0-3]
 #
 set -e
 export LC_ALL=C
@@ -15,16 +15,17 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-if [[ "$1" =~ ^[0-2]$ ]]; then
+if [[ "$1" =~ ^[0-3]$ ]]; then
 	ALGORITHM="$1"
 else
 	echo
 	echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
 	echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
-	echo '    1) Strong      - Recommended by default'
-	echo '    2) Error-free  - Use if Strong patch causes connection error, recommended for Mikrotik routers'
-	until [[ "$ALGORITHM" =~ ^[0-2]$ ]]; do
-		read -rp 'Version choice [0-2]: ' -e -i 1 ALGORITHM
+	echo '    1) Random      - Recommended by default, randomly selects Strong or Error-Free'
+	echo '    2) Strong      - Better protocol masking'
+	echo '    3) Error-Free  - Use if Strong patch causes connection error, recommended for routers'
+	until [[ "$ALGORITHM" =~ ^[0-3]$ ]]; do
+		read -rp 'Version choice [0-3]: ' -e -i 1 ALGORITHM
 	done
 fi
 
@@ -48,10 +49,14 @@ if [[ "$ALGORITHM" == '0' ]]; then
 	echo
 	echo 'OpenVPN patch not installed!'
 	exit 0
+fi
+
+if [[ "$ALGORITHM" == '1' ]]; then
+	PATCH_MODE='		_Bool error_free = random() & 1;'
 elif [[ "$ALGORITHM" == '2' ]]; then
-	ERROR_FREE='#define ERROR_FREE'
+	PATCH_MODE='		_Bool error_free = 0;'
 else
-	ERROR_FREE='#undef ERROR_FREE'
+	PATCH_MODE='		_Bool error_free = 1;'
 fi
 
 make -C /usr/local/src/openvpn uninstall || true
@@ -72,44 +77,43 @@ link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
 					struct link_socket_actual *to)\
 {\
-'"$ERROR_FREE"'\
-	ssize_t buffer_sent = 0;\
 	int opcode = *BPTR(buf) >> 3;\
 	if (opcode == 7 || opcode == 8 || opcode == 10)\
 	{\
-#ifdef ERROR_FREE\
+'"$PATCH_MODE"'\
+		ssize_t buffer_sent = 0;\
+		if (error_free) {\
 #ifdef _WIN32\
-		buffer_sent = link_socket_write_win32(sock, buf, to);\
+			buffer_sent = link_socket_write_win32(sock, buf, to);\
 #else\
-		buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
+			buffer_sent = link_socket_write_udp_posix(sock, buf, to);\
 #endif\
-		if (buffer_sent < 0)\
-			return buffer_sent;\
-#endif\
+			if (buffer_sent < 0)\
+				return buffer_sent;\
+		}\
 		int buffer_len = BLEN(buf);\
-		for (int i = 0; i < 2; i++) {\
-			int data_len = (int)(random() % 101 + buffer_len);\
+		for (int i = 0; i < 3; i++) {\
+			int data_len = (int)(random() % 81 + buffer_len);\
 			uint8_t data[data_len];\
-#ifdef ERROR_FREE\
-			memcpy(data, BPTR(buf), buffer_len);\
-			data[0] = (uint8_t)40;\
-			for (int k = buffer_len; k < data_len; k++) {\
-				data[k] = (uint8_t)(random() % 256);\
+			if (error_free) {\
+				memcpy(data, BPTR(buf), buffer_len);\
+				data[0] = (uint8_t)40;\
+				for (int k = buffer_len; k < data_len; k++) {\
+					data[k] = (uint8_t)(random() % 256);\
+				}\
+			} else {\
+				uint8_t first_byte;\
+				do {\
+					first_byte = (uint8_t)(random() % 256);\
+				} while ((first_byte >> 3) >= 1 && (first_byte >> 3) <= 11);\
+				data[0] = first_byte;\
+				for (int k = 1; k < data_len; k++) {\
+					data[k] = (uint8_t)(random() % 256);\
+				}\
 			}\
-#else\
-			uint8_t first_byte;\
-			do {\
-				first_byte = (uint8_t)(random() % 256);\
-			} while ((first_byte >> 3) >= 1 && (first_byte >> 3) <= 11);\
-			data[0] = first_byte;\
-			for (int k = 1; k < data_len; k++) {\
-				data[k] = (uint8_t)(random() % 256);\
-			}\
-#endif\
 			struct buffer data_buffer = alloc_buf(data_len);\
 			buf_write(&data_buffer, data, data_len);\
-			int data_repeat = (int)(random() % 101 + 100);\
-			for (int j = 0; j < data_repeat; j++) {\
+			for (int j = 0; j < 50; j++) {\
 #ifdef _WIN32\
 				(void)link_socket_write_win32(sock, &data_buffer, to);\
 #else\
@@ -118,9 +122,8 @@ link_socket_write_udp(struct link_socket *sock,\
 			}\
 			free_buf(&data_buffer);\
 		}\
-#ifdef ERROR_FREE\
-		return buffer_sent;\
-#endif\
+		if (error_free)\
+			return buffer_sent;\
 	}\
 #ifdef _WIN32\
 	return link_socket_write_win32(sock, buf, to);\
