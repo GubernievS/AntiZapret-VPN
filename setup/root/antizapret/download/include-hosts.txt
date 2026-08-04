@@ -1224,6 +1224,9 @@ dnsleaktest.com
 dtc.mblock.cc
 se.com
 familywall.com
+panic.com
+render.com
+hyperioxes.com
 
 # Сертификаты
 letsencrypt.org
