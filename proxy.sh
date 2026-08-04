@@ -155,14 +155,15 @@ kernel.panic_on_oops=1
 kernel.softlockup_panic=0
 kernel.hardlockup_panic=0
 kernel.sched_autogroup_enabled=0
+kernel.nmi_watchdog=0
 net.ipv4.ip_forward=1
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 net.ipv4.tcp_mtu_probing=1
-net.core.rmem_max=16777216
-net.core.wmem_max=16777216
-net.ipv4.tcp_rmem=16384 131072 16777216
-net.ipv4.tcp_wmem=16384 131072 16777216
+net.core.rmem_max=33554432
+net.core.wmem_max=33554432
+net.ipv4.tcp_rmem=4096 262144 16777216
+net.ipv4.tcp_wmem=4096 262144 16777216
 net.ipv4.tcp_no_metrics_save=1
 net.core.netdev_budget=600
 net.ipv4.tcp_fastopen=3
@@ -170,22 +171,22 @@ net.ipv4.ip_local_port_range=10000 65535
 net.netfilter.nf_conntrack_max=131072
 net.core.netdev_budget_usecs=8000
 net.core.dev_weight=64
-net.ipv4.tcp_max_syn_backlog=1024
+net.ipv4.tcp_max_syn_backlog=4096
 net.netfilter.nf_conntrack_buckets=32768
 net.ipv4.conf.all.rp_filter=0
 net.ipv4.conf.default.rp_filter=0
 net.core.netdev_max_backlog=10000
 net.core.somaxconn=4096
 net.ipv4.tcp_syncookies=1
-net.ipv4.udp_rmem_min=16384
-net.ipv4.udp_wmem_min=16384
+net.ipv4.udp_rmem_min=4096
+net.ipv4.udp_wmem_min=4096
 net.core.optmem_max=20480
 net.ipv4.tcp_timestamps=1
 net.ipv4.tcp_tw_reuse=1
 net.ipv4.tcp_slow_start_after_idle=0
-net.netfilter.nf_conntrack_tcp_timeout_established=86400
-net.core.rmem_default=1048576
-net.core.wmem_default=1048576
+net.netfilter.nf_conntrack_tcp_timeout_established=3600
+net.core.rmem_default=262144
+net.core.wmem_default=262144
 net.ipv4.tcp_base_mss=1024
 net.ipv4.conf.all.accept_redirects=0
 net.ipv4.conf.default.accept_redirects=0
@@ -199,9 +200,22 @@ net.ipv4.ip_local_reserved_ports=50080,50443,51080,51443,52080,52443
 net.ipv4.tcp_keepalive_time=600
 net.ipv4.tcp_keepalive_intvl=30
 net.ipv4.tcp_keepalive_probes=3
-net.netfilter.nf_conntrack_udp_timeout=60
-net.netfilter.nf_conntrack_udp_timeout_stream=600
+net.netfilter.nf_conntrack_udp_timeout=30
+net.netfilter.nf_conntrack_udp_timeout_stream=120
 net.netfilter.nf_conntrack_tcp_be_liberal=1
+net.ipv4.tcp_notsent_lowat=131072
+net.ipv4.tcp_fin_timeout=15
+net.ipv4.tcp_orphan_retries=3
+net.ipv4.tcp_retries2=8
+net.ipv4.tcp_syn_retries=4
+net.ipv4.tcp_synack_retries=3
+net.netfilter.nf_conntrack_tcp_loose=1
+net.netfilter.nf_conntrack_tcp_timeout_syn_sent=30
+net.netfilter.nf_conntrack_tcp_timeout_syn_recv=30
+net.netfilter.nf_conntrack_tcp_timeout_fin_wait=30
+net.netfilter.nf_conntrack_tcp_timeout_time_wait=30
+net.netfilter.nf_conntrack_tcp_timeout_close_wait=30
+net.netfilter.nf_conntrack_icmp_timeout=10
 " > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
@@ -297,6 +311,4 @@ systemctl enable netfilter-persistent
 # Перезагружаем
 echo
 echo -e '\e[1;32mProxy for AntiZapret VPN server installed successfully!\e[0m'
-echo 'Rebooting...'
-
-reboot -f
+reboot
