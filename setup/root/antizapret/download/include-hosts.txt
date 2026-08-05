@@ -855,8 +855,8 @@ thetvdb.com
 #whatsapp.com
 #whatsapp.net
 entware.net
-roblox.com
-rbxcdn.com
+#roblox.com
+#rbxcdn.com
 facetime.apple.com
 facetime-apple-com.we.apple-dns.net
 pepephone.com
@@ -996,7 +996,7 @@ warhammer-community.com
 kawasaki.com
 quiver.ai
 kawasaki-global-admin.com
-browserleaks.com
+#browserleaks.com
 vast.ai
 skyscanner.com
 skyscnr.com
@@ -1220,7 +1220,7 @@ pubnub.com
 pndsn.com
 traceparts.com
 tracepartsonline.net
-dnsleaktest.com
+#dnsleaktest.com
 dtc.mblock.cc
 se.com
 familywall.com
