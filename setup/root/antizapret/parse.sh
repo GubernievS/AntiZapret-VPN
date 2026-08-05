@@ -172,9 +172,17 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	# Создаем файлы deny.rpz и deny2.rpz для Knot Resolver
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/deny.rpz
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/deny2.rpz
-	sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
-	sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
+
+	if [[ "$ANTIZAPRET_ADBLOCK" == 'y' ]]; then
+		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
+		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
+	fi
 	sed 's/\r//g; /^;/d; /^$/d' download/*rpz.txt config/*rpz.txt >> result/deny.rpz
+
+	if [[ "$VPN_ADBLOCK" == 'y' ]]; then
+		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny2.rpz
+		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny2.rpz
+	fi
 	sed 's/\r//g; /^;/d; /^$/d' download/*rpz2.txt config/*rpz2.txt >> result/deny2.rpz
 
 	# Обновляем файл deny.rpz в Knot Resolver только если файл изменился
