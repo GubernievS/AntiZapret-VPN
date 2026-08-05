@@ -131,7 +131,7 @@ download $DOALL_PATH $DOALL_LINK
 # Миграция старой настройки BLOCK_ADS
 if grep -q '^BLOCK_ADS=' setup; then
 	sed -i 's/^BLOCK_ADS=/ANTIZAPRET_ADBLOCK=/' setup
-	grep -q '^VPN_ADBLOCK=' setup || echo 'VPN_ADBLOCK=n' >> setup
+	sed -i '/^ANTIZAPRET_ADBLOCK=/a VPN_ADBLOCK=n' setup
 fi
 
 source setup
