@@ -237,7 +237,7 @@ tiktokcdn.com
 tiktokcdn-us.com
 tiktokcdn-eu.com
 ttwstatic.com
-ibyteimg.com
+#ibyteimg.com
 #lookerstudio.google.com
 soapui.org
 spotify.com
@@ -1173,7 +1173,7 @@ scdn.co
 #benzinradar.com
 propertyfinder.ae
 bayut.com
-win-rar.com
+#win-rar.com
 #duolingo.com
 gr-assets.com
 sony.co.jp
@@ -1227,6 +1227,9 @@ familywall.com
 panic.com
 render.com
 hyperioxes.com
+cerebras.ai
+studiolab.sagemaker.aws
+cerebras.ai
 
 # Сертификаты
 letsencrypt.org
