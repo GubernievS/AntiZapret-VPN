@@ -37,7 +37,6 @@ fi
 
 [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
-MTU="${MTU:-1420}"
 
 # WARP AntiZapret
 WARP_ANTIZAPRET_INTERFACE=warp-antizapret
@@ -46,8 +45,8 @@ WARP_ANTIZAPRET_PATH="/etc/wireguard/$WARP_ANTIZAPRET_INTERFACE.conf"
 if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
 	set +e
 	echo "Starting $WARP_ANTIZAPRET_INTERFACE..."
-	PRIVATE_KEY=$(wg genkey)
-	KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
+	WARP_PRIVATE_KEY=$(wg genkey)
+	KEY=$(echo "$WARP_PRIVATE_KEY" | wg pubkey)
 	REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
 		-H 'Content-Type: application/json' \
 		-d "{\"key\": \"$KEY\"}")
@@ -57,9 +56,9 @@ if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
 	WARP_ADDRESS=$(echo "$REG" | jq -r '.config.interface.addresses.v4')
 
 	echo "[Interface]
-PrivateKey = $PRIVATE_KEY
+PrivateKey = $WARP_PRIVATE_KEY
 Address = $WARP_ADDRESS/32
-MTU = $MTU
+MTU = 1420
 Table = 13335
 PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.29.0.0/16 to $FAKE_IP.0.0/15 lookup main priority 5000 || true
@@ -95,8 +94,8 @@ WARP_VPN_PATH="/etc/wireguard/$WARP_VPN_INTERFACE.conf"
 if [[ "$VPN_WARP" == 'y' ]]; then
 	set +e
 	echo "Starting $WARP_VPN_INTERFACE..."
-	PRIVATE_KEY=$(wg genkey)
-	KEY=$(echo "$PRIVATE_KEY" | wg pubkey)
+	WARP_PRIVATE_KEY=$(wg genkey)
+	KEY=$(echo "$WARP_PRIVATE_KEY" | wg pubkey)
 	REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
 		-H 'Content-Type: application/json' \
 		-d "{\"key\": \"$KEY\"}")
@@ -106,9 +105,9 @@ if [[ "$VPN_WARP" == 'y' ]]; then
 	WARP_ADDRESS=$(echo "$REG" | jq -r '.config.interface.addresses.v4')
 
 	echo "[Interface]
-PrivateKey = $PRIVATE_KEY
+PrivateKey = $WARP_PRIVATE_KEY
 Address = $WARP_ADDRESS/32
-MTU = $MTU
+MTU = 1420
 Table = 13336
 PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.28.0.0/16 lookup 13336 priority 10000 || true
@@ -324,6 +323,7 @@ fi
 SEGMENTATION_OFFLOAD="${SEGMENTATION_OFFLOAD:-off}"
 TXQUEUELEN="${TXQUEUELEN:-10000}"
 CPU_MASK=$(printf '%x' $(( (1 << $(nproc)) - 1 )))
+MTU="${MTU:-1420}"
 for dev in $(ls /sys/class/net); do
 	[[ "$dev" == "lo" || "$dev" == *docker* ]] && continue
 	# Packet segmentation offload
@@ -334,8 +334,10 @@ for dev in $(ls /sys/class/net); do
 		# Enable SoftIRQ CPU balance
 		echo "$CPU_MASK" | tee /sys/class/net/$dev/queues/rx-*/rps_cpus >/dev/null
 	else
-		# Set MTU
-		ip link set "$dev" mtu "$MTU"
+		# Set MTU if current is greater
+		if [[ $(cat /sys/class/net/$dev/mtu) -gt $MTU ]]; then
+			ip link set "$dev" mtu "$MTU"
+		fi
 	fi
 done
 

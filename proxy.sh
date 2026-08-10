@@ -216,6 +216,7 @@ net.netfilter.nf_conntrack_tcp_timeout_fin_wait=30
 net.netfilter.nf_conntrack_tcp_timeout_time_wait=30
 net.netfilter.nf_conntrack_tcp_timeout_close_wait=30
 net.netfilter.nf_conntrack_icmp_timeout=10
+net.ipv4.ip_no_pmtu_disc=1
 " > /etc/sysctl.d/99-proxy.conf
 
 # Отключим IPv6
