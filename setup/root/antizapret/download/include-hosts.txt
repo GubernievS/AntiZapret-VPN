@@ -1230,6 +1230,7 @@ hyperioxes.com
 cerebras.ai
 studiolab.sagemaker.aws
 cerebras.ai
+fresha.com
 
 # Сертификаты
 letsencrypt.org
