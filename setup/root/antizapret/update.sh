@@ -128,12 +128,6 @@ download $UPDATE_PATH $UPDATE_LINK
 download $PARSE_PATH $PARSE_LINK
 download $DOALL_PATH $DOALL_LINK
 
-# Миграция старой настройки BLOCK_ADS
-if grep -q '^BLOCK_ADS=' setup; then
-	sed -i 's/^BLOCK_ADS=/ANTIZAPRET_ADBLOCK=/' setup
-	sed -i '/^ANTIZAPRET_ADBLOCK=/a VPN_ADBLOCK=n' setup
-fi
-
 source setup
 
 if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
