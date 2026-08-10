@@ -1,4 +1,4 @@
--- IP address renumbering for Full VPN
+-- IP address renumbering for full VPN
 return nil
 --return {
 --	{'A.B.C.D/M', 'X.Y.Z.W'},	-- Source subnet -> destination subnet
