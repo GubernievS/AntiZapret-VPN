@@ -53,7 +53,10 @@ fi
 
 echo
 echo -e '\e[1;32mInstalling proxy for AntiZapret VPN server\e[0m'
-echo 'Proxied ports: 80, 443, 504, 508, 540, 580, 50080, 50443, 51080, 51443, 52080, 52443'
+echo 'Proxied ports:'
+echo '    OpenVPN UDP:           80, 443, 504, 508, 50080, 50443'
+echo '    OpenVPN TCP:           80, 443, 504, 508, 50080, 50443'
+echo '    WireGuard/AmneziaWG:   540, 580, 51080, 51443, 52080, 52443'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
@@ -69,6 +72,18 @@ while read -rp 'Enter AntiZapret VPN server IPv4 address: ' -e DESTINATION_IP
 do
 	[[ -n $(getent ahostsv4 "$DESTINATION_IP") ]] || continue
 	break
+done
+echo
+until [[ "$OPENVPN_UDP" =~ (y|n) ]]; do
+	read -rp 'Enable OpenVPN UDP proxying? [y/n]: ' -e -i y OPENVPN_UDP
+done
+echo
+until [[ "$OPENVPN_TCP" =~ (y|n) ]]; do
+	read -rp 'Enable OpenVPN TCP proxying? [y/n]: ' -e -i n OPENVPN_TCP
+done
+echo
+until [[ "$WIREGUARD" =~ (y|n) ]]; do
+	read -rp 'Enable WireGuard/AmneziaWG proxying? [y/n]: ' -e -i y WIREGUARD
 done
 echo
 echo 'Warning! SSH protection may block your IP after 5 logins/minute!'
@@ -272,26 +287,32 @@ ip6tables -w -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --cla
 
 # nat
 # OpenVPN TCP
-iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
-iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
-iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
+if [[ "$OPENVPN_TCP" == 'y' ]]; then
+	iptables -w -t nat -A PREROUTING -p tcp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p tcp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
+	iptables -w -t nat -A PREROUTING -p tcp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
+	iptables -w -t nat -A PREROUTING -p tcp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p tcp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p tcp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
+fi
 # OpenVPN UDP
-iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
-iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
-iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
-iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
+if [[ "$OPENVPN_UDP" == 'y' ]]; then
+	iptables -w -t nat -A PREROUTING -p udp --dport 80 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p udp --dport 443 -j DNAT --to-destination $DESTINATION_IP:50443
+	iptables -w -t nat -A PREROUTING -p udp --dport 504 -j DNAT --to-destination $DESTINATION_IP:50443
+	iptables -w -t nat -A PREROUTING -p udp --dport 508 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p udp --dport 50080 -j DNAT --to-destination $DESTINATION_IP:50080
+	iptables -w -t nat -A PREROUTING -p udp --dport 50443 -j DNAT --to-destination $DESTINATION_IP:50443
+fi
 # WireGuard/AmneziaWG
-iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:51443
-iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:51080
-iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination $DESTINATION_IP:51080
-iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination $DESTINATION_IP:51443
-iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:51080
-iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:51443
+if [[ "$WIREGUARD" == 'y' ]]; then
+	iptables -w -t nat -A PREROUTING -p udp --dport 540 -j DNAT --to-destination $DESTINATION_IP:51443
+	iptables -w -t nat -A PREROUTING -p udp --dport 580 -j DNAT --to-destination $DESTINATION_IP:51080
+	iptables -w -t nat -A PREROUTING -p udp --dport 51080 -j DNAT --to-destination $DESTINATION_IP:51080
+	iptables -w -t nat -A PREROUTING -p udp --dport 51443 -j DNAT --to-destination $DESTINATION_IP:51443
+	iptables -w -t nat -A PREROUTING -p udp --dport 52080 -j DNAT --to-destination $DESTINATION_IP:51080
+	iptables -w -t nat -A PREROUTING -p udp --dport 52443 -j DNAT --to-destination $DESTINATION_IP:51443
+fi
 # SNAT
 iptables -w -t nat -A POSTROUTING -d $DESTINATION_IP -j SNAT --to-source $DEFAULT_IP
 
