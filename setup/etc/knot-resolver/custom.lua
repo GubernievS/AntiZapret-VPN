@@ -1,0 +1,2 @@
+-- Custom query policies for AntiZapret VPN
+--policy.add(policy.suffix(policy.FORWARD({'8.8.8.8', '8.8.4.4'}), {todname('example.com')}))

@@ -1,4 +1,4 @@
--- IP address renumbering
+-- IP address renumbering for AntiZapret VPN
 return nil
 --return {
 --	{'A.B.C.D/M', 'X.Y.Z.W'},	-- Source subnet -> destination subnet
