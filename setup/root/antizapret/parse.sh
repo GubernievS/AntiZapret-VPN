@@ -3,6 +3,11 @@ set -e
 export LC_ALL=C
 shopt -s nullglob
 
+###
+sed -i 's/^-- IP address renumbering$/-- IP address renumbering for AntiZapret VPN/' /etc/knot-resolver/renumber.lua
+sed -i 's/^-- IP address renumbering$/-- IP address renumbering for Full VPN/' /etc/knot-resolver/renumber2.lua
+###
+
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
