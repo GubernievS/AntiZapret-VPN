@@ -395,10 +395,9 @@ restore(){
 
 	if [[ -d /root/easyrsa3/pki ]]; then
 		rm -rf /etc/openvpn/easyrsa3/*
-		mkdir -p /etc/openvpn/easyrsa3
 	fi
 
-	cp -r /root/easyrsa3/* /etc/openvpn/easyrsa3/ || true
+	cp -r /root/easyrsa3 /etc/openvpn/ || true
 	cp /root/wireguard/* /etc/wireguard/ || true
 	cp /root/config/* /root/antizapret/config/ || true
 	cp /root/knot-resolver/* /etc/knot-resolver/ || true
