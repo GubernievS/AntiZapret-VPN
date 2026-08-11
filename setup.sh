@@ -250,10 +250,10 @@ until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
 	read -rp $'Route all traffic for domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and domains from config/exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
 done
 echo
-until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Obsolete! Include Discord voice IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DISCORD_INCLUDE
-done
-echo
+#until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Discord voice IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DISCORD_INCLUDE
+#done
+#echo
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include Cloudflare IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y CLOUDFLARE_INCLUDE
 done
@@ -266,10 +266,10 @@ until [[ "$WHATSAPP_INCLUDE" =~ (y|n) ]]; do
 	read -rp $'Include WhatsApp IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y WHATSAPP_INCLUDE
 done
 echo
-until [[ "$ROBLOX_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n ROBLOX_INCLUDE
-done
-echo
+#until [[ "$ROBLOX_INCLUDE" =~ (y|n) ]]; do
+#	read -rp $'Include Roblox IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n ROBLOX_INCLUDE
+#done
+#echo
 #until [[ "$AMAZON_INCLUDE" =~ (y|n) ]]; do
 #	read -rp $'Include Amazon IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AMAZON_INCLUDE
 #done
