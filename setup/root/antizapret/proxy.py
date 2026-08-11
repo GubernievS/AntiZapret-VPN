@@ -73,7 +73,7 @@ class ProxyResolver(BaseResolver):
 
     def cleanup_fake_ips_worker(self):
         while True:
-            time.sleep(self.ttl)
+            time.sleep(self.expire)
             try:
                 self.cleanup_fake_ips()
             except Exception as e:
@@ -149,9 +149,9 @@ if __name__=="__main__":
     p.add_argument("--ip-range",default="198.18.0.0/15",
                     metavar="<ip/mask>",
                     help="Fake IP range (default:198.18.0.0/15)")
-    p.add_argument("--ttl",type=int,default=3600,
+    p.add_argument("--ttl",type=int,default=1800,
                     metavar="<seconds>",
-                    help="TTL in seconds for all records (default: 3600)")
+                    help="TTL in seconds for all records (default: 1800)")
     args=p.parse_args()
     args.dns,_,args.dns_port=args.upstream.partition(":")
     args.dns_port=int(args.dns_port or 53)
