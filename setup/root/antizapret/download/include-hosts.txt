@@ -855,7 +855,7 @@ thetvdb.com
 #whatsapp.com
 #whatsapp.net
 entware.net
-#roblox.com
+roblox.com
 #rbxcdn.com
 facetime.apple.com
 facetime-apple-com.we.apple-dns.net
