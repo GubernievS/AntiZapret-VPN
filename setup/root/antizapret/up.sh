@@ -39,25 +39,27 @@ fi
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 # WARP AntiZapret
-WARP_ANTIZAPRET_INTERFACE=warp-antizapret
-WARP_ANTIZAPRET_PATH="/etc/wireguard/$WARP_ANTIZAPRET_INTERFACE.conf"
+ANTIZAPRET_WARP_INTERFACE=warp-antizapret
+ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
 
 if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
 	set +e
-	echo "Starting $WARP_ANTIZAPRET_INTERFACE..."
-	WARP_PRIVATE_KEY=$(wg genkey)
-	KEY=$(echo "$WARP_PRIVATE_KEY" | wg pubkey)
-	REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
-		-H 'Content-Type: application/json' \
-		-d "{\"key\": \"$KEY\"}")
+	echo "Starting $ANTIZAPRET_WARP_INTERFACE..."
+	if [[ -z "$ANTIZAPRET_WARP_PRIVATE_KEY" || -z "$ANTIZAPRET_WARP_PUBLIC_KEY" || -z "$ANTIZAPRET_WARP_ENDPOINT" || -z "$ANTIZAPRET_WARP_ADDRESS" ]]; then
+		ANTIZAPRET_WARP_PRIVATE_KEY=$(wg genkey)
+		KEY=$(echo "$ANTIZAPRET_WARP_PRIVATE_KEY" | wg pubkey)
+		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+			-H 'Content-Type: application/json' \
+			-d "{\"key\": \"$KEY\"}")
 
-	WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
-	WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
-	WARP_ADDRESS=$(echo "$REG" | jq -r '.config.interface.addresses.v4')
+		ANTIZAPRET_WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
+		ANTIZAPRET_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+		ANTIZAPRET_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
+	fi
 
 	echo "[Interface]
-PrivateKey = $WARP_PRIVATE_KEY
-Address = $WARP_ADDRESS/32
+PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
+Address = $ANTIZAPRET_WARP_ADDRESS
 MTU = 1420
 Table = 13335
 PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
@@ -68,45 +70,47 @@ PostDown = ip rule del from $IP.29.0.0/16 to $FAKE_IP.0.0/15 priority 5000
 PostDown = ip rule del from $IP.29.0.0/16 lookup 13335 priority 10000
 
 [Peer]
-PublicKey = $WARP_PUBLIC_KEY
+PublicKey = $ANTIZAPRET_WARP_PUBLIC_KEY
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
-Endpoint = $WARP_ENDPOINT" > $WARP_ANTIZAPRET_PATH
+Endpoint = $ANTIZAPRET_WARP_ENDPOINT" > $ANTIZAPRET_WARP_PATH
 
-	wg-quick up $WARP_ANTIZAPRET_PATH 2>/dev/null
+	wg-quick up $ANTIZAPRET_WARP_PATH 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
-		echo "Started $WARP_ANTIZAPRET_INTERFACE: $WARP_ENDPOINT connected"
-		ANTIZAPRET_OUT_INTERFACE=$WARP_ANTIZAPRET_INTERFACE
-		ANTIZAPRET_OUT_IP=$WARP_ADDRESS
+		echo "Started $ANTIZAPRET_WARP_INTERFACE: $ANTIZAPRET_WARP_ENDPOINT connected"
+		ANTIZAPRET_OUT_INTERFACE=$ANTIZAPRET_WARP_INTERFACE
+		ANTIZAPRET_OUT_IP="${ANTIZAPRET_WARP_ADDRESS%%/*}"
 	else
-		echo "Starting $WARP_ANTIZAPRET_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		echo "Starting $ANTIZAPRET_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
 	fi
 	set -e
 else
-	rm -f $WARP_ANTIZAPRET_PATH
+	rm -f $ANTIZAPRET_WARP_PATH
 fi
 
 # WARP VPN
-WARP_VPN_INTERFACE=warp-vpn
-WARP_VPN_PATH="/etc/wireguard/$WARP_VPN_INTERFACE.conf"
+VPN_WARP_INTERFACE=warp-vpn
+VPN_WARP_PATH="/etc/wireguard/$VPN_WARP_INTERFACE.conf"
 
 if [[ "$VPN_WARP" == 'y' ]]; then
 	set +e
-	echo "Starting $WARP_VPN_INTERFACE..."
-	WARP_PRIVATE_KEY=$(wg genkey)
-	KEY=$(echo "$WARP_PRIVATE_KEY" | wg pubkey)
-	REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
-		-H 'Content-Type: application/json' \
-		-d "{\"key\": \"$KEY\"}")
+	echo "Starting $VPN_WARP_INTERFACE..."
+	if [[ -z "$VPN_WARP_PRIVATE_KEY" || -z "$VPN_WARP_PUBLIC_KEY" || -z "$VPN_WARP_ENDPOINT" || -z "$VPN_WARP_ADDRESS" ]]; then
+		VPN_WARP_PRIVATE_KEY=$(wg genkey)
+		KEY=$(echo "$VPN_WARP_PRIVATE_KEY" | wg pubkey)
+		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+			-H 'Content-Type: application/json' \
+			-d "{\"key\": \"$KEY\"}")
 
-	WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
-	WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
-	WARP_ADDRESS=$(echo "$REG" | jq -r '.config.interface.addresses.v4')
+		VPN_WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
+		VPN_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+		VPN_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
+	fi
 
 	echo "[Interface]
-PrivateKey = $WARP_PRIVATE_KEY
-Address = $WARP_ADDRESS/32
+PrivateKey = $VPN_WARP_PRIVATE_KEY
+Address = $VPN_WARP_ADDRESS
 MTU = 1420
 Table = 13336
 PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
@@ -115,23 +119,23 @@ PostDown = ip rule del from $IP.28.0.0/16 to $IP.28.0.0/16 priority 5000
 PostDown = ip rule del from $IP.28.0.0/16 lookup 13336 priority 10000
 
 [Peer]
-PublicKey = $WARP_PUBLIC_KEY
+PublicKey = $VPN_WARP_PUBLIC_KEY
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
-Endpoint = $WARP_ENDPOINT" > $WARP_VPN_PATH
+Endpoint = $VPN_WARP_ENDPOINT" > $VPN_WARP_PATH
 
-	wg-quick up $WARP_VPN_PATH 2>/dev/null
+	wg-quick up $VPN_WARP_PATH 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
-		echo "Started $WARP_VPN_INTERFACE: $WARP_ENDPOINT connected"
-		VPN_OUT_INTERFACE=$WARP_VPN_INTERFACE
-		VPN_OUT_IP=$WARP_ADDRESS
+		echo "Started $VPN_WARP_INTERFACE: $VPN_WARP_ENDPOINT connected"
+		VPN_OUT_INTERFACE=$VPN_WARP_INTERFACE
+		VPN_OUT_IP="${VPN_WARP_ADDRESS%%/*}"
 	else
-		echo "Starting $WARP_VPN_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		echo "Starting $VPN_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
 	fi
 	set -e
 else
-	rm -f $WARP_VPN_PATH
+	rm -f $VPN_WARP_PATH
 fi
 
 # filter
