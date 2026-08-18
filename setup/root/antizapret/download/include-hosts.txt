@@ -1232,6 +1232,7 @@ studiolab.sagemaker.aws
 cerebras.ai
 fresha.com
 stream.voidboost.one
+github.io
 
 # Сертификаты
 letsencrypt.org
