@@ -1232,8 +1232,8 @@ studiolab.sagemaker.aws
 cerebras.ai
 fresha.com
 stream.voidboost.one
-github.io
-massgrave.dev
+#github.io
+#massgrave.dev
 
 # Сертификаты
 letsencrypt.org
