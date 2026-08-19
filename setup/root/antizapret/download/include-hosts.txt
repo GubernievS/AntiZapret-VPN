@@ -857,8 +857,8 @@ thetvdb.com
 entware.net
 roblox.com
 #rbxcdn.com
-facetime.apple.com
-facetime-apple-com.we.apple-dns.net
+#facetime.apple.com
+#facetime-apple-com.we.apple-dns.net
 pepephone.com
 onlineprinters.com
 onlineprinters.org
@@ -1131,8 +1131,8 @@ niceincontact.com
 martrust.com
 totalcsgo.com
 dantoo.net
-apple.com
-mzstatic.com
+#apple.com
+#mzstatic.com
 survev.io
 openpgpkey.archlinux.org
 srvkp.com
