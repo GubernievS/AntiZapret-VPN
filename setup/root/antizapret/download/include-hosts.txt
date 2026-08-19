@@ -645,7 +645,7 @@ tjmaxx.tjx.com
 abercrombie.com
 adobe.io
 err.ee
-yandexwebcache.org
+#yandexwebcache.org
 mirror.cachyos.org
 mirror.fast0ne.com
 lifehacker.com
