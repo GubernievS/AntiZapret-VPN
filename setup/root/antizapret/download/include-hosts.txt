@@ -958,7 +958,7 @@ linkplay.com
 cdnbase.com
 ouraring.com
 edx.org
-python.org
+#python.org
 xda-developers.com
 xdaforums.com
 xiaomi.eu
@@ -972,7 +972,7 @@ victorinox.com
 #russiancourses.net
 keil.com
 kymcoforum.com
-gmail.com
+#gmail.com
 rabby.io
 rovio.com
 angrybirdsbigadventure.net
