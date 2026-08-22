@@ -11,9 +11,9 @@ gstatic.com
 youtu.be
 yt.be
 googleusercontent.com
-gvt1.com
-gvt2.com
-gvt3.com
+#gvt1.com
+#gvt2.com
+#gvt3.com
 digitalocean.com
 #adguard-vpn.com
 signal.org
@@ -27,7 +27,7 @@ nnmclub.ch
 #pravdabeslana.ru
 simsync.io
 game-debate.com
-lib.ru
+#lib.ru
 fbcdn.net
 messenger.com
 fb.com
@@ -39,7 +39,7 @@ acf.international
 rutracker.cc
 x.com
 conversations.im
-roskomsvoboda.org
+#roskomsvoboda.org
 amazfitwatchfaces.com
 buymeacoffee.com
 redgifs.com
@@ -59,7 +59,7 @@ foxitsoftware.com
 platform.activestate.com
 login.amd.com
 bits.avcdn.net
-forums.chaos.com
+#forums.chaos.com
 try.chaos.com
 cisco.com
 database.clamav.net
@@ -991,8 +991,8 @@ archlinuxarm.org
 disqus.com
 disquscdn.com
 picovr.com
-wahapedia.ru
-warhammer-community.com
+#wahapedia.ru
+#warhammer-community.com
 kawasaki.com
 quiver.ai
 kawasaki-global-admin.com
@@ -1236,6 +1236,7 @@ stream.voidboost.one
 #massgrave.dev
 lexmark.com
 dreammods.net
+mureka.ai
 
 # Сертификаты
 letsencrypt.org
