@@ -109,6 +109,8 @@ dns.switch.ch CNAME .
 *.dns.switch.ch CNAME .
 odvr.nic.cz CNAME .
 *.odvr.nic.cz CNAME .
+dns.pub CNAME .
+*.dns.pub CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
