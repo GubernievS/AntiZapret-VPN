@@ -95,6 +95,10 @@ dns4all.eu CNAME .
 *.dns4all.eu CNAME .
 dns.comss.one CNAME .
 *.dns.comss.one CNAME .
+xbox-dns.ru CNAME .
+*.xbox-dns.ru CNAME .
+dns.malw.link CNAME .
+*.dns.malw.link CNAME .
 dns.apple.com CNAME .
 *.dns.apple.com CNAME .
 dns.bebasid.com CNAME .
