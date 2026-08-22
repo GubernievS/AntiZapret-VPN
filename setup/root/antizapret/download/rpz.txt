@@ -103,6 +103,12 @@ ordns.he.net CNAME .
 *.ordns.he.net CNAME .
 canadianshield.cira.ca CNAME .
 *.canadianshield.cira.ca CNAME .
+hagezi.org CNAME .
+*.hagezi.org CNAME .
+dns.switch.ch CNAME .
+*.dns.switch.ch CNAME .
+odvr.nic.cz CNAME .
+*.odvr.nic.cz CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
