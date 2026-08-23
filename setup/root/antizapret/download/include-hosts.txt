@@ -20,7 +20,7 @@ signal.org
 hetzner.com
 hetzner.cloud
 lostfilm.tv
-licdn.com
+#licdn.com
 rutrk.org
 nnm-club.ws
 nnmclub.ch
@@ -240,7 +240,7 @@ ttwstatic.com
 #ibyteimg.com
 #lookerstudio.google.com
 soapui.org
-spotify.com
+#spotify.com
 githubcopilot.com
 getoutline.com
 code.org
@@ -1169,7 +1169,7 @@ scratch.mit.edu
 deadorbit.net
 gravityshavings.net
 #gdebenz.ru
-scdn.co
+#scdn.co
 #benzinradar.com
 propertyfinder.ae
 bayut.com
