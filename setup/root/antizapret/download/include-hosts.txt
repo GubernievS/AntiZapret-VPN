@@ -240,7 +240,8 @@ ttwstatic.com
 #ibyteimg.com
 #lookerstudio.google.com
 soapui.org
-#spotify.com
+spotify.com
+#scdn.co
 githubcopilot.com
 getoutline.com
 code.org
@@ -424,7 +425,7 @@ matrix.org
 vector.im
 atelecom.biz
 coolstuffgames.com
-board-game.co.uk
+#board-game.co.uk
 githubassets.com
 vscode.dev
 humblebundle.com
@@ -1169,7 +1170,6 @@ scratch.mit.edu
 deadorbit.net
 gravityshavings.net
 #gdebenz.ru
-#scdn.co
 #benzinradar.com
 propertyfinder.ae
 bayut.com
