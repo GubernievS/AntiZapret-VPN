@@ -265,7 +265,7 @@ spiceworks.com
 pornolab.net
 senumy.com
 play.xbox.com
-coursera.org
+#coursera.org
 meta.com
 blackfriday.com
 webex.com
@@ -1166,7 +1166,7 @@ whatwg.org
 oraclecloud.com
 fal.ai
 fal.media
-scratch.mit.edu
+#scratch.mit.edu
 deadorbit.net
 gravityshavings.net
 #gdebenz.ru
