@@ -61,8 +61,8 @@ login.amd.com
 bits.avcdn.net
 #forums.chaos.com
 try.chaos.com
-cisco.com
-database.clamav.net
+#cisco.com
+id.cisco.com
 clamav.net
 dell.com
 dellcdn.com
@@ -83,7 +83,7 @@ download.qt.io
 master.qt.io
 ruckuswireless.com
 servarr.com
-pkgs.tailscale.com
+#pkgs.tailscale.com
 account.templatemonster.com
 app.terraform.io
 terraform.io
@@ -151,9 +151,10 @@ lipstickalley.com
 liquidsky.com
 lowes.com
 m3u.in
-macvendors.com
+#macvendors.com
 malwarebytes.org
-mattermost.com
+#mattermost.com
+customers.mattermost.com
 maximintegrated.com
 mbed.com
 megogo.net
@@ -244,7 +245,8 @@ spotify.com
 #scdn.co
 githubcopilot.com
 getoutline.com
-code.org
+#code.org
+studio.code.org
 swagger.io
 readybot.io
 seekvectorlogo.net
@@ -370,7 +372,7 @@ promods.net
 metopera.org
 theaudiodb.com
 reka.ai
-familysearch.org
+#familysearch.org
 login.norton.com
 myworld.leica-geosystems.com
 philscomputerlab.com
@@ -380,7 +382,8 @@ lightning.ai
 alphacoders.com
 element14.com
 octopart.com
-community.sap.com
+#community.sap.com
+pages.community.sap.com
 home-connect.com
 home-connect.cn
 xmg.gg
@@ -399,7 +402,7 @@ gateway.pinata.cloud
 #ai.google.dev
 #alkalimakersuite-pa.clients6.google.com
 iaai.com
-bid.cars
+#bid.cars
 api.app.prod.grazie.aws.intellij.net
 stripe.com
 stripecdn.com
@@ -408,7 +411,7 @@ yithemes.com
 vans.com
 vans.it
 vans.de
-remotethermo.com
+#remotethermo.com
 everyware-cloud.com
 gold.razer.com
 x.ai
@@ -431,7 +434,7 @@ vscode.dev
 humblebundle.com
 geospy.ai
 #captcha-delivery.com
-developer.nvidia.com
+#developer.nvidia.com
 pny.com
 reverb.com
 semrush.com
@@ -469,7 +472,7 @@ nflxso.net
 nflxvideo.net
 nba.com
 delltechnologies.com
-download.lenovo.com
+#download.lenovo.com
 darkproject.eu
 framer.com
 tor.eff.org
@@ -486,7 +489,7 @@ rebrand.ly
 adguard.com
 avira.com
 mullvad.net
-invent.kde.org
+#invent.kde.org
 s-trade.com
 ua
 is.gd
@@ -513,7 +516,7 @@ spaceforce.mil
 bbystatic.com
 av-connection.com
 udemy.com
-udemycdn.com
+#udemycdn.com
 foxnews.com
 meshcapade.com
 elgato.com
@@ -530,7 +533,7 @@ ibm.com
 8chan.moe
 augmentcode.com
 ikea.com
-id.photonengine.com
+#id.photonengine.com
 tommy.com
 ralphlauren.com
 ralphlauren.nl
@@ -631,7 +634,7 @@ autodesk.com
 autodesk.net
 autodesk.eu
 autocad.com
-okta.com
+#okta.com
 pubnubapi.com
 cdnbunny.org
 vmware.com
@@ -647,8 +650,8 @@ abercrombie.com
 adobe.io
 err.ee
 #yandexwebcache.org
-mirror.cachyos.org
-mirror.fast0ne.com
+#mirror.cachyos.org
+#mirror.fast0ne.com
 lifehacker.com
 myheritage.com
 cdn77.com
