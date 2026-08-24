@@ -11,7 +11,7 @@ gstatic.com
 youtu.be
 yt.be
 googleusercontent.com
-#gvt1.com
+gvt1.com
 #gvt2.com
 #gvt3.com
 digitalocean.com
@@ -1240,6 +1240,7 @@ stream.voidboost.one
 lexmark.com
 dreammods.net
 mureka.ai
+trackstack.app
 
 # Сертификаты
 letsencrypt.org
