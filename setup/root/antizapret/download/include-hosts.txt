@@ -1241,6 +1241,7 @@ lexmark.com
 dreammods.net
 mureka.ai
 trackstack.app
+zimbra.org
 
 # Сертификаты
 letsencrypt.org
