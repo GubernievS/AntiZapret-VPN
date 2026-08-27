@@ -136,9 +136,9 @@ echo
 echo -e 'Choose Cloudflare WARP for \e[1;32mfull VPN\e[0m (vpn-*) outbound traffic:'
 echo '    1) None       - Do not use WARP'
 echo '    2) All        - Route all full VPN traffic via WARP'
-echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
-until [[ "$VPN_WARP" =~ ^[1-3]$ ]]; do
-	read -rp 'WARP choice [1-3]: ' -e -i 2 VPN_WARP
+#echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
+until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
+	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
