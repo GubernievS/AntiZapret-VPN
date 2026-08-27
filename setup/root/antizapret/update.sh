@@ -96,7 +96,7 @@ WHATSAPP_IPS_PATH=download/whatsapp-ips.txt
 ROBLOX_IPS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/roblox-ips.txt
 ROBLOX_IPS_PATH=download/roblox-ips.txt
 
-PROXY=https://cdn.jsdelivr.net/gh/GubernievS/AntiZapret-VPN@main/setup/root/antizapret/
+PROXY=https://proxy.cors.sh/
 
 function download {
 	local path="${1}"
@@ -106,7 +106,7 @@ function download {
 	
 	if ! curl -fL --connect-timeout 30 --max-time 300 "$link" -o "$tmp_path"; then
 		echo 'Trying connect via proxy...'
-		curl -fL --connect-timeout 30 --max-time 300 "$PROXY$path" -o "$tmp_path" || exit 2
+		curl -fL --connect-timeout 30 --max-time 300 "$PROXY$link" -o "$tmp_path" || exit 2
 	fi
 
 	mv -f "$tmp_path" "$path"
