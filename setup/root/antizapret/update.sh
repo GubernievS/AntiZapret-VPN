@@ -96,26 +96,19 @@ WHATSAPP_IPS_PATH=download/whatsapp-ips.txt
 ROBLOX_IPS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/roblox-ips.txt
 ROBLOX_IPS_PATH=download/roblox-ips.txt
 
-PROXY=https://api.codetabs.com/v1/proxy?quest=
+PROXY=https://cdn.jsdelivr.net/gh/GubernievS/AntiZapret-VPN@main/setup/root/antizapret/
 
 function download {
 	local path="${1}"
 	local tmp_path="${path}.tmp"
 	local link="$2"
 	echo "$path"
-	if curl -fL --connect-timeout 30 "$link" -o "$tmp_path"; then
-		local_size="$(stat -c '%s' "$tmp_path")"
-		header="$(curl -fsSLI --connect-timeout 30 "$link")" || exit 3
-		remote_size="$(echo "$header" | grep -i content-length | cut -d ':' -f 2 | sed 's/[[:space:]]//g')"
-		if [[ -n "$remote_size" && "$local_size" != "$remote_size" ]]; then
-			echo "Failed to download $path! Size on server is different"
-			rm -f "$tmp_path"
-			exit 4
-		fi
-	else
+	
+	if ! curl -fL --connect-timeout 30 --max-time 300 "$link" -o "$tmp_path"; then
 		echo 'Trying connect via proxy...'
-		curl -fL --connect-timeout 30 "$PROXY$link" -o "$tmp_path" || exit 2
+		curl -fL --connect-timeout 30 --max-time 300 "$PROXY$path" -o "$tmp_path" || exit 2
 	fi
+
 	mv -f "$tmp_path" "$path"
 	if [[ "$path" == *.sh ]]; then
 		chmod +x "$path"
