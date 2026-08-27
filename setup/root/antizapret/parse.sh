@@ -23,6 +23,43 @@ rm -rf temp result
 mkdir -p temp result
 source setup
 
+###
+if [[ ! -f "config/include-warp-hosts.txt" ]]; then
+	echo '# Добавление доменов для маршрутизации исходящего трафика через WARP
+#
+# Формат записи: example.com
+# Где:
+#   example.com - доменное имя в кодировке ASCII или Punycode
+#
+# Примеры записи:
+#   subdomain.example.com  - добавление домена третьего уровня subdomain.example.com и всех его поддоменов
+#   example.com            - добавление домена второго уровня example.com и всех его поддоменов
+#   com                    - добавление домена верхнего уровня com и всех его поддоменов
+#   xn--80aswg.xn--p1ai    - добавление домена второго уровня сайт.рф и всех его поддоменов (кодировка Punycode)
+#
+# Строки начинающиеся с # это комментарии и они не обрабатываются
+#' > config/include-warp-hosts.txt
+fi
+
+if [[ ! -f "config/exclude-warp-hosts.txt" ]]; then
+	echo '# Исключение доменов из маршрутизации исходящего трафика через WARP
+# Исключить можно любые домены, а не только добавленные в config/include-warp-hosts.txt
+#
+# Формат записи: example.com
+# Где:
+#   example.com - доменное имя в кодировке ASCII или Punycode
+#
+# Примеры записи:
+#   subdomain.example.com  - исключение домена третьего уровня subdomain.example.com и всех его поддоменов
+#   example.com            - исключение домена второго уровня example.com и всех его поддоменов
+#   com                    - исключение домена верхнего уровня com и всех его поддоменов
+#   xn--80aswg.xn--p1ai    - исключение домена второго уровня сайт.рф и всех его поддоменов (кодировка Punycode)
+#
+# Строки начинающиеся с # это комментарии и они не обрабатываются
+#' > config/exclude-warp-hosts.txt
+fi
+###
+
 for file in config/*.txt; do
 	sed -i -e '$a\' "$file"
 done
@@ -203,8 +240,8 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-hosts.txt config/*exclude-hosts.txt | sort -u > temp/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*remove-hosts.txt config/*remove-hosts.txt | sort -u > temp/remove-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*include-warp-hosts.txt /dev/null | sort -u > result/include-warp-hosts.txt
-	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*exclude-warp-hosts.txt /dev/null | sort -u > result/exclude-warp-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*include-warp-hosts.txt | sort -u > result/include-warp-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*exclude-warp-hosts.txt | sort -u > result/exclude-warp-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
