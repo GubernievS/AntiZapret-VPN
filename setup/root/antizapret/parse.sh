@@ -208,6 +208,8 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-hosts.txt config/*exclude-hosts.txt | sort -u > temp/exclude-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*remove-hosts.txt config/*remove-hosts.txt | sort -u > temp/remove-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*include-warp-hosts.txt | sort -u > result/include-warp-hosts.txt
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*exclude-warp-hosts.txt | sort -u > result/exclude-warp-hosts.txt
 
 	# Обрабатываем список заблокированных ресурсов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
@@ -257,6 +259,20 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	# Выводим результат
 	echo "$(wc -l < result/include-hosts.txt) - include-hosts.txt"
 	echo "$(wc -l < result/exclude-hosts.txt) - exclude-hosts.txt"
+	echo "$(wc -l < result/include-warp-hosts.txt) - include-warp-hosts.txt"
+	echo "$(wc -l < result/exclude-warp-hosts.txt) - exclude-warp-hosts.txt"
+
+	# Создаем файл warp.rpz для Knot Resolver
+	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/warp.rpz
+	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-warp-hosts.txt >> result/warp.rpz
+	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-warp-hosts.txt >> result/warp.rpz
+
+	# Обновляем файл warp.rpz в Knot Resolver только если файл изменился
+	if [[ -f result/warp.rpz ]] && ! diff -q result/warp.rpz /etc/knot-resolver/warp.rpz; then
+		cp -f result/warp.rpz /etc/knot-resolver/warp.rpz.tmp
+		mv -f /etc/knot-resolver/warp.rpz.tmp /etc/knot-resolver/warp.rpz
+		sleep 5
+	fi
 
 	# Создаем файл proxy.rpz для Knot Resolver
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/proxy.rpz

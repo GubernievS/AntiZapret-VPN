@@ -12,6 +12,13 @@ if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrad
 	exit 2
 fi
 
+# Остановим фоновые обновления системы
+systemctl stop apt-daily.timer
+systemctl stop apt-daily-upgrade.timer
+systemctl stop apt-daily
+systemctl stop apt-daily-upgrade
+systemctl stop unattended-upgrades
+
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
@@ -105,12 +112,12 @@ until [[ "$WIREGUARD_ENABLE" =~ (y|n) ]]; do
 done
 echo
 echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
-echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
-echo '    1) Random      - Recommended by default, randomly selects Strong or Error-Free'
-echo '    2) Strong      - Better protocol masking'
-echo '    3) Error-Free  - Use if Strong patch causes connection error, recommended for routers'
-until [[ "$OPENVPN_PATCH" =~ ^[0-3]$ ]]; do
-	read -rp 'Version choice [0-3]: ' -e -i 1 OPENVPN_PATCH
+echo '    1) None        - Do not install anti-censorship patch, or remove if already installed'
+echo '    2) Random      - Recommended by default, randomly selects Strong or Error-Free'
+echo '    3) Strong      - Better protocol masking'
+echo '    4) Error-Free  - Use if Strong patch causes connection error, recommended for routers'
+until [[ "$OPENVPN_PATCH" =~ ^[1-4]$ ]]; do
+	read -rp 'Version choice [1-4]: ' -e -i 2 OPENVPN_PATCH
 done
 echo
 echo 'OpenVPN DCO lowers CPU load, boosts data speeds, and only supports AES-128-GCM, AES-256-GCM and CHACHA20-POLY1305 encryption'
@@ -118,12 +125,20 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 	read -rp 'Turn on OpenVPN DCO? [y/n]: ' -e -i y OPENVPN_DCO
 done
 echo
-until [[ "$ANTIZAPRET_WARP" =~ (y|n) ]]; do
-	read -rp $'Use Cloudflare WARP for \001\e[1;32m\002AntiZapret VPN\e[0m\002 (antizapret-*) outbound traffic? [y/n]: ' -e -i n ANTIZAPRET_WARP
+echo -e 'Choose Cloudflare WARP for \e[1;32mAntiZapret VPN\e[0m (antizapret-*) outbound traffic:'
+echo '    1) None       - Do not use WARP'
+echo '    2) All        - Route all AntiZapret VPN traffic via WARP'
+echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
+until [[ "$ANTIZAPRET_WARP" =~ ^[1-3]$ ]]; do
+	read -rp 'WARP choice [1-3]: ' -e -i 3 ANTIZAPRET_WARP
 done
 echo
-until [[ "$VPN_WARP" =~ (y|n) ]]; do
-	read -rp $'Use Cloudflare WARP for \001\e[1;32m\002full VPN\e[0m\002 (vpn-*) outbound traffic? [y/n]: ' -e -i n VPN_WARP
+echo -e 'Choose Cloudflare WARP for \e[1;32mfull VPN\e[0m (vpn-*) outbound traffic:'
+echo '    1) None       - Do not use WARP'
+echo '    2) All        - Route all full VPN traffic via WARP'
+echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
+until [[ "$VPN_WARP" =~ ^[1-3]$ ]]; do
+	read -rp 'WARP choice [1-3]: ' -e -i 2 VPN_WARP
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
@@ -186,12 +201,12 @@ until [[ "$ALTERNATIVE_FAKE_IP" =~ (y|n) ]]; do
 	read -rp 'Use alternative range of FAKE IP addresses? [y/n]: ' -e -i y ALTERNATIVE_FAKE_IP
 done
 echo
-until [[ "$OPENVPN_BACKUP_TCP" =~ (y|n) ]]; do
-	read -rp 'Use TCP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i n OPENVPN_BACKUP_TCP
-done
-echo
 until [[ "$OPENVPN_BACKUP_UDP" =~ (y|n) ]]; do
 	read -rp 'Use UDP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i y OPENVPN_BACKUP_UDP
+done
+echo
+until [[ "$OPENVPN_BACKUP_TCP" =~ (y|n) ]]; do
+	read -rp 'Use TCP ports 80, 443, 504, 508 as backup for OpenVPN connections? [y/n]: ' -e -i n OPENVPN_BACKUP_TCP
 done
 echo
 until [[ "$WIREGUARD_BACKUP" =~ (y|n) ]]; do
@@ -295,11 +310,6 @@ echo
 #done
 #echo
 echo 'Installation, please wait...'
-
-# Отключим фоновые обновления системы
-systemctl stop unattended-upgrades
-systemctl stop apt-daily.timer
-systemctl stop apt-daily-upgrade.timer
 
 # Остановим и выключим обновляемые службы
 systemctl disable --now kresd@1
@@ -476,8 +486,8 @@ ANTIZAPRET_ADBLOCK=$ANTIZAPRET_ADBLOCK
 VPN_ADBLOCK=$VPN_ADBLOCK
 ALTERNATIVE_CLIENT_IP=$ALTERNATIVE_CLIENT_IP
 ALTERNATIVE_FAKE_IP=$ALTERNATIVE_FAKE_IP
-OPENVPN_BACKUP_TCP=$OPENVPN_BACKUP_TCP
 OPENVPN_BACKUP_UDP=$OPENVPN_BACKUP_UDP
+OPENVPN_BACKUP_TCP=$OPENVPN_BACKUP_TCP
 WIREGUARD_BACKUP=$WIREGUARD_BACKUP
 OPENVPN_DUPLICATE=$OPENVPN_DUPLICATE
 OPENVPN_LOG=$OPENVPN_LOG
@@ -595,8 +605,9 @@ if [[ "$OPENVPN_LOG" == 'y' ]]; then
 	sed -i '/^#\(verb\|log\|status\)/s/^#//' /etc/openvpn/server/*.conf
 fi
 
-# Изменяем поведение policy.PASS в Knot Resolver
+# Изменяем поведение Knot Resolver
 sed -i '/function policy\.PASS(state, _)/,/^end$/s/return state/return nil/' /usr/lib/knot-resolver/kres_modules/policy.lua
+sed -i -z -E 's/policy\.DENY_MSG\([^)]*kres\.extended_error\.NOTSUP[^)]*\)/policy.DENY/g' /usr/lib/knot-resolver/kres_modules/policy.lua
 
 # Загружаем и создаем списки исключений
 /root/antizapret/doall.sh noclear
@@ -627,7 +638,7 @@ fi
 
 ERRORS=
 
-if [[ "$OPENVPN_PATCH" != '0' ]]; then
+if [[ "$OPENVPN_PATCH" != '1' ]]; then
 	if ! /root/antizapret/patch-openvpn.sh "$OPENVPN_PATCH"; then
 		ERRORS+="\n\e[1;31mAnti-censorship patch for OpenVPN has not installed!\e[0m Please run '/root/antizapret/patch-openvpn.sh' after rebooting\n"
 	fi

@@ -42,7 +42,7 @@ fi
 ANTIZAPRET_WARP_INTERFACE=warp-antizapret
 ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
 
-if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
+if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' ]]; then
 	set +e
 	echo "Starting $ANTIZAPRET_WARP_INTERFACE..."
 	if [[ -z "$ANTIZAPRET_WARP_PRIVATE_KEY" || -z "$ANTIZAPRET_WARP_PUBLIC_KEY" || -z "$ANTIZAPRET_WARP_ENDPOINT" || -z "$ANTIZAPRET_WARP_ADDRESS" ]]; then
@@ -56,6 +56,9 @@ if [[ "$ANTIZAPRET_WARP" == 'y' ]]; then
 		ANTIZAPRET_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
 		ANTIZAPRET_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
+	ANTIZAPRET_WARP_IP="${ANTIZAPRET_WARP_ADDRESS%%/*}"
+
+	[[ "$ANTIZAPRET_WARP" == '3' ]] && ANTIZAPRET_FWMARK="fwmark 0x2 "
 
 	echo "[Interface]
 PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
@@ -63,11 +66,9 @@ Address = $ANTIZAPRET_WARP_ADDRESS
 MTU = 1420
 Table = 13335
 PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.29.0.0/16 to $FAKE_IP.0.0/15 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.29.0.0/16 lookup 13335 priority 10000 || true
+PostUp = ip rule add from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 13335 priority 10000 || true
 PostDown = ip rule del from $IP.29.0.0/16 to $IP.29.0.0/16 priority 5000
-PostDown = ip rule del from $IP.29.0.0/16 to $FAKE_IP.0.0/15 priority 5000
-PostDown = ip rule del from $IP.29.0.0/16 lookup 13335 priority 10000
+PostDown = ip rule del from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 13335 priority 10000
 
 [Peer]
 PublicKey = $ANTIZAPRET_WARP_PUBLIC_KEY
@@ -79,8 +80,10 @@ Endpoint = $ANTIZAPRET_WARP_ENDPOINT" > $ANTIZAPRET_WARP_PATH
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $ANTIZAPRET_WARP_INTERFACE: $ANTIZAPRET_WARP_ENDPOINT connected"
-		ANTIZAPRET_OUT_INTERFACE=$ANTIZAPRET_WARP_INTERFACE
-		ANTIZAPRET_OUT_IP="${ANTIZAPRET_WARP_ADDRESS%%/*}"
+		if [[ "$ANTIZAPRET_WARP" == '2' ]]; then
+			ANTIZAPRET_OUT_INTERFACE=$ANTIZAPRET_WARP_INTERFACE
+			ANTIZAPRET_OUT_IP=$ANTIZAPRET_WARP_IP
+		fi
 	else
 		echo "Starting $ANTIZAPRET_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
 	fi
@@ -93,7 +96,7 @@ fi
 VPN_WARP_INTERFACE=warp-vpn
 VPN_WARP_PATH="/etc/wireguard/$VPN_WARP_INTERFACE.conf"
 
-if [[ "$VPN_WARP" == 'y' ]]; then
+if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
 	set +e
 	echo "Starting $VPN_WARP_INTERFACE..."
 	if [[ -z "$VPN_WARP_PRIVATE_KEY" || -z "$VPN_WARP_PUBLIC_KEY" || -z "$VPN_WARP_ENDPOINT" || -z "$VPN_WARP_ADDRESS" ]]; then
@@ -107,6 +110,9 @@ if [[ "$VPN_WARP" == 'y' ]]; then
 		VPN_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
 		VPN_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
+	VPN_WARP_IP="${VPN_WARP_ADDRESS%%/*}"
+
+	[[ "$VPN_WARP" == '3' ]] && VPN_FWMARK="fwmark 0x2 "
 
 	echo "[Interface]
 PrivateKey = $VPN_WARP_PRIVATE_KEY
@@ -114,9 +120,9 @@ Address = $VPN_WARP_ADDRESS
 MTU = 1420
 Table = 13336
 PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.28.0.0/16 lookup 13336 priority 10000 || true
+PostUp = ip rule add from $IP.28.0.0/16 ${VPN_FWMARK}lookup 13336 priority 10000 || true
 PostDown = ip rule del from $IP.28.0.0/16 to $IP.28.0.0/16 priority 5000
-PostDown = ip rule del from $IP.28.0.0/16 lookup 13336 priority 10000
+PostDown = ip rule del from $IP.28.0.0/16 ${VPN_FWMARK}lookup 13336 priority 10000
 
 [Peer]
 PublicKey = $VPN_WARP_PUBLIC_KEY
@@ -128,8 +134,10 @@ Endpoint = $VPN_WARP_ENDPOINT" > $VPN_WARP_PATH
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $VPN_WARP_INTERFACE: $VPN_WARP_ENDPOINT connected"
-		VPN_OUT_INTERFACE=$VPN_WARP_INTERFACE
-		VPN_OUT_IP="${VPN_WARP_ADDRESS%%/*}"
+		if [[ "$VPN_WARP" == '2' ]]; then
+			VPN_OUT_INTERFACE=$VPN_WARP_INTERFACE
+			VPN_OUT_IP=$VPN_WARP_IP
+		fi
 	else
 		echo "Starting $VPN_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
 	fi
@@ -189,12 +197,7 @@ fi
 iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 # Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
-	if [[ "$ANTIZAPRET_OUT_INTERFACE" == "$VPN_OUT_INTERFACE" ]]; then
-		iptables -w -I FORWARD 2 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
-	else
-		iptables -w -I FORWARD 2 ! -i $ANTIZAPRET_OUT_INTERFACE -d $IP.29.0.0/16 -j DROP
-		iptables -w -I FORWARD 3 ! -i $VPN_OUT_INTERFACE -d $IP.28.0.0/16 -j DROP
-	fi
+	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -d $IP.28.0.0/15 -j DROP
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 	iptables -w -I INPUT 3 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 fi
@@ -302,13 +305,41 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 fi
 # Mapping fake IP to real IP
 iptables -w -t nat -S ANTIZAPRET-MAPPING &>/dev/null || iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
+iptables -w -t nat -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
+# WARP
+iptables -w -t mangle -S ANTIZAPRET-WARP &>/dev/null || iptables -w -t mangle -N ANTIZAPRET-WARP
+iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
+if [[ "$ANTIZAPRET_WARP" == '3' ]]; then
+	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
+		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
+	else
+		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
+	fi
+fi
+if [[ "$VPN_WARP" == '3' ]]; then
+	if [[ -z "$VPN_WARP_IP" ]]; then
+		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE
+	else
+		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
+	fi
+fi
 # SNAT/MASQUERADE VPN
 if [[ "$ANTIZAPRET_OUT_INTERFACE" == "$VPN_OUT_INTERFACE" && "$ANTIZAPRET_OUT_IP" == "$VPN_OUT_IP" ]]; then
 	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
 		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
 	else
 		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
+	fi
+elif [[ "$ANTIZAPRET_WARP" == '3' ]]; then
+	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
+		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
+	else
+		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
+	fi
+	if [[ -z "$VPN_OUT_IP" ]]; then
+		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
+	else
+		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
 	fi
 else
 	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
@@ -346,10 +377,10 @@ for dev in $(ls /sys/class/net); do
 done
 
 # Clear Knot Resolver cache
-if [[ "$(iptables -w -t nat -S ANTIZAPRET-MAPPING | wc -l)" -eq 1 ]]; then
-	count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
-	echo "AntiZapret DNS cache cleared: $count entries"
-fi
+count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
+echo "AntiZapret DNS cache cleared: $count entries"
+count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/2 | grep -oE '[0-9]+' || echo 0)"
+echo "VPN DNS cache cleared: $count entries"
 
 ./custom-up.sh
 exit 0

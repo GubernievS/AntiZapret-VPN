@@ -3,7 +3,7 @@
 # Патч для обхода блокировки протокола OpenVPN
 # Работает только для UDP соединений
 #
-# chmod +x patch-openvpn.sh && ./patch-openvpn.sh [0-3]
+# chmod +x patch-openvpn.sh && ./patch-openvpn.sh [1-4]
 #
 set -e
 export LC_ALL=C
@@ -15,23 +15,23 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
-if [[ "$1" =~ ^[0-3]$ ]]; then
+if [[ "$1" =~ ^[1-4]$ ]]; then
 	ALGORITHM="$1"
 else
 	echo
 	echo 'Choose anti-censorship patch for OpenVPN (UDP only):'
-	echo '    0) None        - Do not install anti-censorship patch, or remove if already installed'
-	echo '    1) Random      - Recommended by default, randomly selects Strong or Error-Free'
-	echo '    2) Strong      - Better protocol masking'
-	echo '    3) Error-Free  - Use if Strong patch causes connection error, recommended for routers'
-	until [[ "$ALGORITHM" =~ ^[0-3]$ ]]; do
-		read -rp 'Version choice [0-3]: ' -e -i 1 ALGORITHM
+	echo '    1) None        - Do not install anti-censorship patch, or remove if already installed'
+	echo '    2) Random      - Recommended by default, randomly selects Strong or Error-Free'
+	echo '    3) Strong      - Better protocol masking'
+	echo '    4) Error-Free  - Use if Strong patch causes connection error, recommended for routers'
+	until [[ "$ALGORITHM" =~ ^[1-4]$ ]]; do
+		read -rp 'Version choice [1-4]: ' -e -i 2 ALGORITHM
 	done
 fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-if [[ "$ALGORITHM" == '0' ]]; then
+if [[ "$ALGORITHM" == '1' ]]; then
 	if [[ -d /usr/local/src/openvpn ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
@@ -51,9 +51,9 @@ if [[ "$ALGORITHM" == '0' ]]; then
 	exit 0
 fi
 
-if [[ "$ALGORITHM" == '1' ]]; then
+if [[ "$ALGORITHM" == '2' ]]; then
 	PATCH_MODE='		_Bool error_free = random() & 1;'
-elif [[ "$ALGORITHM" == '2' ]]; then
+elif [[ "$ALGORITHM" == '3' ]]; then
 	PATCH_MODE='		_Bool error_free = 0;'
 else
 	PATCH_MODE='		_Bool error_free = 1;'

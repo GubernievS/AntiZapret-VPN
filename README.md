@@ -81,7 +81,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 3. Изменить настройки (или нажимать Enter для выбора значения по умолчанию):
 	- Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 	- Включить OpenVPN DCO
-	- Включить Cloudflare WARP для исходящего трафика для AntiZapret VPN и обычного VPN
+	- Включить Cloudflare WARP для исходящего трафика AntiZapret VPN и обычного VPN
 	- Выбрать DNS для AntiZapret VPN и обычного VPN
 	- Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN и обычном VPN на основе правил AdGuard и OISD
 	- Использовать альтернативные диапазоны IP-адресов клиентов: 172... вместо 10...
@@ -101,7 +101,6 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 5. Установить дополнения:
 	- [StatusOpenVPN](https://github.com/TheMurmabis/StatusOpenVPN) - статистика подключений и Telegram-бот
 	- [AdminPanelAZ](https://github.com/Kirito0098/AdminPanelAZ) - управление и конфигурация
-	- [TG-Bot-OpenVPN-Antizapret](https://github.com/VATAKATru61/TG-Bot-OpenVPN-Antizapret) - Telegram-бот (только OpenVPN)
 	- [AZ-WARP](https://github.com/Liafanx/AZ-WARP) - расширенная маршрутизация через WARP
 	- [vpn-control-panel](https://github.com/0009609ilya-crypto/vpn-control-panel) - управление и конфигурация
 
@@ -111,7 +110,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 
 ### 1. Установить/удалить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 ```
-/root/antizapret/patch-openvpn.sh [0-3]
+/root/antizapret/patch-openvpn.sh [1-4]
 ```
 
 ### 2. Включить/отключить [OpenVPN DCO](https://community.openvpn.net/openvpn/wiki/DataChannelOffload)
