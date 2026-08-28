@@ -32,6 +32,14 @@ if [[ -f "config/rpz2.txt" ]]; then
 	mv -f config/rpz2.txt config/deny2.txt
 fi
 
+if [[ -f "config/include-hosts.txt" ]] && ! grep -qF 'добавление всех доменов' config/include-hosts.txt; then
+	sed -i '/^#   xn--80aswg\.xn--p1ai/a\#   .                      - добавление всех доменов (исключения задаются в config/exclude-hosts.txt)' config/include-hosts.txt
+fi
+
+if [[ -f "config/include-warp-hosts.txt" ]] && ! grep -qF 'добавление всех доменов' config/include-warp-hosts.txt; then
+	sed -i '/^#   xn--80aswg\.xn--p1ai/a\#   .                      - добавление всех доменов (исключения задаются в config/exclude-warp-hosts.txt)' config/include-warp-hosts.txt
+fi
+
 if [[ ! -f "config/include-warp-hosts.txt" ]]; then
 	echo '# Добавление доменов для маршрутизации исходящего трафика через WARP
 #
@@ -44,6 +52,7 @@ if [[ ! -f "config/include-warp-hosts.txt" ]]; then
 #   example.com            - добавление домена второго уровня example.com и всех его поддоменов
 #   com                    - добавление домена верхнего уровня com и всех его поддоменов
 #   xn--80aswg.xn--p1ai    - добавление домена второго уровня сайт.рф и всех его поддоменов (кодировка Punycode)
+#   .                      - добавление всех доменов (исключения задаются в config/exclude-warp-hosts.txt)
 #
 # Строки начинающиеся с # это комментарии и они не обрабатываются
 #' > config/include-warp-hosts.txt
