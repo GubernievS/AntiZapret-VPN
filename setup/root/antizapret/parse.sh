@@ -58,6 +58,13 @@ if [[ ! -f "config/exclude-warp-hosts.txt" ]]; then
 # Строки начинающиеся с # это комментарии и они не обрабатываются
 #' > config/exclude-warp-hosts.txt
 fi
+
+if [[ ! -f "config/warp.txt" ]]; then
+	echo '; Настройка RPZ для маршрутизации через WARP
+; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
+; CNAME . добавляет домен для маршрутизации через WARP
+;' > config/warp.txt
+fi
 ###
 
 for file in config/*.txt; do
@@ -298,6 +305,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-warp-hosts.txt >> result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-warp-hosts.txt >> result/warp.rpz
+	sed 's/\r//g; /^;/d; /^$/d' config/warp.txt >> result/warp.rpz
 
 	# Обновляем файл warp.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/warp.rpz ]] && ! diff -q result/warp.rpz /etc/knot-resolver/warp.rpz; then
