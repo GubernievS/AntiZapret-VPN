@@ -24,6 +24,14 @@ mkdir -p temp result
 source setup
 
 ###
+if [[ -f "config/rpz.txt" ]]; then
+	mv -f config/rpz.txt config/deny.txt
+fi
+
+if [[ -f "config/rpz2.txt" ]]; then
+	mv -f config/rpz2.txt config/deny2.txt
+fi
+
 if [[ ! -f "config/include-warp-hosts.txt" ]]; then
 	echo '# Добавление доменов для маршрутизации исходящего трафика через WARP
 #
@@ -221,13 +229,13 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
 	fi
-	sed 's/\r//g; /^;/d; /^$/d' download/*rpz.txt config/*rpz.txt >> result/deny.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*deny.txt config/*deny.txt >> result/deny.rpz
 
 	if [[ "$VPN_ADBLOCK" == 'y' ]]; then
 		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny2.rpz
 		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny2.rpz
 	fi
-	sed 's/\r//g; /^;/d; /^$/d' download/*rpz2.txt config/*rpz2.txt >> result/deny2.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*deny2.txt config/*deny2.txt >> result/deny2.rpz
 
 	# Обновляем файл deny.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
@@ -305,7 +313,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-warp-hosts.txt >> result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-warp-hosts.txt >> result/warp.rpz
-	sed 's/\r//g; /^;/d; /^$/d' config/warp.txt >> result/warp.rpz
+	sed 's/\r//g; /^;/d; /^$/d' config/*warp.txt >> result/warp.rpz
 
 	# Обновляем файл warp.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/warp.rpz ]] && ! diff -q result/warp.rpz /etc/knot-resolver/warp.rpz; then
