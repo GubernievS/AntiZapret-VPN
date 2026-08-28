@@ -1,0 +1,4 @@
+; Настройка RPZ для маршрутизации через AntiZapret VPN
+; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
+; CNAME . добавляет домен для маршрутизации через AntiZapret VPN
+;

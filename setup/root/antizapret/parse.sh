@@ -73,6 +73,13 @@ if [[ ! -f "config/warp.txt" ]]; then
 ; CNAME . добавляет домен для маршрутизации через WARP
 ;' > config/warp.txt
 fi
+
+if [[ ! -f "config/proxy.txt" ]]; then
+	echo '; Настройка RPZ для маршрутизации через AntiZapret VPN
+; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
+; CNAME . добавляет домен для маршрутизации через AntiZapret VPN
+;' > config/proxy.txt
+fi
 ###
 
 for file in config/*.txt; do
@@ -326,6 +333,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/proxy.rpz
+	sed 's/\r//g; /^;/d; /^$/d' config/*proxy.txt >> result/proxy.rpz
 
 	# Обновляем файл proxy.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/proxy.rpz ]] && ! diff -q result/proxy.rpz /etc/knot-resolver/proxy.rpz; then
