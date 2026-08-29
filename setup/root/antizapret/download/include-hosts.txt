@@ -682,7 +682,7 @@ fpt.live.com
 account.live.com
 signup.live.com
 msftauth.net
-msauth.net
+#msauth.net
 deepl.com
 ikea.ee
 ikea.lt
