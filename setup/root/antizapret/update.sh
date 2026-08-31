@@ -30,7 +30,7 @@ PARSE_PATH=parse.sh
 DOALL_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh
 DOALL_PATH=doall.sh
 
-DOMAIN_LINK=https://raw.githubusercontent.com/bol-van/rulist/heads/main/reestr_hostname.txt
+DOMAIN_LINK=https://raw.githubusercontent.com/bol-van/rulist/main/reestr_hostname.txt
 DOMAIN_PATH=download/bol-van-domain.txt
 
 DOMAIN2_LINK=https://antifilter.download/list/domains.lst
@@ -60,7 +60,7 @@ EXCLUDE_ADBLOCK_HOSTS_PATH=download/exclude-adblock-hosts.txt
 ADGUARD_LINK=https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
 ADGUARD_PATH=download/adguard.txt
 
-OISD_LINK=https://raw.githubusercontent.com/sjhgvr/oisd/refs/heads/main/domainswild2_small.txt
+OISD_LINK=https://raw.githubusercontent.com/sjhgvr/oisd/main/domainswild2_small.txt
 OISD_PATH=download/oisd-include-adblock-hosts.txt
 
 DISCORD_IPS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/discord-ips.txt
