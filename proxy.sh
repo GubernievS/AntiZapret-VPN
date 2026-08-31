@@ -331,19 +331,12 @@ if [[ -n "$WIREGUARD_IP" && "$WIREGUARD_IP" != "$OPENVPN_IP" ]]; then
 	iptables -w -t nat -A POSTROUTING -d $WIREGUARD_IP -j SNAT --to-source $DEFAULT_IP
 fi
 
-# Сброс счётчиков
-iptables -w -Z
-iptables -w -t nat -Z
-iptables -w -t mangle -Z
-iptables -w -t raw -Z
-ip6tables -w -Z
-ip6tables -w -t nat -Z
-ip6tables -w -t mangle -Z
-ip6tables -w -t raw -Z
-
 # Сохранение новых правил iptables
 netfilter-persistent save
 systemctl enable netfilter-persistent
+
+# Обнуление счётчиков в сохранённых правилах
+sed -E -i 's/\[[0-9]+:[0-9]+\]/[0:0]/g' /etc/iptables/rules.*
 
 # Перезагружаем
 echo
