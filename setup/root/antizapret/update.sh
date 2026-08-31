@@ -30,7 +30,7 @@ PARSE_PATH=parse.sh
 DOALL_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/doall.sh
 DOALL_PATH=doall.sh
 
-DOMAIN_LINK=https://raw.githubusercontent.com/bol-van/rulist/refs/heads/main/reestr_hostname.txt
+DOMAIN_LINK=https://raw.githubusercontent.com/bol-van/rulist/heads/main/reestr_hostname.txt
 DOMAIN_PATH=download/bol-van-domain.txt
 
 DOMAIN2_LINK=https://antifilter.download/list/domains.lst
