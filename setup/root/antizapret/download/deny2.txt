@@ -99,6 +99,8 @@ xbox-dns.ru CNAME .
 *.xbox-dns.ru CNAME .
 dns.malw.link CNAME .
 *.dns.malw.link CNAME .
+geohide.ru CNAME .
+*.geohide.ru CNAME .
 dns.nullsproxy.com CNAME .
 *.dns.nullsproxy.com CNAME .
 dns.apple.com CNAME .

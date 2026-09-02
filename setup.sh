@@ -153,7 +153,7 @@ echo '    4) Google *         - Use if previous choice fails to resolve domains'
 echo '    5) AdGuard *        - Use for blocking ads, trackers, malware and phishing websites'
 echo '    6) Comss **         - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    7) XBox **          - More details: https://xbox-dns.ru'
-echo '    8) Malw **          - More details: https://info.dns.malw.link'
+echo '    8) GeoHide **       - More details: https://geohide.ru'
 echo
 echo '  * - DNS resolvers support EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -171,7 +171,7 @@ echo '    5) Google *     - Use if previous choice fails to resolve domains'
 echo '    6) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
 echo '    7) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    8) XBox **      - More details: https://xbox-dns.ru'
-echo '    9) Malw **      - More details: https://info.dns.malw.link'
+echo '    9) GeoHide **   - More details: https://geohide.ru'
 echo
 echo '  * - DNS resolvers support EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -573,9 +573,9 @@ elif [[ "$VPN_DNS" == '8' ]]; then
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 111.88.96.50"\npush "dhcp-option DNS 111.88.96.51"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/111.88.96.50, 111.88.96.51/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == '9' ]]; then
-	# Malw
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 95.216.204.218"\npush "dhcp-option DNS 80.253.249.40"' /etc/openvpn/server/vpn*.conf
-	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/95.216.204.218, 80.253.249.40/' /etc/wireguard/templates/vpn-client*.conf
+	# GeoHide
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 193.233.112.67"\npush "dhcp-option DNS 193.233.112.68"\npush "dhcp-option DNS 45.155.204.190"\npush "dhcp-option DNS 37.230.192.51"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/193.233.112.67, 193.233.112.68, 45.155.204.190, 37.230.192.51/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 # Не используем альтернативный диапазон подменных IPv4-адресов
