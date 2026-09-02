@@ -422,7 +422,10 @@ fi
 apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
 apt-get autoremove --purge -y
 apt-get clean
+
+# Конфигурируем пакеты
 dpkg-reconfigure -f noninteractive unattended-upgrades
+git config --global http.version HTTP/1.1
 
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
