@@ -13,11 +13,11 @@ if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrad
 fi
 
 # Остановим фоновые обновления системы
-systemctl stop apt-daily.timer
-systemctl stop apt-daily-upgrade.timer
-systemctl stop apt-daily
-systemctl stop apt-daily-upgrade
-systemctl stop unattended-upgrades
+systemctl stop apt-daily.timer 2>/dev/null
+systemctl stop apt-daily-upgrade.timer 2>/dev/null
+systemctl stop apt-daily 2>/dev/null
+systemctl stop apt-daily-upgrade 2>/dev/null
+systemctl stop unattended-upgrades 2>/dev/null
 
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
