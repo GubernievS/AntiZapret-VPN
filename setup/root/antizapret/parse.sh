@@ -24,12 +24,12 @@ mkdir -p temp result
 source setup
 
 ###
-mv -f config/rpz.txt config/deny.txt || true
-mv -f config/rpz2.txt config/deny2.txt || true
-mv -f config/deny.txt config/deny-rpz.txt || true
-mv -f config/deny2.txt config/deny2-rpz.txt || true
-mv -f config/warp.txt config/warp-rpz.txt || true
-mv -f config/proxy.txt config/proxy-rpz.txt || true
+mv -f config/rpz.txt config/deny.txt 2>/dev/null || true
+mv -f config/rpz2.txt config/deny2.txt 2>/dev/null || true
+mv -f config/deny.txt config/deny-rpz.txt 2>/dev/null || true
+mv -f config/deny2.txt config/deny2-rpz.txt 2>/dev/null || true
+mv -f config/warp.txt config/warp-rpz.txt 2>/dev/null || true
+mv -f config/proxy.txt config/proxy-rpz.txt 2>/dev/null || true
 
 if [[ -f "config/include-hosts.txt" ]] && ! grep -qF 'добавление всех доменов' config/include-hosts.txt; then
 	sed -i '/^#   xn--80aswg\.xn--p1ai/a\#   .                      - добавление всех доменов (исключения задаются в config/exclude-hosts.txt)' config/include-hosts.txt
