@@ -126,17 +126,16 @@ until [[ "$OPENVPN_DCO" =~ (y|n) ]]; do
 done
 echo
 echo -e 'Choose Cloudflare WARP for \e[1;32mAntiZapret VPN\e[0m (antizapret-*) outbound traffic:'
-echo '    1) None       - Do not use WARP'
-echo '    2) All        - Route all AntiZapret VPN traffic via WARP'
-echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
+echo '    1) None     - Do not use'
+echo '    2) All      - Route all traffic'
+echo '    3) Domains  - Route AntiZapret domains and config/include-warp-hosts.txt, excluding config/exclude-warp-hosts.txt'
 until [[ "$ANTIZAPRET_WARP" =~ ^[1-3]$ ]]; do
 	read -rp 'WARP choice [1-3]: ' -e -i 3 ANTIZAPRET_WARP
 done
 echo
 echo -e 'Choose Cloudflare WARP for \e[1;32mfull VPN\e[0m (vpn-*) outbound traffic:'
-echo '    1) None       - Do not use WARP'
-echo '    2) All        - Route all full VPN traffic via WARP'
-#echo '    3) Selective  - Route only domains from config/include-warp-hosts.txt via WARP'
+echo '    1) None     - Do not use'
+echo '    2) All      - Route all traffic'
 until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
 	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
@@ -262,7 +261,7 @@ do
 done
 echo
 until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
-	read -rp $'Route all traffic for domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and domains from config/exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
+	read -rp $'Route all domains via \001\e[1;32m\002AntiZapret VPN\001\e[0m\002, excluding Russian domains and config/exclude-hosts.txt? [y/n]: ' -e -i n ROUTE_ALL
 done
 echo
 #until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
