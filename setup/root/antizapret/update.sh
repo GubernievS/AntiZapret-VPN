@@ -36,11 +36,11 @@ DOMAIN_PATH=download/bol-van-domain.txt
 DOMAIN2_LINK=https://antifilter.download/list/domains.lst
 DOMAIN2_PATH=download/antifilter-download-domain.txt
 
-DENY_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny-rpz.txt
-DENY_PATH=download/deny-rpz.txt
+DENY_RPZ_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny-rpz.txt
+DENY_RPZ_PATH=download/deny-rpz.txt
 
-DENY2_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny2-rpz.txt
-DENY2_PATH=download/deny2-rpz.txt
+DENY2_RPZ_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny2-rpz.txt
+DENY2_RPZ_PATH=download/deny2-rpz.txt
 
 INCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt
 INCLUDE_HOSTS_PATH=download/include-hosts.txt
@@ -126,8 +126,8 @@ source setup
 if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
 	download $DOMAIN_PATH $DOMAIN_LINK
 	( download $DOMAIN2_PATH $DOMAIN2_LINK ) || true
-	download $DENY_PATH $DENY_LINK
-	download $DENY2_PATH $DENY2_LINK
+	download $DENY_RPZ_PATH $DENY_RPZ_LINK
+	download $DENY2_RPZ_PATH $DENY2_RPZ_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
 	download $REMOVE_HOSTS_PATH $REMOVE_HOSTS_LINK
 
