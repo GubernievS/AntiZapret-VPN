@@ -36,11 +36,11 @@ DOMAIN_PATH=download/bol-van-domain.txt
 DOMAIN2_LINK=https://antifilter.download/list/domains.lst
 DOMAIN2_PATH=download/antifilter-download-domain.txt
 
-DENY_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny.txt
-DENY_PATH=download/deny.txt
+DENY_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny-rpz.txt
+DENY_PATH=download/deny-rpz.txt
 
-DENY2_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny2.txt
-DENY2_PATH=download/deny2.txt
+DENY2_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/deny2-rpz.txt
+DENY2_PATH=download/deny2-rpz.txt
 
 INCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt
 INCLUDE_HOSTS_PATH=download/include-hosts.txt

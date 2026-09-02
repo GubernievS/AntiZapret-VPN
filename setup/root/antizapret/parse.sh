@@ -24,13 +24,12 @@ mkdir -p temp result
 source setup
 
 ###
-if [[ -f "config/rpz.txt" ]]; then
-	mv -f config/rpz.txt config/deny.txt
-fi
-
-if [[ -f "config/rpz2.txt" ]]; then
-	mv -f config/rpz2.txt config/deny2.txt
-fi
+mv -f config/rpz.txt config/deny.txt || true
+mv -f config/rpz2.txt config/deny2.txt || true
+mv -f config/deny.txt config/deny-rpz.txt || true
+mv -f config/deny2.txt config/deny2-rpz.txt || true
+mv -f config/warp.txt config/warp-rpz.txt || true
+mv -f config/proxy.txt config/proxy-rpz.txt || true
 
 if [[ -f "config/include-hosts.txt" ]] && ! grep -qF 'добавление всех доменов' config/include-hosts.txt; then
 	sed -i '/^#   xn--80aswg\.xn--p1ai/a\#   .                      - добавление всех доменов (исключения задаются в config/exclude-hosts.txt)' config/include-hosts.txt
@@ -76,18 +75,18 @@ if [[ ! -f "config/exclude-warp-hosts.txt" ]]; then
 #' > config/exclude-warp-hosts.txt
 fi
 
-if [[ ! -f "config/warp.txt" ]]; then
+if [[ ! -f "config/warp-rpz.txt" ]]; then
 	echo '; Настройка RPZ для маршрутизации через WARP
 ; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
 ; CNAME . добавляет домен для маршрутизации через WARP
-;' > config/warp.txt
+;' > config/warp-rpz.txt
 fi
 
-if [[ ! -f "config/proxy.txt" ]]; then
+if [[ ! -f "config/proxy-rpz.txt" ]]; then
 	echo '; Настройка RPZ для маршрутизации через AntiZapret VPN
 ; https://www.knot-resolver.cz/documentation/latest5/modules-policy.html#response-policy-zones
 ; CNAME . добавляет домен для маршрутизации через AntiZapret VPN
-;' > config/proxy.txt
+;' > config/proxy-rpz.txt
 fi
 ###
 
@@ -245,13 +244,13 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny.rpz
 		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny.rpz
 	fi
-	sed 's/\r//g; /^;/d; /^$/d' download/*deny.txt config/*deny.txt >> result/deny.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*deny-rpz.txt config/*deny-rpz.txt >> result/deny.rpz
 
 	if [[ "$VPN_ADBLOCK" == 'y' ]]; then
 		sed 's/$/ CNAME ./; p; s/^/*./' result/include-adblock-hosts.txt >> result/deny2.rpz
 		sed 's/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-adblock-hosts.txt >> result/deny2.rpz
 	fi
-	sed 's/\r//g; /^;/d; /^$/d' download/*deny2.txt config/*deny2.txt >> result/deny2.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*deny2-rpz.txt config/*deny2-rpz.txt >> result/deny2.rpz
 
 	# Обновляем файл deny.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/deny.rpz ]] && ! diff -q result/deny.rpz /etc/knot-resolver/deny.rpz; then
@@ -329,7 +328,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-warp-hosts.txt >> result/warp.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-warp-hosts.txt >> result/warp.rpz
-	sed 's/\r//g; /^;/d; /^$/d' config/*warp.txt >> result/warp.rpz
+	sed 's/\r//g; /^;/d; /^$/d' config/*warp-rpz.txt >> result/warp.rpz
 
 	# Обновляем файл warp.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/warp.rpz ]] && ! diff -q result/warp.rpz /etc/knot-resolver/warp.rpz; then
@@ -342,7 +341,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	echo -e '$TTL 10800\n@ SOA . . (1 1 1 1 10800)' > result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME ./; t; s/$/ CNAME ./; p; s/^/*./' result/include-hosts.txt >> result/proxy.rpz
 	sed '/^\.$/ s/.*/*. CNAME rpz-passthru./; t; s/$/ CNAME rpz-passthru./; p; s/^/*./' result/exclude-hosts.txt >> result/proxy.rpz
-	sed 's/\r//g; /^;/d; /^$/d' config/*proxy.txt >> result/proxy.rpz
+	sed 's/\r//g; /^;/d; /^$/d' config/*proxy-rpz.txt >> result/proxy.rpz
 
 	# Обновляем файл proxy.rpz в Knot Resolver только если файл изменился
 	if [[ -f result/proxy.rpz ]] && ! diff -q result/proxy.rpz /etc/knot-resolver/proxy.rpz; then
