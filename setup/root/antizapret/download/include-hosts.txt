@@ -1245,6 +1245,7 @@ budgetlightforum.com
 metabrainz.org
 virustotal.com
 mercedes-benz.de
+caterpillar.com
 
 # Сертификаты
 letsencrypt.org
