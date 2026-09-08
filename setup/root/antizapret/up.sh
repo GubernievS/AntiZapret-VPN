@@ -85,7 +85,12 @@ Endpoint = $ANTIZAPRET_WARP_ENDPOINT" > $ANTIZAPRET_WARP_PATH
 			ANTIZAPRET_OUT_IP=$ANTIZAPRET_WARP_IP
 		fi
 	else
-		echo "Starting $ANTIZAPRET_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		if [[ "$WARP_PROTECTION" == 'y' ]]; then
+			echo "Starting $ANTIZAPRET_WARP_INTERFACE failed! Blocking traffic"
+			iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -j DROP
+		else
+			echo "Starting $ANTIZAPRET_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		fi
 	fi
 	set -e
 else
@@ -139,7 +144,12 @@ Endpoint = $VPN_WARP_ENDPOINT" > $VPN_WARP_PATH
 			VPN_OUT_IP=$VPN_WARP_IP
 		fi
 	else
-		echo "Starting $VPN_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		if [[ "$WARP_PROTECTION" == 'y' ]]; then
+			echo "Starting $VPN_WARP_INTERFACE failed! Blocking traffic"
+			iptables -w -I FORWARD 2 -s $IP.28.0.0/16 -j DROP
+		else
+			echo "Starting $VPN_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
+		fi
 	fi
 	set -e
 else

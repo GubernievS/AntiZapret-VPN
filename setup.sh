@@ -141,6 +141,11 @@ until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
 	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
 echo
+echo -e 'Warning! WARP protection blocks \e[1;32mAntiZapret VPN\e[0m and \e[1;32mfull VPN\e[0m traffic if WARP failed to connect!'
+until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable WARP protection? [y/n]: ' -e -i y WARP_PROTECTION
+done
+echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) MSK-IX+NSDI      - DNS resolvers optimized for users located in Russia, recommended by default'
 echo '       +BI.ZONE+TransTeleCom'
@@ -479,6 +484,7 @@ ANTIZAPRET_WARP_PUBLIC_KEY=
 ANTIZAPRET_WARP_ENDPOINT=
 ANTIZAPRET_WARP_ADDRESS=
 VPN_WARP=$VPN_WARP
+WARP_PROTECTION=$WARP_PROTECTION
 VPN_WARP_PRIVATE_KEY=
 VPN_WARP_PUBLIC_KEY=
 VPN_WARP_ENDPOINT=
