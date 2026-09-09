@@ -394,7 +394,6 @@ systemctl disable --now ifupdown-wait-online
 systemctl disable --now setvtrgb
 systemctl disable --now e2scrub_reap
 systemctl disable --now systemd-pstore
-systemctl disable --now openvpn
 #systemctl disable --now networkd-dispatcher
 #systemctl disable --now secureboot-db
 
@@ -474,6 +473,7 @@ elif [[ "$OS" == 'debian' ]] && (( VERSION < 14 )); then
 	INSTALL="-t $CODENAME-backports linux-image-$ARCH linux-headers-$ARCH"
 fi
 apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
+systemctl disable --now openvpn
 apt-get autoremove --purge -y
 apt-get clean
 
