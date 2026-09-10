@@ -38,6 +38,8 @@ fi
 [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
+WARP_MTU="${WARP_MTU:-1280}"
+
 # WARP AntiZapret
 ANTIZAPRET_WARP_INTERFACE=warp-antizapret
 ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
@@ -63,7 +65,7 @@ if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WAR
 	echo "[Interface]
 PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
 Address = $ANTIZAPRET_WARP_ADDRESS
-MTU = 1420
+MTU = $WARP_MTU
 Table = 13335
 PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 13335 priority 10000 || true
@@ -122,7 +124,7 @@ if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
 	echo "[Interface]
 PrivateKey = $VPN_WARP_PRIVATE_KEY
 Address = $VPN_WARP_ADDRESS
-MTU = 1420
+MTU = $WARP_MTU
 Table = 13336
 PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
 PostUp = ip rule add from $IP.28.0.0/16 ${VPN_FWMARK}lookup 13336 priority 10000 || true
