@@ -88,6 +88,11 @@ if [[ ! -f "config/proxy-rpz.txt" ]]; then
 ; CNAME . добавляет домен для маршрутизации через AntiZapret VPN
 ;' > config/proxy-rpz.txt
 fi
+
+if grep -qF 'MTU = 1420' up.sh; then
+	sed -i 's/MTU = 1420/MTU = 1280/g' up.sh
+	systemctl restart antizapret
+fi
 ###
 
 for file in config/*.txt; do
