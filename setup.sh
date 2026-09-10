@@ -472,7 +472,7 @@ if [[ "$OS" == 'ubuntu' ]] && (( VERSION < 26 )); then
 elif [[ "$OS" == 'debian' ]] && (( VERSION < 14 )); then
 	INSTALL="-t $CODENAME-backports linux-image-$ARCH linux-headers-$ARCH"
 fi
-apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq ethtool iproute2
+apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq iproute2
 systemctl disable --now openvpn
 apt-get autoremove --purge -y
 apt-get clean
@@ -572,7 +572,6 @@ AKAMAI_INCLUDE=$AKAMAI_INCLUDE
 CLEAR_HOSTS=y
 TXQUEUELEN=10000
 MTU=1420
-SEGMENTATION_OFFLOAD=on
 DEFAULT_INTERFACE=
 DEFAULT_IP=
 ANTIZAPRET_OUT_INTERFACE=
