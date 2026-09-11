@@ -1248,6 +1248,7 @@ mercedes-benz.de
 oneweb.mercedes-benz.com
 caterpillar.com
 dpaste.com
+wikimapia.org
 
 # Сертификаты
 letsencrypt.org
