@@ -1249,9 +1249,10 @@ oneweb.mercedes-benz.com
 caterpillar.com
 dpaste.com
 wikimapia.org
+vogue.com
 
 # Сертификаты
-letsencrypt.org
+#letsencrypt.org
 lencr.org
 pki.goog
 amazontrust.com
