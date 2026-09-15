@@ -1251,6 +1251,7 @@ dpaste.com
 wikimapia.org
 vogue.com
 ui.com
+decagames.com
 
 # Сертификаты
 #letsencrypt.org
