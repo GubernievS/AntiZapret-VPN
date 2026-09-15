@@ -46,6 +46,7 @@ INCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/m
 INCLUDE_HOSTS_PATH=download/include-hosts.txt
 
 EXCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt
+EXCLUDE_RU_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-ru-hosts.txt
 EXCLUDE_HOSTS_PATH=download/exclude-hosts.txt
 
 REMOVE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/remove-hosts.txt.gz
@@ -132,9 +133,9 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	download $REMOVE_HOSTS_PATH $REMOVE_HOSTS_LINK
 
 	if [[ "$ROUTE_ALL" == 'y' ]]; then
-		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
+		download $EXCLUDE_HOSTS_PATH $EXCLUDE_RU_HOSTS_LINK
 	else
-		printf '# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!' > $EXCLUDE_HOSTS_PATH
+		download $EXCLUDE_HOSTS_PATH $EXCLUDE_HOSTS_LINK
 	fi
 
 	if [[ "$ANTIZAPRET_ADBLOCK" == 'y' || "$VPN_ADBLOCK" == 'y' ]]; then
