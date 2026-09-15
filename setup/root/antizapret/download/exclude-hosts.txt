@@ -15,8 +15,8 @@ downloads.cursor.com
 # IP
 ip.hetzner.com
 checkip.amazonaws.com
-ipdata.co
+redirector.googlevideo.com
 2ip.com.ua
 2ip.ua
-whoer.net
+
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!

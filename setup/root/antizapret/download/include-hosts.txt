@@ -54,7 +54,7 @@ viber.com
 viber.ru
 viber.me
 vb.me
-whoer.net
+#whoer.net
 foxitsoftware.com
 platform.activestate.com
 login.amd.com
@@ -271,7 +271,7 @@ play.xbox.com
 meta.com
 blackfriday.com
 webex.com
-ipdata.co
+#ipdata.co
 aftermarket.schaeffler.com
 vehiclelifetimesolutions.schaeffler.com
 adam-audio.com

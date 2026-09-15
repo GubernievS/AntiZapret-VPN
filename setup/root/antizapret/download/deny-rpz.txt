@@ -167,8 +167,6 @@ tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
 ; https://habr.com/ru/articles/1006666
-redirector.googlevideo.com CNAME .
-checkip.amazonaws.com CNAME .
 icanhazip.com CNAME .
 *.icanhazip.com CNAME .
 ifconfig.co CNAME .
