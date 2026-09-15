@@ -4,7 +4,10 @@ rs.mail.ru
 rutor.org
 rutoro.info
 www-torproject.org
-al-array.com
 top-fwz1.vk.ru
 top-fwz1.vk.com
+vk-analytics.ru
+trace-flow.ru
+apptracer.ru
+reef.vk-cdn.net
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
