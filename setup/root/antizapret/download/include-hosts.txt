@@ -1252,6 +1252,7 @@ wikimapia.org
 vogue.com
 ui.com
 decagames.com
+bulkhead.com
 
 # Сертификаты
 #letsencrypt.org
