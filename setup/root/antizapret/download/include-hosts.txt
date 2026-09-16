@@ -1253,6 +1253,7 @@ vogue.com
 ui.com
 decagames.com
 bulkhead.com
+weex.com
 
 # Сертификаты
 #letsencrypt.org
