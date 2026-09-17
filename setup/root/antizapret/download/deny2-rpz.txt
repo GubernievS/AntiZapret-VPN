@@ -194,32 +194,4 @@ media.themoviedb.org A 51.83.172.163
 *.media.themoviedb.org A 51.83.172.163
 media.themoviedb.org A 37.19.203.178
 *.media.themoviedb.org A 37.19.203.178
-
-tracker.openbittorrent.com A 52.223.13.41
-
-; https://habr.com/ru/articles/1006666
-oneme.ru CNAME .
-*.oneme.ru CNAME .
-max.ru CNAME .
-*.max.ru CNAME .
-
-; https://habr.com/ru/articles/1000792
-telega.info CNAME .
-*.telega.info CNAME .
-
-; https://habr.com/ru/articles/1036222
-vk-analytics.ru CNAME .
-*.vk-analytics.ru CNAME .
-trace-flow.ru CNAME .
-*.trace-flow.ru CNAME .
-apptracer.ru CNAME .
-*.apptracer.ru CNAME .
-
-; https://habr.com/ru/articles/1046710
-reef.vk-cdn.net CNAME .
-*.reef.vk-cdn.net CNAME .
-oneme.app CNAME .
-*.oneme.app CNAME .
-rustore.ru CNAME .
-*.rustore.ru CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
