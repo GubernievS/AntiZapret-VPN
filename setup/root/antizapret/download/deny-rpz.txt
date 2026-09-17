@@ -166,7 +166,7 @@ retracker.lanta-net.ru CNAME .
 tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
-; https://habr.com/ru/articles/1006666
+# IP
 icanhazip.com CNAME .
 *.icanhazip.com CNAME .
 ifconfig.co CNAME .
@@ -181,20 +181,48 @@ eth0.me CNAME .
 *.eth0.me CNAME .
 ip.sb CNAME .
 *.ip.sb CNAME .
-
-; https://habr.com/ru/articles/1000792
-telega.info CNAME .
-*.telega.info CNAME .
-
-; https://habr.com/ru/articles/1036222
-vk-analytics.ru CNAME .
-*.vk-analytics.ru CNAME .
-trace-flow.ru CNAME .
-*.trace-flow.ru CNAME .
-apptracer.ru CNAME .
-*.apptracer.ru CNAME .
-
-; https://habr.com/ru/articles/1046710
-reef.vk-cdn.net CNAME .
-*.reef.vk-cdn.net CNAME .
+ip.comss.net CNAME .
+*.ip.comss.net CNAME .
+ipv4-check-perf.radar.cloudflare.com CNAME .
+*.ipv4-check-perf.radar.cloudflare.com CNAME .
+checkip.sh CNAME .
+*.checkip.sh CNAME .
+checkmyip.now CNAME .
+*.checkmyip.now CNAME .
+db-ip.com CNAME .
+*.db-ip.com CNAME .
+find-my-ip.com CNAME .
+*.find-my-ip.com CNAME .
+findip.net CNAME .
+*.findip.net CNAME .
+freeipapi.com CNAME .
+*.freeipapi.com CNAME .
+geodatatool.com CNAME .
+*.geodatatool.com CNAME .
+geojs.io CNAME .
+*.geojs.io CNAME .
+geoplugin.com CNAME .
+*.geoplugin.com CNAME .
+greip.io CNAME .
+*.greip.io CNAME .
+ifconfig.io CNAME .
+*.ifconfig.io CNAME .
+infosniper.net CNAME .
+*.infosniper.net CNAME .
+ipaddress.com CNAME .
+*.ipaddress.com CNAME .
+mon-ip.com CNAME .
+*.mon-ip.com CNAME .
+ip.guide CNAME .
+*.ip.guide CNAME .
+am.i.mullvad.net CNAME .
+*.am.i.mullvad.net CNAME .
+hide.me CNAME .
+*.hide.me CNAME .
+ip2location.com CNAME .
+*.ip2location.com CNAME .
+ip2location.io CNAME .
+*.ip2location.io CNAME .
+ip2ruscity.com CNAME .
+*.ip2ruscity.com CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
