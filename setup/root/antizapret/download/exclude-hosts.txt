@@ -12,11 +12,9 @@ eu.sentry.io
 de.sentry.io
 us.sentry.io
 downloads.cursor.com
+
 # IP
 ip.hetzner.com
 checkip.amazonaws.com
 redirector.googlevideo.com
-2ip.com.ua
-2ip.ua
-
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
