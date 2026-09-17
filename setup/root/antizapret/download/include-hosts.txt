@@ -1254,6 +1254,7 @@ ui.com
 decagames.com
 bulkhead.com
 weex.com
+openhands.dev
 
 # Сертификаты
 #letsencrypt.org
