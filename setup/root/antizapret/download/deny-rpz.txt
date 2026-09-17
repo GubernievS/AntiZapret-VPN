@@ -167,8 +167,8 @@ tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
 ; IP
-2ip.ua CNAME .
-*.2ip.ua CNAME .
+;2ip.ua CNAME .
+;*.2ip.ua CNAME .
 apiip.net CNAME .
 *.apiip.net CNAME .
 ;check-host.net CNAME .
@@ -355,4 +355,14 @@ whoer.net CNAME .
 *.whoer.net CNAME .
 whoisxmlapi.com CNAME .
 *.whoisxmlapi.com CNAME .
+ip.guide CNAME .
+*.ip.guide CNAME .
+;abuseipdb.com CNAME .
+;*.abuseipdb.com CNAME .
+vpnapi.io CNAME .
+*.vpnapi.io CNAME .
+;scamalytics.com CNAME .
+;*.scamalytics.com CNAME .
+;infobyip.com CNAME .
+;*.infobyip.com CNAME .
 ; НЕ РЕДАКТИРУЙТ
