@@ -365,4 +365,6 @@ vpnapi.io CNAME .
 ;*.scamalytics.com CNAME .
 ;infobyip.com CNAME .
 ;*.infobyip.com CNAME .
+iplark.com CNAME .
+*.iplark.com CNAME .
 ; НЕ РЕДАКТИРУЙТ
