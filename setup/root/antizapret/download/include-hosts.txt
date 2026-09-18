@@ -1255,6 +1255,9 @@ decagames.com
 bulkhead.com
 weex.com
 openhands.dev
+tailscale.com
+powersurf.eu
+xpenology.tech
 
 # Сертификаты
 #letsencrypt.org
