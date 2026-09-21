@@ -60,7 +60,7 @@ platform.activestate.com
 login.amd.com
 bits.avcdn.net
 #forums.chaos.com
-try.chaos.com
+#try.chaos.com
 #cisco.com
 id.cisco.com
 clamav.net
@@ -1260,6 +1260,7 @@ powersurf.eu
 xpenology.tech
 swaggerhub.com
 honor.com
+accounts.chaos.com
 
 # Сертификаты
 #letsencrypt.org
