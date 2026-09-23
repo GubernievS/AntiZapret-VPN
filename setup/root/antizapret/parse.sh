@@ -96,15 +96,15 @@ fi
 
 if [[ -f /etc/knot-resolver/kresd.conf ]]; then
 	kresd_updated=
-	if grep -qF "--return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
+	if grep -qF -- "--return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "/--return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/d" /etc/knot-resolver/kresd.conf
 		kresd_updated=1
 	fi
-	if grep -qF "return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
+	if grep -qF -- "return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "s/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '193.233.112.88', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/" /etc/knot-resolver/kresd.conf
 		kresd_updated=1
 	fi
-	if grep -qF "return policy.FORWARD({'217.60.245.219', '217.60.245.233', '31.25.239.132', '143.20.64.192', '2.27.118.34'})" /etc/knot-resolver/kresd.conf; then
+	if grep -qF -- "return policy.FORWARD({'217.60.245.219', '217.60.245.233', '31.25.239.132', '143.20.64.192', '2.27.118.34'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "s/return policy.FORWARD({'217.60.245.219', '217.60.245.233', '31.25.239.132', '143.20.64.192', '2.27.118.34'})/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '193.233.112.88', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/" /etc/knot-resolver/kresd.conf
 		kresd_updated=1
 	fi
