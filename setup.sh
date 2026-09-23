@@ -399,8 +399,8 @@ systemctl disable --now systemd-pstore
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
-	dpkg -s fail2ban &>/dev/null && apt-get purge -y fail2ban || true
-	dpkg -s sshguard &>/dev/null && apt-get purge -y sshguard || true
+	dpkg -s fail2ban &>/dev/null && apt-get purge -y fail2ban
+	dpkg -s sshguard &>/dev/null && apt-get purge -y sshguard
 fi
 
 # Удаляем кэш Knot Resolver
