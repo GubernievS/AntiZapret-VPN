@@ -606,7 +606,10 @@ if [[ "$ANTIZAPRET_DNS" != '1' ]]; then
 fi
 
 # Настраиваем DNS в full VPN
-if [[ "$VPN_DNS" == '3' ]]; then
+if [[ "$VPN_DNS" == '1' && "$ANTIZAPRET_DNS" != '1' ]]; then
+	# Self-hosted
+	sed -i "s/local dns2 = 2/local dns2 = $ANTIZAPRET_DNS/" /etc/knot-resolver/kresd.conf
+elif [[ "$VPN_DNS" == '3' ]]; then
 	# Quad9
 	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 9.9.9.10"\npush "dhcp-option DNS 149.112.112.10"' /etc/openvpn/server/vpn*.conf
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/9.9.9.10, 149.112.112.10/' /etc/wireguard/templates/vpn-client*.conf
