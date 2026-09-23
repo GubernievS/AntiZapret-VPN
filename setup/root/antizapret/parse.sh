@@ -95,20 +95,24 @@ if grep -qF 'MTU = 1420' up.sh; then
 fi
 
 if [[ -f /etc/knot-resolver/kresd.conf ]]; then
-	kresd_updated=
+	kresd_restart=
 	if grep -qF -- "--return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "/--return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/d" /etc/knot-resolver/kresd.conf
-		kresd_updated=1
+		grep -qE 'local dns[12] = 8' /etc/knot-resolver/kresd.conf && kresd_restart=1
 	fi
 	if grep -qF -- "return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "s/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '193.233.112.88', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/" /etc/knot-resolver/kresd.conf
-		kresd_updated=1
+		grep -qE 'local dns[12] = 8' /etc/knot-resolver/kresd.conf && kresd_restart=1
 	fi
 	if grep -qF -- "return policy.FORWARD({'217.60.245.219', '217.60.245.233', '31.25.239.132', '143.20.64.192', '2.27.118.34'})" /etc/knot-resolver/kresd.conf; then
 		sed -i "s/return policy.FORWARD({'217.60.245.219', '217.60.245.233', '31.25.239.132', '143.20.64.192', '2.27.118.34'})/return policy.FORWARD({'193.233.112.67', '193.233.112.68', '193.233.112.88', '45.155.204.190', '37.230.192.51', '46.8.158.6'})/" /etc/knot-resolver/kresd.conf
-		kresd_updated=1
+		grep -qE 'local dns[12] = 8' /etc/knot-resolver/kresd.conf && kresd_restart=1
 	fi
-	if [[ -n "$kresd_updated" ]] && grep -qE 'local dns[12] = 8' /etc/knot-resolver/kresd.conf; then
+	if grep -qF -- "policy.FORWARD({'94.247.43.254', '95.216.99.249', '152.53.15.127', '185.226.181.19'})," /etc/knot-resolver/kresd.conf; then
+		sed -i "s/policy.FORWARD({'94.247.43.254', '95.216.99.249', '152.53.15.127', '185.226.181.19'}),/policy.FORWARD({'91.190.185.43', '94.247.43.254', '95.216.99.249', '185.226.181.19'}),/g" /etc/knot-resolver/kresd.conf
+		kresd_restart=1
+	fi
+	if [[ -n "$kresd_restart" ]]; then
 		systemctl restart 'kresd@*'
 	fi
 fi
