@@ -109,29 +109,69 @@ echo
 echo 'Installation, please wait...'
 
 # Удалим ненужные службы
-apt-get purge -y ufw
-apt-get purge -y firewalld
-apt-get purge -y apparmor
-apt-get purge -y apport
-apt-get purge -y modemmanager
-apt-get purge -y snapd
-apt-get purge -y upower
-apt-get purge -y multipath-tools
-apt-get purge -y rsyslog
-apt-get purge -y udisks2
-apt-get purge -y qemu-guest-agent
-apt-get purge -y tuned
-apt-get purge -y sysstat
-apt-get purge -y acpid
-apt-get purge -y fwupd
-apt-get purge -y watchdog
-apt-get purge -y pcscd
-apt-get purge -y packagekit
+dpkg -s ufw &>/dev/null && apt-get purge -y ufw
+dpkg -s firewalld &>/dev/null && apt-get purge -y firewalld
+dpkg -s apparmor &>/dev/null && apt-get purge -y apparmor
+dpkg -s apport &>/dev/null && apt-get purge -y apport
+dpkg -s modemmanager &>/dev/null && apt-get purge -y modemmanager
+dpkg -s snapd &>/dev/null && apt-get purge -y snapd
+dpkg -s upower &>/dev/null && apt-get purge -y upower
+dpkg -s multipath-tools &>/dev/null && apt-get purge -y multipath-tools
+dpkg -s rsyslog &>/dev/null && apt-get purge -y rsyslog
+dpkg -s udisks2 &>/dev/null && apt-get purge -y udisks2
+dpkg -s qemu-guest-agent &>/dev/null && apt-get purge -y qemu-guest-agent
+dpkg -s tuned &>/dev/null && apt-get purge -y tuned
+dpkg -s sysstat &>/dev/null && apt-get purge -y sysstat
+dpkg -s acpid &>/dev/null && apt-get purge -y acpid
+dpkg -s fwupd &>/dev/null && apt-get purge -y fwupd
+dpkg -s watchdog &>/dev/null && apt-get purge -y watchdog
+dpkg -s pcscd &>/dev/null && apt-get purge -y pcscd
+dpkg -s packagekit &>/dev/null && apt-get purge -y packagekit
+dpkg -s thermald &>/dev/null && apt-get purge -y thermald
+dpkg -s open-iscsi &>/dev/null && apt-get purge -y open-iscsi
+dpkg -s ubuntu-drivers-common &>/dev/null && apt-get purge -y ubuntu-drivers-common
+dpkg -s avahi-daemon &>/dev/null && apt-get purge -y avahi-daemon
+dpkg -s accountsservice &>/dev/null && apt-get purge -y accountsservice
+dpkg -s bolt &>/dev/null && apt-get purge -y bolt
+dpkg -s plymouth &>/dev/null && apt-get purge -y plymouth
+dpkg -s popularity-contest &>/dev/null && apt-get purge -y popularity-contest
+dpkg -s whoopsie &>/dev/null && apt-get purge -y whoopsie
+dpkg -s landscape-common &>/dev/null && apt-get purge -y landscape-common
+dpkg -s canonical-livepatch &>/dev/null && apt-get purge -y canonical-livepatch
+dpkg -s ppp &>/dev/null && apt-get purge -y ppp
+dpkg -s speech-dispatcher &>/dev/null && apt-get purge -y speech-dispatcher
+dpkg -s brltty &>/dev/null && apt-get purge -y brltty
+dpkg -s bluez &>/dev/null && apt-get purge -y bluez
+dpkg -s bluetooth &>/dev/null && apt-get purge -y bluetooth
+dpkg -s wpasupplicant &>/dev/null && apt-get purge -y wpasupplicant
+dpkg -s cups &>/dev/null && apt-get purge -y cups
+dpkg -s cups-browsed &>/dev/null && apt-get purge -y cups-browsed
+dpkg -s cups-client &>/dev/null && apt-get purge -y cups-client
+dpkg -s cups-daemon &>/dev/null && apt-get purge -y cups-daemon
+dpkg -s cups-common &>/dev/null && apt-get purge -y cups-common
+dpkg -s nfs-common &>/dev/null && apt-get purge -y nfs-common
+dpkg -s rpcbind &>/dev/null && apt-get purge -y rpcbind
+dpkg -s cifs-utils &>/dev/null && apt-get purge -y cifs-utils
+dpkg -s ntfs-3g &>/dev/null && apt-get purge -y ntfs-3g
+dpkg -s os-prober &>/dev/null && apt-get purge -y os-prober
+dpkg -s laptop-detect &>/dev/null && apt-get purge -y laptop-detect
+dpkg -s powermgmt-base &>/dev/null && apt-get purge -y powermgmt-base
+dpkg -s xdg-user-dirs &>/dev/null && apt-get purge -y xdg-user-dirs
+dpkg -s update-notifier-common &>/dev/null && apt-get purge -y update-notifier-common
+dpkg -s at &>/dev/null && apt-get purge -y at
+dpkg -s spice-vdagent &>/dev/null && apt-get purge -y spice-vdagent
+dpkg -s libnss-mdns &>/dev/null && apt-get purge -y libnss-mdns
+dpkg -s byobu &>/dev/null && apt-get purge -y byobu
+dpkg -s ubuntu-advantage-tools &>/dev/null && apt-get purge -y ubuntu-advantage-tools
+dpkg -s ubuntu-pro-client &>/dev/null && apt-get purge -y ubuntu-pro-client
+dpkg -s pollinate &>/dev/null && apt-get purge -y pollinate
+dpkg -s secureboot-db &>/dev/null && apt-get purge -y secureboot-db
+#dpkg -s pastebinit &>/dev/null && apt-get purge -y pastebinit
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
-	apt-get purge -y fail2ban
-	apt-get purge -y sshguard
+	dpkg -s fail2ban &>/dev/null && apt-get purge -y fail2ban
+	dpkg -s sshguard &>/dev/null && apt-get purge -y sshguard
 fi
 
 # Отключим IPv6
