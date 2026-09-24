@@ -1,2 +1,9 @@
 -- Custom query policies for full VPN
---policy.add(policy.suffix(policy.FORWARD({'8.8.8.8', '8.8.4.4'}), {todname('example.com')}))
+-- Resolve domains via custom DNS only
+--policy.add(policy.suffix(policy.STUB({'8.8.8.8', '8.8.4.4'}), {
+--    todname('example.com'),
+--    todname('example.org'),
+--    todname('example.net'),
+--}))
+-- Set outgoing IPv4 address for upstream DNS queries
+--net.outgoing_v4('1.2.3.4')
