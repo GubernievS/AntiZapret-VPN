@@ -5,6 +5,10 @@ cd /root/antizapret
 
 source setup
 
+# Out IP protection
+iptables -w -D INPUT -d $ANTIZAPRET_OUT_IP -j DROP
+iptables -w -D INPUT -d $VPN_OUT_IP -j DROP
+
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')"
 	if [[ -z "$DEFAULT_INTERFACE" ]]; then
