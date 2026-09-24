@@ -444,7 +444,7 @@ rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 rm -rf /etc/apt/sources.list.d/backports.list
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get dist-upgrade -y
+apt-get dist-upgrade -y --fix-missing
 apt-get install -y curl gpg
 
 # Папка для ключей
