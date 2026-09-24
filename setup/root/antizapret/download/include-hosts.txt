@@ -1262,6 +1262,7 @@ swaggerhub.com
 honor.com
 accounts.chaos.com
 boxofficemojo.com
+wooting.io
 
 # Сертификаты
 #letsencrypt.org
