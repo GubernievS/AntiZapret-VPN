@@ -333,6 +333,14 @@ ip6tables -w -I OUTPUT 1 -m conntrack --ctstate INVALID -j DROP
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
 	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name proxy-ssh6 --hashlimit-htable-expire 60000 -j DROP
+	if [[ "$SSH_PROXY" == 'y' ]]; then
+		if [[ "$OPENVPN_UDP" == 'y' || "$OPENVPN_TCP" == 'y' ]]; then
+			iptables -w -t mangle -A PREROUTING -p tcp --dport $OPENVPN_SSH -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
+		fi
+		if [[ "$WIREGUARD" == 'y' ]]; then
+			iptables -w -t mangle -A PREROUTING -p tcp --dport $WIREGUARD_SSH -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name proxy-ssh --hashlimit-htable-expire 60000 -j DROP
+		fi
+	fi
 fi
 # SSH proxy
 if [[ "$SSH_PROXY" == 'y' ]]; then
