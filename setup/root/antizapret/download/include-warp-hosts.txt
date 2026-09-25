@@ -1,0 +1,14 @@
+# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
+turn.cloudflare.com
+stun.cloudflare.com
+turn.l.google.com
+stun.l.google.com
+stun-anycast.l.google.com
+stun1.l.google.com
+stun2.l.google.com
+stun3.l.google.com
+stun4.l.google.com
+stun.conversations.im
+stun.ui.com
+stun.pubnub.com
+# НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!

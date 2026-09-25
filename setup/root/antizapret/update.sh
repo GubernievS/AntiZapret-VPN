@@ -45,6 +45,9 @@ DENY2_RPZ_PATH=download/deny2-rpz.txt
 INCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-hosts.txt
 INCLUDE_HOSTS_PATH=download/include-hosts.txt
 
+INCLUDE_WARP_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-warp-hosts.txt
+INCLUDE_WARP_HOSTS_PATH=download/include-warp-hosts.txt
+
 EXCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-hosts.txt
 EXCLUDE_RU_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-ru-hosts.txt
 EXCLUDE_HOSTS_PATH=download/exclude-hosts.txt
@@ -130,6 +133,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	download $DENY_RPZ_PATH $DENY_RPZ_LINK
 	download $DENY2_RPZ_PATH $DENY2_RPZ_LINK
 	download $INCLUDE_HOSTS_PATH $INCLUDE_HOSTS_LINK
+	download $INCLUDE_WARP_HOSTS_PATH $INCLUDE_WARP_HOSTS_LINK
 	download $REMOVE_HOSTS_PATH $REMOVE_HOSTS_LINK
 
 	if [[ "$ROUTE_ALL" == 'y' ]]; then
