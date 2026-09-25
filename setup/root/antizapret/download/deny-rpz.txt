@@ -367,4 +367,12 @@ vpnapi.io CNAME .
 ;*.infobyip.com CNAME .
 iplark.com CNAME .
 *.iplark.com CNAME .
+hide.me CNAME .
+*.hide.me CNAME .
+ipfighter.com CNAME .
+*.ipfighter.com CNAME .
+nodemaven.com CNAME .
+*.nodemaven.com CNAME .
+vpnmentor.com CNAME .
+*.vpnmentor.com CNAME .
 ; НЕ РЕДАКТИРУЙТ
