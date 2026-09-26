@@ -1259,7 +1259,7 @@ tailscale.com
 powersurf.eu
 xpenology.tech
 swaggerhub.com
-honor.com
+#honor.com
 accounts.chaos.com
 boxofficemojo.com
 wooting.io
