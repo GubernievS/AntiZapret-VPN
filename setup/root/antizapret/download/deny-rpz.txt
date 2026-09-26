@@ -363,8 +363,8 @@ vpnapi.io CNAME .
 *.vpnapi.io CNAME .
 ;scamalytics.com CNAME .
 ;*.scamalytics.com CNAME .
-;infobyip.com CNAME .
-;*.infobyip.com CNAME .
+infobyip.com CNAME .
+*.infobyip.com CNAME .
 iplark.com CNAME .
 *.iplark.com CNAME .
 hide.me CNAME .
@@ -395,4 +395,13 @@ teoh.io CNAME .
 *.teoh.io CNAME .
 myip.foo CNAME .
 *.myip.foo CNAME .
+; (www.)cloudflare.com/cdn-cgi/trace
+cloudflare.com CNAME .
+www.cloudflare.com CNAME .
+shodan.io CNAME .
+*.shodan.io CNAME .
+ipquery.io CNAME .
+*.ipquery.io CNAME .
+ipwho.org CNAME .
+*.ipwho.org CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
