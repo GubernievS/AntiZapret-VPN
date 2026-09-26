@@ -375,4 +375,8 @@ nodemaven.com CNAME .
 *.nodemaven.com CNAME .
 vpnmentor.com CNAME .
 *.vpnmentor.com CNAME .
+geojs.io CNAME .
+*.geojs.io CNAME .
+ipquery.io CNAME .
+*.ipquery.io CNAME .
 ; НЕ РЕДАКТИРУЙТ
