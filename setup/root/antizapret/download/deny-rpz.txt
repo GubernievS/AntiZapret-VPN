@@ -385,4 +385,12 @@ ipwhois.app CNAME .
 *.ipwhois.app CNAME .
 ipyou.net CNAME .
 *.ipyou.net CNAME .
+checkip.me CNAME .
+*.checkip.me CNAME .
+ip.gs CNAME .
+*.ip.gs CNAME .
+ipaddress.you CNAME .
+*.ipaddress.you CNAME .
+teoh.io CNAME .
+*.teoh.io CNAME .
 ; НЕ РЕДАКТИРУЙТ
