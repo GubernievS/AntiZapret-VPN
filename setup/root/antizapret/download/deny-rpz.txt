@@ -167,18 +167,18 @@ tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
 ; IP
-;2ip.ua CNAME .
-;*.2ip.ua CNAME .
-;apiip.net CNAME .
-;*.apiip.net CNAME .
+2ip.ua CNAME .
+*.2ip.ua CNAME .
+apiip.net CNAME .
+*.apiip.net CNAME .
 ;check-host.net CNAME .
 ;*.check-host.net CNAME .
 checkip.sh CNAME .
 *.checkip.sh CNAME .
 checkmyip.now CNAME .
 *.checkmyip.now CNAME .
-;country.is CNAME .
-;*.country.is CNAME .
+country.is CNAME .
+*.country.is CNAME .
 ;criminalip.io CNAME .
 ;*.criminalip.io CNAME .
 db-ip.com CNAME .
@@ -187,10 +187,10 @@ findip.net CNAME .
 *.findip.net CNAME .
 find-my-ip.com CNAME .
 *.find-my-ip.com CNAME .
-;fraudlogix.com CNAME .
-;*.fraudlogix.com CNAME .
-;freegeoip.app CNAME .
-;*.freegeoip.app CNAME .
+fraudlogix.com CNAME .
+*.fraudlogix.com CNAME .
+freegeoip.app CNAME .
+*.freegeoip.app CNAME .
 freeipapi.com CNAME .
 *.freeipapi.com CNAME .
 geodatatool.com CNAME .
