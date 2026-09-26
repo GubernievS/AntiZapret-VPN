@@ -393,4 +393,6 @@ ipaddress.you CNAME .
 *.ipaddress.you CNAME .
 teoh.io CNAME .
 *.teoh.io CNAME .
-; НЕ РЕДАКТИРУЙТ
+myip.foo CNAME .
+*.myip.foo CNAME .
+; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
