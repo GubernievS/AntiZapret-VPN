@@ -379,4 +379,10 @@ geojs.io CNAME .
 *.geojs.io CNAME .
 ipquery.io CNAME .
 *.ipquery.io CNAME .
+eth0.me CNAME .
+*.eth0.me CNAME .
+ipwhois.app CNAME .
+*.ipwhois.app CNAME .
+ipyou.net CNAME .
+*.ipyou.net CNAME .
 ; НЕ РЕДАКТИРУЙТ
