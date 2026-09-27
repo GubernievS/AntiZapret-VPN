@@ -406,4 +406,18 @@ ipwho.org CNAME .
 *.ipwho.org CNAME .
 2ip.me CNAME .
 *.2ip.me CNAME .
+webbrowsertools.com CNAME .
+*.webbrowsertools.com CNAME .
+dnsleak.com CNAME .
+*.dnsleak.com CNAME .
+myipadressnow.com CNAME .
+*.myipadressnow.com CNAME .
+geomyip.com CNAME .
+*.geomyip.com CNAME .
+ipshu.com CNAME .
+*.ipshu.com CNAME .
+ipin.io CNAME .
+*.ipin.io CNAME .
+ip.network CNAME .
+*.ip.network CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
