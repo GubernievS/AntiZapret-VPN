@@ -404,4 +404,6 @@ ipquery.io CNAME .
 *.ipquery.io CNAME .
 ipwho.org CNAME .
 *.ipwho.org CNAME .
+2ip.me CNAME .
+*.2ip.me CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
