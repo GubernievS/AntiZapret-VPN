@@ -5,5 +5,3 @@
 --    todname('example.org'),
 --    todname('example.net'),
 --}))
--- Set outgoing IPv4 address for upstream DNS queries
---net.outgoing_v4('1.2.3.4')
