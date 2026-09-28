@@ -10,10 +10,10 @@ source setup
 
 # Out IP protection
 if [[ -n "$ANTIZAPRET_OUT_IP" ]]; then
-	iptables -w -I INPUT 1 -d $ANTIZAPRET_OUT_IP -j DROP
+	iptables -w -I INPUT 1 -d $ANTIZAPRET_OUT_IP -m conntrack --ctstate NEW -j DROP
 fi
 if [[ -n "$VPN_OUT_IP" && "$VPN_OUT_IP" != "$ANTIZAPRET_OUT_IP" ]]; then
-	iptables -w -I INPUT 1 -d $VPN_OUT_IP -j DROP
+	iptables -w -I INPUT 1 -d $VPN_OUT_IP -m conntrack --ctstate NEW -j DROP
 fi
 
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
