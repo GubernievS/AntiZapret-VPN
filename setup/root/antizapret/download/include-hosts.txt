@@ -1268,6 +1268,7 @@ fextralife.com
 cloudsmith.io
 notion.com
 mtgcardbuilder.com
+zerro.app
 
 # Сертификаты
 #letsencrypt.org
