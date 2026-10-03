@@ -151,6 +151,16 @@ onedns.net CNAME .
 *.onedns.net CNAME .
 dns.dnswarden.com CNAME .
 *.dns.dnswarden.com CNAME .
+raw.ghost.pm CNAME .
+*.raw.ghost.pm CNAME .
+dns.bezmezhau.com CNAME .
+*.dns.bezmezhau.com CNAME .
+dns.dns-ai.ru CNAME .
+*.dns.dns-ai.ru CNAME .
+dns.astracat.ru CNAME .
+*.dns.astracat.ru CNAME .
+dns.astracat.network CNAME .
+*.dns.astracat.network CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
