@@ -442,4 +442,8 @@ decodo.com CNAME .
 *.decodo.com CNAME .
 ipxo.com CNAME .
 *.ipxo.com CNAME .
+veepn.com CNAME .
+*.veepn.com CNAME .
+nordvpn.com CNAME .
+*.nordvpn.com CNAME .
 ; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
