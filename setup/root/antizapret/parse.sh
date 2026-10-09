@@ -305,6 +305,7 @@ ANTIZAPRET_WARP_INTERFACE=warp-antizapret
 ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
 if [[ -f $ANTIZAPRET_WARP_PATH ]]; then
 	wg-quick down $ANTIZAPRET_WARP_INTERFACE 2>/dev/null && wg-quick up $ANTIZAPRET_WARP_INTERFACE 2>/dev/null
+	echo "Reconnect $ANTIZAPRET_WARP_INTERFACE"
 fi
 
 # WARP VPN
@@ -312,6 +313,7 @@ VPN_WARP_INTERFACE=warp-vpn
 VPN_WARP_PATH="/etc/wireguard/$VPN_WARP_INTERFACE.conf"
 if [[ -f $VPN_WARP_PATH ]]; then
 	wg-quick down $VPN_WARP_INTERFACE 2>/dev/null && wg-quick up $VPN_WARP_INTERFACE 2>/dev/null
+	echo "Reconnect $VPN_WARP_INTERFACE"
 fi
 
 ./custom-parse.sh "$1" || true
