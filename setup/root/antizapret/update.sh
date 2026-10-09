@@ -107,11 +107,8 @@ function download {
 	local tmp_path="${path}.tmp"
 	local link="$2"
 	echo "$path"
-	
-	if ! curl -fL --connect-timeout 30 --max-time 300 "$link" -o "$tmp_path"; then
-		echo 'Trying connect via proxy...'
-		curl -fL --connect-timeout 30 --max-time 300 "$PROXY$link" -o "$tmp_path" || exit 2
-	fi
+
+	curl -fL --connect-timeout 30 --max-time 300 "$link" -o "$tmp_path" || exit 2
 
 	mv -f "$tmp_path" "$path"
 	if [[ "$path" == *.sh ]]; then
