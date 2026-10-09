@@ -171,7 +171,7 @@ iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_WARP_INTERFACE -j SNA
 
 # WARP AntiZapret
 if [[ -f $ANTIZAPRET_WARP_PATH ]]; then
-	wg-quick down $ANTIZAPRET_WARP_PATH
+	wg-quick down $ANTIZAPRET_WARP_INTERFACE
 fi
 if ip link show dev $ANTIZAPRET_WARP_INTERFACE &>/dev/null; then
 	ip link delete dev $ANTIZAPRET_WARP_INTERFACE
@@ -179,7 +179,7 @@ fi
 
 # WARP VPN
 if [[ -f $VPN_WARP_PATH ]]; then
-	wg-quick down $VPN_WARP_PATH
+	wg-quick down $VPN_WARP_INTERFACE
 fi
 if ip link show dev $VPN_WARP_INTERFACE &>/dev/null; then
 	ip link delete dev $VPN_WARP_INTERFACE

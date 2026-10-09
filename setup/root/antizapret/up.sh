@@ -86,7 +86,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 Endpoint = $ANTIZAPRET_WARP_ENDPOINT" > $ANTIZAPRET_WARP_PATH
 
-	wg-quick up $ANTIZAPRET_WARP_PATH 2>/dev/null
+	wg-quick up $ANTIZAPRET_WARP_INTERFACE 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $ANTIZAPRET_WARP_INTERFACE: $ANTIZAPRET_WARP_ENDPOINT connected"
@@ -145,7 +145,7 @@ AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 15
 Endpoint = $VPN_WARP_ENDPOINT" > $VPN_WARP_PATH
 
-	wg-quick up $VPN_WARP_PATH 2>/dev/null
+	wg-quick up $VPN_WARP_INTERFACE 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $VPN_WARP_INTERFACE: $VPN_WARP_ENDPOINT connected"
