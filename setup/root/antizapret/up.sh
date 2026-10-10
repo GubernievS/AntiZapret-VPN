@@ -74,11 +74,11 @@ if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WAR
 PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
 Address = $ANTIZAPRET_WARP_ADDRESS
 MTU = $WARP_MTU
-Table = 13335
+Table = 1000
 PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 13335 priority 10000 || true
+PostUp = ip rule add from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 1000 priority 10000 || true
 PostDown = ip rule del from $IP.29.0.0/16 to $IP.29.0.0/16 priority 5000
-PostDown = ip rule del from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 13335 priority 10000
+PostDown = ip rule del from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 1000 priority 10000
 
 [Peer]
 PublicKey = $ANTIZAPRET_WARP_PUBLIC_KEY
@@ -133,11 +133,11 @@ if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
 PrivateKey = $VPN_WARP_PRIVATE_KEY
 Address = $VPN_WARP_ADDRESS
 MTU = $WARP_MTU
-Table = 13336
+Table = 2000
 PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.28.0.0/16 ${VPN_FWMARK}lookup 13336 priority 10000 || true
+PostUp = ip rule add from $IP.28.0.0/16 ${VPN_FWMARK}lookup 2000 priority 10000 || true
 PostDown = ip rule del from $IP.28.0.0/16 to $IP.28.0.0/16 priority 5000
-PostDown = ip rule del from $IP.28.0.0/16 ${VPN_FWMARK}lookup 13336 priority 10000
+PostDown = ip rule del from $IP.28.0.0/16 ${VPN_FWMARK}lookup 2000 priority 10000
 
 [Peer]
 PublicKey = $VPN_WARP_PUBLIC_KEY
