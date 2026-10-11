@@ -186,8 +186,8 @@ echo
 echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'
 echo '    1) Self-hosted        - Use previous choice for AntiZapret VPN, recommended by default'
 echo '    2) Cloudflare/Custom  - Disables replacement answer from self‑hosted DNS, allows custom DNS'
-until [[ "$VPN_DNS" =~ ^[1-9]$ ]]; do
-	read -rp 'DNS choice [1-9]: ' -e -i 1 VPN_DNS
+until [[ "$VPN_DNS" =~ ^[1-2]$ ]]; do
+	read -rp 'DNS choice [1-2]: ' -e -i 1 VPN_DNS
 done
 echo
 until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
