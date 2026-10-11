@@ -157,14 +157,13 @@ iptables -w -t nat -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPR
 iptables -w -D FORWARD -s $IP.29.0.0/16 -j DROP
 iptables -w -D FORWARD -s $IP.28.0.0/16 -j DROP
 iptables -w -D OUTPUT -m owner --uid-owner knot-resolver ! -d 127.0.0.0/8 -j DROP
-iptables -w -t mangle -D OUTPUT -m owner --uid-owner knot-resolver ! -d 127.0.0.0/8 -j MARK --set-mark 0x3
 iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
+iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
 # SNAT/MASQUERADE VPN
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP

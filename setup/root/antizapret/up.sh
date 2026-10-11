@@ -185,14 +185,15 @@ if [[ "$DNS_WARP" == '2' ]]; then
 		DNS_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
 	DNS_WARP_IP="${DNS_WARP_ADDRESS%%/*}"
+	DNS_WARP_UID="$(id -u knot-resolver)"
 
 	echo "[Interface]
 PrivateKey = $DNS_WARP_PRIVATE_KEY
 Address = $DNS_WARP_ADDRESS
 MTU = $WARP_MTU
 Table = 3000
-PostUp = ip rule add fwmark 0x3 lookup 3000 priority 10000 || true
-PostDown = ip rule del fwmark 0x3 lookup 3000 priority 10000
+PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 11000 || true
+PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 11000
 
 [Peer]
 PublicKey = $DNS_WARP_PUBLIC_KEY
@@ -204,11 +205,10 @@ Endpoint = $DNS_WARP_ENDPOINT" > $DNS_WARP_PATH
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $DNS_WARP_INTERFACE: $DNS_WARP_ENDPOINT connected"
-		iptables -w -t mangle -A OUTPUT -m owner --uid-owner knot-resolver ! -d 127.0.0.0/8 -j MARK --set-mark 0x3
 		if [[ -z "$DNS_WARP_IP" ]]; then
-			iptables -w -t nat -A POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j MASQUERADE
+			iptables -w -t nat -A POSTROUTING -o $DNS_WARP_INTERFACE -j MASQUERADE
 		else
-			iptables -w -t nat -A POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
+			iptables -w -t nat -A POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
 		fi
 	else
 		if [[ "$WARP_PROTECTION" == 'y' ]]; then
