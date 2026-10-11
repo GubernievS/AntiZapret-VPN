@@ -316,6 +316,14 @@ if [[ -f $VPN_WARP_PATH ]]; then
 	echo "Reconnect $VPN_WARP_INTERFACE"
 fi
 
+# WARP DNS
+DNS_WARP_INTERFACE=warp-dns
+DNS_WARP_PATH="/etc/wireguard/$DNS_WARP_INTERFACE.conf"
+if [[ -f $DNS_WARP_PATH ]]; then
+	wg-quick down $DNS_WARP_INTERFACE 2>/dev/null && wg-quick up $DNS_WARP_INTERFACE 2>/dev/null
+	echo "Reconnect $DNS_WARP_INTERFACE"
+fi
+
 ./custom-parse.sh "$1" || true
 
 exit 0

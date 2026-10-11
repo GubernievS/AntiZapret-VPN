@@ -78,7 +78,7 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 3. Изменить настройки (или нажимать Enter для выбора значения по умолчанию):
 	- Установить патч для обхода блокировки протокола OpenVPN (только для UDP соединений)
 	- Включить OpenVPN DCO
-	- Включить Cloudflare WARP для исходящего трафика AntiZapret VPN и обычного VPN
+	- Включить Cloudflare WARP для исходящего трафика AntiZapret VPN, обычного VPN и исходящих DNS-запросов
 	- Выбрать DNS для AntiZapret VPN и обычного VPN
 	- Включить блокировку рекламы, трекеров и фишинга в AntiZapret VPN и обычном VPN на основе правил AdGuard и OISD
 	- Использовать альтернативные диапазоны IP-адресов клиентов: 172... вместо 10...

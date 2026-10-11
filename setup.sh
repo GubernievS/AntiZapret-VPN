@@ -91,14 +91,25 @@ echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
-if (( MTU < 1500 )); then
-	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $MTU"
-	echo "Change MTU in OpenVPN and WireGuard configs from 1420 to $((MTU-80)) on this server after installation"
-	echo
-fi
+DEFAULT_MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
+MTU=$((DEFAULT_MTU - 80))
+(( MTU > 1420 )) && MTU=1420
+(( MTU < 1280 )) && MTU=1280
 
 # Спрашиваем о настройках
+if (( DEFAULT_MTU < 1500 )); then
+	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $DEFAULT_MTU"
+	echo "Recommended OpenVPN/WireGuard MTU is $MTU"
+fi
+read -rp 'OpenVPN/WireGuard MTU [1280-1420]: ' -e -i "$MTU" MTU
+until [[ "$MTU" =~ ^[0-9]+$ ]] && (( MTU >= 1280 && MTU <= 1420 )); do
+	read -rp 'OpenVPN/WireGuard MTU [1280-1420]: ' -e -i "$MTU" MTU
+done
+echo
+until [[ "$WARP_MTU" =~ ^[0-9]+$ ]] && (( WARP_MTU >= 1280 && WARP_MTU <= 1420 )); do
+	read -rp 'Cloudflare WARP MTU [1280-1420]: ' -e -i 1280 WARP_MTU
+done
+echo
 until [[ "$OPENVPN_UDP_ENABLE" =~ (y|n) ]]; do
 	read -rp 'Enable OpenVPN UDP? [y/n]: ' -e -i y OPENVPN_UDP_ENABLE
 done
@@ -141,7 +152,14 @@ until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
 	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
 echo
-echo -e 'Warning! WARP protection blocks \e[1;32mAntiZapret VPN\e[0m and \e[1;32mfull VPN\e[0m traffic if WARP failed to connect!'
+echo -e 'Choose Cloudflare WARP for \e[1;32mDNS\e[0m outbound queries:'
+echo '    1) None  - Do not use'
+echo '    2) All   - Route all DNS outbound queries'
+until [[ "$DNS_WARP" =~ ^[1-2]$ ]]; do
+	read -rp 'WARP choice [1-2]: ' -e -i 1 DNS_WARP
+done
+echo
+echo -e 'Warning! WARP protection blocks \e[1;32mAntiZapret VPN\e[0m, \e[1;32mfull VPN\e[0m and \e[1;32mDNS\e[0m traffic if WARP failed to connect!'
 until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable WARP protection? [y/n]: ' -e -i y WARP_PROTECTION
 done
@@ -520,11 +538,16 @@ ANTIZAPRET_WARP_PUBLIC_KEY=
 ANTIZAPRET_WARP_ENDPOINT=
 ANTIZAPRET_WARP_ADDRESS=
 VPN_WARP=$VPN_WARP
-WARP_PROTECTION=$WARP_PROTECTION
 VPN_WARP_PRIVATE_KEY=
 VPN_WARP_PUBLIC_KEY=
 VPN_WARP_ENDPOINT=
 VPN_WARP_ADDRESS=
+DNS_WARP=$DNS_WARP
+DNS_WARP_PRIVATE_KEY=
+DNS_WARP_PUBLIC_KEY=
+DNS_WARP_ENDPOINT=
+DNS_WARP_ADDRESS=
+WARP_PROTECTION=$WARP_PROTECTION
 ANTIZAPRET_DNS=$ANTIZAPRET_DNS
 VPN_DNS=$VPN_DNS
 ANTIZAPRET_ADBLOCK=$ANTIZAPRET_ADBLOCK
@@ -558,8 +581,8 @@ GOOGLE_INCLUDE=$GOOGLE_INCLUDE
 AKAMAI_INCLUDE=$AKAMAI_INCLUDE
 CLEAR_HOSTS=y
 TXQUEUELEN=10000
-MTU=1420
-WARP_MTU=1280
+MTU=$MTU
+WARP_MTU=$WARP_MTU
 DEFAULT_INTERFACE=
 DEFAULT_IP=
 ANTIZAPRET_OUT_INTERFACE=
@@ -612,6 +635,12 @@ if [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]]; then
 	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 10\./s = 172\./g' {} +
 else
 	find /etc/wireguard -name '*.conf' -exec sed -i 's/s = 172\./s = 10\./g' {} +
+fi
+
+# Настраиваем MTU в OpenVPN и WireGuard
+if [[ "$MTU" != '1420' ]]; then
+	sed -i "s/tun-mtu 1420/tun-mtu $MTU/" /etc/openvpn/server/*.conf
+	sed -i "s/MTU = 1420/MTU = $MTU/" /etc/wireguard/templates/*.conf
 fi
 
 # Запрещаем несколько одновременных подключений к OpenVPN для одного клиента
