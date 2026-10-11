@@ -192,8 +192,10 @@ PrivateKey = $DNS_WARP_PRIVATE_KEY
 Address = $DNS_WARP_ADDRESS
 MTU = $WARP_MTU
 Table = 3000
-PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 11000 || true
-PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 11000
+PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 5000 || true
+PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 10000 || true
+PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 5000
+PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 10000
 
 [Peer]
 PublicKey = $DNS_WARP_PUBLIC_KEY
