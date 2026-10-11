@@ -152,14 +152,7 @@ until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
 	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
 echo
-echo -e 'Choose Cloudflare WARP for \e[1;32mDNS\e[0m outbound queries:'
-echo '    1) None  - Do not use'
-echo '    2) All   - Route all DNS outbound queries'
-until [[ "$DNS_WARP" =~ ^[1-2]$ ]]; do
-	read -rp 'WARP choice [1-2]: ' -e -i 1 DNS_WARP
-done
-echo
-echo -e 'Warning! WARP protection blocks \e[1;32mAntiZapret VPN\e[0m, \e[1;32mfull VPN\e[0m and \e[1;32mDNS\e[0m traffic if WARP failed to connect!'
+echo -e 'Warning! WARP protection blocks \e[1;32mAntiZapret VPN\e[0m and \e[1;32mfull VPN\e[0m traffic if WARP failed to connect!'
 until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable WARP protection? [y/n]: ' -e -i y WARP_PROTECTION
 done
@@ -188,6 +181,14 @@ echo '    1) Self-hosted        - Use previous choice for AntiZapret VPN, recomm
 echo '    2) Cloudflare/Custom  - Disables replacement answer from self‑hosted DNS, allows custom DNS'
 until [[ "$VPN_DNS" =~ ^[1-2]$ ]]; do
 	read -rp 'DNS choice [1-2]: ' -e -i 1 VPN_DNS
+done
+echo
+echo -e 'Choose Cloudflare WARP for \e[1;32mDNS\e[0m outbound queries:'
+echo '    1) None  - Do not use'
+echo '    2) All   - Route all DNS outbound queries'
+echo '               Use if selected DNS resolvers are blocked or unreachable from this server'
+until [[ "$DNS_WARP" =~ ^[1-2]$ ]]; do
+	read -rp 'WARP choice [1-2]: ' -e -i 1 DNS_WARP
 done
 echo
 until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do

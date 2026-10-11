@@ -211,12 +211,7 @@ Endpoint = $DNS_WARP_ENDPOINT" > $DNS_WARP_PATH
 			iptables -w -t nat -A POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
 		fi
 	else
-		if [[ "$WARP_PROTECTION" == 'y' ]]; then
-			echo "Starting $DNS_WARP_INTERFACE failed! Blocking traffic"
-			iptables -w -I OUTPUT 1 -m owner --uid-owner knot-resolver ! -d 127.0.0.0/8 -j DROP
-		else
-			echo "Starting $DNS_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
-		fi
+		echo "Starting $DNS_WARP_INTERFACE failed! Use $DEFAULT_INTERFACE"
 	fi
 	set -e
 else
