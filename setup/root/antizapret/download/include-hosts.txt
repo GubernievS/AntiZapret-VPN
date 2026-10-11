@@ -1184,6 +1184,7 @@ sony.co.jp
 radio-t.com
 kamadojoe.com
 gerrit.openvpn.net
+build.openvpn.net
 thiscould.work
 minimeis.com
 ayntec.com
