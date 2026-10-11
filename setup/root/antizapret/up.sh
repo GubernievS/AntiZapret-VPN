@@ -205,6 +205,11 @@ Endpoint = $DNS_WARP_ENDPOINT" > $DNS_WARP_PATH
 	if [[ $? -eq 0 ]]; then
 		echo "Started $DNS_WARP_INTERFACE: $DNS_WARP_ENDPOINT connected"
 		iptables -w -t mangle -A OUTPUT -m owner --uid-owner knot-resolver ! -d 127.0.0.0/8 -j MARK --set-mark 0x3
+		if [[ -z "$DNS_WARP_IP" ]]; then
+			iptables -w -t nat -A POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j MASQUERADE
+		else
+			iptables -w -t nat -A POSTROUTING -m mark --mark 0x3 -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
+		fi
 	else
 		if [[ "$WARP_PROTECTION" == 'y' ]]; then
 			echo "Starting $DNS_WARP_INTERFACE failed! Blocking traffic"
