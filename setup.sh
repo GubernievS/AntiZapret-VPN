@@ -98,8 +98,8 @@ MTU=$((DEFAULT_MTU - 80))
 
 # Спрашиваем о настройках
 if (( DEFAULT_MTU < 1500 )); then
-	echo "Warning! Low MTU on $DEFAULT_INTERFACE: $DEFAULT_MTU"
-	echo "Recommended OpenVPN/WireGuard MTU is $MTU"
+	echo "Warning! MTU on $DEFAULT_INTERFACE is $DEFAULT_MTU"
+	echo "Recommended OpenVPN/WireGuard/WARP MTU is $MTU"
 fi
 read -rp 'OpenVPN/WireGuard MTU [1280-1420]: ' -e -i "$MTU" MTU
 until [[ "$MTU" =~ ^[0-9]+$ ]] && (( MTU >= 1280 && MTU <= 1420 )); do
@@ -107,7 +107,7 @@ until [[ "$MTU" =~ ^[0-9]+$ ]] && (( MTU >= 1280 && MTU <= 1420 )); do
 done
 echo
 until [[ "$WARP_MTU" =~ ^[0-9]+$ ]] && (( WARP_MTU >= 1280 && WARP_MTU <= 1420 )); do
-	read -rp 'Cloudflare WARP MTU [1280-1420]: ' -e -i 1280 WARP_MTU
+	read -rp 'Cloudflare WARP MTU [1280-1420]: ' -e -i "$MTU" WARP_MTU
 done
 echo
 until [[ "$OPENVPN_UDP_ENABLE" =~ (y|n) ]]; do
