@@ -4,9 +4,9 @@ export LC_ALL=C
 shopt -s nullglob
 
 ###
-sed -i "/-- GeoHide/{n;c\\
-		return policy.STUB({'159.194.200.33', '193.233.112.67', '193.233.112.88', '37.230.192.51', '46.8.158.6', '193.233.112.68'}) 
-}" /etc/knot-resolver/kresd.conf
+#sed -i "/-- GeoHide/{n;c\\
+#		return policy.STUB({'159.194.200.33', '193.233.112.67', '193.233.112.88', '37.230.192.51', '46.8.158.6', '193.233.112.68'}) 
+#}" /etc/knot-resolver/kresd.conf
 ###
 
 # Обработка ошибок
