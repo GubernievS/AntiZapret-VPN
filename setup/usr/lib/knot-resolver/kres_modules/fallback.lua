@@ -54,7 +54,11 @@ end
 -- Switch to fallback on timeout or all upstream fail
 function M.layer.produce(state, req, pkt)
 	local qry = req:current()
-	if not qry or qry.flags.CACHED or not qry.flags.FORWARD then
+	if not qry
+		or qry.flags.CACHED -- Skip cached answers
+		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
+		-- or req.options.TCP -- Skip policy.TLS_FORWARD
+		then
 		return state
 	end
 
@@ -69,7 +73,11 @@ end
 -- Switch to fallback on non-NOERROR or empty A
 function M.layer.consume(state, req, pkt)
 	local qry = req:current()
-	if not qry or qry.flags.CACHED or not qry.flags.FORWARD then
+	if not qry
+		or qry.flags.CACHED -- Skip cached answers
+		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
+		-- or req.options.TCP -- Skip policy.TLS_FORWARD
+		then
 		return state
 	end
 
@@ -87,7 +95,10 @@ end
 -- Switch to fallback after upstream fail
 function M.layer.reset(state, req)
 	local qry = req:current()
-	if not qry or qry.flags.CACHED or not qry.flags.FORWARD
+	if not qry
+		or qry.flags.CACHED -- Skip cached answers
+		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
+		-- or req.options.TCP -- Skip policy.TLS_FORWARD
 		or req.count_fail_row == 0 then
 		return state
 	end
