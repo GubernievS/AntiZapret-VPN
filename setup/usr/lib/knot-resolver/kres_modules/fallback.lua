@@ -1,4 +1,4 @@
--- Fallback on bad answer from default upstream
+-- Fallback on a bad answer from policy.FORWARD
 
 local ffi = require('ffi')
 local kres = require('kres')
