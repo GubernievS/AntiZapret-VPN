@@ -489,12 +489,12 @@ git config --global http.version HTTP/1.1
 
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
-git clone https://github.com/paulc/dnslib.git /tmp/dnslib
+git clone --depth 1 https://github.com/paulc/dnslib.git /tmp/dnslib
 PIP_BREAK_SYSTEM_PACKAGES=1 python3 -m pip install --force-reinstall --user /tmp/dnslib
 
 # Клонируем репозиторий antizapret
 rm -rf /tmp/antizapret
-git clone https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
+git clone --depth 1 https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antizapret
 
 # Сохраняем пользовательские настройки и обработчики custom*.sh
 cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ || true
