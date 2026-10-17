@@ -485,7 +485,7 @@ apt-get clean
 
 # Конфигурируем пакеты
 dpkg-reconfigure -f noninteractive unattended-upgrades
-git config --global http.version HTTP/1.1
+#git config --global http.version HTTP/1.1
 
 # Клонируем репозиторий и устанавливаем dnslib
 rm -rf /tmp/dnslib
