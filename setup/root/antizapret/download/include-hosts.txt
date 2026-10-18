@@ -1275,6 +1275,8 @@ stubhub.com
 citycodegame.com
 mobile.de
 miro.com
+crucial.com
+picks.my
 
 # Сертификаты
 #letsencrypt.org
