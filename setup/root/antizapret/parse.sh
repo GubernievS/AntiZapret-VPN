@@ -3,10 +3,6 @@ set -e
 export LC_ALL=C
 shopt -s nullglob
 
-###
-sed -i "s/, '46\.8\.158\.6'//g" /etc/knot-resolver/kresd.conf
-###
-
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
