@@ -3,6 +3,7 @@ ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
 
 tracker.openbittorrent.com A 52.223.13.41
+
 image.tmdb.org A 185.59.220.198
 *.image.tmdb.org A 185.59.220.198
 image.tmdb.org A 185.59.220.199
