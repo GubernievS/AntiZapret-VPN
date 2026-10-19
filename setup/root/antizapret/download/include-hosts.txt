@@ -1277,6 +1277,7 @@ mobile.de
 miro.com
 crucial.com
 picks.my
+hevy.com
 
 # Сертификаты
 #letsencrypt.org
