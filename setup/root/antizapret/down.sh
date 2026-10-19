@@ -201,5 +201,6 @@ if ip link show dev $DNS_WARP_INTERFACE &>/dev/null; then
 	ip link delete dev $DNS_WARP_INTERFACE
 fi
 
-./custom-down.sh
+./custom-down.sh "$@" || true
+
 exit 0

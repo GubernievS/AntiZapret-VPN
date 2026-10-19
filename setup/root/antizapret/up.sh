@@ -453,5 +453,6 @@ echo "AntiZapret DNS cache cleared: $count entries"
 count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/2 | grep -oE '[0-9]+' || echo 0)"
 echo "VPN DNS cache cleared: $count entries"
 
-./custom-up.sh
+./custom-up.sh "$@" || true
+
 exit 0

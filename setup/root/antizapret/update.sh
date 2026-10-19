@@ -198,6 +198,6 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 	fi
 fi
 
-./custom-update.sh "$1" || true
+./custom-update.sh "$@" || true
 
 exit 0

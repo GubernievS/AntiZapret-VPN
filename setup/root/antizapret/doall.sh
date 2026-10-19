@@ -13,7 +13,8 @@ if [[ "$SUM1" != "$SUM2" ]]; then
 	cat update.sh | bash -s "$1"
 fi
 ./parse.sh "$1"
-./custom-doall.sh "$1" || true
+./custom-doall.sh "$@" || true
 
 echo "Execution time: $SECONDS seconds"
+
 exit 0

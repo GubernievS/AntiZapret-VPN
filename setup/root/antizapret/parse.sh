@@ -344,6 +344,6 @@ if [[ -f $DNS_WARP_PATH ]]; then
 	echo "Reconnect $DNS_WARP_INTERFACE"
 fi
 
-./custom-parse.sh "$1" || true
+./custom-parse.sh "$@" || true
 
 exit 0
