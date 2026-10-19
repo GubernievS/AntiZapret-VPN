@@ -182,6 +182,9 @@ retracker.lanta-net.ru CNAME .
 tracker.tfile.co CNAME .
 tracker.openbittorrent.com A 52.223.13.41
 
+ntc.party A 130.255.77.28
+*.ntc.party A 130.255.77.28
+
 ; IP
 2ip.ua CNAME .
 *.2ip.ua CNAME .
