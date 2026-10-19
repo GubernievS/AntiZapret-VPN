@@ -1,2 +1,3 @@
 #!/bin/bash
-exit 0
+
+./scripts/custom-client-disconnect.sh "$@"

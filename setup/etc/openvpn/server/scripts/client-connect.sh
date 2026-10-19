@@ -9,4 +9,4 @@ push "route-ipv6 fc00::/7"
 push "block-ipv6"' >> "$1"
 fi
 
-exit 0
+./scripts/custom-client-connect.sh "$@"
