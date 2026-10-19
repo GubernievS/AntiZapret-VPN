@@ -1278,6 +1278,8 @@ miro.com
 crucial.com
 picks.my
 hevy.com
+hevyapp.com
+hevycoach.com
 
 # Сертификаты
 #letsencrypt.org
