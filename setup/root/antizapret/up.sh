@@ -170,7 +170,7 @@ fi
 DNS_WARP_INTERFACE=warp-dns
 DNS_WARP_PATH="/etc/wireguard/$DNS_WARP_INTERFACE.conf"
 
-if [[ "$DNS_WARP" == '2' ]]; then
+if [[ "$DNS_WARP" == 'y' ]]; then
 	set +e
 	echo "Starting $DNS_WARP_INTERFACE..."
 	if [[ -z "$DNS_WARP_PRIVATE_KEY" || -z "$DNS_WARP_PUBLIC_KEY" || -z "$DNS_WARP_ENDPOINT" || -z "$DNS_WARP_ADDRESS" ]]; then
