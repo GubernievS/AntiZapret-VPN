@@ -201,6 +201,18 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		sleep 5
 	fi
 
+	# Создаем файл deny3.rpz для Knot Resolver (AntiZapret VPN (blocked domains) and full VPN)
+	echo -e '$TTL 86400\n@ SOA . . (1 1 1 1 86400)' > temp/deny3.rpz
+	sed 's/\r//g; /^;/d; /^$/d' download/*deny3-rpz.txt config/*deny3-rpz.txt >> temp/deny3.rpz
+	cp temp/deny3.rpz result/deny3.rpz
+
+	# Обновляем файл deny3.rpz в Knot Resolver только если файл изменился
+	if [[ -f result/deny3.rpz ]] && ! diff -q result/deny3.rpz /etc/knot-resolver/deny3.rpz; then
+		cp -f result/deny3.rpz /etc/knot-resolver/deny3.rpz.tmp
+		mv -f /etc/knot-resolver/deny3.rpz.tmp /etc/knot-resolver/deny3.rpz
+		sleep 5
+	fi
+
 	# Обрабатываем конфигурационные файлы
 	sed -E 's/[\r[:space:]]+//g; /^\.$/!{/^[[:punct:]]/d;}; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*include-hosts.txt config/*include-hosts.txt > temp/include-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*exclude-hosts.txt config/*exclude-hosts.txt | sort -u > temp/exclude-hosts.txt

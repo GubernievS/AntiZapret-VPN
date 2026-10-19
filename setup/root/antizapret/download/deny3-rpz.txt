@@ -1,0 +1,32 @@
+; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
+ntc.party A 130.255.77.28
+*.ntc.party A 130.255.77.28
+
+tracker.openbittorrent.com A 52.223.13.41
+image.tmdb.org A 185.59.220.198
+*.image.tmdb.org A 185.59.220.198
+image.tmdb.org A 185.59.220.199
+*.image.tmdb.org A 185.59.220.199
+image.tmdb.org A 169.150.247.35
+*.image.tmdb.org A 169.150.247.35
+image.tmdb.org A 169.150.247.36
+*.image.tmdb.org A 169.150.247.36
+
+themoviedb.org A 3.160.150.117
+*.themoviedb.org A 3.160.150.117
+themoviedb.org A 3.160.150.18
+*.themoviedb.org A 3.160.150.18
+themoviedb.org A 18.165.140.30
+*.themoviedb.org A 18.165.140.30
+themoviedb.org A 18.165.140.10
+*.themoviedb.org A 18.165.140.10
+
+media.themoviedb.org A 185.111.111.157
+*.media.themoviedb.org A 185.111.111.157
+media.themoviedb.org A 185.111.111.158
+*.media.themoviedb.org A 185.111.111.158
+media.themoviedb.org A 51.83.172.163
+*.media.themoviedb.org A 51.83.172.163
+media.themoviedb.org A 37.19.203.178
+*.media.themoviedb.org A 37.19.203.178
+; НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!

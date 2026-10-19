@@ -1,0 +1,7 @@
+-- Custom query policies for AntiZapret VPN (blocked domains) and full VPN
+-- Resolve domains via custom DNS only
+--policy.add(policy.suffix(policy.STUB({'8.8.8.8', '8.8.4.4'}), {
+--    todname('example.com'),
+--    todname('example.org'),
+--    todname('example.net'),
+--}))
