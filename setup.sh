@@ -138,7 +138,7 @@ done
 echo
 echo -e 'Choose Cloudflare WARP for \e[1;32mAntiZapret VPN\e[0m (antizapret-*) outbound traffic:'
 echo '    1) None    - Do not use'
-echo '    2) All     - Route all traffic (domains and IPs)'
+echo '    2) All     - Route all AntiZapret VPN traffic (domains and IPs)'
 echo '    3) Domain  - Route AntiZapret domains and config/include-warp-hosts.txt, excluding config/exclude-warp-hosts.txt'
 echo '    4) Custom  - Route domains only from config/include-warp-hosts.txt, excluding config/exclude-warp-hosts.txt'
 until [[ "$ANTIZAPRET_WARP" =~ ^[1-4]$ ]]; do
@@ -147,7 +147,7 @@ done
 echo
 echo -e 'Choose Cloudflare WARP for \e[1;32mfull VPN\e[0m (vpn-*) outbound traffic:'
 echo '    1) None  - Do not use'
-echo '    2) All   - Route all traffic (domains and IPs)'
+echo '    2) All   - Route all full VPN traffic (domains and IPs)'
 until [[ "$VPN_WARP" =~ ^[1-2]$ ]]; do
 	read -rp 'WARP choice [1-2]: ' -e -i 2 VPN_WARP
 done
@@ -325,6 +325,7 @@ echo 'Installation, please wait...'
 # Остановим и выключим обновляемые службы
 systemctl disable --now kresd@1
 systemctl disable --now kresd@2
+systemctl disable --now kresd@3
 systemctl disable --now antizapret
 systemctl disable --now antizapret-update.timer
 systemctl disable --now antizapret-update
@@ -412,6 +413,7 @@ fi
 # Удаляем кэш Knot Resolver
 rm -rf /var/cache/knot-resolver/*
 rm -rf /var/cache/knot-resolver2/*
+rm -rf /var/cache/knot-resolver3/*
 
 # Удаляем старые файлы OpenVPN и WireGuard
 rm -rf /etc/openvpn/server/*
@@ -499,7 +501,7 @@ git clone --depth 1 https://github.com/GubernievS/AntiZapret-VPN.git /tmp/antiza
 # Сохраняем пользовательские настройки и обработчики custom*.sh
 cp /root/antizapret/config/*.txt /tmp/antizapret/setup/root/antizapret/config/ || true
 cp /root/antizapret/custom*.sh /tmp/antizapret/setup/root/antizapret/ || true
-cp /etc/knot-resolver/*.lua /tmp/antizapret/setup/etc/knot-resolver/ || true
+cp /etc/knot-resolver/custom*.lua /etc/knot-resolver/renumber*.lua /tmp/antizapret/setup/etc/knot-resolver/ || true
 
 # Восстанавливаем из бэкапа пользовательские настройки и обработчики custom*.sh, пользователей OpenVPN и WireGuard
 if [[ -e /root/backup*.tar.gz ]]; then
@@ -596,6 +598,7 @@ FAKE_IP=" > /tmp/antizapret/setup/root/antizapret/setup
 # Создаем папки для кэша Knot Resolver
 mkdir -p /var/cache/knot-resolver
 mkdir -p /var/cache/knot-resolver2
+mkdir -p /var/cache/knot-resolver3
 
 # Выставляем разрешения
 find /tmp/antizapret -type f -exec chmod 644 {} +
@@ -604,6 +607,7 @@ find /tmp/antizapret/setup/root/antizapret -type f -exec chmod +x {} +
 find /tmp/antizapret/setup/etc/openvpn/server/scripts -type f -exec chmod +x {} +
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver
 chown -R knot-resolver:knot-resolver /var/cache/knot-resolver2
+chown -R knot-resolver:knot-resolver /var/cache/knot-resolver3
 
 # Копируем нужное, удаляем не нужное
 rm -rf /root/antizapret
@@ -613,12 +617,12 @@ rm -rf /tmp/antizapret
 
 # Настраиваем DNS в AntiZapret VPN
 if [[ "$ANTIZAPRET_DNS" != '1' ]]; then
-	sed -i "s/local dns1 = 1/local dns1 = $ANTIZAPRET_DNS/" /etc/knot-resolver/kresd.conf
+	sed -i "s/local antizapret_dns = 1/local antizapret_dns = $ANTIZAPRET_DNS/" /etc/knot-resolver/kresd.conf
 fi
 
 # Настраиваем DNS в full VPN
 if [[ "$VPN_DNS" == '1' && "$ANTIZAPRET_DNS" != '1' ]]; then
-	sed -i "s/local dns2 = 2/local dns2 = $ANTIZAPRET_DNS/" /etc/knot-resolver/kresd.conf
+	sed -i "s/local vpn_dns = 2/local vpn_dns = $ANTIZAPRET_DNS/" /etc/knot-resolver/kresd.conf
 fi
 
 # Не используем альтернативный диапазон подменных IPv4-адресов
@@ -669,6 +673,7 @@ sed -i -z -E 's/policy\.DENY_MSG\([^)]*kres\.extended_error\.NOTSUP[^)]*\)/polic
 # Включим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
+systemctl enable kresd@3
 systemctl enable antizapret
 systemctl enable antizapret-update.timer
 systemctl enable antizapret-update

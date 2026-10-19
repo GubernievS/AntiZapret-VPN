@@ -58,12 +58,12 @@ if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WAR
 	if [[ -z "$ANTIZAPRET_WARP_PRIVATE_KEY" || -z "$ANTIZAPRET_WARP_PUBLIC_KEY" || -z "$ANTIZAPRET_WARP_ENDPOINT" || -z "$ANTIZAPRET_WARP_ADDRESS" ]]; then
 		ANTIZAPRET_WARP_PRIVATE_KEY=$(wg genkey)
 		KEY=$(echo "$ANTIZAPRET_WARP_PRIVATE_KEY" | wg pubkey)
-		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a$RANDOM/reg" \
 			-H 'Content-Type: application/json' \
 			-d "{\"key\": \"$KEY\"}")
 
 		ANTIZAPRET_WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
-		ANTIZAPRET_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+		ANTIZAPRET_WARP_ENDPOINT=$(echo "$REG" | jq -r '(.config.peers[0].endpoint.v4 // .config.peers[0].endpoint.host // .config.peers[0].endpoint) | sub(":0$"; ":2408")')
 		ANTIZAPRET_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
 	ANTIZAPRET_WARP_IP="${ANTIZAPRET_WARP_ADDRESS%%/*}"
@@ -117,12 +117,12 @@ if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
 	if [[ -z "$VPN_WARP_PRIVATE_KEY" || -z "$VPN_WARP_PUBLIC_KEY" || -z "$VPN_WARP_ENDPOINT" || -z "$VPN_WARP_ADDRESS" ]]; then
 		VPN_WARP_PRIVATE_KEY=$(wg genkey)
 		KEY=$(echo "$VPN_WARP_PRIVATE_KEY" | wg pubkey)
-		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a$RANDOM/reg" \
 			-H 'Content-Type: application/json' \
 			-d "{\"key\": \"$KEY\"}")
 
 		VPN_WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
-		VPN_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+		VPN_WARP_ENDPOINT=$(echo "$REG" | jq -r '(.config.peers[0].endpoint.v4 // .config.peers[0].endpoint.host // .config.peers[0].endpoint) | sub(":0$"; ":2408")')
 		VPN_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
 	VPN_WARP_IP="${VPN_WARP_ADDRESS%%/*}"
@@ -176,12 +176,12 @@ if [[ "$DNS_WARP" == '2' ]]; then
 	if [[ -z "$DNS_WARP_PRIVATE_KEY" || -z "$DNS_WARP_PUBLIC_KEY" || -z "$DNS_WARP_ENDPOINT" || -z "$DNS_WARP_ADDRESS" ]]; then
 		DNS_WARP_PRIVATE_KEY=$(wg genkey)
 		KEY=$(echo "$DNS_WARP_PRIVATE_KEY" | wg pubkey)
-		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a2158/reg" \
+		REG=$(curl -sSfL --connect-timeout 10 -X POST "https://api.cloudflareclient.com/v0a$RANDOM/reg" \
 			-H 'Content-Type: application/json' \
 			-d "{\"key\": \"$KEY\"}")
 
 		DNS_WARP_PUBLIC_KEY=$(echo "$REG" | jq -r '.config.peers[0].public_key')
-		DNS_WARP_ENDPOINT=$(echo "$REG" | jq -r '.config.peers[0].endpoint.host')
+		DNS_WARP_ENDPOINT=$(echo "$REG" | jq -r '(.config.peers[0].endpoint.v4 // .config.peers[0].endpoint.host // .config.peers[0].endpoint) | sub(":0$"; ":2408")')
 		DNS_WARP_ADDRESS="$(echo "$REG" | jq -r '.config.interface.addresses.v4')/32"
 	fi
 	DNS_WARP_IP="${DNS_WARP_ADDRESS%%/*}"
