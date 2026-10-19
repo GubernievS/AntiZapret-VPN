@@ -184,9 +184,9 @@ until [[ "$VPN_DNS" =~ ^[1-2]$ ]]; do
 	read -rp 'DNS choice [1-2]: ' -e -i 1 VPN_DNS
 done
 echo
-echo 'Use if selected DNS resolvers are blocked or unreachable from this server'
+echo 'Answer "y" if selected DNS resolvers are blocked or unreachable'
 until [[ "$DNS_WARP" =~ (y|n) ]]; do
-	read -rp $'Route all DNS outbound queries via Cloudflare WARP? [y/n]: ' -e -i n DNS_WARP
+	read -rp 'Route all DNS outbound queries via Cloudflare WARP? [y/n]: ' -e -i n DNS_WARP
 done
 echo
 until [[ "$ANTIZAPRET_ADBLOCK" =~ (y|n) ]]; do
