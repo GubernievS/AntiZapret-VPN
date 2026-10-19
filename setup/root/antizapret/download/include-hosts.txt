@@ -1280,6 +1280,7 @@ picks.my
 hevy.com
 hevyapp.com
 hevycoach.com
+harman.com
 
 # Сертификаты
 #letsencrypt.org
