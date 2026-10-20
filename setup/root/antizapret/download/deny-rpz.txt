@@ -181,9 +181,6 @@ tracker.token.ro CNAME .
 retracker.lanta-net.ru CNAME .
 tracker.tfile.co CNAME .
 
-ntc.party A 130.255.77.28
-*.ntc.party A 130.255.77.28
-
 tracker.openbittorrent.com A 52.223.13.41
 
 ; IP
