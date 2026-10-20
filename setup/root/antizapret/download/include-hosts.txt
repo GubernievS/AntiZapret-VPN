@@ -1281,6 +1281,7 @@ hevy.com
 hevyapp.com
 hevycoach.com
 harman.com
+chatterfy.ai
 
 # Сертификаты
 #letsencrypt.org
