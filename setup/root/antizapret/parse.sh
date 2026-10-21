@@ -332,7 +332,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/2 | grep -oE '[0-9]+' || echo 0)"
 		echo "VPN DNS cache cleared: $count entries"
 		count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/3 | grep -oE '[0-9]+' || echo 0)"
-		echo "Common DNS cache cleared: $count entries"
+		echo "Proxy DNS cache cleared: $count entries"
 	fi
 fi
 
