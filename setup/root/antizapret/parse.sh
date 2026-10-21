@@ -3,6 +3,10 @@ set -e
 export LC_ALL=C
 shopt -s nullglob
 
+###
+sed -i '/sndbuf\|rcvbuf/d' /etc/openvpn/server/*.conf
+###
+
 # Обработка ошибок
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
