@@ -1,4 +1,4 @@
--- IP address renumbering for AntiZapret VPN (blocked domains) and full VPN
+-- IP address renumbering for Proxy DNS
 return nil
 --return {
 --	{'A.B.C.D/M', 'X.Y.Z.W'},	-- Source subnet -> destination subnet

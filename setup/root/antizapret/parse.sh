@@ -205,7 +205,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		sleep 5
 	fi
 
-	# Создаем файл deny3.rpz для Knot Resolver (AntiZapret VPN (blocked domains) and full VPN)
+	# Создаем файл deny3.rpz для Knot Resolver (Proxy DNS)
 	echo -e '$TTL 86400\n@ SOA . . (1 1 1 1 86400)' > temp/deny3.rpz
 	sed 's/\r//g; /^;/d; /^$/d' download/*deny3-rpz.txt config/*deny3-rpz.txt >> temp/deny3.rpz
 	cp temp/deny3.rpz result/deny3.rpz
