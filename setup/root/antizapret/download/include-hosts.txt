@@ -1285,6 +1285,7 @@ chatterfy.ai
 context7.com
 lichtbild.com
 nousresearch.com
+agentskills.io
 
 # Сертификаты
 #letsencrypt.org
