@@ -1288,6 +1288,7 @@ nousresearch.com
 agentskills.io
 cleanyour.tv
 geekuninstaller.com
+transifex.com
 
 # Сертификаты
 #letsencrypt.org
