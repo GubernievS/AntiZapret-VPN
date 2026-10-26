@@ -91,23 +91,29 @@ echo 'OpenVPN + WireGuard + AmneziaWG'
 echo 'More details: https://github.com/GubernievS/AntiZapret-VPN'
 echo
 
-DEFAULT_MTU=$(< /sys/class/net/$DEFAULT_INTERFACE/mtu)
-MTU=$((DEFAULT_MTU - 80))
+echo 'Detecting path MTU via ping to Cloudflare WARP (engage.cloudflareclient.com)...'
+DEFAULT_MTU=1280
+for size in $(seq 1472 -1 1252); do
+	mtu=$((size + 28))
+	if ping -4 -n -M do -s "$size" -c 1 -W 1 engage.cloudflareclient.com >/dev/null 2>&1; then
+		DEFAULT_MTU=$mtu
+		break
+	fi
+done
+MTU=$((DEFAULT_MTU - 60))
 (( MTU > 1420 )) && MTU=1420
 (( MTU < 1280 )) && MTU=1280
 
 # Спрашиваем о настройках
-if (( DEFAULT_MTU < 1500 )); then
-	echo "Warning! MTU on $DEFAULT_INTERFACE is $DEFAULT_MTU"
-	echo "Recommended OpenVPN/WireGuard/WARP MTU is $MTU"
-fi
-read -rp 'OpenVPN/WireGuard MTU [1280-1420]: ' -e -i "$MTU" MTU
+echo "Detected path MTU: $DEFAULT_MTU"
+echo "Recommended OpenVPN/WireGuard/WARP path MTU is $MTU"
+read -rp 'OpenVPN/WireGuard path MTU [1280-1420]: ' -e -i "$MTU" MTU
 until [[ "$MTU" =~ ^[0-9]+$ ]] && (( MTU >= 1280 && MTU <= 1420 )); do
-	read -rp 'OpenVPN/WireGuard MTU [1280-1420]: ' -e -i "$MTU" MTU
+	read -rp 'OpenVPN/WireGuard path MTU [1280-1420]: ' -e -i "$MTU" MTU
 done
 echo
 until [[ "$WARP_MTU" =~ ^[0-9]+$ ]] && (( WARP_MTU >= 1280 && WARP_MTU <= 1420 )); do
-	read -rp 'Cloudflare WARP MTU [1280-1420]: ' -e -i "$MTU" WARP_MTU
+	read -rp 'Cloudflare WARP path MTU [1280-1420]: ' -e -i "$MTU" WARP_MTU
 done
 echo
 until [[ "$OPENVPN_UDP_ENABLE" =~ (y|n) ]]; do
