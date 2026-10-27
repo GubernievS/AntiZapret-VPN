@@ -84,7 +84,7 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 
 	# Создаем файл для OpenVPN и файлы маршрутов для роутеров
 	echo "push \"route $FAKE_IP.0.0 255.254.0.0\"" > result/DEFAULT
-	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute $IP.29.0.0 255.255.0.0\nroute $FAKE_IP.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
+	echo -e "route 0.0.0.0 128.0.0.0 net_gateway\nroute 128.0.0.0 128.0.0.0 net_gateway\nroute $IP.29.0.1 255.255.255.255\nroute $IP.29.16.1 255.255.255.255\nroute $FAKE_IP.0.0 255.254.0.0" > result/tp-link-openvpn-routes.txt
 	echo -e "route ADD DNS_IP_1 MASK 255.255.255.255 $IP.29.8.1\nroute ADD DNS_IP_2 MASK 255.255.255.255 $IP.29.8.1\nroute ADD $FAKE_IP.0.0 MASK 255.254.0.0 $IP.29.8.1" > result/keenetic-wireguard-routes.txt
 	echo "/ip route add dst-address=$FAKE_IP.0.0/15 gateway=$IP.29.8.1 distance=1 comment=\"antizapret-wireguard\"" > result/mikrotik-wireguard-routes.txt
 	while read -r cidr; do
