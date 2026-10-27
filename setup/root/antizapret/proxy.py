@@ -7,9 +7,9 @@ from dnslib import DNSRecord,RCODE,QTYPE,A
 from dnslib.server import DNSServer,DNSHandler,BaseResolver,DNSLogger,TCPServer
 
 class ProxyResolver(BaseResolver):
-    def __init__(self,dns,dns_port,dns_timeout,ip_range,ttl):
+    def __init__(self,dns,dns_port,dns_timeout,fake_ip,dns_ttl,expire):
         self._env=os.environ.copy()
-        self.ip_pool={str(x) for x in IPv4Network(ip_range).hosts()}
+        self.ip_pool={str(x) for x in IPv4Network(fake_ip).hosts()}
         self.ip_map={}
         # Loading existing fake IP mapping
         mapping=subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-S","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,env=self._env)
@@ -42,9 +42,8 @@ class ProxyResolver(BaseResolver):
         self.dns=dns
         self.dns_port=dns_port
         self.dns_timeout=dns_timeout
-        self.ttl=ttl
-        # Seconds of inactivity before fake IP is removed
-        self.expire=ttl * 2
+        self.dns_ttl=dns_ttl
+        self.expire=expire
         self.lock=threading.Lock()
         # Start thread for expire fake IP mapping
         threading.Thread(target=self.expire_mapping_worker,daemon=True).start()
@@ -139,7 +138,7 @@ class ProxyResolver(BaseResolver):
             if request.q.qtype==QTYPE.A:
                 now=time.time()
                 for record in reply.rr:
-                    record.ttl=self.ttl
+                    record.ttl=self.dns_ttl
                     if record.rtype!=QTYPE.A:
                         continue
                     real_ip=str(record.rdata)
@@ -157,12 +156,13 @@ class ProxyResolver(BaseResolver):
 
 if __name__=="__main__":
     p=argparse.ArgumentParser(description="DNS Proxy")
-    p.add_argument("--dns",default="127.3.3.3:53",help="Upstream DNS server:port (default:127.3.3.3:53)")
+    p.add_argument("--dns",default="127.3.3.3:53",help="Upstream DNS server:port (default: 127.3.3.3:53)")
     p.add_argument("--dns-timeout",type=float,default=5,help="Upstream DNS timeout (default: 5s)")
-    p.add_argument("--ip-range",default="198.18.0.0/15",help="Fake IP range (default:198.18.0.0/15)")
-    p.add_argument("--ttl",type=int,default=1800,help="TTL in seconds for A records (default: 1800)")
-    p.add_argument("--proxy",default="127.4.4.4:53",help="Local Fake IP proxy listen address:port (default:127.4.4.4:53)")
-    p.add_argument("--warp",default="127.5.5.5:53",help="Local WARP proxy listen address:port (default:127.5.5.5:53)")
+    p.add_argument("--fake-ip",default="198.18.0.0/15",help="Fake IP range (default: 198.18.0.0/15)")
+    p.add_argument("--dns-ttl",type=int,default=300,help="TTL in seconds for A records (default: 300)")
+    p.add_argument("--expire",type=int,default=3600,help="Seconds of inactivity before fake IP is removed (default: 3600)")
+    p.add_argument("--proxy",default="127.4.4.4:53",help="Local Fake IP proxy listen address:port (default: 127.4.4.4:53)")
+    p.add_argument("--warp",default="127.5.5.5:53",help="Local WARP proxy listen address:port (default: 127.5.5.5:53)")
     p.add_argument("--log",default="truncated,error",help="Log hooks to enable (default: +truncated,+error,-request,-reply,-recv,-send,-data)")
     p.add_argument("--log-prefix",action="store_true",default=False,help="Log prefix (timestamp/handler/resolver) (default: False)")
     args=p.parse_args()
@@ -174,7 +174,7 @@ if __name__=="__main__":
     args.warp_port=int(args.warp_port or 53)
     TCPServer.request_queue_size=128
     print("Starting...")
-    resolver=ProxyResolver(args.dns,args.dns_port,args.dns_timeout,args.ip_range,args.ttl)
+    resolver=ProxyResolver(args.dns,args.dns_port,args.dns_timeout,args.fake_ip,args.dns_ttl,args.expire)
     logger=DNSLogger(args.log,prefix=args.log_prefix)
     def start_server(address,port,tcp=False):
         server=DNSServer(resolver,port=port,address=address,tcp=tcp,logger=logger,handler=DNSHandler)
