@@ -111,23 +111,21 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 		cp -f result/ips /etc/wireguard/ips
 	fi
 
-	if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
-		# Обрабатываем конфигурационные файлы
-		sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u \
-		| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/forward-ips.txt
+	# Обрабатываем конфигурационные файлы
+	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*forward-ips.txt temp/route-ips.txt | sort -u \
+	| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/forward-ips.txt
 
-		# Выводим результат
-		echo "$(wc -l < result/forward-ips.txt) - forward-ips.txt"
+	# Выводим результат
+	echo "$(wc -l < result/forward-ips.txt) - forward-ips.txt"
 
-		# Обновляем ipset antizapret-forward
-		{
-			echo 'create antizapret-forward hash:net -exist'
-			echo 'flush antizapret-forward'
-			while read -r cidr; do
-				echo "add antizapret-forward $cidr -exist"
-			done < result/forward-ips.txt
-		} | ipset restore
-	fi
+	# Обновляем ipset antizapret-forward
+	{
+		echo 'create antizapret-forward hash:net -exist'
+		echo 'flush antizapret-forward'
+		while read -r cidr; do
+			echo "add antizapret-forward $cidr -exist"
+		done < result/forward-ips.txt
+	} | ipset restore
 
 	if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 		# Обрабатываем конфигурационные файлы
