@@ -6,6 +6,13 @@ if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrad
 	exit 2
 fi
 
+# Остановим фоновые обновления системы
+systemctl stop apt-daily.timer 2>/dev/null
+systemctl stop apt-daily-upgrade.timer 2>/dev/null
+systemctl stop apt-daily 2>/dev/null
+systemctl stop apt-daily-upgrade 2>/dev/null
+systemctl stop unattended-upgrades 2>/dev/null
+
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
 	echo 'Error: You need to run this as root!'
@@ -186,7 +193,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 # Удаляем переопределённые параметры ядра
-sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
 
 # Принудительная загрузка модуля nf_conntrack
 echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
