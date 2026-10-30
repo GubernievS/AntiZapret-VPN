@@ -177,6 +177,8 @@ dns.wlrus.cfd CNAME .
 *.dns.wlrus.cfd CNAME .
 free.shecan.ir CNAME .
 *.free.shecan.ir CNAME .
+dns.geodema.love CNAME .
+*.dns.geodema.love CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
