@@ -101,6 +101,8 @@ dns.comss.one CNAME .
 *.dns.comss.one CNAME .
 doh.comss.one CNAME .
 *.doh.comss.one CNAME .
+router.comss.one CNAME .
+*.router.comss.one CNAME .
 xbox-dns.ru CNAME .
 *.xbox-dns.ru CNAME .
 dns.malw.link CNAME .
@@ -161,6 +163,21 @@ dns.astracat.ru CNAME .
 *.dns.astracat.ru CNAME .
 dns.astracat.network CNAME .
 *.dns.astracat.network CNAME .
+dns.commonnet.work CNAME .
+*.dns.commonnet.work CNAME .
+dns.dagami.ru CNAME .
+*.dns.dagami.ru CNAME .
+dns.mafioznik.xyz CNAME .
+*.dns.mafioznik.xyz CNAME .
+dns.magicdns.ru CNAME .
+*.dns.magicdns.ru CNAME .
+dns.zapret.moe CNAME .
+*.dns.zapret.moe CNAME .
+dns.wlrus.cfd CNAME .
+*.dns.wlrus.cfd CNAME .
+free.shecan.ir CNAME .
+*.free.shecan.ir CNAME .
+
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
 
