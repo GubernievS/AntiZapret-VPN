@@ -249,35 +249,37 @@ if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 
-# Restrict forwarding
-if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
-	{
-		echo 'create antizapret-forward hash:net -exist'
-		echo 'flush antizapret-forward'
-		if [[ -f result/forward-ips.txt ]]; then
-			while read -r line; do
-				echo "add antizapret-forward $line"
-			done < result/forward-ips.txt
-		fi
-	} | ipset restore
-	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
-fi
-
 # Drop forwarding
 {
 	echo 'create antizapret-drop hash:net -exist'
 	echo 'flush antizapret-drop'
 	if [[ -f result/drop-ips.txt ]]; then
 		while read -r cidr; do
-			echo "add antizapret-drop $cidr"
+			echo "add antizapret-drop $cidr -exist"
 		done < result/drop-ips.txt
 	fi
 } | ipset restore
 iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 
+# Allow forwarding
+{
+	echo 'create antizapret-forward hash:net -exist'
+	echo 'flush antizapret-forward'
+	if [[ -f result/forward-ips.txt ]]; then
+		while read -r line; do
+			echo "add antizapret-forward $line -exist"
+		done < result/forward-ips.txt
+	fi
+} | ipset restore
+iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-forward dst -j ACCEPT
+
+# Restrict forwarding
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+
 # Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
-	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -d $IP.28.0.0/15 -j DROP
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 	iptables -w -I INPUT 3 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 fi
@@ -295,7 +297,7 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 		echo 'flush antizapret-allow'
 		if [[ -f result/allow-ips.txt ]]; then
 			while read -r line; do
-				echo "add antizapret-allow $line"
+				echo "add antizapret-allow $line -exist"
 			done < result/allow-ips.txt
 		fi
 	} | ipset restore
@@ -332,7 +334,7 @@ fi
 	echo 'flush antizapret-deny'
 	if [[ -f result/deny-ips.txt ]]; then
 		while read -r cidr; do
-			echo "add antizapret-deny $cidr"
+			echo "add antizapret-deny $cidr -exist"
 		done < result/deny-ips.txt
 	fi
 } | ipset restore
@@ -411,6 +413,10 @@ iptables -w -t nat -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPR
 # WARP
 iptables -w -t mangle -S ANTIZAPRET-WARP &>/dev/null || iptables -w -t mangle -N ANTIZAPRET-WARP
 iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
+
+# Block 127.0.0.0/8 from non-lo
+iptables -w -t raw -A PREROUTING ! -i lo -s 127.0.0.0/8 -j DROP
+
 if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
 		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE

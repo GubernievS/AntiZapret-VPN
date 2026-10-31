@@ -83,20 +83,23 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent pr
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'd1:ad2:id20:' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 
-# Restrict forwarding
-iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
-
 # Drop forwarding
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 
+# Allow forwarding
+iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-forward dst -j ACCEPT
+
+# Restrict forwarding
+iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+
 # Client and server isolation
-iptables -w -D FORWARD -s $IP.28.0.0/15 -d $IP.28.0.0/15 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 
 # SSH protection
 iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
 ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
+
 # Attack protection
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
@@ -180,6 +183,10 @@ iptables -w -t nat -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPR
 iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -j DROP
 iptables -w -t raw -D PREROUTING -s $IP.28.0.0/16 -j DROP
 iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
+
+# Block 127.0.0.0/8 from non-lo
+iptables -w -t raw -D PREROUTING ! -i lo -s 127.0.0.0/8 -j DROP
+
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE
