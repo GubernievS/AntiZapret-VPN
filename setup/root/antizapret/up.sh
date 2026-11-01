@@ -413,10 +413,6 @@ iptables -w -t nat -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPR
 # WARP
 iptables -w -t mangle -S ANTIZAPRET-WARP &>/dev/null || iptables -w -t mangle -N ANTIZAPRET-WARP
 iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
-
-# Block 127.0.0.0/8 from non-lo
-iptables -w -t raw -A PREROUTING ! -i lo -s 127.0.0.0/8 -j DROP
-
 if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
 		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
