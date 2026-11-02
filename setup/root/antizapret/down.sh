@@ -176,13 +176,15 @@ iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 853 -j DROP
 # Restrict forwarding
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 
-# Mapping fake IP to real IP
-iptables -w -t nat -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
+# Mapping fake IP to real IP / WARP
+nft flush chain ip antizapret mapping_hook
+nft delete chain ip antizapret mapping_hook
+nft flush chain ip antizapret warp_hook
+nft delete chain ip antizapret warp_hook
 
 # WARP
 iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -j DROP
 iptables -w -t raw -D PREROUTING -s $IP.28.0.0/16 -j DROP
-iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE

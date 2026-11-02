@@ -1,41 +1,35 @@
 #!/usr/bin/env -S python3 -u
 # -*- coding: utf-8 -*-
 
-import subprocess,time,argparse,threading,os
+import re,subprocess,time,argparse,threading,os
 from ipaddress import IPv4Network
 from dnslib import DNSRecord,RCODE,QTYPE,A
 from dnslib.server import DNSServer,DNSHandler,BaseResolver,DNSLogger,TCPServer
 
 class ProxyResolver(BaseResolver):
-    def __init__(self,dns,dns_port,dns_timeout,fake_ip,dns_ttl,expire):
+    def __init__(self,dns,dns_port,dns_timeout,fake_cidr,dns_ttl,expire):
         self._env=os.environ.copy()
-        self.ip_pool={str(x) for x in IPv4Network(fake_ip).hosts()}
+        self.ip_pool={str(x) for x in IPv4Network(fake_cidr).hosts()}
         self.ip_map={}
         # Loading existing fake IP mapping
-        mapping=subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-S","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,env=self._env)
+        mapping=subprocess.run(["/usr/sbin/nft","list","map","ip","antizapret","mapping"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,env=self._env)
         if mapping.returncode:
-            subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-N","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+            subprocess.run(["/usr/sbin/nft","add","table","ip","antizapret"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
+            subprocess.run(["/usr/sbin/nft","add","map","ip","antizapret","mapping","{","type","ipv4_addr",":","ipv4_addr",";","size","131072",";","}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
         warp_ips=set()
-        warp=subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-S","ANTIZAPRET-WARP"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,env=self._env)
+        warp=subprocess.run(["/usr/sbin/nft","list","set","ip","antizapret","warp"],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,env=self._env)
         if warp.returncode:
-            subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-N","ANTIZAPRET-WARP"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
-        for line in warp.stdout.splitlines():
-            parts=line.split()
-            if len(parts) < 8:
-                continue
-            warp_ips.add(parts[3].split("/")[0])
+            subprocess.run(["/usr/sbin/nft","add","table","ip","antizapret"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
+            subprocess.run(["/usr/sbin/nft","add","set","ip","antizapret","warp","{","type","ipv4_addr",";","size","131072",";","}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+        else:
+            warp_ips.update(re.findall(r"\d+\.\d+\.\d+\.\d+",warp.stdout))
         now=time.time()
-        for line in mapping.stdout.splitlines():
-            parts=line.split()
-            if len(parts) < 8:
-                continue
-            fake_ip=parts[3].split("/")[0]
-            real_ip=parts[7]
+        for fake_ip,real_ip in re.findall(r"(\d+\.\d+\.\d+\.\d+)\s*:\s*(\d+\.\d+\.\d+\.\d+)",mapping.stdout):
             if not self.mapping_ip(real_ip,fake_ip,now,fake_ip in warp_ips):
                 print("Restarting: Invalid loaded fake IP mapping")
                 try:
-                    subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-F","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
-                    subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-F","ANTIZAPRET-WARP"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+                    subprocess.run(["/usr/sbin/nft","flush","map","ip","antizapret","mapping"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+                    subprocess.run(["/usr/sbin/nft","flush","set","ip","antizapret","warp"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
                 finally:
                     os._exit(1)
         print(f"Loaded: {len(self.ip_map)} fake IPs")
@@ -61,16 +55,16 @@ class ProxyResolver(BaseResolver):
             self.ip_map[(real_ip,warp)]={"fake_ip": fake_ip,"used": now}
         try:
             if warp:
-                subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-A","ANTIZAPRET-WARP","-d",fake_ip,"-j","MARK","--set-mark","0x2"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
-            subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-A","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to-destination",real_ip],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+                subprocess.run(["/usr/sbin/nft","add","element","ip","antizapret","warp","{",fake_ip,"}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+            subprocess.run(["/usr/sbin/nft","add","element","ip","antizapret","mapping","{",fake_ip,":",real_ip,"}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
         except Exception as e:
             print(f"Error: {e} (real_ip={real_ip} fake_ip={fake_ip} warp={warp})")
             with self.lock:
                 del self.ip_map[(real_ip,warp)]
                 self.ip_pool.add(fake_ip)
             if warp:
-                subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-D","ANTIZAPRET-WARP","-d",fake_ip,"-j","MARK","--set-mark","0x2"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
-            subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-D","ANTIZAPRET-MAPPING","-d",fake_ip,"-j","DNAT","--to-destination",real_ip],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
+                subprocess.run(["/usr/sbin/nft","delete","element","ip","antizapret","warp","{",fake_ip,"}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
+            subprocess.run(["/usr/sbin/nft","delete","element","ip","antizapret","mapping","{",fake_ip,"}"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False,env=self._env)
             return None
         #print(f"Mapping: {fake_ip} to {real_ip} warp={warp}")
         return fake_ip
@@ -96,36 +90,34 @@ class ProxyResolver(BaseResolver):
                 print(f"Error: {e}")
                 print("Restarting: Expire fake IP mapping failed")
                 try:
-                    subprocess.run(["/usr/sbin/iptables","-w","-t","nat","-F","ANTIZAPRET-MAPPING"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
-                    subprocess.run(["/usr/sbin/iptables","-w","-t","mangle","-F","ANTIZAPRET-WARP"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+                    subprocess.run(["/usr/sbin/nft","flush","map","ip","antizapret","mapping"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+                    subprocess.run(["/usr/sbin/nft","flush","set","ip","antizapret","warp"],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
                 finally:
                     os._exit(2)
 
     def expire_mapping(self):
         with self.lock:
             now=time.time()
-            mapping=[]
-            mangle=["*mangle"]
-            nat=["*nat"]
+            expired=[]
+            warp_ips=[]
+            mapping_ips=[]
             for (real_ip,warp),entry in self.ip_map.items():
                 if now - entry["used"] > self.expire:
-                    mapping.append((real_ip,warp,entry["fake_ip"]))
-            for real_ip,warp,fake_ip in mapping:
+                    expired.append((real_ip,warp,entry["fake_ip"]))
+            for real_ip,warp,fake_ip in expired:
                 self.ip_pool.add(fake_ip)
                 del self.ip_map[(real_ip,warp)]
                 if warp:
-                    mangle.append(f"-D ANTIZAPRET-WARP -d {fake_ip} -j MARK --set-mark 0x2")
-                nat.append(f"-D ANTIZAPRET-MAPPING -d {fake_ip} -j DNAT --to-destination {real_ip}")
+                    warp_ips.append(fake_ip)
+                mapping_ips.append(fake_ip)
                 #print(f"Unmapping: {fake_ip} to {real_ip} warp={warp}")
-        if mapping:
+        if expired:
             rules=[]
-            if len(mangle) > 1:
-                rules.extend(mangle)
-                rules.append("COMMIT")
-            nat.append("COMMIT")
-            rules.extend(nat)
-            subprocess.run(["/usr/sbin/iptables-restore","-w","-n"],input="\n".join(rules).encode(),stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
-            print(f"Expired: {len(mapping)} fake IPs")
+            if warp_ips:
+                rules.append("delete element ip antizapret warp { "+", ".join(warp_ips)+" }")
+            rules.append("delete element ip antizapret mapping { "+", ".join(mapping_ips)+" }")
+            subprocess.run(["/usr/sbin/nft","-f","-"],input="\n".join(rules).encode(),stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True,env=self._env)
+            print(f"Expired: {len(expired)} fake IPs")
 
     def resolve(self,request,handler):
         warp=handler.server.warp
@@ -158,7 +150,7 @@ if __name__=="__main__":
     p=argparse.ArgumentParser(description="DNS Proxy")
     p.add_argument("--dns",default="127.3.3.3:53",help="Upstream DNS server:port (default: 127.3.3.3:53)")
     p.add_argument("--dns-timeout",type=float,default=5,help="Upstream DNS timeout (default: 5s)")
-    p.add_argument("--fake-ip",default="198.18.0.0/15",help="Fake IP range (default: 198.18.0.0/15)")
+    p.add_argument("--fake-cidr",default="198.18.0.0/15",help="Fake IP CIDR (default: 198.18.0.0/15)")
     p.add_argument("--dns-ttl",type=int,default=300,help="TTL in seconds for A records (default: 300)")
     p.add_argument("--expire",type=int,default=3600,help="Seconds of inactivity before fake IP is removed (default: 3600)")
     p.add_argument("--proxy",default="127.4.4.4:53",help="Local Fake IP proxy listen address:port (default: 127.4.4.4:53)")
@@ -174,7 +166,7 @@ if __name__=="__main__":
     args.warp_port=int(args.warp_port or 53)
     TCPServer.request_queue_size=128
     print("Starting...")
-    resolver=ProxyResolver(args.dns,args.dns_port,args.dns_timeout,args.fake_ip,args.dns_ttl,args.expire)
+    resolver=ProxyResolver(args.dns,args.dns_port,args.dns_timeout,args.fake_cidr,args.dns_ttl,args.expire)
     logger=DNSLogger(args.log,prefix=args.log_prefix)
     def start_server(address,port,tcp=False):
         server=DNSServer(resolver,port=port,address=address,tcp=tcp,logger=logger,handler=DNSHandler)

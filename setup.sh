@@ -105,8 +105,9 @@ MTU=$((DEFAULT_MTU - 60))
 (( MTU < 1280 )) && MTU=1280
 
 # Спрашиваем о настройках
-echo "Detected path MTU: $DEFAULT_MTU"
+echo "Detected server path MTU: $DEFAULT_MTU"
 echo "Recommended OpenVPN/WireGuard/WARP path MTU is $MTU"
+echo
 read -rp 'OpenVPN/WireGuard path MTU [1280-1420]: ' -e -i "$MTU" MTU
 until [[ "$MTU" =~ ^[0-9]+$ ]] && (( MTU >= 1280 && MTU <= 1420 )); do
 	read -rp 'OpenVPN/WireGuard path MTU [1280-1420]: ' -e -i "$MTU" MTU
@@ -434,7 +435,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 # Удаляем переопределённые параметры ядра
-sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
 
 # Принудительная загрузка модуля nf_conntrack
 echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
@@ -484,7 +485,7 @@ if [[ "$OS" == 'ubuntu' ]] && (( VERSION < 26 )); then
 elif [[ "$OS" == 'debian' ]] && (( VERSION < 14 )); then
 	INSTALL="-t $CODENAME-backports linux-image-$ARCH linux-headers-$ARCH"
 fi
-apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq iproute2
+apt-get install -y $INSTALL git openvpn iptables easy-rsa gawk knot-resolver idn sipcalc python3-pip wireguard diffutils socat lua-cqueues ipset irqbalance unattended-upgrades jq iproute2 nftables
 systemctl disable --now openvpn
 apt-get autoremove --purge -y
 apt-get clean
@@ -534,6 +535,8 @@ rm -rf /root/custom
 
 # Сохраняем настройки
 echo "SETUP_DATE=$(date --iso-8601=seconds)
+MTU=$MTU
+WARP_MTU=$WARP_MTU
 OPENVPN_UDP_ENABLE=$OPENVPN_UDP_ENABLE
 OPENVPN_TCP_ENABLE=$OPENVPN_TCP_ENABLE
 WIREGUARD_ENABLE=$WIREGUARD_ENABLE
@@ -586,10 +589,9 @@ DIGITALOCEAN_INCLUDE=$DIGITALOCEAN_INCLUDE
 OVH_INCLUDE=$OVH_INCLUDE
 GOOGLE_INCLUDE=$GOOGLE_INCLUDE
 AKAMAI_INCLUDE=$AKAMAI_INCLUDE
+RECONNECT_WARP=n
 CLEAR_HOSTS=y
 TXQUEUELEN=10000
-MTU=$MTU
-WARP_MTU=$WARP_MTU
 DEFAULT_INTERFACE=
 DEFAULT_IP=
 ANTIZAPRET_OUT_INTERFACE=

@@ -406,13 +406,16 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
 fi
 
-# Mapping fake IP to real IP
-iptables -w -t nat -S ANTIZAPRET-MAPPING &>/dev/null || iptables -w -t nat -N ANTIZAPRET-MAPPING
-iptables -w -t nat -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-MAPPING
+# Mapping fake IP to real IP / WARP
+nft add table ip antizapret
+nft list map ip antizapret mapping &>/dev/null || nft add map ip antizapret mapping '{ type ipv4_addr : ipv4_addr ; size 131072 ; }'
+nft list set ip antizapret warp &>/dev/null || nft add set ip antizapret warp '{ type ipv4_addr ; size 131072 ; }'
+nft add chain ip antizapret mapping_hook '{ type nat hook prerouting priority -50 ; policy accept ; }'
+nft add rule ip antizapret mapping_hook ip saddr $IP.28.0.0/15 ip daddr $FAKE_IP.0.0/15 dnat to ip daddr map @mapping
+nft add chain ip antizapret warp_hook '{ type filter hook prerouting priority -150 ; policy accept ; }'
+nft add rule ip antizapret warp_hook ip saddr $IP.28.0.0/15 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x2
 
 # WARP
-iptables -w -t mangle -S ANTIZAPRET-WARP &>/dev/null || iptables -w -t mangle -N ANTIZAPRET-WARP
-iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/15 -d $FAKE_IP.0.0/15 -j ANTIZAPRET-WARP
 if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
 		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
