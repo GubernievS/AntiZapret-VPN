@@ -179,6 +179,8 @@ free.shecan.ir CNAME .
 *.free.shecan.ir CNAME .
 dns.geodema.love CNAME .
 *.dns.geodema.love CNAME .
+d.webshiftvpn.ru CNAME .
+*.d.webshiftvpn.ru CNAME .
 
 dnsbl.manitu.net CNAME .
 *.dnsbl.manitu.net CNAME .
