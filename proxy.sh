@@ -1,4 +1,5 @@
 #!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
 
 # Проверка необходимости перезагрузить
 if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades &>/dev/null; then
@@ -228,12 +229,11 @@ echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-
 echo iptables-persistent iptables-persistent/autosave_v6 boolean false | debconf-set-selections
 
 # Обновляем систему и ставим необходимые пакеты
-export DEBIAN_FRONTEND=noninteractive
 apt-get clean
+dpkg --configure -a --force-confdef --force-confold
 apt-get update
-dpkg --configure -a
-apt-get install --fix-broken -y
-apt-get dist-upgrade -y --fix-missing
+apt-get install -f -y
+apt-get dist-upgrade -y --fix-missing -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold
 apt-get install -y iptables iptables-persistent irqbalance unattended-upgrades
 apt-get autoremove --purge -y
 apt-get clean

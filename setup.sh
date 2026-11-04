@@ -5,6 +5,7 @@
 # https://github.com/GubernievS/AntiZapret-VPN
 #
 export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
 
 # Проверка необходимости перезагрузить
 if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades &>/dev/null; then
@@ -61,10 +62,7 @@ find /var/log -name "*.gz" -delete
 find /var/log -name "*.1" -delete
 find /var/log -type f -exec truncate -s 0 {} +
 [[ -d /etc/openvpn/server/logs ]] && find /etc/openvpn/server/logs -type f -exec truncate -s 0 {} +
-dpkg --configure -a >/dev/null
-apt-get install -f -y >/dev/null
 apt-get clean >/dev/null
-apt-get autoremove --purge -y >/dev/null
 
 # Проверка свободного места (минимум 2Гб)
 if [[ $(df --output=avail / | tail -n 1) -lt $((2 * 1024 * 1024)) ]]; then
@@ -432,8 +430,10 @@ rm -rf /etc/openvpn/client/*
 rm -rf /etc/wireguard/templates/*
 
 # Удаляем скомпилированный патченный OpenVPN
-make -C /usr/local/src/openvpn uninstall
-rm -rf /usr/local/src/openvpn
+if [[ -d /usr/local/src/openvpn ]]; then
+	make -C /usr/local/src/openvpn uninstall || true
+	rm -rf /usr/local/src/openvpn
+fi
 
 # Отключим IPv6
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
@@ -461,9 +461,10 @@ trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
 rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
 rm -rf /etc/apt/sources.list.d/backports.list
-export DEBIAN_FRONTEND=noninteractive
+dpkg --configure -a --force-confdef --force-confold
 apt-get update
-apt-get dist-upgrade -y --fix-missing
+apt-get install -f -y
+apt-get dist-upgrade -y --fix-missing -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold
 apt-get install -y curl gpg
 
 # Папка для ключей
