@@ -421,6 +421,7 @@ dpkg -s ftp &>/dev/null && apt-get purge -y ftp
 dpkg -s tnftp &>/dev/null && apt-get purge -y tnftp
 dpkg -s lxd-installer &>/dev/null && apt-get purge -y lxd-installer
 dpkg -s lxd-agent-loader &>/dev/null && apt-get purge -y lxd-agent-loader
+dpkg -s openvpn-dco-dkms &>/dev/null && apt-get purge -y openvpn-dco-dkms
 #dpkg -s pastebinit &>/dev/null && apt-get purge -y pastebinit
 
 # Отключим ненужные службы
