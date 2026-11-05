@@ -9,10 +9,10 @@ export LC_ALL=C
 
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	echo -e "\e[1;31mError at line $2: $3 (exit code $1)\e[0m"
 	exit 1
 }
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+trap 'handle_error $? $LINENO "$BASH_COMMAND"' ERR
 
 VERSION="$(openvpn --version | head -n 1 | awk '{print $2}')"
 if [[ ! "$VERSION" =~ ^2\.7 ]]; then

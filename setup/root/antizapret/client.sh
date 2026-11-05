@@ -12,10 +12,10 @@ shopt -s nullglob
 
 handle_error() {
 	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	echo -e "\e[1;31mError at line $2: $3 (exit code $1)\e[0m"
 	exit 1
 }
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+trap 'handle_error $? $LINENO "$BASH_COMMAND"' ERR
 
 if (( $# > 3 )); then
 	echo 'Too many parameters! Usage: ./client.sh [1-9] [client_name] [cert_expire_days]'
@@ -139,7 +139,7 @@ addOpenVPN(){
 	render "/etc/openvpn/client/templates/vpn-tcp.conf" > "/root/antizapret/client/openvpn/vpn-tcp/vpn-$FILE_NAME-tcp.ovpn"
 	render "/etc/openvpn/client/templates/vpn.conf" > "/root/antizapret/client/openvpn/vpn/vpn-$FILE_NAME.ovpn"
 
-	echo "OpenVPN profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/openvpn"
+	echo "OpenVPN profile files created for client '$CLIENT_NAME' at /root/antizapret/client/openvpn"
 }
 
 deleteOpenVPN(){
@@ -268,7 +268,7 @@ AllowedIPs = ${CLIENT_IP}/32
 	render "/etc/wireguard/templates/vpn-client-wg.conf" > "/root/antizapret/client/wireguard/vpn/vpn-$FILE_NAME-wg.conf"
 	render "/etc/wireguard/templates/vpn-client-am.conf" > "/root/antizapret/client/amneziawg/vpn/vpn-$FILE_NAME-am.conf"
 
-	echo "WireGuard/AmneziaWG profile files (re)created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
+	echo "WireGuard/AmneziaWG profile files created for client '$CLIENT_NAME' at /root/antizapret/client/wireguard and /root/antizapret/client/amneziawg"
 	echo
 	echo 'Attention! If import fails, shorten profile filename to 32 chars (Windows) or 15 (Linux/Android/iOS), remove parentheses'
 }
@@ -317,9 +317,9 @@ recreate(){
 		ls /etc/openvpn/easyrsa3/pki/issued | sed 's/\.crt$//' | grep -v "^antizapret-server$" | sort | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addOpenVPN >/dev/null
-				echo "OpenVPN profile files recreated for client '$CLIENT_NAME'"
+				echo "OpenVPN profile files created for client '$CLIENT_NAME'"
 			else
-				echo "OpenVPN client name '$CLIENT_NAME' is invalid! No profile files recreated"
+				echo "OpenVPN client name '$CLIENT_NAME' is invalid! No profile files created"
 			fi
 		done
 	else
@@ -335,9 +335,9 @@ recreate(){
 		grep -hE "^# Client" /etc/wireguard/antizapret.conf /etc/wireguard/vpn.conf | cut -d '=' -f 2 | sed 's/ //g' | sort -u | while read -r CLIENT_NAME; do
 			if [[ "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]{1,32}$ ]]; then
 				addWireGuard >/dev/null
-				echo "WireGuard/AmneziaWG profile files recreated for client '$CLIENT_NAME'"
+				echo "WireGuard/AmneziaWG profile files created for client '$CLIENT_NAME'"
 			else
-				echo "WireGuard/AmneziaWG client name '$CLIENT_NAME' is invalid! No profile files recreated"
+				echo "WireGuard/AmneziaWG client name '$CLIENT_NAME' is invalid! No profile files created"
 			fi
 		done
 	else
@@ -371,7 +371,7 @@ backup(){
 
 	rm -rf /root/antizapret/backup
 
-	echo "Backup configuration and clients (re)created at $BACKUP_FILE"
+	echo "Configuration and client files backed up to $BACKUP_FILE"
 }
 
 restore(){
@@ -414,7 +414,7 @@ restore(){
 	initOpenVPN
 	recreate
 
-	echo "Configuration and clients restored from backup"
+	echo "Configuration and client files restored from backup"
 	reboot
 }
 
@@ -427,9 +427,9 @@ if ! [[ "$OPTION" =~ ^[1-9]$ ]]; then
 	echo '    4) WireGuard/AmneziaWG - Add client'
 	echo '    5) WireGuard/AmneziaWG - Delete client'
 	echo '    6) WireGuard/AmneziaWG - List clients'
-	echo '    7) (Re)create client profile files'
-	echo '    8) Backup configuration and clients'
-	echo '    9) Restore configuration and clients from backup'
+	echo '    7) Recreate client profile files'
+	echo '    8) Backup configuration and client files'
+	echo '    9) Restore configuration and client files from backup'
 	until [[ "$OPTION" =~ ^[1-9]$ ]]; do
 		read -rp 'Option choice [1-9]: ' -e OPTION
 	done
@@ -469,15 +469,15 @@ case "$OPTION" in
 		listWireGuard
 		;;
 	7)
-		echo '(Re)create client profile files'
+		echo 'Recreate client profile files'
 		recreate
 		;;
 	8)
-		echo 'Backup configuration and clients'
+		echo 'Backup configuration and client files'
 		backup
 		;;
 	9)
-		echo 'Restore configuration and clients from backup'
+		echo 'Restore configuration and client files from backup'
 		restore
 		;;
 esac
