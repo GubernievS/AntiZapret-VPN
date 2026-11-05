@@ -122,6 +122,11 @@ done
 echo
 echo 'Installation, please wait...'
 
+# Починим сломанные пакеты
+dpkg --configure -a --force-confdef --force-confold
+apt-get update
+apt-get install -f -y
+
 # Удалим ненужные службы
 dpkg -s ufw &>/dev/null && apt-get purge -y ufw
 dpkg -s firewalld &>/dev/null && apt-get purge -y firewalld
@@ -207,12 +212,6 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
-# Удаляем переопределённые параметры ядра
-[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
-
-# Принудительная загрузка модуля nf_conntrack
-echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
-
 # Завершим выполнение скрипта при ошибке
 set -e
 
@@ -223,6 +222,12 @@ handle_error() {
 	exit 1
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
+# Удаляем переопределённые параметры ядра
+[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+
+# Принудительная загрузка модуля nf_conntrack
+echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
 
 # Автоматически сохраним правила iptables
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections

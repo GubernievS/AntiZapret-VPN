@@ -339,6 +339,14 @@ systemctl disable --now openvpn-server@vpn-tcp
 systemctl disable --now wg-quick@antizapret
 systemctl disable --now wg-quick@vpn
 
+# Починим сломанные пакеты
+rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
+rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
+rm -rf /etc/apt/sources.list.d/backports.list
+dpkg --configure -a --force-confdef --force-confold
+apt-get update
+apt-get install -f -y
+
 # Удалим ненужные службы
 dpkg -s ufw &>/dev/null && apt-get purge -y ufw
 dpkg -s firewalld &>/dev/null && apt-get purge -y firewalld
@@ -431,7 +439,7 @@ rm -rf /etc/wireguard/templates/*
 
 # Удаляем скомпилированный патченный OpenVPN
 if [[ -d /usr/local/src/openvpn ]]; then
-	make -C /usr/local/src/openvpn uninstall || true
+	make -C /usr/local/src/openvpn uninstall
 	rm -rf /usr/local/src/openvpn
 fi
 
@@ -439,12 +447,6 @@ fi
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-
-# Удаляем переопределённые параметры ядра
-[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
-
-# Принудительная загрузка модуля nf_conntrack
-echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
 
 # Завершим выполнение скрипта при ошибке
 set -e
@@ -457,10 +459,13 @@ handle_error() {
 }
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+# Удаляем переопределённые параметры ядра
+[[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
+
+# Принудительная загрузка модуля nf_conntrack
+echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
+
 # Обновляем систему
-rm -rf /etc/apt/sources.list.d/cznic-labs-knot-resolver.list
-rm -rf /etc/apt/sources.list.d/openvpn-aptrepo.list
-rm -rf /etc/apt/sources.list.d/backports.list
 dpkg --configure -a --force-confdef --force-confold
 apt-get update
 apt-get install -f -y
