@@ -1,6 +1,17 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
+# Завершим выполнение скрипта при ошибке
+set -e
+
+# Обработка ошибок
+handle_error() {
+	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
+	echo -e "\e[1;31mError at line $1: $2\e[0m"
+	exit 1
+}
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+
 # Проверка необходимости перезагрузить
 if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrades &>/dev/null; then
 	echo 'Error: You need to reboot this server before installation!'
@@ -8,11 +19,11 @@ if [[ -f /var/run/reboot-required ]] || pidof apt apt-get dpkg unattended-upgrad
 fi
 
 # Остановим фоновые обновления системы
-systemctl stop apt-daily.timer 2>/dev/null
-systemctl stop apt-daily-upgrade.timer 2>/dev/null
-systemctl stop apt-daily 2>/dev/null
-systemctl stop apt-daily-upgrade 2>/dev/null
-systemctl stop unattended-upgrades 2>/dev/null
+systemctl stop apt-daily.timer 2>/dev/null || true
+systemctl stop apt-daily-upgrade.timer 2>/dev/null || true
+systemctl stop apt-daily 2>/dev/null || true
+systemctl stop apt-daily-upgrade 2>/dev/null || true
+systemctl stop unattended-upgrades 2>/dev/null || true
 
 # Проверка прав root
 if [[ "$EUID" -ne 0 ]]; then
@@ -47,13 +58,13 @@ else
 	exit 7
 fi
 
-DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')"
+DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')" || true
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	echo 'Default network interface not found!'
 	exit 8
 fi
 
-DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
+DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')" || true
 if [[ -z "$DEFAULT_IP" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 9
@@ -193,11 +204,11 @@ dpkg -s lxd-agent-loader &>/dev/null && apt-get purge -y lxd-agent-loader
 #dpkg -s pastebinit &>/dev/null && apt-get purge -y pastebinit
 
 # Отключим ненужные службы
-systemctl disable --now ifupdown-wait-online
-systemctl disable --now setvtrgb
-systemctl disable --now e2scrub_reap
-systemctl disable --now systemd-pstore
-systemctl disable --now motd-news.timer
+systemctl disable --now ifupdown-wait-online || true
+systemctl disable --now setvtrgb || true
+systemctl disable --now e2scrub_reap || true
+systemctl disable --now systemd-pstore || true
+systemctl disable --now motd-news.timer || true
 #systemctl disable --now networkd-dispatcher
 #systemctl disable --now secureboot-db
 
@@ -208,20 +219,9 @@ if [[ "$SSH_PROTECTION" == 'y' ]]; then
 fi
 
 # Отключим IPv6
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
-sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-
-# Завершим выполнение скрипта при ошибке
-set -e
-
-# Обработка ошибок
-handle_error() {
-	echo "$(lsb_release -ds) $(uname -r) $(date --iso-8601=seconds)"
-	echo -e "\e[1;31mError at line $1: $2\e[0m"
-	exit 1
-}
-trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 || true
+sysctl -w net.ipv6.conf.default.disable_ipv6=1 || true
+sysctl -w net.ipv6.conf.lo.disable_ipv6=1 || true
 
 # Удаляем переопределённые параметры ядра
 [[ -f /etc/sysctl.conf ]] && sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
