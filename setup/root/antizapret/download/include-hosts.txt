@@ -1236,7 +1236,7 @@ studiolab.sagemaker.aws
 cerebras.ai
 fresha.com
 stream.voidboost.one
-github.io
+#github.io
 #massgrave.dev
 lexmark.com
 dreammods.net
@@ -1291,6 +1291,7 @@ geekuninstaller.com
 transifex.com
 diabrowser.com
 flixcdn.com
+cdn.form.io
 
 # Сертификаты
 #letsencrypt.org
