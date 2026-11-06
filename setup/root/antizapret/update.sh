@@ -55,8 +55,8 @@ EXCLUDE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/m
 EXCLUDE_RU_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/exclude-ru-hosts.txt
 EXCLUDE_HOSTS_PATH=download/exclude-hosts.txt
 
-REMOVE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/remove-hosts.txt.gz
-REMOVE_HOSTS_PATH=download/remove-hosts.txt.gz
+REMOVE_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/remove-hosts.txt
+REMOVE_HOSTS_PATH=download/remove-hosts.txt
 
 INCLUDE_ADBLOCK_HOSTS_LINK=https://raw.githubusercontent.com/GubernievS/AntiZapret-VPN/main/setup/root/antizapret/download/include-adblock-hosts.txt
 INCLUDE_ADBLOCK_HOSTS_PATH=download/include-adblock-hosts.txt
