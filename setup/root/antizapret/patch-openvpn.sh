@@ -35,8 +35,10 @@ if [[ "$ALGORITHM" == '1' ]]; then
 	if [[ -d /usr/local/src/openvpn ]]; then
 		make -C /usr/local/src/openvpn uninstall || true
 		rm -rf /usr/local/src/openvpn
+		dpkg --configure -a --force-confdef --force-confold
 		apt-get update
-		apt-get dist-upgrade -y --fix-missing
+		apt-get install -f -y
+		apt-get dist-upgrade -y --fix-missing -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold
 		apt-get install -y openvpn
 		apt-get autoremove --purge -y
 		apt-get clean
@@ -61,8 +63,10 @@ fi
 
 make -C /usr/local/src/openvpn uninstall || true
 rm -rf /usr/local/src/openvpn
+dpkg --configure -a --force-confdef --force-confold
 apt-get update
-apt-get dist-upgrade -y --fix-missing
+apt-get install -f -y
+apt-get dist-upgrade -y --fix-missing -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold
 apt-get install -y openvpn curl tar build-essential pkg-config libssl-dev libsystemd-dev libnl-genl-3-dev libcap-ng-dev
 apt-get autoremove --purge -y
 apt-get clean
