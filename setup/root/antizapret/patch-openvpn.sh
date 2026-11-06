@@ -61,8 +61,10 @@ else
 	PATCH_MODE='		_Bool error_free = 1;'
 fi
 
-make -C /usr/local/src/openvpn uninstall || true
-rm -rf /usr/local/src/openvpn
+if [[ -d /usr/local/src/openvpn ]]; then
+	make -C /usr/local/src/openvpn uninstall || true
+	rm -rf /usr/local/src/openvpn
+fi
 dpkg --configure -a --force-confdef --force-confold
 apt-get update
 apt-get install -f -y
