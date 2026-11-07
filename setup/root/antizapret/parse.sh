@@ -330,7 +330,8 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	fi
 fi
 
-if [[ "$RECONNECT_WARP" == 'y' ]]; then
+# Переподключим WARP если аптайм сервера больше 60 секунд
+if [[ "$RECONNECT_WARP" == 'y' && $(cut -d. -f1 /proc/uptime) -gt 60 ]]; then
 	# WARP AntiZapret
 	ANTIZAPRET_WARP_INTERFACE=warp-antizapret
 	ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
