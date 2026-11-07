@@ -179,6 +179,7 @@ if __name__=="__main__":
     udp_warp=start_server(args.warp,args.warp_port)
     tcp_warp=start_server(args.warp,args.warp_port,tcp=True)
     print(f"Started WARP resolver: {args.warp}:{args.warp_port} -> {args.dns}:{args.dns_port}")
+    print("Started proxy resolver")
     while all(s.thread.is_alive() for s in (udp_server,tcp_server,udp_warp,tcp_warp)):
         time.sleep(1)
     print("Restarting: A server thread died")
