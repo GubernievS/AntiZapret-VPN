@@ -5,18 +5,27 @@ cd /root/antizapret
 
 source setup
 
+# Out IP protection (before DEFAULT_IP fill / WARP overrides)
+iptables -w -D INPUT -d $ANTIZAPRET_OUT_IP -m conntrack --ctstate NEW -j DROP
+iptables -w -D INPUT -d $VPN_OUT_IP -m conntrack --ctstate NEW -j DROP
+
 if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	DEFAULT_INTERFACE="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'dev \K\S+')"
 	if [[ -z "$DEFAULT_INTERFACE" ]]; then
 		echo 'Default network interface not found!'
 		exit 1
 	fi
+fi
+if [[ -z "$DEFAULT_IP" ]]; then
 	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 	if [[ -z "$DEFAULT_IP" ]]; then
 		echo 'Default IPv4 address not found!'
 		exit 2
 	fi
 fi
+
+# Cleanup leftover Out IP DROP from buggy runs that filled DEFAULT_IP too early
+iptables -w -D INPUT -d $DEFAULT_IP -m conntrack --ctstate NEW -j DROP
 
 if [[ -z "$ANTIZAPRET_OUT_INTERFACE" ]]; then
 	ANTIZAPRET_OUT_INTERFACE=$DEFAULT_INTERFACE
@@ -34,10 +43,6 @@ fi
 
 [[ "$ALTERNATIVE_CLIENT_IP" == 'y' ]] && IP="${CLIENT_IP:-172}" || IP=10
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
-
-# Out IP protection (before WARP overrides OUT_IP)
-iptables -w -D INPUT -d $ANTIZAPRET_OUT_IP -m conntrack --ctstate NEW -j DROP
-iptables -w -D INPUT -d $VPN_OUT_IP -m conntrack --ctstate NEW -j DROP
 
 # WARP AntiZapret
 ANTIZAPRET_WARP_INTERFACE=warp-antizapret
