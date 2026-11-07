@@ -261,6 +261,11 @@ until [[ "$SCAN_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable network scan protection? [y/n]: ' -e -i y SCAN_PROTECTION
 done
 echo
+echo 'Warning! Flood protection limits new connections and DNS queries per VPN client!'
+until [[ "$FLOOD_PROTECTION" =~ (y|n) ]]; do
+	read -rp 'Enable VPN client flood protection? [y/n]: ' -e -i y FLOOD_PROTECTION
+done
+echo
 echo 'Warning! Torrent guard blocks VPN traffic for 1 minute on torrent detection!'
 until [[ "$TORRENT_GUARD" =~ (y|n) ]]; do
 	read -rp $'Enable torrent guard for \001\e[1;32m\002full VPN\001\e[0m\002? [y/n]: ' -e -i y TORRENT_GUARD
@@ -284,6 +289,14 @@ while read -rp 'Enter valid domain name for this WireGuard/AmneziaWG server or p
 do
 	[[ -z "$WIREGUARD_HOST" ]] && break
 	[[ -n $(getent ahostsv4 "$WIREGUARD_HOST") ]] && break
+done
+echo
+until [[ "$RECONNECT_WARP" =~ (y|n) ]]; do
+	read -rp 'Reconnect all WARP connections after parse.sh/doall.sh and every night? [y/n]: ' -e -i y RECONNECT_WARP
+done
+echo
+until [[ "$CLEAR_HOSTS" =~ (y|n) ]]; do
+	read -rp $'Remove spam domains (casino, bookmaker, etc) from \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y CLEAR_HOSTS
 done
 echo
 until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
@@ -585,11 +598,14 @@ OPENVPN_LOG=$OPENVPN_LOG
 SSH_PROTECTION=$SSH_PROTECTION
 ATTACK_PROTECTION=$ATTACK_PROTECTION
 SCAN_PROTECTION=$SCAN_PROTECTION
+FLOOD_PROTECTION=$FLOOD_PROTECTION
 TORRENT_GUARD=$TORRENT_GUARD
 RESTRICT_FORWARD=$RESTRICT_FORWARD
 CLIENT_ISOLATION=$CLIENT_ISOLATION
 OPENVPN_HOST=$OPENVPN_HOST
 WIREGUARD_HOST=$WIREGUARD_HOST
+RECONNECT_WARP=$RECONNECT_WARP
+CLEAR_HOSTS=$CLEAR_HOSTS
 ROUTE_ALL=$ROUTE_ALL
 DISCORD_INCLUDE=$DISCORD_INCLUDE
 CLOUDFLARE_INCLUDE=$CLOUDFLARE_INCLUDE
@@ -602,8 +618,6 @@ DIGITALOCEAN_INCLUDE=$DIGITALOCEAN_INCLUDE
 OVH_INCLUDE=$OVH_INCLUDE
 GOOGLE_INCLUDE=$GOOGLE_INCLUDE
 AKAMAI_INCLUDE=$AKAMAI_INCLUDE
-RECONNECT_WARP=y
-CLEAR_HOSTS=y
 TXQUEUELEN=10000
 DEFAULT_INTERFACE=
 DEFAULT_IP=
