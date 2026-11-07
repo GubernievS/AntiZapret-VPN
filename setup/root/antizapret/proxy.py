@@ -147,7 +147,7 @@ class ProxyResolver(BaseResolver):
         return reply
 
 if __name__=="__main__":
-    p=argparse.ArgumentParser(description="DNS Proxy")
+    p=argparse.ArgumentParser(description="Proxy resolver")
     p.add_argument("--dns",default="127.3.3.3:53",help="Upstream DNS server:port (default: 127.3.3.3:53)")
     p.add_argument("--dns-timeout",type=float,default=5,help="Upstream DNS timeout (default: 5s)")
     p.add_argument("--fake-cidr",default="198.18.0.0/15",help="Fake IP CIDR (default: 198.18.0.0/15)")
@@ -165,7 +165,7 @@ if __name__=="__main__":
     args.warp,_,args.warp_port=args.warp.partition(":")
     args.warp_port=int(args.warp_port or 53)
     TCPServer.request_queue_size=128
-    print("Starting...")
+    print("Starting proxy resolver...")
     resolver=ProxyResolver(args.dns,args.dns_port,args.dns_timeout,args.fake_cidr,args.dns_ttl,args.expire)
     logger=DNSLogger(args.log,prefix=args.log_prefix)
     def start_server(address,port,tcp=False):
@@ -175,10 +175,10 @@ if __name__=="__main__":
         return server
     udp_server=start_server(args.proxy,args.proxy_port)
     tcp_server=start_server(args.proxy,args.proxy_port,tcp=True)
-    print(f"Started proxy resolver {args.proxy}:{args.proxy_port} -> {args.dns}:{args.dns_port}")
+    print(f"Started AntiZapret resolver: {args.proxy}:{args.proxy_port} -> {args.dns}:{args.dns_port}")
     udp_warp=start_server(args.warp,args.warp_port)
     tcp_warp=start_server(args.warp,args.warp_port,tcp=True)
-    print(f"Started WARP resolver {args.warp}:{args.warp_port} -> {args.dns}:{args.dns_port}")
+    print(f"Started WARP resolver: {args.warp}:{args.warp_port} -> {args.dns}:{args.dns_port}")
     while all(s.thread.is_alive() for s in (udp_server,tcp_server,udp_warp,tcp_warp)):
         time.sleep(1)
     print("Restarting: A server thread died")
