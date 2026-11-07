@@ -211232,7 +211232,6 @@ cdn4.video.az
 cdn6.video.az
 cdn7.video.az
 cdn8.video.az
-cdninstagram.com
 cdnmves.wd-bags.fr
 cdntaxitoday.ru
 cdnz.one
