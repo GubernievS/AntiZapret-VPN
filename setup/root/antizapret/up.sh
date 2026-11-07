@@ -8,7 +8,7 @@ cd /root/antizapret
 
 source setup
 
-# Out IP protection (only if explicitly set in setup — before DEFAULT_IP fill)
+# Out IP protection
 if [[ -n "$ANTIZAPRET_OUT_IP" ]]; then
 	iptables -w -I INPUT 1 -d $ANTIZAPRET_OUT_IP -m conntrack --ctstate NEW -j DROP
 fi
@@ -22,6 +22,8 @@ if [[ -z "$DEFAULT_INTERFACE" ]]; then
 		echo 'Default network interface not found!'
 		exit 1
 	fi
+fi
+if [[ -z "$DEFAULT_IP" ]]; then
 	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
 	if [[ -z "$DEFAULT_IP" ]]; then
 		echo 'Default IPv4 address not found!'

@@ -5,7 +5,7 @@ cd /root/antizapret
 
 source setup
 
-# Out IP protection (before DEFAULT_IP fill / WARP overrides)
+# Out IP protection
 iptables -w -D INPUT -d $ANTIZAPRET_OUT_IP -m conntrack --ctstate NEW -j DROP
 iptables -w -D INPUT -d $VPN_OUT_IP -m conntrack --ctstate NEW -j DROP
 
@@ -23,9 +23,6 @@ if [[ -z "$DEFAULT_IP" ]]; then
 		exit 2
 	fi
 fi
-
-# Cleanup leftover Out IP DROP from buggy runs that filled DEFAULT_IP too early
-iptables -w -D INPUT -d $DEFAULT_IP -m conntrack --ctstate NEW -j DROP
 
 if [[ -z "$ANTIZAPRET_OUT_INTERFACE" ]]; then
 	ANTIZAPRET_OUT_INTERFACE=$DEFAULT_INTERFACE
