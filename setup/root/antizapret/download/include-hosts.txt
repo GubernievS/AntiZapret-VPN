@@ -1292,6 +1292,7 @@ transifex.com
 diabrowser.com
 flixcdn.com
 cdn.form.io
+kleinanzeigen.de
 
 # Сертификаты
 #letsencrypt.org
