@@ -712,7 +712,7 @@ gql.twitch.tv
 live.chat.eveonline.com
 #labs.google
 squarecdn.com
-xgpuweb.gssv-play-prod.xboxlive.com
+gssv-play-prod.xboxlive.com
 auth.xboxlive.com
 swarovski.com
 weekday.com
