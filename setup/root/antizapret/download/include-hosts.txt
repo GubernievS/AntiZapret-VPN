@@ -1294,6 +1294,7 @@ flixcdn.com
 cdn.form.io
 kleinanzeigen.de
 mouser.de
+ntc.party
 
 # Сертификаты
 #letsencrypt.org
