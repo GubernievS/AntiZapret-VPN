@@ -12,4 +12,6 @@ stun.conversations.im
 stun.ui.com
 stun.pubnub.com
 cloudflare.com
+openai.com
+chatgpt.com
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
