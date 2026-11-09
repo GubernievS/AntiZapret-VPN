@@ -294,6 +294,10 @@ until [[ "$RECONNECT_WARP" =~ (y|n) ]]; do
 	read -rp 'Reconnect all WARP connections after parse.sh/doall.sh and every night? [y/n]: ' -e -i y RECONNECT_WARP
 done
 echo
+until [[ "$CLEAR_DNS_CACHE" =~ (y|n) ]]; do
+	read -rp 'Clear Knot Resolver DNS cache after parse.sh/doall.sh and every night? [y/n]: ' -e -i y CLEAR_DNS_CACHE
+done
+echo
 until [[ "$CLEAR_HOSTS" =~ (y|n) ]]; do
 	read -rp $'Remove spam domains (casino, bookmaker, etc) from \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y CLEAR_HOSTS
 done
@@ -604,6 +608,7 @@ CLIENT_ISOLATION=$CLIENT_ISOLATION
 OPENVPN_HOST=$OPENVPN_HOST
 WIREGUARD_HOST=$WIREGUARD_HOST
 RECONNECT_WARP=$RECONNECT_WARP
+CLEAR_DNS_CACHE=$CLEAR_DNS_CACHE
 CLEAR_HOSTS=$CLEAR_HOSTS
 ROUTE_ALL=$ROUTE_ALL
 DISCORD_INCLUDE=$DISCORD_INCLUDE
@@ -695,7 +700,7 @@ sed -i '/function policy\.PASS(state, _)/,/^end$/s/return state/return nil/' /us
 sed -i -z -E 's/policy\.DENY_MSG\([^)]*kres\.extended_error\.NOTSUP[^)]*\)/policy.DENY/g' /usr/lib/knot-resolver/kres_modules/policy.lua
 
 # Загружаем и создаем списки исключений
-/root/antizapret/doall.sh noclear
+/root/antizapret/doall.sh
 
 # Настраиваем сервера OpenVPN и WireGuard/AmneziaWG для первого запуска
 # Пересоздаем для всех существующих пользователей файлы подключений

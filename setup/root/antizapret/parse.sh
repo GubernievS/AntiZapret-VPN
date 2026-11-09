@@ -11,10 +11,15 @@ handle_error() {
 }
 trap 'handle_error $? $LINENO "$BASH_COMMAND"' ERR
 
-if [[ -n "$1" && "$1" != 'ip' && "$1" != 'ips' && "$1" != 'host' && "$1" != 'hosts' && "$1" != 'noclear' && "$1" != 'noclean' ]]; then
-	echo "Ignored invalid parameter: $1"
-	set --
-fi
+DO_IP= DO_HOST=
+for arg; do
+	case "$arg" in
+		ip|ips) DO_IP=1 ;;
+		host|hosts) DO_HOST=1 ;;
+		*) echo "Ignored invalid parameter: $arg" ;;
+	esac
+done
+[[ -z "$DO_IP$DO_HOST" ]] && DO_IP=1 DO_HOST=1
 
 echo 'Parse AntiZapret VPN files:'
 
@@ -27,7 +32,7 @@ for file in config/*.txt; do
 	sed -i -e '$a\' "$file"
 done
 
-if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
+if [[ -n "$DO_IP" ]]; then
 	echo 'IPs...'
 
 	# Обрабатываем конфигурационные файлы
@@ -142,7 +147,7 @@ if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == '
 	fi
 fi
 
-if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
+if [[ -n "$DO_HOST" ]]; then
 	echo 'Hosts...'
 
 	# Обрабатываем список с рекламными доменами для блокировки
@@ -319,8 +324,8 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 		sleep 5
 	fi
 
-	# Очищаем кэш Knot Resolver
-	if [[ "$1" != 'noclear' && "$1" != 'noclean' ]]; then
+	# Очищаем кэш Knot Resolver если аптайм сервера больше 60 секунд
+	if [[ "$CLEAR_DNS_CACHE" == 'y' && $(cut -d. -f1 /proc/uptime) -gt 60 ]]; then
 		count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE '[0-9]+' || echo 0)"
 		echo "AntiZapret DNS cache cleared: $count entries"
 		count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/2 | grep -oE '[0-9]+' || echo 0)"

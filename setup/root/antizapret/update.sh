@@ -10,10 +10,15 @@ handle_error() {
 }
 trap 'handle_error $? $LINENO "$BASH_COMMAND"' ERR
 
-if [[ -n "$1" && "$1" != 'ip' && "$1" != 'ips' && "$1" != 'host' && "$1" != 'hosts' && "$1" != 'noclear' && "$1" != 'noclean' ]]; then
-	echo "Ignored invalid parameter: $1"
-	set --
-fi
+DO_IP= DO_HOST=
+for arg; do
+	case "$arg" in
+		ip|ips) DO_IP=1 ;;
+		host|hosts) DO_HOST=1 ;;
+		*) echo "Ignored invalid parameter: $arg" ;;
+	esac
+done
+[[ -z "$DO_IP$DO_HOST" ]] && DO_IP=1 DO_HOST=1
 
 echo 'Update AntiZapret VPN files:'
 
@@ -127,7 +132,7 @@ download $DOALL_PATH $DOALL_LINK
 
 source setup
 
-if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
+if [[ -n "$DO_HOST" ]]; then
 	download $DOMAIN_PATH $DOMAIN_LINK
 	( download $DOMAIN2_PATH $DOMAIN2_LINK ) || true
 	download $DENY_RPZ_PATH $DENY_RPZ_LINK
@@ -156,7 +161,7 @@ if [[ -z "$1" || "$1" == 'host' || "$1" == 'hosts' || "$1" == 'noclear' || "$1" 
 	fi
 fi
 
-if [[ -z "$1" || "$1" == 'ip' || "$1" == 'ips' || "$1" == 'noclear' || "$1" == 'noclean' ]]; then
+if [[ -n "$DO_IP" ]]; then
 	if [[ "$DISCORD_INCLUDE" == 'y' ]]; then
 		download $DISCORD_IPS_PATH $DISCORD_IPS_LINK
 	fi
