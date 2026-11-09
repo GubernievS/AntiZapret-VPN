@@ -174,6 +174,12 @@ until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable WARP protection? [y/n]: ' -e -i y WARP_PROTECTION
 done
 echo
+echo 'Leave empty for default endpoint'
+read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i '162.159.192.1:500' WARP_ENDPOINT
+until [[ -z "$WARP_ENDPOINT" || "$WARP_ENDPOINT" =~ ^[^:]+:[0-9]+$ ]]; do
+	read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i '162.159.192.1:500' WARP_ENDPOINT
+done
+echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
 echo '    1) MSK-IX+NSDI      - DNS resolvers optimized for users located in Russia, recommended by default'
 echo '       +BI.ZONE+TransTeleCom'
@@ -586,6 +592,7 @@ DNS_WARP_PRIVATE_KEY=
 DNS_WARP_PUBLIC_KEY=
 DNS_WARP_ENDPOINT=
 DNS_WARP_ADDRESS=
+WARP_ENDPOINT=$WARP_ENDPOINT
 WARP_PROTECTION=$WARP_PROTECTION
 ANTIZAPRET_DNS=$ANTIZAPRET_DNS
 VPN_DNS=$VPN_DNS
