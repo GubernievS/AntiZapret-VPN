@@ -593351,7 +593351,6 @@ ntc-eserv.ru
 ntc-infotech.ru
 ntc-rodos.ru
 ntc-sirius.ru
-ntc.party
 ntclub.cf
 ntclub.store
 ntclub.xyz

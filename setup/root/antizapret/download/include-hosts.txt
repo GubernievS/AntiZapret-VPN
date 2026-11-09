@@ -1295,7 +1295,6 @@ flixcdn.com
 cdn.form.io
 kleinanzeigen.de
 mouser.de
-ntc.party
 designer.microsoft.com
 #designerapp.officeapps.live.com
 ecs.office.com
