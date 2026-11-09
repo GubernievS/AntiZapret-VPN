@@ -184,13 +184,12 @@ echo '       +ControlD+UltraDNS'
 echo '    3) Yandex *         - Use if previous choice fails to resolve domains'
 echo '    4) Google *         - Use if previous choice fails to resolve domains'
 echo '    5) AdGuard *        - Use for blocking ads, trackers, malware and phishing websites'
-echo '    6) Comss **         - More details: https://comss.ru/page.php?id=7315'
-echo '    7) GeoHide **       - More details: https://geohide.ru'
+echo '    6) GeoHide **       - More details: https://geohide.ru'
 echo '  * - DNS resolvers support EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
 echo '      Use only if this server is geolocated in Russia or problems accessing some internet resources'
-until [[ "$ANTIZAPRET_DNS" =~ ^[1-7]$ ]]; do
-	read -rp 'DNS choice [1-7]: ' -e -i 1 ANTIZAPRET_DNS
+until [[ "$ANTIZAPRET_DNS" =~ ^[1-6]$ ]]; do
+	read -rp 'DNS choice [1-6]: ' -e -i 1 ANTIZAPRET_DNS
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mfull VPN\e[0m (vpn-*):'

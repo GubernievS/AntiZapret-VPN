@@ -13,9 +13,6 @@ google_dns = policy.FORWARD({'8.8.8.8', '8.8.4.4'})
 -- AdGuard
 adguard_dns = policy.FORWARD({'94.140.14.14', '94.140.15.15', '94.140.14.14@5353', '94.140.15.15@5353'})
 
--- Comss
-comss_dns = policy.STUB({'212.109.221.20', '212.109.195.93', '195.133.25.16'})
-
 -- GeoHide
 geohide_dns = policy.STUB({
 	-- RU
