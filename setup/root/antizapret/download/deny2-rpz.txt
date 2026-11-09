@@ -187,8 +187,12 @@ dnsbl.manitu.net CNAME .
 
 *.pub.3gppnetwork.org CNAME .
 
+rarbg.me CNAME .
 *.rarbg.me CNAME .
+rarbg.com CNAME .
 *.rarbg.com CNAME .
+tracktor.in CNAME .
+*.tracktor.in CNAME .
 tracker.publicbt.com CNAME .
 tracker.trackerfix.com CNAME .
 public.publictracker.xyz CNAME .
