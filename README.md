@@ -237,7 +237,12 @@ bash <(wget -qO- --no-hsts --inet4-only https://raw.githubusercontent.com/Gubern
 
 ### 2. Как посмотреть активные соединения?
 
-Посмотреть активные соединения и статистику OpenVPN можно в логах \*-status.log в папке /etc/openvpn/server/logs на сервере (файлы обновляются каждые 30 секунд)\
+Посмотреть активные соединения и статистику OpenVPN можно через management-сокет, например:
+```
+echo "status" | socat - UNIX-CONNECT:/run/openvpn-server/vpn-udp.sock
+```
+Также доступны сокеты: `antizapret-udp`, `antizapret-tcp`, `vpn-tcp`\
+Если при установке включены подробные логи OpenVPN — статус также пишется в \*-status.log в папке /etc/openvpn/server/logs (обновление каждые 30 секунд)\
 Посмотреть активные соединения и статистику WireGuard/AmneziaWG можно командой
 ```
 wg show
