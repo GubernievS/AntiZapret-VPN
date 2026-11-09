@@ -1298,7 +1298,8 @@ mouser.de
 ntc.party
 designer.microsoft.com
 #designerapp.officeapps.live.com
-#ecs.office.com
+ecs.office.com
+hifishark.com
 
 # Сертификаты
 #letsencrypt.org
