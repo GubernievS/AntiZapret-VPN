@@ -474,14 +474,15 @@ else
 fi
 
 # Network tuning
-TXQUEUELEN="${TXQUEUELEN:-10000}"
 CPU_MASK=$(printf '%x' $(( (1 << $(nproc)) - 1 )))
 MTU="${MTU:-1420}"
 for dev in $(ls /sys/class/net); do
 	[[ "$dev" == "lo" || "$dev" == *docker* ]] && continue
 	if [[ -e "/sys/class/net/$dev/device" ]]; then
 		# Set TX queue length
-		ip link set "$dev" txqueuelen "$TXQUEUELEN"
+		ip link set "$dev" txqueuelen 10000
+		# Set fq flow limit
+		tc qdisc replace dev "$dev" root fq flow_limit 1000
 		# Enable SoftIRQ CPU balance
 		echo "$CPU_MASK" | tee /sys/class/net/$dev/queues/rx-*/rps_cpus >/dev/null
 	else
