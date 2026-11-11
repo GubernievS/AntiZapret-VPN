@@ -157,6 +157,8 @@ raw.ghost.pm CNAME .
 *.raw.ghost.pm CNAME .
 dns.bezmezhau.com CNAME .
 *.dns.bezmezhau.com CNAME .
+sync.bezmezhau.com CNAME .
+*.sync.bezmezhau.com CNAME .
 dns.dns-ai.ru CNAME .
 *.dns.dns-ai.ru CNAME .
 dns.astracat.ru CNAME .
