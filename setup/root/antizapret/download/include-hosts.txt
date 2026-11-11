@@ -404,7 +404,6 @@ gateway.pinata.cloud
 #alkalimakersuite-pa.clients6.google.com
 iaai.com
 #bid.cars
-api.app.prod.grazie.aws.intellij.net
 stripe.com
 stripecdn.com
 sora.com
@@ -697,6 +696,9 @@ tvn24.pl
 insideevs.com
 sbom.sh
 jetbrains.ai
+jetbrains.com
+jetbrains.cloud
+api.app.prod.grazie.aws.intellij.net
 wdfiles.com
 ansys.com
 census.gov
@@ -706,7 +708,6 @@ usher.ttvnw.net
 thetrainline.com
 bing.com
 msa.fr
-jetbrains.com
 xe.com
 gql.twitch.tv
 live.chat.eveonline.com
