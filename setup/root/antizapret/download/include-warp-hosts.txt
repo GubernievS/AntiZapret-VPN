@@ -11,6 +11,7 @@ stun4.l.google.com
 stun.conversations.im
 stun.ui.com
 stun.pubnub.com
+stun.voip.blackberry.com
 cloudflare.com
 #openai.com
 #chatgpt.com
