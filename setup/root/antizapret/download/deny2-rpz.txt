@@ -217,6 +217,15 @@ retracker.hq.ertelecom.ru CNAME .
 run.publictracker.xyz CNAME .
 tracker.tfile.me CNAME .
 tracker2.wasabii.com.tw CNAME .
+run-2.publictracker.xyz CNAME .
+tracker.publictracker.xyz CNAME .
+free.publictracker.xyz CNAME .
+tracker.nanoha.org CNAME .
+tracker1.myporn.club CNAME .
+retracker.mgts.by CNAME .
+tracker.electro-torrent.pl CNAME .
+tracker.ccp.ovh CNAME .
+tracker.srv00.com CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
