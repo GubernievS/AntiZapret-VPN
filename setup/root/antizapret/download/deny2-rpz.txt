@@ -205,6 +205,18 @@ retracker.lanta.me CNAME .
 tracker.token.ro CNAME .
 retracker.lanta-net.ru CNAME .
 tracker.tfile.co CNAME .
+retracker.local CNAME .
+public-tracker.cf CNAME .
+tracker.cubonegro.lol CNAME .
+tracker.pirateparty.gr CNAME .
+tracker.onetracker.net CNAME .
+tracker.x4w.co CNAME .
+tracker4.piratux.com CNAME .
+tracker.t-rb.org CNAME .
+retracker.hq.ertelecom.ru CNAME .
+run.publictracker.xyz CNAME .
+tracker.tfile.me CNAME .
+tracker2.wasabii.com.tw CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
