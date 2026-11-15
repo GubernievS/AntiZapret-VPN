@@ -226,6 +226,12 @@ retracker.mgts.by CNAME .
 tracker.electro-torrent.pl CNAME .
 tracker.ccp.ovh CNAME .
 tracker.srv00.com CNAME .
+tr2.zal-2me.com CNAME .
+tr2.kinox4you.com CNAME .
+tr2.tor2me.info CNAME .
+tr2.zalx2me.com CNAME .
+tr2.kinox2me.com CNAME .
+tr1.tor2me.info CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
