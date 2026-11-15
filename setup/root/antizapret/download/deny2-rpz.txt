@@ -232,6 +232,8 @@ tr2.tor2me.info CNAME .
 tr2.zalx2me.com CNAME .
 tr2.kinox2me.com CNAME .
 tr1.tor2me.info CNAME .
+bt.svao-ix.ru CNAME .
+tr0.tor2me.info CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
