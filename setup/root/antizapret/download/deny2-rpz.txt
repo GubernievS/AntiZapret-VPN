@@ -234,6 +234,17 @@ tr2.kinox2me.com CNAME .
 tr1.tor2me.info CNAME .
 bt.svao-ix.ru CNAME .
 tr0.tor2me.info CNAME .
+tr3.tor2me.info CNAME .
+tr4.tor2me.info CNAME .
+tr5.tor2me.info CNAME .
+tr5.zalx2me.com CNAME .
+tr5.zalx4you.com CNAME .
+tr5.kinox2me.com CNAME .
+tr5.kinox4you.com CNAME .
+tr5.zal-4you.com CNAME .
+tr5.zal-2me.com CNAME .
+tr2.zalx4you.com CNAME .
+tr2.zal-4you.com CNAME .
 
 ntc.party A 130.255.77.28
 *.ntc.party A 130.255.77.28
@@ -241,6 +252,8 @@ ntc.party A 130.255.77.28
 tracker.openbittorrent.com A 52.223.13.41
 
 dns.msftncsi.com A 131.107.255.255
+
+_xmpp-client._tcp.scs.samsungqbe.com CNAME .
 
 image.tmdb.org A 185.59.220.198
 *.image.tmdb.org A 185.59.220.198
