@@ -1304,6 +1304,7 @@ theserverside.com
 epidemicsound.com
 remarkable.com
 monica.im
+duck.ai
 
 # Сертификаты
 #letsencrypt.org
