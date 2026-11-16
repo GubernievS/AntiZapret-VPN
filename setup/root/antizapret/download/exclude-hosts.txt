@@ -11,7 +11,7 @@ firebaselogging-pa.googleapis.com
 eu.sentry.io
 de.sentry.io
 us.sentry.io
-
+fonts.googleapis.com
 # IP
 ip.hetzner.com
 checkip.amazonaws.com
