@@ -175,9 +175,9 @@ until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
 done
 echo
 echo 'Enter empty to set default endpoint'
-read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i '162.159.192.1:500' WARP_ENDPOINT
+read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
 until [[ -z "$WARP_ENDPOINT" || "$WARP_ENDPOINT" =~ ^[^:]+:[0-9]+$ ]]; do
-	read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i '162.159.192.1:500' WARP_ENDPOINT
+	read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'

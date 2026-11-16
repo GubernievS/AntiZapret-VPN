@@ -66,6 +66,7 @@ DNS_WARP_INTERFACE=warp-dns
 DNS_WARP_PATH="/etc/wireguard/$DNS_WARP_INTERFACE.conf"
 [[ -z "$DNS_WARP_ADDRESS" ]] && DNS_WARP_ADDRESS=$(awk -F'= ' '/^Address/{print $2; exit}' "$DNS_WARP_PATH")
 DNS_WARP_IP="${DNS_WARP_ADDRESS%%/*}"
+DNS_WARP_UID="$(id -u knot-resolver)"
 
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
@@ -85,14 +86,19 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'BitTorrent pr
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m string --string 'd1:ad2:id20:' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 
-# Drop forwarding
-iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
+# Flood WARP protection
+iptables -w -D FORWARD -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 100 -j DROP
+iptables -w -D FORWARD -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 100/sec --hashlimit-burst 100 -j DROP
 
-# Allow forwarding
-iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-forward dst -j ACCEPT
+# Flood forward protection
+iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 100000 -j DROP
+iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
 
 # Restrict forwarding
 iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+
+# Drop forwarding
+iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 
 # Client and server isolation
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
@@ -114,10 +120,9 @@ ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashli
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 
-# Flood protection
-iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -d 127.0.0.0/8 -m hashlimit --hashlimit-name antizapret-dns --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
+# Flood DNS protection
+iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Scan protection
 iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
@@ -187,35 +192,42 @@ iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMA
 nft flush chain ip antizapret mapping_hook
 nft delete chain ip antizapret mapping_hook
 
-# SNAT/MASQUERADE VPN
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
-
-# WARP
-iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -j DROP
-iptables -w -t raw -D PREROUTING -s $IP.28.0.0/16 -j DROP
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
-iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
-
-# WARP mark
+# Mark packets to route via WARP (0x2 = AntiZapret, 0x4 = VPN, 0x8 = DNS)
+iptables -w -t mangle -D PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0xe
+iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0xe
+iptables -w -t mangle -D OUTPUT -m owner --uid-owner "$DNS_WARP_UID" ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x8/0xe
 nft flush chain ip antizapret warp_hook
 nft delete chain ip antizapret warp_hook
 
+# WARP SNAT/MASQUERADE
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
+iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
+
+# AntiZapret/VPN SNAT/MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
+iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
+
+# Save WARP interface in connmark for ICMP
+iptables -w -t mangle -D PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
+iptables -w -t mangle -D POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
+iptables -w -t mangle -D PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
+iptables -w -t mangle -D POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
+iptables -w -t mangle -D PREROUTING -i $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+iptables -w -t mangle -D POSTROUTING -o $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+
+# Restore fwmark on ICMP
+iptables -w -t mangle -D OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0xe --ctmask 0xe
+
 # WARP AntiZapret
+iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -j DROP
 if [[ -f $ANTIZAPRET_WARP_PATH ]]; then
 	wg-quick down $ANTIZAPRET_WARP_INTERFACE
 fi
@@ -224,6 +236,7 @@ if ip link show dev $ANTIZAPRET_WARP_INTERFACE &>/dev/null; then
 fi
 
 # WARP VPN
+iptables -w -t raw -D PREROUTING -s $IP.28.0.0/16 -j DROP
 if [[ -f $VPN_WARP_PATH ]]; then
 	wg-quick down $VPN_WARP_INTERFACE
 fi

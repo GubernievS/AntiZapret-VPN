@@ -49,6 +49,9 @@ fi
 [[ "$ALTERNATIVE_FAKE_IP" == 'y' ]] && FAKE_IP="${FAKE_IP:-198.18}" || FAKE_IP="$IP.30"
 
 WARP_MTU="${WARP_MTU:-1280}"
+ANTIZAPRET_WARP_INTERFACE=warp-antizapret
+VPN_WARP_INTERFACE=warp-vpn
+DNS_WARP_INTERFACE=warp-dns
 
 # Default policy
 iptables -w -P INPUT ACCEPT
@@ -79,6 +82,28 @@ if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 
+# Flood WARP/forward protection
+if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
+	iptables -w -I FORWARD 2 -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 100 -j DROP
+	iptables -w -I FORWARD 2 -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 100/sec --hashlimit-burst 100 -j DROP
+	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 100000 -j DROP
+	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
+fi
+
+# Restrict forwarding
+{
+	echo 'create antizapret-forward hash:net -exist'
+	echo 'flush antizapret-forward'
+	if [[ -f result/forward-ips.txt ]]; then
+		while read -r line; do
+			echo "add antizapret-forward $line -exist"
+		done < result/forward-ips.txt
+	fi
+} | ipset restore
+if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
+	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+fi
+
 # Drop forwarding
 {
 	echo 'create antizapret-drop hash:net -exist'
@@ -90,23 +115,6 @@ fi
 	fi
 } | ipset restore
 iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
-
-# Allow forwarding
-{
-	echo 'create antizapret-forward hash:net -exist'
-	echo 'flush antizapret-forward'
-	if [[ -f result/forward-ips.txt ]]; then
-		while read -r line; do
-			echo "add antizapret-forward $line -exist"
-		done < result/forward-ips.txt
-	fi
-} | ipset restore
-iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m set --match-set antizapret-forward dst -j ACCEPT
-
-# Restrict forwarding
-if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
-	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
-fi
 
 # Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
@@ -148,11 +156,10 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 fi
 
-# Flood protection
+# Flood DNS protection
 if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
-	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -d 127.0.0.0/8 -m hashlimit --hashlimit-name antizapret-dns --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 fi
 
 # Scan protection
@@ -250,7 +257,6 @@ nft add chain ip antizapret mapping_hook '{ type nat hook prerouting priority -5
 nft add rule ip antizapret mapping_hook ip saddr $IP.28.0.0/15 ip daddr $FAKE_IP.0.0/15 dnat to ip daddr map @mapping
 
 # WARP AntiZapret
-ANTIZAPRET_WARP_INTERFACE=warp-antizapret
 ANTIZAPRET_WARP_PATH="/etc/wireguard/$ANTIZAPRET_WARP_INTERFACE.conf"
 
 if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
@@ -269,17 +275,13 @@ if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WAR
 	fi
 	ANTIZAPRET_WARP_IP="${ANTIZAPRET_WARP_ADDRESS%%/*}"
 
-	[[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]] && ANTIZAPRET_FWMARK="fwmark 0x2 "
-
 	echo "[Interface]
 PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
 Address = $ANTIZAPRET_WARP_ADDRESS
 MTU = $WARP_MTU
-Table = 1000
-PostUp = ip rule add from $IP.29.0.0/16 to $IP.29.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 1000 priority 10000 || true
-PostDown = ip rule del from $IP.29.0.0/16 to $IP.29.0.0/16 priority 5000
-PostDown = ip rule del from $IP.29.0.0/16 ${ANTIZAPRET_FWMARK}lookup 1000 priority 10000
+Table = 1
+PostUp = ip rule add fwmark 0x2/0xe lookup 1 priority 100 || true
+PostDown = ip rule del fwmark 0x2/0xe lookup 1 priority 100
 
 [Peer]
 PublicKey = $ANTIZAPRET_WARP_PUBLIC_KEY
@@ -309,7 +311,6 @@ else
 fi
 
 # WARP VPN
-VPN_WARP_INTERFACE=warp-vpn
 VPN_WARP_PATH="/etc/wireguard/$VPN_WARP_INTERFACE.conf"
 
 if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
@@ -328,17 +329,13 @@ if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
 	fi
 	VPN_WARP_IP="${VPN_WARP_ADDRESS%%/*}"
 
-	[[ "$VPN_WARP" == '3' ]] && VPN_FWMARK="fwmark 0x2 "
-
 	echo "[Interface]
 PrivateKey = $VPN_WARP_PRIVATE_KEY
 Address = $VPN_WARP_ADDRESS
 MTU = $WARP_MTU
-Table = 2000
-PostUp = ip rule add from $IP.28.0.0/16 to $IP.28.0.0/16 lookup main priority 5000 || true
-PostUp = ip rule add from $IP.28.0.0/16 ${VPN_FWMARK}lookup 2000 priority 10000 || true
-PostDown = ip rule del from $IP.28.0.0/16 to $IP.28.0.0/16 priority 5000
-PostDown = ip rule del from $IP.28.0.0/16 ${VPN_FWMARK}lookup 2000 priority 10000
+Table = 2
+PostUp = ip rule add fwmark 0x4/0xe lookup 2 priority 200 || true
+PostDown = ip rule del fwmark 0x4/0xe lookup 2 priority 200
 
 [Peer]
 PublicKey = $VPN_WARP_PUBLIC_KEY
@@ -368,7 +365,6 @@ else
 fi
 
 # WARP DNS
-DNS_WARP_INTERFACE=warp-dns
 DNS_WARP_PATH="/etc/wireguard/$DNS_WARP_INTERFACE.conf"
 
 if [[ "$DNS_WARP" == 'y' ]]; then
@@ -392,11 +388,9 @@ if [[ "$DNS_WARP" == 'y' ]]; then
 PrivateKey = $DNS_WARP_PRIVATE_KEY
 Address = $DNS_WARP_ADDRESS
 MTU = $WARP_MTU
-Table = 3000
-PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 5000 || true
-PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 10000 || true
-PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 5000
-PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3000 priority 10000
+Table = 3
+PostUp = ip rule add fwmark 0x8/0xe lookup 3 priority 300 || true
+PostDown = ip rule del fwmark 0x8/0xe lookup 3 priority 300
 
 [Peer]
 PublicKey = $DNS_WARP_PUBLIC_KEY
@@ -421,44 +415,45 @@ else
 	rm -f $DNS_WARP_PATH
 fi
 
-# WARP mark
+# Mark packets to route via WARP (0x2 = AntiZapret, 0x4 = VPN, 0x8 = DNS)
 nft list set ip antizapret warp &>/dev/null || nft add set ip antizapret warp '{ type ipv4_addr ; size 131072 ; }'
 nft add chain ip antizapret warp_hook '{ type filter hook prerouting priority -150 ; policy accept ; }'
-nft add rule ip antizapret warp_hook ip saddr $IP.28.0.0/15 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x2
+if [[ "$ANTIZAPRET_WARP" == '2' ]]; then
+	iptables -w -t mangle -A PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0xe
+elif [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
+	nft add rule ip antizapret warp_hook ip saddr $IP.29.0.0/16 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x2
+fi
+if [[ "$VPN_WARP" == '2' ]]; then
+	iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0xe
+elif [[ "$VPN_WARP" == '3' ]]; then
+	nft add rule ip antizapret warp_hook ip saddr $IP.28.0.0/16 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x4
+fi
+if [[ "$DNS_WARP" == 'y' ]]; then
+	iptables -w -t mangle -A OUTPUT -m owner --uid-owner "$DNS_WARP_UID" ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x8/0xe
+fi
 
-# WARP
+# WARP SNAT/MASQUERADE
 if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
 	else
-		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark --mark 0x2 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
 	fi
 fi
 if [[ "$VPN_WARP" == '3' ]]; then
 	if [[ -z "$VPN_WARP_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j MASQUERADE
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j MASQUERADE
 	else
-		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -m mark --mark 0x2 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
 	fi
 fi
 
-# SNAT/MASQUERADE VPN
+# AntiZapret/VPN SNAT/MASQUERADE
 if [[ "$ANTIZAPRET_OUT_INTERFACE" == "$VPN_OUT_INTERFACE" && "$ANTIZAPRET_OUT_IP" == "$VPN_OUT_IP" ]]; then
 	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
 		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
 	else
 		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/15 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-	fi
-elif [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
-	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j MASQUERADE
-	else
-		iptables -w -t nat -A POSTROUTING -s $IP.29.0.0/16 -m mark ! --mark 0x2 -o $ANTIZAPRET_OUT_INTERFACE -j SNAT --to-source $ANTIZAPRET_OUT_IP
-	fi
-	if [[ -z "$VPN_OUT_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
-	else
-		iptables -w -t nat -A POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
 	fi
 else
 	if [[ -z "$ANTIZAPRET_OUT_IP" ]]; then
@@ -473,14 +468,31 @@ else
 	fi
 fi
 
+# Save WARP interface in connmark for ICMP
+if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
+	iptables -w -t mangle -A PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
+	iptables -w -t mangle -A POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
+fi
+if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
+	iptables -w -t mangle -A PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
+	iptables -w -t mangle -A POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
+fi
+if [[ "$DNS_WARP" == 'y' ]]; then
+	iptables -w -t mangle -A PREROUTING -i $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+	iptables -w -t mangle -A POSTROUTING -o $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+fi
+
+# Restore fwmark on ICMP
+iptables -w -t mangle -A OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0xe --ctmask 0xe
+
 # Network tuning
 CPU_MASK=$(printf '%x' $(( (1 << $(nproc)) - 1 )))
 MTU="${MTU:-1420}"
 for dev in $(ls /sys/class/net); do
 	[[ "$dev" == "lo" || "$dev" == *docker* ]] && continue
+	# Set TX queue length
+	ip link set "$dev" txqueuelen 10000
 	if [[ -e "/sys/class/net/$dev/device" ]]; then
-		# Set TX queue length
-		ip link set "$dev" txqueuelen 10000
 		# Set fq flow limit
 		tc qdisc replace dev "$dev" root fq flow_limit 1000
 		# Enable SoftIRQ CPU balance
@@ -498,6 +510,8 @@ count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/1 | grep -oE 
 echo "AntiZapret DNS cache cleared: $count entries"
 count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/2 | grep -oE '[0-9]+' || echo 0)"
 echo "VPN DNS cache cleared: $count entries"
+count="$(echo 'cache.clear()' | socat - /run/knot-resolver/control/3 | grep -oE '[0-9]+' || echo 0)"
+echo "Proxy DNS cache cleared: $count entries"
 
 ./custom-up.sh "$@" || true
 
