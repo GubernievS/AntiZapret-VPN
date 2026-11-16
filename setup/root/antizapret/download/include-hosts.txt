@@ -1305,6 +1305,7 @@ epidemicsound.com
 remarkable.com
 monica.im
 duck.ai
+kilo.ai
 
 # Сертификаты
 #letsencrypt.org
