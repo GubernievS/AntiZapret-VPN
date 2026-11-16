@@ -159,7 +159,7 @@ fi
 # Flood DNS protection
 if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 fi
 
 # Scan protection

@@ -122,7 +122,7 @@ ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --
 
 # Flood DNS protection
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Scan protection
 iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
