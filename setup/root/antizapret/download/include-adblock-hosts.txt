@@ -1,9 +1,6 @@
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
 ad.mail.ru
 rs.mail.ru
-rutor.org
-rutoro.info
-www-torproject.org
 top-fwz1.vk.ru
 top-fwz1.vk.com
 vk-analytics.ru
