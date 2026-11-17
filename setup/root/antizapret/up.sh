@@ -84,8 +84,8 @@ fi
 
 # Flood WARP/forward protection
 if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
-	iptables -w -I FORWARD 2 -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 1 -j DROP
-	iptables -w -I FORWARD 2 -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 500/sec --hashlimit-burst 1 -j DROP
+	iptables -w -I FORWARD 2 -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
+	iptables -w -I FORWARD 2 -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 500/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 100000 -j DROP
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
 fi
