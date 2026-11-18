@@ -1307,6 +1307,8 @@ remarkable.com
 monica.im
 duck.ai
 kilo.ai
+zerkalo.xyz
+zerkalo.ink
 
 # Сертификаты
 #letsencrypt.org
