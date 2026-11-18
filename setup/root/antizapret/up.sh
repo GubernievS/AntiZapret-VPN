@@ -82,12 +82,14 @@ if [[ "$TORRENT_GUARD" == 'y' ]]; then
 	iptables -w -I FORWARD 5 -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 fi
 
-# Flood WARP/forward protection
+# Flood protection
 if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
 	iptables -w -I FORWARD 2 -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 500/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 100000 -j DROP
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 fi
 
 # Restrict forwarding
@@ -154,12 +156,6 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
-fi
-
-# Flood DNS protection
-if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
-	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 fi
 
 # Scan protection

@@ -86,13 +86,13 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m length --length 100: -m string
 iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m length --length 100: -m string --string 'd1:ad2:id20:' --algo kmp --to 100 -j SET --add-set antizapret-torrent src --exist
 iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 
-# Flood WARP protection
+# Flood protection
 iptables -w -D FORWARD -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 100/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 iptables -w -D FORWARD -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 500/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
-
-# Flood forward protection
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 100000 -j DROP
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m connlimit --connlimit-above 1000 --connlimit-mask 32 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Restrict forwarding
 iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
@@ -119,10 +119,6 @@ ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! 
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
-
-# Flood DNS protection
-iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Scan protection
 iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
