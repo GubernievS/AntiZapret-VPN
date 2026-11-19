@@ -78,6 +78,12 @@ curl -fL --connect-timeout 30 https://build.openvpn.net/downloads/releases/openv
 tar --strip-components=1 -xvzf /usr/local/src/openvpn.tar.gz -C /usr/local/src/openvpn
 rm -f /usr/local/src/openvpn.tar.gz
 
+# Добавляем crypto.h для prng_bytes()
+sed -i '/#include "socket_util.h"/a\
+#include "crypto.h"
+' /usr/local/src/openvpn/src/openvpn/socket.h
+
+# UDP
 sed -i '/link_socket_write_udp(struct link_socket \*sock/,/^$/c\
 link_socket_write_udp(struct link_socket *sock,\
 					struct buffer *buf,\
@@ -98,34 +104,26 @@ link_socket_write_udp(struct link_socket *sock,\
 				return buffer_sent;\
 		}\
 		int buffer_len = BLEN(buf);\
-		for (int i = 0; i < 3; i++) {\
-			int data_len = (int)(random() % 81 + buffer_len);\
+		int write_num = 150 + (int)(random() % 51);\
+		for (int i = 0; i < write_num; i++) {\
+			int data_len = (int)(random() % 100 + buffer_len + 1);\
 			uint8_t data[data_len];\
 			if (error_free) {\
 				memcpy(data, BPTR(buf), buffer_len);\
 				data[0] = (uint8_t)40;\
-				for (int k = buffer_len; k < data_len; k++) {\
-					data[k] = (uint8_t)(random() % 256);\
-				}\
+				prng_bytes(data + buffer_len, data_len - buffer_len);\
 			} else {\
-				uint8_t first_byte;\
-				do {\
-					first_byte = (uint8_t)(random() % 256);\
-				} while ((first_byte >> 3) >= 1 && (first_byte >> 3) <= 11);\
-				data[0] = first_byte;\
-				for (int k = 1; k < data_len; k++) {\
-					data[k] = (uint8_t)(random() % 256);\
-				}\
+				prng_bytes(data, data_len);\
+				if ((data[0] >> 3) >= 1 && (data[0] >> 3) <= 11)\
+					data[0] = (uint8_t)(data[0] & 0x07);\
 			}\
 			struct buffer data_buffer = alloc_buf(data_len);\
 			buf_write(&data_buffer, data, data_len);\
-			for (int j = 0; j < 50; j++) {\
 #ifdef _WIN32\
-				(void)link_socket_write_win32(sock, &data_buffer, to);\
+			(void)link_socket_write_win32(sock, &data_buffer, to);\
 #else\
-				(void)link_socket_write_udp_posix(sock, &data_buffer, to);\
+			(void)link_socket_write_udp_posix(sock, &data_buffer, to);\
 #endif\
-			}\
 			free_buf(&data_buffer);\
 		}\
 		if (error_free)\
