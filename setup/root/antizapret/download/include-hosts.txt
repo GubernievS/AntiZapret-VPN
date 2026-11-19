@@ -1309,6 +1309,8 @@ duck.ai
 kilo.ai
 zerkalo.xyz
 zerkalo.ink
+#scryfall.com
+cards.scryfall.io
 
 # Сертификаты
 #letsencrypt.org
