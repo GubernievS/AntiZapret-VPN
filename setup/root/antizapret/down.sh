@@ -66,7 +66,6 @@ DNS_WARP_INTERFACE=warp-dns
 DNS_WARP_PATH="/etc/wireguard/$DNS_WARP_INTERFACE.conf"
 [[ -z "$DNS_WARP_ADDRESS" ]] && DNS_WARP_ADDRESS=$(awk -F'= ' '/^Address/{print $2; exit}' "$DNS_WARP_PATH")
 DNS_WARP_IP="${DNS_WARP_ADDRESS%%/*}"
-DNS_WARP_UID="$(id -u knot-resolver)"
 
 # INPUT connection tracking
 iptables -w -D INPUT -m conntrack --ctstate INVALID -j DROP
@@ -94,7 +93,7 @@ iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Restrict forwarding
-iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1/0x1 -m set ! --match-set antizapret-forward dst -j DROP
 
 # Drop forwarding
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
@@ -181,24 +180,23 @@ iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p tcp --dport 853 -j DROP
 iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 853 -j DROP
 
 # Restrict forwarding
-iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-xmark 0x1/0x1
 
 # Mapping fake IP to real IP
 nft flush chain ip antizapret mapping_hook
 nft delete chain ip antizapret mapping_hook
 
-# Mark packets to route via WARP (0x2 = AntiZapret, 0x4 = VPN, 0x8 = DNS)
-iptables -w -t mangle -D PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0xe
-iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0xe
-iptables -w -t mangle -D OUTPUT -m owner --uid-owner "$DNS_WARP_UID" ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x8/0xe
+# Mark AntiZapret/VPN to route via WARP
+iptables -w -t mangle -D PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0x6
+iptables -w -t mangle -D PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0x6
 nft flush chain ip antizapret warp_hook
 nft delete chain ip antizapret warp_hook
 
 # WARP SNAT/MASQUERADE
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j MASQUERADE
-iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0x6 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x2/0x6 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0x6 -o $VPN_WARP_INTERFACE -j MASQUERADE
+iptables -w -t nat -D POSTROUTING -m mark --mark 0x4/0x6 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
 iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -o $DNS_WARP_INTERFACE -j SNAT --to-source $DNS_WARP_IP
 
@@ -210,16 +208,14 @@ iptables -w -t nat -D POSTROUTING -s $IP.29.0.0/16 -o $ANTIZAPRET_OUT_INTERFACE 
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j MASQUERADE
 iptables -w -t nat -D POSTROUTING -s $IP.28.0.0/16 -o $VPN_OUT_INTERFACE -j SNAT --to-source $VPN_OUT_IP
 
-# Save WARP interface in connmark for ICMP
-iptables -w -t mangle -D PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
-iptables -w -t mangle -D POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
-iptables -w -t mangle -D PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
-iptables -w -t mangle -D POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
-iptables -w -t mangle -D PREROUTING -i $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
-iptables -w -t mangle -D POSTROUTING -o $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+# Save WARP mark in connmark for ICMP
+iptables -w -t mangle -D PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0x6
+iptables -w -t mangle -D POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0x6
+iptables -w -t mangle -D PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0x6
+iptables -w -t mangle -D POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0x6
 
-# Restore fwmark on ICMP
-iptables -w -t mangle -D OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0xe --ctmask 0xe
+# Restore WARP mark from connmark for ICMP
+iptables -w -t mangle -D OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0x6 --ctmask 0x6
 
 # WARP AntiZapret
 iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -j DROP

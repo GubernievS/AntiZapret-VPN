@@ -102,7 +102,7 @@ fi
 	fi
 } | ipset restore
 if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
-	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
+	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1/0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
 
 # Drop forwarding
@@ -242,7 +242,7 @@ fi
 
 # Restrict forwarding
 if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
-	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-mark 0x1
+	iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-xmark 0x1/0x1
 fi
 
 # Mapping fake IP to real IP
@@ -275,8 +275,8 @@ PrivateKey = $ANTIZAPRET_WARP_PRIVATE_KEY
 Address = $ANTIZAPRET_WARP_ADDRESS
 MTU = $WARP_MTU
 Table = 1
-PostUp = ip rule add fwmark 0x2/0xe lookup 1 priority 100 || true
-PostDown = ip rule del fwmark 0x2/0xe lookup 1 priority 100
+PostUp = ip rule add fwmark 0x2/0x6 lookup 1 priority 100 || true
+PostDown = ip rule del fwmark 0x2/0x6 lookup 1 priority 100
 
 [Peer]
 PublicKey = $ANTIZAPRET_WARP_PUBLIC_KEY
@@ -329,8 +329,8 @@ PrivateKey = $VPN_WARP_PRIVATE_KEY
 Address = $VPN_WARP_ADDRESS
 MTU = $WARP_MTU
 Table = 2
-PostUp = ip rule add fwmark 0x4/0xe lookup 2 priority 200 || true
-PostDown = ip rule del fwmark 0x4/0xe lookup 2 priority 200
+PostUp = ip rule add fwmark 0x4/0x6 lookup 2 priority 200 || true
+PostDown = ip rule del fwmark 0x4/0x6 lookup 2 priority 200
 
 [Peer]
 PublicKey = $VPN_WARP_PUBLIC_KEY
@@ -384,8 +384,10 @@ PrivateKey = $DNS_WARP_PRIVATE_KEY
 Address = $DNS_WARP_ADDRESS
 MTU = $WARP_MTU
 Table = 3
-PostUp = ip rule add fwmark 0x8/0xe lookup 3 priority 300 || true
-PostDown = ip rule del fwmark 0x8/0xe lookup 3 priority 300
+PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 30 || true
+PostUp = ip rule add uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3 priority 300 || true
+PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID to $IP.28.0.0/15 lookup main priority 30
+PostDown = ip rule del uidrange $DNS_WARP_UID-$DNS_WARP_UID lookup 3 priority 300
 
 [Peer]
 PublicKey = $DNS_WARP_PUBLIC_KEY
@@ -410,36 +412,35 @@ else
 	rm -f $DNS_WARP_PATH
 fi
 
-# Mark packets to route via WARP (0x2 = AntiZapret, 0x4 = VPN, 0x8 = DNS)
-nft list set ip antizapret warp &>/dev/null || nft add set ip antizapret warp '{ type ipv4_addr ; size 131072 ; }'
-nft add chain ip antizapret warp_hook '{ type filter hook prerouting priority -150 ; policy accept ; }'
+# Mark AntiZapret/VPN to route via WARP
+if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' || "$VPN_WARP" == '3' ]]; then
+	nft list set ip antizapret warp &>/dev/null || nft add set ip antizapret warp '{ type ipv4_addr ; size 131072 ; }'
+	nft add chain ip antizapret warp_hook '{ type filter hook prerouting priority -150 ; policy accept ; }'
+fi
 if [[ "$ANTIZAPRET_WARP" == '2' ]]; then
-	iptables -w -t mangle -A PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0xe
+	iptables -w -t mangle -A PREROUTING -s $IP.29.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x2/0x6
 elif [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	nft add rule ip antizapret warp_hook ip saddr $IP.29.0.0/16 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x2
 fi
 if [[ "$VPN_WARP" == '2' ]]; then
-	iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0xe
+	iptables -w -t mangle -A PREROUTING -s $IP.28.0.0/16 ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x4/0x6
 elif [[ "$VPN_WARP" == '3' ]]; then
 	nft add rule ip antizapret warp_hook ip saddr $IP.28.0.0/16 ip daddr $FAKE_IP.0.0/15 ip daddr @warp meta mark set 0x4
-fi
-if [[ "$DNS_WARP" == 'y' ]]; then
-	iptables -w -t mangle -A OUTPUT -m owner --uid-owner "$DNS_WARP_UID" ! -d $IP.28.0.0/15 -j MARK --set-xmark 0x8/0xe
 fi
 
 # WARP SNAT/MASQUERADE
 if [[ "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
 	if [[ -z "$ANTIZAPRET_WARP_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0x6 -o $ANTIZAPRET_WARP_INTERFACE -j MASQUERADE
 	else
-		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0xe -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x2/0x6 -o $ANTIZAPRET_WARP_INTERFACE -j SNAT --to-source $ANTIZAPRET_WARP_IP
 	fi
 fi
 if [[ "$VPN_WARP" == '3' ]]; then
 	if [[ -z "$VPN_WARP_IP" ]]; then
-		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j MASQUERADE
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0x6 -o $VPN_WARP_INTERFACE -j MASQUERADE
 	else
-		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0xe -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
+		iptables -w -t nat -A POSTROUTING -m mark --mark 0x4/0x6 -o $VPN_WARP_INTERFACE -j SNAT --to-source $VPN_WARP_IP
 	fi
 fi
 
@@ -463,22 +464,18 @@ else
 	fi
 fi
 
-# Save WARP interface in connmark for ICMP
+# Save WARP mark in connmark for ICMP
 if [[ "$ANTIZAPRET_WARP" == '2' || "$ANTIZAPRET_WARP" == '3' || "$ANTIZAPRET_WARP" == '4' ]]; then
-	iptables -w -t mangle -A PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
-	iptables -w -t mangle -A POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0xe
+	iptables -w -t mangle -A PREROUTING -i $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0x6
+	iptables -w -t mangle -A POSTROUTING -o $ANTIZAPRET_WARP_INTERFACE -j CONNMARK --set-xmark 0x2/0x6
 fi
 if [[ "$VPN_WARP" == '2' || "$VPN_WARP" == '3' ]]; then
-	iptables -w -t mangle -A PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
-	iptables -w -t mangle -A POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0xe
-fi
-if [[ "$DNS_WARP" == 'y' ]]; then
-	iptables -w -t mangle -A PREROUTING -i $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
-	iptables -w -t mangle -A POSTROUTING -o $DNS_WARP_INTERFACE -j CONNMARK --set-xmark 0x8/0xe
+	iptables -w -t mangle -A PREROUTING -i $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0x6
+	iptables -w -t mangle -A POSTROUTING -o $VPN_WARP_INTERFACE -j CONNMARK --set-xmark 0x4/0x6
 fi
 
-# Restore fwmark on ICMP
-iptables -w -t mangle -A OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0xe --ctmask 0xe
+# Restore WARP mark from connmark for ICMP
+iptables -w -t mangle -A OUTPUT -p icmp -m conntrack --ctstate RELATED ! -d $IP.28.0.0/15 -j CONNMARK --restore-mark --nfmask 0x6 --ctmask 0x6
 
 # Network tuning
 CPU_MASK=$(printf '%x' $(( (1 << $(nproc)) - 1 )))
