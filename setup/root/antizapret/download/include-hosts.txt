@@ -1312,6 +1312,7 @@ zerkalo.ink
 #scryfall.com
 cards.scryfall.io
 bytesroute.com
+yahoo.com
 
 # Сертификаты
 #letsencrypt.org
