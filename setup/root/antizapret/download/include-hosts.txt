@@ -1313,6 +1313,7 @@ zerkalo.ink
 cards.scryfall.io
 bytesroute.com
 yahoo.com
+cra.cz
 
 # Сертификаты
 #letsencrypt.org
