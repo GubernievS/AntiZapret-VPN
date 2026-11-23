@@ -1055,7 +1055,7 @@ territorial.io
 scene7.com
 mail.com
 react-hook-form.com
-shop.gameloft.com
+gameloft.com
 usps.com
 instructables.com
 ammyy.com
@@ -1301,8 +1301,8 @@ designer.microsoft.com
 #designerapp.officeapps.live.com
 ecs.office.com
 hifishark.com
-theserverside.com
-epidemicsound.com
+#theserverside.com
+#epidemicsound.com
 remarkable.com
 monica.im
 duck.ai
@@ -1312,7 +1312,7 @@ zerkalo.ink
 #scryfall.com
 cards.scryfall.io
 bytesroute.com
-yahoo.com
+#yahoo.com
 cra.cz
 
 # Сертификаты
