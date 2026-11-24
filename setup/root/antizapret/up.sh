@@ -84,11 +84,12 @@ fi
 
 # Flood protection
 if [[ "$FLOOD_PROTECTION" == 'y' ]]; then
+	iptables -w -I FORWARD 2 -o $DNS_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-dns-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 	iptables -w -I FORWARD 2 -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 fi
 
 # Restrict forwarding
@@ -123,12 +124,6 @@ if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	iptables -w -I INPUT 3 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 fi
 
-# SSH protection
-if [[ "$SSH_PROTECTION" == 'y' ]]; then
-	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
-	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
-fi
-
 # Attack protection
 if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	{
@@ -155,6 +150,12 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
+fi
+
+# SSH protection
+if [[ "$SSH_PROTECTION" == 'y' ]]; then
+	iptables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
+	ip6tables -w -I INPUT 2 -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
 fi
 
 # Scan protection

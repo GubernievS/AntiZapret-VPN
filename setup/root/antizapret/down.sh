@@ -86,8 +86,9 @@ iptables -w -D FORWARD -s $IP.28.0.0/16 -p udp -m length --length 100: -m string
 iptables -w -D FORWARD -s $IP.28.0.0/16 -m set --match-set antizapret-torrent src -j DROP
 
 # Flood protection
-iptables -w -D FORWARD -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 iptables -w -D FORWARD -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-vpn-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
+iptables -w -D FORWARD -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
+iptables -w -D FORWARD -o $DNS_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-dns-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
@@ -102,10 +103,6 @@ iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -
 iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
 iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 
-# SSH protection
-iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
-ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
-
 # Attack protection
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
@@ -117,6 +114,10 @@ ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! 
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
+
+# SSH protection
+iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
+ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
 
 # Scan protection
 iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP

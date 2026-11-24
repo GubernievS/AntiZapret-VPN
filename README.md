@@ -26,7 +26,7 @@ AntiZapret VPN реализует технологию [раздельного �
 ```
 chrome://flags/#local-network-access-check
 ```
-4. Отключить IPv6 на устройстве, в подключении на роутере, в локальной сети 
+4. Отключить IPv6 на устройстве, в подключении на роутере, в локальной сети
 
 **Рекомендации!**\
 Всегда устанавливайте на сервере патч OpenVPN UDP (устанавливается по умолчанию)\
@@ -285,7 +285,7 @@ IP-адрес блокируется на 10 минут при нарушени�
 
 Список заблокированных IP-адресов
 ```
-ipset list antizapret-block | grep '\.' | sort -u 
+ipset list antizapret-block | grep '\.' | sort -u
 ipset list antizapret-block6 | grep -E '.*:.*:.*:' | sort -u
 ```
 Список отслеживаемых подключений по IP за последние 10 минут
@@ -299,9 +299,9 @@ ipset list antizapret-allow | grep '\.' | sort -u
 ipset list antizapret-allow6 | grep -E '.*:.*:.*:' | sort -u
 ```
 
-Можно добавить IPv4-адреса исключений в файл /root/antizapret/config/allow-ips.txt 
+Можно добавить IPv4-адреса исключений в файл /root/antizapret/config/allow-ips.txt
 ```
-nano /root/antizapret/config/allow-ips.txt 
+nano /root/antizapret/config/allow-ips.txt
 ```
 После этого нужно обновить списки IP-адресов
 ```
