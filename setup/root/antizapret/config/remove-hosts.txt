@@ -1,5 +1,6 @@
 # Исключение доменов из обработки в AntiZapret VPN
-# Исключить можно только скачанные или добавленные в config/include-hosts.txt и config/exclude-hosts.txt
+# Исключить можно только домены из download/include-hosts.txt, config/include-hosts.txt,
+# download/*domain.txt, download/exclude-hosts.txt и config/exclude-hosts.txt
 #
 # Формат записи: example.com
 # Где:

@@ -48,7 +48,7 @@ if [[ -n "$DO_IP" ]]; then
 	# Выводим результат
 	echo "$(wc -l < result/route-ips.txt) - route-ips.txt"
 
-	# Обрабатываем список запрещенных сетей для форвардинга
+	# Обрабатываем список запрещенных сетей для маршрутизации
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*drop-ips.txt | sort -u \
 	| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/drop-ips.txt
 
@@ -64,7 +64,7 @@ if [[ -n "$DO_IP" ]]; then
 		done < result/drop-ips.txt
 	} | ipset restore
 
-	# Обрабатываем список IP-источников, которым запрещены входящие подключения к серверу (INPUT)
+	# Обрабатываем список запрещенных сетей для входящих подключений
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d' config/*deny-ips.txt | sort -u \
 	| awk -F'[/.]' 'NF==5 && $1>=0 && $1<=255 && $2>=0 && $2<=255 && $3>=0 && $3<=255 && $4>=0 && $4<=255 && $5>=1 && $5<=32 {print}' > result/deny-ips.txt
 
@@ -223,20 +223,20 @@ if [[ -n "$DO_HOST" ]]; then
 	sed -E 's/[\r[:space:]]+//g; /^\.$/!{/^[[:punct:]]/d;}; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' download/*include-warp-hosts.txt config/*include-warp-hosts.txt | sort -u > result/include-warp-hosts.txt
 	sed -E 's/[\r[:space:]]+//g; /^[[:punct:]]/d; /^$/d; s/[]_~:/?#\[@!$&'\''()*+,;=].*//; s/.*/\L&/' config/*exclude-warp-hosts.txt | sort -u > result/exclude-warp-hosts.txt
 
-	# Обрабатываем список заблокированных ресурсов
+	# Обрабатываем список заблокированных доменов
 	# Удаляем лишнее и преобразуем доменные имена содержащие международные символы в формат Punycode
 	[[ -n "$(compgen -G 'download/*domain.txt')" ]] && \
 	sed -n 's/^[[:punct:]]\+//; s/[[:punct:]]\+$//; /\./{s/.*/\L&/; /^[а-яa-z0-9.-]\+$/{/[^.]\{64\}/!p}}' download/*domain.txt \
 	| CHARSET=UTF-8 idn --no-tld >> temp/include-hosts.txt
 
-	# Удаляем домены казино и букмекеров
+	# Удаляем спам домены
 	if [[ "$CLEAR_HOSTS" == 'y' ]]; then
 		grep -Evi '[ck]a+[szc3]+[iley1]+n+[0-9o]|[vw][uy]+[l1]+[kc]a+n|[vw]a+[vw]+a+d+a|x-*bet|most-*bet|leon-*bet|rio-*bet|mel-*bet|ramen-*bet|marathon-*bet|max-*bet|bet-*win|gg-*bet|spin-*bet|banzai-*bet|1iks-*bet|x-*slot|sloto-*zal|max-*slot|bk-*leon|gold-*fishka|play-*fortuna|dragon-*money|poker-*dom|1-*win|crypto-*bos|free-*spin|fair-*spin|no-*deposit|igrovye|avtomaty|bookmaker|slottica|sykaaa|admiral-*x|x-*admiral|pin-*up|pari-*match|betting|partypoker|jackpot|bonus|azino[0-9-]|888-*starz|zooma[0-9-]|zenit-*bet|eldorado|slots|vodka|new-?retro|platinum|igrat|flagman|arkada|vpn|proxy|diplom|attestat|kupit|pra[vw]a|svidetelstv[ao]|armada|spra[vw]k[ai]|black-*sprut|zooma|^1[^0-9]{5}\.' temp/include-hosts.txt | sort -u > temp/include-hosts2.txt
 	else
 		sort -u temp/include-hosts.txt > temp/include-hosts2.txt
 	fi
 
-	# Удаляем не существующие домены
+	# Удаляем лишние домены
 	comm -13 temp/remove-hosts.txt temp/include-hosts2.txt > temp/include-hosts3.txt
 	comm -13 temp/remove-hosts.txt temp/exclude-hosts.txt > result/exclude-hosts.txt
 
