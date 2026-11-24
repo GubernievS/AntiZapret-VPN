@@ -57,7 +57,6 @@ function M.layer.produce(state, req, pkt)
 	if not qry
 		or qry.flags.CACHED -- Skip cached answers
 		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
-		-- or req.options.TCP -- Skip policy.TLS_FORWARD
 		then
 		return state
 	end
@@ -76,7 +75,6 @@ function M.layer.consume(state, req, pkt)
 	if not qry
 		or qry.flags.CACHED -- Skip cached answers
 		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
-		-- or req.options.TCP -- Skip policy.TLS_FORWARD
 		then
 		return state
 	end
@@ -98,7 +96,6 @@ function M.layer.reset(state, req)
 	if not qry
 		or qry.flags.CACHED -- Skip cached answers
 		or not qry.flags.FORWARD -- Only policy.FORWARD / policy.TLS_FORWARD
-		-- or req.options.TCP -- Skip policy.TLS_FORWARD
 		or req.count_fail_row == 0 then
 		return state
 	end
