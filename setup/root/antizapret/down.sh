@@ -90,8 +90,8 @@ iptables -w -D FORWARD -o $VPN_WARP_INTERFACE -m conntrack --ctstate NEW -m hash
 iptables -w -D FORWARD -o $ANTIZAPRET_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-antizapret-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 iptables -w -D FORWARD -o $DNS_WARP_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-name warp-dns-new --hashlimit-above 1000/sec --hashlimit-burst 1 --hashlimit-htable-expire 1000 -j DROP
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m conntrack --ctstate NEW -m hashlimit --hashlimit-name antizapret-new --hashlimit-mode srcip --hashlimit-above 10/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -p udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp --dport 53 -m tcp --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p udp -m udp --dport 53 -m hashlimit --hashlimit-name antizapret-dns-udp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp -m tcp --dport 53 --tcp-flags PSH PSH -m hashlimit --hashlimit-name antizapret-dns-tcp --hashlimit-mode srcip --hashlimit-above 100/sec --hashlimit-burst 1000 --hashlimit-htable-expire 10000 -j DROP
 
 # Restrict forwarding
 iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1/0x1 -m set ! --match-set antizapret-forward dst -j DROP
@@ -100,8 +100,8 @@ iptables -w -D FORWARD -s $IP.29.0.0/16 -m connmark --mark 0x1/0x1 -m set ! --ma
 iptables -w -D FORWARD -s $IP.28.0.0/15 -m set --match-set antizapret-drop dst -j DROP
 
 # Client and server isolation
-iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
-iptables -w -D INPUT -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p tcp -m tcp ! --dport 53 -j DROP
+iptables -w -D INPUT -s $IP.28.0.0/15 -p udp -m udp ! --dport 53 -j DROP
 
 # Attack protection
 iptables -w -D INPUT -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
@@ -116,25 +116,25 @@ ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --
 ip6tables -w -D INPUT -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist
 
 # SSH protection
-iptables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
-ip6tables -w -D INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
+iptables -w -D INPUT -p tcp -m tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-ssh --hashlimit-htable-expire 60000 -j DROP
+ip6tables -w -D INPUT -p tcp -m tcp --dport ssh -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 5/hour --hashlimit-burst 5 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-ssh6 --hashlimit-htable-expire 60000 -j DROP
 
 # Scan protection
-iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
-iptables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
-iptables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p icmp --icmp-type port-unreachable -j DROP
-ip6tables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
-ip6tables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p tcp --tcp-flags RST RST -j DROP
-ip6tables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type port-unreachable -j DROP
+iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmp -m icmp --icmp-type echo-request -j DROP
+iptables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p tcp -m tcp --tcp-flags RST RST -j DROP
+iptables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p icmp -m icmp --icmp-type port-unreachable -j DROP
+ip6tables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -p icmpv6 -m icmpv6 --icmpv6-type echo-request -j DROP
+ip6tables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p tcp -m tcp --tcp-flags RST RST -j DROP
+ip6tables -w -t raw -D OUTPUT -o $DEFAULT_INTERFACE -p icmpv6 -m icmpv6 --icmpv6-type port-unreachable -j DROP
 
 # Deny input
 iptables -w -t raw -D PREROUTING -i $DEFAULT_INTERFACE -m set --match-set antizapret-deny src -j DROP
 
 # Clamp TCP MSS
-iptables -w -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-iptables -w -t mangle -D OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-ip6tables -w -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-ip6tables -w -t mangle -D OUTPUT ! -o lo -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+iptables -w -t mangle -D FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+iptables -w -t mangle -D OUTPUT ! -o lo -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -D FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -w -t mangle -D OUTPUT ! -o lo -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
 # NOTRACK loopback
 iptables -w -t raw -D PREROUTING -i lo -j NOTRACK
@@ -143,38 +143,38 @@ ip6tables -w -t raw -D PREROUTING -i lo -j NOTRACK
 ip6tables -w -t raw -D OUTPUT -o lo -j NOTRACK
 
 # OpenVPN TCP port redirection for backup connections
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 80 -j REDIRECT --to-ports 50080
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 443 -j REDIRECT --to-ports 50443
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 504 -j REDIRECT --to-ports 50443
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp --dport 508 -j REDIRECT --to-ports 50080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 50080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 50443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 504 -j REDIRECT --to-ports 50443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 508 -j REDIRECT --to-ports 50080
 
 # OpenVPN UDP port redirection for backup connections
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 80 -j REDIRECT --to-ports 50080
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 443 -j REDIRECT --to-ports 50443
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 504 -j REDIRECT --to-ports 50443
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 508 -j REDIRECT --to-ports 50080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 80 -j REDIRECT --to-ports 50080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 443 -j REDIRECT --to-ports 50443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 504 -j REDIRECT --to-ports 50443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 508 -j REDIRECT --to-ports 50080
 
 # WireGuard/AmneziaWG port redirection for backup connections
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 540 -j REDIRECT --to-ports 51443
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 580 -j REDIRECT --to-ports 51080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 540 -j REDIRECT --to-ports 51443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 580 -j REDIRECT --to-ports 51080
 
 # AmneziaWG redirection ports to WireGuard
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52080 -j REDIRECT --to-ports 51080
-iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp --dport 52443 -j REDIRECT --to-ports 51443
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52080 -j REDIRECT --to-ports 51080
+iptables -w -t nat -D PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52443 -j REDIRECT --to-ports 51443
 
 # AntiZapret DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.1.1.1
-iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.1.1.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p udp -m udp --dport 53 -j DNAT --to-destination 127.1.1.1
+iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 -p tcp -m tcp --dport 53 -j DNAT --to-destination 127.1.1.1
 
 # VPN DNS redirection to Knot Resolver
-iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p udp --dport 53 -j DNAT --to-destination 127.2.2.2
-iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p tcp --dport 53 -j DNAT --to-destination 127.2.2.2
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p udp -m udp --dport 53 -j DNAT --to-destination 127.2.2.2
+iptables -w -t nat -D PREROUTING -s $IP.28.0.0/16 -p tcp -m tcp --dport 53 -j DNAT --to-destination 127.2.2.2
 
 # Block DoT/DoQ
-iptables -w -t raw -D PREROUTING -s $IP.28.0.0/15 -p tcp --dport 853 -j DROP
-iptables -w -t raw -D PREROUTING -s $IP.28.0.0/15 -p udp --dport 853 -j DROP
-iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p tcp --dport 853 -j DROP
-iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p udp --dport 853 -j DROP
+iptables -w -t raw -D PREROUTING -s $IP.28.0.0/15 -p tcp -m tcp --dport 853 -j DROP
+iptables -w -t raw -D PREROUTING -s $IP.28.0.0/15 -p udp -m udp --dport 853 -j DROP
+iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p tcp -m tcp --dport 853 -j DROP
+iptables -w -t raw -D PREROUTING -s $IP.29.0.0/16 -p udp -m udp --dport 853 -j DROP
 
 # Restrict forwarding
 iptables -w -t nat -D PREROUTING -s $IP.29.0.0/16 ! -d $FAKE_IP.0.0/15 -j CONNMARK --set-xmark 0x1/0x1
