@@ -194,29 +194,29 @@ ip6tables -w -t raw -A OUTPUT -o lo -j NOTRACK
 
 # OpenVPN TCP port redirection for backup connections
 if [[ "$OPENVPN_BACKUP_TCP" == 'y' ]]; then
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 50080
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 50443
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 504 -j REDIRECT --to-ports 50443
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 508 -j REDIRECT --to-ports 50080
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 80 -j DNAT --to-destination :50080
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 443 -j DNAT --to-destination :50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 504 -j DNAT --to-destination :50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p tcp -m tcp --dport 508 -j DNAT --to-destination :50080
 fi
 
 # OpenVPN UDP port redirection for backup connections
 if [[ "$OPENVPN_BACKUP_UDP" == 'y' ]]; then
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 80 -j REDIRECT --to-ports 50080
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 443 -j REDIRECT --to-ports 50443
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 504 -j REDIRECT --to-ports 50443
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 508 -j REDIRECT --to-ports 50080
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 80 -j DNAT --to-destination :50080
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 443 -j DNAT --to-destination :50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 504 -j DNAT --to-destination :50443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 508 -j DNAT --to-destination :50080
 fi
 
 # WireGuard/AmneziaWG port redirection for backup connections
 if [[ "$WIREGUARD_BACKUP" == 'y' ]]; then
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 540 -j REDIRECT --to-ports 51443
-	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 580 -j REDIRECT --to-ports 51080
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 540 -j DNAT --to-destination :51443
+	iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 580 -j DNAT --to-destination :51080
 fi
 
 # AmneziaWG redirection ports to WireGuard
-iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52080 -j REDIRECT --to-ports 51080
-iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52443 -j REDIRECT --to-ports 51443
+iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52080 -j DNAT --to-destination :51080
+iptables -w -t nat -A PREROUTING -i $DEFAULT_INTERFACE -p udp -m udp --dport 52443 -j DNAT --to-destination :51443
 
 # AntiZapret DNS redirection to Knot Resolver
 iptables -w -t nat -A PREROUTING -s $IP.29.0.0/16 -p udp -m udp --dport 53 -j DNAT --to-destination 127.1.1.1
