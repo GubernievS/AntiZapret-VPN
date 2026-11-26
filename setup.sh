@@ -88,8 +88,7 @@ if [[ -z "$DEFAULT_INTERFACE" ]]; then
 	exit 9
 fi
 
-DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')" || true
-if [[ -z "$DEFAULT_IP" ]]; then
+if [[ -z "$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')" ]]; then
 	echo 'Default IPv4 address not found!'
 	exit 10
 fi
@@ -174,10 +173,10 @@ until [[ "$WARP_PROTECTION" =~ (y|n) ]]; do
 	read -rp 'Enable WARP protection? [y/n]: ' -e -i y WARP_PROTECTION
 done
 echo
-echo 'Enter empty to set default endpoint'
-read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
+echo 'Enter empty to set default endpoint (engage.cloudflareclient.com:2408)'
+read -rp 'Custom Cloudflare WARP endpoint (ip:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
 until [[ -z "$WARP_ENDPOINT" || "$WARP_ENDPOINT" =~ ^[^:]+:[0-9]+$ ]]; do
-	read -rp 'Custom Cloudflare WARP endpoint (host:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
+	read -rp 'Custom Cloudflare WARP endpoint (ip:port): ' -e -i "162.159.192.$((RANDOM % 254 + 1)):500" WARP_ENDPOINT
 done
 echo
 echo -e 'Choose DNS resolvers for \e[1;32mAntiZapret VPN\e[0m (antizapret-*):'
@@ -356,6 +355,21 @@ echo
 #	read -rp $'Include Akamai IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n AKAMAI_INCLUDE
 #done
 #echo
+read -rp 'Enter default input/output IP or press Enter to auto-detect: ' -e DEFAULT_IP
+until [[ -z "$DEFAULT_IP" || -n $(getent ahostsv4 "$DEFAULT_IP") ]]; do
+	read -rp 'Enter default input/output IP or press Enter to auto-detect: ' -e DEFAULT_IP
+done
+echo
+read -rp $'Enter \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 out IP or press Enter to auto-detect: ' -e ANTIZAPRET_OUT_IP
+until [[ -z "$ANTIZAPRET_OUT_IP" || -n $(getent ahostsv4 "$ANTIZAPRET_OUT_IP") ]]; do
+	read -rp $'Enter \001\e[1;32m\002AntiZapret VPN\001\e[0m\002 out IP or press Enter to auto-detect: ' -e ANTIZAPRET_OUT_IP
+done
+echo
+read -rp $'Enter \001\e[1;32m\002full VPN\001\e[0m\002 out IP or press Enter to auto-detect: ' -e VPN_OUT_IP
+until [[ -z "$VPN_OUT_IP" || -n $(getent ahostsv4 "$VPN_OUT_IP") ]]; do
+	read -rp $'Enter \001\e[1;32m\002full VPN\001\e[0m\002 out IP or press Enter to auto-detect: ' -e VPN_OUT_IP
+done
+echo
 echo 'Installation, please wait...'
 
 # Остановим и выключим обновляемые службы
@@ -630,11 +644,11 @@ OVH_INCLUDE=$OVH_INCLUDE
 GOOGLE_INCLUDE=$GOOGLE_INCLUDE
 AKAMAI_INCLUDE=$AKAMAI_INCLUDE
 DEFAULT_INTERFACE=
-DEFAULT_IP=
+DEFAULT_IP=$DEFAULT_IP
 ANTIZAPRET_OUT_INTERFACE=
-ANTIZAPRET_OUT_IP=
+ANTIZAPRET_OUT_IP=$ANTIZAPRET_OUT_IP
 VPN_OUT_INTERFACE=
-VPN_OUT_IP=
+VPN_OUT_IP=$VPN_OUT_IP
 CLIENT_IP=
 FAKE_IP=" > /tmp/antizapret/setup/root/antizapret/setup
 
