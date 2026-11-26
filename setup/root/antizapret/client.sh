@@ -22,15 +22,18 @@ if (( $# > 3 )); then
 	exit 2
 fi
 
-SERVER_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
-if [[ -z "$SERVER_IP" ]]; then
-	echo 'Default IPv4 address not found!'
-	exit 3
-fi
-
 export EASYRSA_PKI=/etc/openvpn/easyrsa3/pki
 cd /root/antizapret
 source setup
+
+if [[ -z "$DEFAULT_IP" ]]; then
+	DEFAULT_IP="$(ip route get 1.2.3.4 2>/dev/null | grep -oP 'src \K\S+')"
+	if [[ -z "$DEFAULT_IP" ]]; then
+		echo 'Default IPv4 address not found!'
+		exit 3
+	fi
+fi
+
 umask 022
 OPTION="$1"
 CLIENT_NAME="$2"
@@ -58,7 +61,7 @@ askClientCertExpire(){
 
 setServerHost_FileName(){
 	if [[ -z "$1" ]]; then
-		SERVER_HOST="$SERVER_IP"
+		SERVER_HOST="$DEFAULT_IP"
 	else
 		SERVER_HOST="$1"
 	fi
@@ -365,7 +368,7 @@ backup(){
 	cp /etc/knot-resolver/custom*.lua /etc/knot-resolver/renumber*.lua /root/antizapret/backup/knot-resolver || true
 	cp /root/antizapret/custom*.sh /root/antizapret/backup/custom || true
 
-	BACKUP_FILE="/root/antizapret/backup-$SERVER_IP.tar.gz"
+	BACKUP_FILE="/root/antizapret/backup-$DEFAULT_IP.tar.gz"
 	tar -czf $BACKUP_FILE -C /root/antizapret/backup easyrsa3 wireguard config knot-resolver custom
 	tar -tzf $BACKUP_FILE >/dev/null
 
