@@ -1314,6 +1314,9 @@ cards.scryfall.io
 bytesroute.com
 yahoo.com
 cra.cz
+cimediacloud.com
+sony.net
+ndmdhs.com
 
 # Сертификаты
 #letsencrypt.org
