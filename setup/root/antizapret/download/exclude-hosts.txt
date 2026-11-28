@@ -16,5 +16,6 @@ fonts.googleapis.com
 ip.hetzner.com
 checkip.amazonaws.com
 redirector.googlevideo.com
+redirector.gvt1.com
 2ip.ua
 # НЕ РЕДАКТИРУЙТЕ ЭТОТ ФАЙЛ!
