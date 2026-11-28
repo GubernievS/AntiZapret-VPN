@@ -1,4 +1,5 @@
 -- Fallback on a bad answer from policy.FORWARD
+-- Load this module before cache: modules = { 'fallback < cache' }
 
 local ffi = require('ffi')
 local kres = require('kres')
@@ -23,10 +24,8 @@ local function do_fallback(state, req, qry)
 	local qname = kres.dname2str(qry.sname)
 	log_debug(ffi.C.LOG_GRP_POLICY, '          fallback \'%s\'', qname)
 
-	-- Reset cache
-	event.after(0, function()
-		cache.clear(qname, true)
-	end)
+	-- Do not cache this bad answer
+	qry.flags.PKT_IS_SANE = false
 
 	-- Reset current records
 	if qry.cname_parent == nil then
